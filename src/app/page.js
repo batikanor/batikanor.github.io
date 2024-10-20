@@ -265,32 +265,68 @@ export default function Home() {
     }
   }, [gameMode, planePosition]);
 
-  // Markers for the globe
   const markers = useMemo(
     () => [
       {
         lat: 41.0082, // Istanbul
         lng: 28.9784,
-        label: "BSc Computer Science, Turkish German University",
-        size: 15, // Increased size from 10 to 15
+        label: "School & Achievements in Istanbul",
+        size: 15,
         color: "red",
-        description:
-          "Studied BSc Computer Science at the Turkish German University in Istanbul.",
+        description: `School:<br/>- BSc Computer Engineering, Turkish-German University<br/><br/>Achievements in Istanbul:<br/>- Developed Upnotify Bot (2021)<br/>- Mentored Quantum Programming Workshop (2021)<br/>- Worked on data mining projects (2020-2023)<br/>- 3rd Place at BESTIstanbul Big Data Solutions Hackathon (2019)`,
       },
       {
         lat: 48.1351, // Munich
         lng: 11.582,
-        label: "MSc Informatics, Technical University of Munich",
-        size: 15, // Increased size from 10 to 15
+        label: "School & Achievements in Munich",
+        size: 20,
         color: "blue",
-        description:
-          "Currently pursuing MSc Informatics at the Technical University of Munich.",
+        description: `School:<br/>- MSc Informatics, Technical University of Munich<br/><br/>Achievements in Munich:<br/>- 1st Place at Thüga Solutions Hackathon (2024)<br/>- 2nd Place (team) & 1st Place (individual) at TUM AI Makeathon (2024)<br/>- 1st Place at EthMunich Hackathon (2023)`,
       },
-      // Add more markers here as needed
+      {
+        lat: 47.3769, // Zurich
+        lng: 8.5417,
+        label: "Achievements in Zurich",
+        size: 20,
+        color: "green",
+        description: `Achievements:<br/>- 1st Place & Audience Award at SwissHacks (2024)`,
+      },
+      {
+        lat: 41.3851, // Barcelona
+        lng: 2.1734,
+        label: "Achievements in Barcelona",
+        size: 20,
+        color: "orange",
+        description: `Achievements:<br/>- 3rd Place at HackUPC Main Challenge (2024)`,
+      },
+      {
+        lat: 51.3397, // Leipzig
+        lng: 12.3731,
+        label: "Achievements in Leipzig",
+        size: 20,
+        color: "purple",
+        description: `Achievements:<br/>- 2nd Place at DSAG Ideathon Leipzig (2024)`,
+      },
+      {
+        lat: 49.0069, // Karlsruhe
+        lng: 8.4037,
+        label: "Achievements in Karlsruhe",
+        size: 20,
+        color: "yellow",
+        description: `Achievements:<br/>- 1st Place at MSG Code & Create Hackathon (2023)`,
+      },
+      {
+        lat: 53.8655, // Lübeck
+        lng: 10.6866,
+        label: "Achievements in Lübeck",
+        size: 20,
+        color: "pink",
+        description: `Achievements:<br/>- 2nd Place at Dräger Hackathon (2023)`,
+      },
     ],
     []
   );
-
+  
   // Generate arcs between markers
   const arcs = useMemo(
     () =>
@@ -671,7 +707,7 @@ export default function Home() {
               // Arcs properties
               arcsData={arcs}
               arcColor="color"
-              arcStroke={1.5}
+              arcStroke={0.5}
               arcDashLength={0.25}
               arcDashGap={0.2}
               arcDashInitialGap={() => Math.random()}
@@ -776,17 +812,16 @@ export default function Home() {
             <h2 className="text-xl font-semibold">
               {hoveredMarker.label}
             </h2>
-            <p className="mt-2">{hoveredMarker.description}</p>
+            <p className="mt-2" dangerouslySetInnerHTML={{ __html: hoveredMarker.description }} />
           </div>
         )}
+
 
         {/* Modal Popup for Marker Click */}
         {clickedMarker && (
           <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
             <div className="bg-gray-800 rounded-lg p-6 text-white max-w-md mx-auto">
-              <p className="text-lg font-semibold">
-                {clickedMarker.description}
-              </p>
+              <p className="text-lg font-semibold" dangerouslySetInnerHTML={{ __html: clickedMarker.description }} />
               <button
                 className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
                 onClick={() => setClickedMarker(null)}
