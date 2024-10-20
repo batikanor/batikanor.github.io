@@ -16,7 +16,7 @@ export default function Navbar() {
       <div className="container mx-auto flex justify-between items-center py-4 px-6">
         {/* Logo */}
         <Link href="/">
-          <span className="text-2xl font-bold cursor-pointer">Batikan Bora Ormanci</span>
+          <span className="text-2xl font-bold cursor-pointer">Batıkan Bora Ormancı</span>
         </Link>
 
         {/* Desktop Navigation */}

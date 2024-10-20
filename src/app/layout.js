@@ -1,7 +1,7 @@
 import localFont from 'next/font/local';
 import './globals.css';
 import Navbar from '../components/Navbar';
-// import Footer from '../components/Footer'; // Uncomment if you have a Footer component
+import Footer from '../components/Footer';
 
 const geistSans = localFont({
   src: './fonts/GeistVF.woff',
@@ -23,28 +23,36 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
-      <body className="antialiased">
+      <body className="antialiased flex flex-col min-h-screen">
         {/* Header */}
-        <header>
+        <header className="bg-white dark:bg-gray-800 shadow">
           <Navbar />
         </header>
 
         {/* Main Content Area */}
-        <div className="min-h-screen grid grid-cols-1 lg:grid-cols-5">
+        <div className="flex-1 flex flex-col lg:flex-row">
           {/* Left Sidebar */}
-          <aside className="hidden lg:block bg-green-800 lg:col-span-1"></aside>
+          <aside className="hidden lg:block lg:w-1/5 bg-gray-100 dark:bg-gray-900 p-4">
+            {/* Add content here */}
+          </aside>
 
           {/* Main Content */}
-          <main className="lg:col-span-3 p-6 sm:p-12 bg-gray-50 dark:bg-gray-900">
+          <main className="flex-1 p-6 sm:p-12 bg-white dark:bg-gray-800">
             {children}
           </main>
 
           {/* Right Sidebar */}
-          <aside className="hidden lg:block bg-gray-700 lg:col-span-1"></aside>
+          <aside className="hidden lg:block lg:w-1/5 bg-gray-100 dark:bg-gray-900 p-4">
+            {/* Add content here */}
+          </aside>
         </div>
 
         {/* Footer */}
-        {/* <Footer /> */}
+        <footer className="bg-white dark:bg-gray-800 shadow">
+          <Footer />
+        </footer>
+        <br/>
+
       </body>
     </html>
   );

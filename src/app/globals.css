@@ -17,6 +17,7 @@
 }
 
 body {
+  @apply antialiased flex flex-col min-h-screen;
   background-color: var(--background);
   color: var(--foreground);
   font-family: var(--font-geist-sans), sans-serif;
@@ -30,9 +31,30 @@ a {
   transition: color 0.2s ease-in-out;
 }
 
-/* Utility for balanced text wrapping */
+/* Utility for balanced text wrapping and layout styles */
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+
+  /* Layout Utility Classes */
+  .layout-header {
+    @apply bg-white dark:bg-gray-800 shadow;
+  }
+
+  .layout-main {
+    @apply flex-1 flex flex-col lg:flex-row;
+  }
+
+  .layout-aside {
+    @apply hidden lg:block lg:w-1/5 bg-gray-100 dark:bg-gray-900 p-4;
+  }
+
+  .layout-content {
+    @apply flex-1 p-6 sm:p-12 bg-white dark:bg-gray-800;
+  }
+
+  .layout-footer {
+    @apply bg-white dark:bg-gray-800 shadow;
   }
 }
