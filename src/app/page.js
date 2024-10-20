@@ -358,7 +358,7 @@ export default function Home() {
           onClick={() => setGameMode((prev) => !prev)}
           className="mb-4 px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600 transition"
         >
-          {gameMode ? "End Game" : "Play Tic-Tac-Toe in Antarctica"}
+          {gameMode ? "End Tic-Tac-Toe Game" : "Play Tic-Tac-Toe in Antarctica"}
         </button>
 
         {/* Display Current Player */}

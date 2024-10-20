@@ -21,7 +21,8 @@ const GlobeWrapper = ({ onGlobeLoad, ...props }) => {
     if (globeRef.current) {
       // Set the initial point of view to focus on Antarctica
       globeRef.current.pointOfView(
-        { lat: -90, lng: 0, altitude: 3 }, // Adjust altitude as needed
+        { lat: 41.0082, lng: 28.9784, altitude: 2 }, // Focus on Istanbul. altitude shows how much we zoom in
+        // { lat: -90, lng: 0, altitude: 3 }, // Adjust altitude as needed
         1000 // Animation duration in milliseconds
       );
 
