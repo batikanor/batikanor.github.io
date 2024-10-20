@@ -1,15 +1,12 @@
-/* Import Tailwind's base, components, and utilities */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Global variables for light/dark mode */
 :root {
   --background: #ffffff;
   --foreground: #171717;
 }
 
-/* Dark mode color scheme */
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
@@ -17,17 +14,21 @@
   }
 }
 
-/* Base styling for the entire document */
 body {
-  background-color: var(--background); /* Adapts to light/dark mode */
-  color: var(--foreground); /* Text color adapts to light/dark mode */
-  font-family: var(--font-geist-sans); /* Custom font applied */
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans);
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-/* Apply a utility for balanced text wrapping */
+/* Modern hover effect on links */
+a {
+  transition: color 0.2s ease-in-out;
+}
+
+/* Utility for balanced text wrapping */
 @layer utilities {
   .text-balance {
     text-wrap: balance;
