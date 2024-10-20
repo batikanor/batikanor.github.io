@@ -25,6 +25,15 @@ const nextConfig = {
     images: {
       unoptimized: true,
     },
+    async redirects() {
+      return [
+        {
+          source: '/google',
+          destination: 'https://google.com',
+          permanent: true,  // Use `false` if you want a temporary redirect
+        },
+      ];
+    },
   };
   
   export default nextConfig;
