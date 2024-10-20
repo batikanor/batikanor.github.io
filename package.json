@@ -12,6 +12,7 @@
     "@heroicons/react": "^2.1.5",
     "@react-three/drei": "^9.114.6",
     "@react-three/fiber": "^8.17.10",
+    "lodash": "^4.17.21",
     "next": "14.2.15",
     "react": "^18",
     "react-dom": "^18",
