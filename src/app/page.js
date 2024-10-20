@@ -1,5 +1,5 @@
-// src/app/page.js
 "use client";
+
 import dynamic from "next/dynamic";
 import React, {
   useEffect,
@@ -9,22 +9,50 @@ import React, {
 } from "react";
 import { debounce } from "lodash";
 
-// Step 2: Dynamically import the GlobeWrapper component without ref forwarding
+// Dynamically import the GlobeWrapper component without server-side rendering
 const Globe = dynamic(() => import("../components/GlobeWrapper"), { ssr: false });
 
 export default function Home() {
+  // State to ensure client-side rendering
   const [isClient, setIsClient] = useState(false);
+
+  // Refs
   const globeContainerRef = useRef(null);
   const globeEl = useRef();
+
+  // State for container dimensions
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+
+  // State for marker interactions
   const [clickedMarker, setClickedMarker] = useState(null);
   const [hoveredMarker, setHoveredMarker] = useState(null);
-  const [gameMode, setGameMode] = useState(false); // Game mode state
-  const [gameBoard, setGameBoard] = useState(Array(9).fill(null)); // 3x3 Tic Tac Toe
+
+  // Game mode state
+  // Possible values: 'ticTacToe', 'planeCollectCoins', false
+  const [gameMode, setGameMode] = useState(false);
+
+  // Tic-Tac-Toe game state
+  const [gameBoard, setGameBoard] = useState(Array(9).fill(null));
   const [currentPlayer, setCurrentPlayer] = useState("X");
   const [winner, setWinner] = useState(null);
 
-  // Corrected GeoJSON data for Custom Polygons Layer with proper hexagons
+  // Plane Collect Coins game state
+  const [planePosition, setPlanePosition] = useState({ lat: 55.7558, lng: 37.6173 }); // Moscow, Russia
+  const [keysPressed, setKeysPressed] = useState({
+    w: false,
+    a: false,
+    s: false,
+    d: false,
+  });
+  const animationFrameRef = useRef();
+
+  // Coins state
+  const [coins, setCoins] = useState([]);
+  const [collectedCoins, setCollectedCoins] = useState(0);
+  const [gameStartTime, setGameStartTime] = useState(null);
+  const [elapsedTime, setElapsedTime] = useState(0);
+
+  // Sample GeoJSON data for Egypt positioned polygons (3x3 grid)
   const sampleGeoJson = useMemo(
     () => ({
       type: "FeatureCollection",
@@ -32,54 +60,54 @@ export default function Home() {
         // Row 1
         {
           type: "Feature",
-          properties: { name: "Antarctica", index: 0 },
+          properties: { name: "Egypt", index: 0 },
           geometry: {
             type: "Polygon",
             coordinates: [
               [
-                [10, -75],
-                [12, -73],
-                [15, -73],
-                [17, -75],
-                [15, -77],
-                [12, -77],
-                [10, -75],
+                [24.5, 24.5],
+                [25.5, 25.4],
+                [26.5, 24.5],
+                [26.5, 23.6],
+                [25.5, 22.7],
+                [24.5, 23.6],
+                [24.5, 24.5],
               ],
             ],
           },
         },
         {
           type: "Feature",
-          properties: { name: "Antarctica", index: 1 },
+          properties: { name: "Egypt", index: 1 },
           geometry: {
             type: "Polygon",
             coordinates: [
               [
-                [20, -75],
-                [22, -73],
-                [25, -73],
-                [27, -75],
-                [25, -77],
-                [22, -77],
-                [20, -75],
+                [26.5, 24.5],
+                [27.5, 25.4],
+                [28.5, 24.5],
+                [28.5, 23.6],
+                [27.5, 22.7],
+                [26.5, 23.6],
+                [26.5, 24.5],
               ],
             ],
           },
         },
         {
           type: "Feature",
-          properties: { name: "Antarctica", index: 2 },
+          properties: { name: "Egypt", index: 2 },
           geometry: {
             type: "Polygon",
             coordinates: [
               [
-                [30, -75],
-                [32, -73],
-                [35, -73],
-                [37, -75],
-                [35, -77],
-                [32, -77],
-                [30, -75],
+                [28.5, 24.5],
+                [29.5, 25.4],
+                [30.5, 24.5],
+                [30.5, 23.6],
+                [29.5, 22.7],
+                [28.5, 23.6],
+                [28.5, 24.5],
               ],
             ],
           },
@@ -87,54 +115,54 @@ export default function Home() {
         // Row 2
         {
           type: "Feature",
-          properties: { name: "Antarctica", index: 3 },
+          properties: { name: "Egypt", index: 3 },
           geometry: {
             type: "Polygon",
             coordinates: [
               [
-                [10, -80],
-                [12, -78],
-                [15, -78],
-                [17, -80],
-                [15, -82],
-                [12, -82],
-                [10, -80],
+                [24.5, 26.5],
+                [25.5, 27.4],
+                [26.5, 26.5],
+                [26.5, 25.6],
+                [25.5, 24.7],
+                [24.5, 25.6],
+                [24.5, 26.5],
               ],
             ],
           },
         },
         {
           type: "Feature",
-          properties: { name: "Antarctica", index: 4 },
+          properties: { name: "Egypt", index: 4 },
           geometry: {
             type: "Polygon",
             coordinates: [
               [
-                [20, -80],
-                [22, -78],
-                [25, -78],
-                [27, -80],
-                [25, -82],
-                [22, -82],
-                [20, -80],
+                [26.5, 26.5],
+                [27.5, 27.4],
+                [28.5, 26.5],
+                [28.5, 25.6],
+                [27.5, 24.7],
+                [26.5, 25.6],
+                [26.5, 26.5],
               ],
             ],
           },
         },
         {
           type: "Feature",
-          properties: { name: "Antarctica", index: 5 },
+          properties: { name: "Egypt", index: 5 },
           geometry: {
             type: "Polygon",
             coordinates: [
               [
-                [30, -80],
-                [32, -78],
-                [35, -78],
-                [37, -80],
-                [35, -82],
-                [32, -82],
-                [30, -80],
+                [28.5, 26.5],
+                [29.5, 27.4],
+                [30.5, 26.5],
+                [30.5, 25.6],
+                [29.5, 24.7],
+                [28.5, 25.6],
+                [28.5, 26.5],
               ],
             ],
           },
@@ -142,54 +170,54 @@ export default function Home() {
         // Row 3
         {
           type: "Feature",
-          properties: { name: "Antarctica", index: 6 },
+          properties: { name: "Egypt", index: 6 },
           geometry: {
             type: "Polygon",
             coordinates: [
               [
-                [10, -85],
-                [12, -83],
-                [15, -83],
-                [17, -85],
-                [15, -87],
-                [12, -87],
-                [10, -85],
+                [24.5, 28.5],
+                [25.5, 29.4],
+                [26.5, 28.5],
+                [26.5, 27.6],
+                [25.5, 26.7],
+                [24.5, 27.6],
+                [24.5, 28.5],
               ],
             ],
           },
         },
         {
           type: "Feature",
-          properties: { name: "Antarctica", index: 7 },
+          properties: { name: "Egypt", index: 7 },
           geometry: {
             type: "Polygon",
             coordinates: [
               [
-                [20, -85],
-                [22, -83],
-                [25, -83],
-                [27, -85],
-                [25, -87],
-                [22, -87],
-                [20, -85],
+                [26.5, 28.5],
+                [27.5, 29.4],
+                [28.5, 28.5],
+                [28.5, 27.6],
+                [27.5, 26.7],
+                [26.5, 27.6],
+                [26.5, 28.5],
               ],
             ],
           },
         },
         {
           type: "Feature",
-          properties: { name: "Antarctica", index: 8 },
+          properties: { name: "Egypt", index: 8 },
           geometry: {
             type: "Polygon",
             coordinates: [
               [
-                [30, -85],
-                [32, -83],
-                [35, -83],
-                [37, -85],
-                [35, -87],
-                [32, -87],
-                [30, -85],
+                [28.5, 28.5],
+                [29.5, 29.4],
+                [30.5, 28.5],
+                [30.5, 27.6],
+                [29.5, 26.7],
+                [28.5, 27.6],
+                [28.5, 28.5],
               ],
             ],
           },
@@ -199,7 +227,7 @@ export default function Home() {
     []
   );
 
-  // This ensures the Globe is only rendered on the client-side
+  // Ensure the Globe is only rendered on the client-side
   useEffect(() => {
     setIsClient(true);
   }, []);
@@ -212,17 +240,32 @@ export default function Home() {
     }
   }, [isClient]);
 
-  // Set the point of view when the globe component is ready
+  // Set the point of view based on game mode
   useEffect(() => {
     if (globeEl.current) {
-      globeEl.current.pointOfView(
-        { lat: -90, lng: 0, altitude: 3 }, // Focus on Antarctica with higher altitude for better visibility
-        1000
-      );
+      if (gameMode === "planeCollectCoins") {
+        // Focus on plane's current position when Plane Collect Coins is active
+        globeEl.current.pointOfView(
+          { lat: planePosition.lat, lng: planePosition.lng, altitude: 2 },
+          1000
+        );
+      } else if (gameMode === "ticTacToe") {
+        // Focus on Egypt when Tic-Tac-Toe is active
+        globeEl.current.pointOfView(
+          { lat: 26, lng: 30, altitude: 2 }, // Egypt coordinates
+          1000
+        );
+      } else {
+        // Default view (Istanbul)
+        globeEl.current.pointOfView(
+          { lat: 41.0082, lng: 28.9784, altitude: 2 }, // Istanbul coordinates
+          1000
+        );
+      }
     }
-  }, [globeEl]);
+  }, [gameMode, planePosition]);
 
-  // Markers for the globe with increased size and adjusted altitude
+  // Markers for the globe
   const markers = useMemo(
     () => [
       {
@@ -292,18 +335,14 @@ export default function Home() {
 
     for (let line of lines) {
       const [a, b, c] = line;
-      if (
-        board[a] &&
-        board[a] === board[b] &&
-        board[a] === board[c]
-      ) {
+      if (board[a] && board[a] === board[b] && board[a] === board[c]) {
         return board[a];
       }
     }
     return null;
   };
 
-  // Handle hexagon clicks for the game
+  // Handle polygon (hexagon) clicks for Tic-Tac-Toe
   const handleHexagonClick = (hexIndex) => {
     if (winner || gameBoard[hexIndex]) return; // Ignore if game over or cell occupied
 
@@ -327,6 +366,11 @@ export default function Home() {
     setCurrentPlayer("X");
     setWinner(null);
     setGameMode(false);
+    setPlanePosition({ lat: 55.7558, lng: 37.6173 }); // Reset plane to Moscow
+    setCoins([]);
+    setCollectedCoins(0);
+    setElapsedTime(0);
+    setGameStartTime(null);
   };
 
   // Helper function to get the center of a polygon
@@ -334,12 +378,191 @@ export default function Home() {
     const coordinates = geometry.coordinates[0];
     const latitudes = coordinates.map((coord) => coord[1]);
     const longitudes = coordinates.map((coord) => coord[0]);
-    const lat =
-      latitudes.reduce((a, b) => a + b, 0) / latitudes.length;
-    const lng =
-      longitudes.reduce((a, b) => a + b, 0) / longitudes.length;
+    const lat = latitudes.reduce((a, b) => a + b, 0) / latitudes.length;
+    const lng = longitudes.reduce((a, b) => a + b, 0) / longitudes.length;
     return { lat, lng };
   };
+
+  // Generate 20 random coins on the globe
+  const generateRandomCoins = () => {
+    const newCoins = [];
+    for (let i = 0; i < 20; i++) {
+      const lat = Math.random() * 180 - 90; // Latitude between -90 and 90
+      const lng = Math.random() * 360 - 180; // Longitude between -180 and 180
+      newCoins.push({ lat, lng, id: i });
+    }
+    setCoins(newCoins);
+  };
+
+  // Handle Plane Movement with WASD using Continuous Movement
+  useEffect(() => {
+    if (gameMode !== "planeCollectCoins") return;
+
+    const speed = 0.9; // Degrees per frame
+
+    const updatePlanePosition = () => {
+      let { lat, lng } = planePosition;
+      let moved = false;
+
+      if (keysPressed.w) {
+        lat += speed;
+        if (lat > 90) lat = 90;
+        moved = true;
+      }
+      if (keysPressed.s) {
+        lat -= speed;
+        if (lat < -90) lat = -90;
+        moved = true;
+      }
+      if (keysPressed.a) {
+        lng -= speed;
+        if (lng < -180) lng += 360;
+        moved = true;
+      }
+      if (keysPressed.d) {
+        lng += speed;
+        if (lng > 180) lng -= 360;
+        moved = true;
+      }
+
+      if (moved) {
+        setPlanePosition({ lat, lng });
+        if (globeEl.current) {
+          globeEl.current.pointOfView(
+            { lat, lng, altitude: 2 },
+            500
+          );
+        }
+
+        // Check for coin collection
+        setCoins((prevCoins) => {
+          const remainingCoins = prevCoins.filter((coin) => {
+            const distance = Math.sqrt(
+              Math.pow(coin.lat - lat, 2) +
+              Math.pow(coin.lng - lng, 2)
+            );
+            if (distance < 10) { // Threshold distance for collection
+              setCollectedCoins((prev) => prev + 1);
+              return false; // Remove the coin
+            }
+            return true;
+          });
+          return remainingCoins;
+        });
+      }
+
+      animationFrameRef.current = requestAnimationFrame(updatePlanePosition);
+    };
+
+    // Start the animation loop
+    animationFrameRef.current = requestAnimationFrame(updatePlanePosition);
+
+    // Clean up on unmount or game mode change
+    return () => {
+      cancelAnimationFrame(animationFrameRef.current);
+    };
+  }, [gameMode, keysPressed, planePosition]);
+
+  // Keyboard event handlers for continuous movement
+  useEffect(() => {
+    if (gameMode !== "planeCollectCoins") return;
+
+    const handleKeyDown = (e) => {
+      const key = e.key.toLowerCase();
+      if (["w", "a", "s", "d"].includes(key)) {
+        e.preventDefault();
+        setKeysPressed((prev) => ({ ...prev, [key]: true }));
+      }
+    };
+
+    const handleKeyUp = (e) => {
+      const key = e.key.toLowerCase();
+      if (["w", "a", "s", "d"].includes(key)) {
+        e.preventDefault();
+        setKeysPressed((prev) => ({ ...prev, [key]: false }));
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keyup", handleKeyUp);
+
+    // Clean up
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("keyup", handleKeyUp);
+    };
+  }, [gameMode]);
+
+  // Plane Marker
+  const planeMarker = useMemo(
+    () => ({
+      lat: planePosition.lat,
+      lng: planePosition.lng,
+      label: "✈️", // Plane emoji
+      size: 20, // Larger size for visibility
+      color: "orange",
+      description: "You are flying the plane!",
+    }),
+    [planePosition]
+  );
+
+  // Coin Markers
+  const coinMarkers = useMemo(
+    () => coins.map((coin) => ({
+      lat: coin.lat,
+      lng: coin.lng,
+      label: "🪙", // Coin emoji
+      size: 10, // Size for coins
+      color: "yellow",
+      description: "A shiny coin to collect!",
+      id: coin.id,
+    })),
+    [coins]
+  );
+
+  // All markers including the plane and coins
+  const allMarkers = useMemo(() => {
+    if (gameMode === "planeCollectCoins") {
+      return [...markers, planeMarker, ...coinMarkers];
+    }
+    return markers;
+  }, [markers, gameMode, planeMarker, coinMarkers]);
+
+  // Timer Effect
+  useEffect(() => {
+    let timerInterval;
+
+    if (gameMode === "planeCollectCoins") {
+      if (!gameStartTime) {
+        setGameStartTime(Date.now());
+      }
+
+      timerInterval = setInterval(() => {
+        setElapsedTime(Date.now() - (gameStartTime || Date.now()));
+      }, 1000);
+    }
+
+    return () => {
+      if (timerInterval) clearInterval(timerInterval);
+    };
+  }, [gameMode, gameStartTime]);
+
+  // Start Plane Collect Coins Game
+  const startPlaneGame = () => {
+    setGameMode("planeCollectCoins");
+    setCollectedCoins(0);
+    setElapsedTime(0);
+    setGameStartTime(Date.now());
+    generateRandomCoins();
+  };
+
+  // Check if all coins are collected
+  useEffect(() => {
+    if (gameMode === "planeCollectCoins" && coins.length === 0 && collectedCoins === 20) {
+      // Player has collected all coins
+      setGameMode(false);
+    }
+  }, [coins, collectedCoins, gameMode]);
 
   return (
     <div>
@@ -353,16 +576,32 @@ export default function Home() {
           <p className="text-xl sm:text-2xl mt-4">Batıkan Bora Ormancı</p>
         </header>
 
-        {/* Toggle Button for Game */}
-        <button
-          onClick={() => setGameMode((prev) => !prev)}
-          className="mb-4 px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600 transition"
-        >
-          {gameMode ? "End Tic-Tac-Toe Game" : "Play Tic-Tac-Toe in Antarctica"}
-        </button>
+        {/* Toggle Buttons for Games */}
+        <div className="flex flex-wrap space-x-4 mb-4 justify-center">
+          <button
+            onClick={() => setGameMode("ticTacToe")}
+            className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-purple-600 transition m-2"
+          >
+            Play Tic-Tac-Toe in Egypt
+          </button>
+          <button
+            onClick={startPlaneGame}
+            className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-green-600 transition m-2"
+          >
+            Play Plane Collect Coins (WIP)
+          </button>
+          {gameMode && (
+            <button
+              onClick={() => resetGame()}
+              className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition m-2"
+            >
+              Exit Game
+            </button>
+          )}
+        </div>
 
-        {/* Display Current Player */}
-        {gameMode && !winner && (
+        {/* Display Current Player or Instructions */}
+        {gameMode === "ticTacToe" && !winner && (
           <div className="mb-4 text-lg sm:text-xl font-semibold">
             Current Player:{" "}
             <span
@@ -375,6 +614,23 @@ export default function Home() {
           </div>
         )}
 
+        {gameMode === "planeCollectCoins" && (
+          <div className="mb-4 text-lg sm:text-xl font-semibold text-center">
+            <p>
+              Use <span className="font-mono">W</span> (Up),{" "}
+              <span className="font-mono">A</span> (Left),{" "}
+              <span className="font-mono">S</span> (Down),{" "}
+              <span className="font-mono">D</span> (Right) to fly the plane.
+            </p>
+            <p className="mt-2">
+              Collected Coins: {collectedCoins} / 20
+            </p>
+            <p className="mt-2">
+              Time Elapsed: {(elapsedTime / 1000).toFixed(1)} seconds
+            </p>
+          </div>
+        )}
+
         {/* Spinnable Earth - Render only on the client */}
         {isClient && (
           <div
@@ -382,12 +638,19 @@ export default function Home() {
             className="relative w-full max-w-2xl h-[700px] sm:h-[800px] md:h-[900px]"
           >
             <Globe
-              ref={globeEl}
+              onGlobeLoad={(globe) => {
+                globeEl.current = globe;
+              }}
+              initialView={
+                gameMode === "planeCollectCoins"
+                  ? { lat: planePosition.lat, lng: planePosition.lng, altitude: 2 }
+                  : undefined // Let GlobeWrapper handle initialView for other modes
+              }
               width={dimensions.width}
               height={dimensions.height}
               globeImageUrl="//unpkg.com/three-globe/example/img/earth-blue-marble.jpg"
               backgroundColor="rgba(0,0,0,0)"
-              pointsData={markers}
+              pointsData={allMarkers}
               pointSize={(point) =>
                 hoveredMarker && hoveredMarker.label === point.label
                   ? point.size + 5
@@ -411,7 +674,7 @@ export default function Home() {
               arcDashAnimateTime={1500}
               arcsTransitionDuration={0}
               // Custom Polygons Layer
-              polygonsData={gameMode ? sampleGeoJson.features : []}
+              polygonsData={gameMode === "ticTacToe" ? sampleGeoJson.features : []}
               polygonCapColor={(d) =>
                 d.properties.index !== undefined
                   ? gameBoard[d.properties.index]
@@ -423,16 +686,23 @@ export default function Home() {
               }
               polygonSideColor={() => "rgba(0, 0, 0, 0.1)"}
               polygonStrokeColor={() => "#000"}
-              polygonAltitude={(d) =>
-                d.properties.index !== undefined
-                  ? gameBoard[d.properties.index]
-                    ? 0.02
-                    : 0.01
-                  : 0
-              }
+              polygonAltitude={(d) => {
+                if (d.properties.index === undefined) return 0;
+
+                // Extract the latitude from the polygon's geometry
+                // Using the center latitude for better accuracy
+                const { lat } = getPolygonCenter(d.geometry);
+                const latitudeRadians = (lat * Math.PI) / 180;
+                const scalingFactor = Math.cos(latitudeRadians);
+
+                // Determine altitude based on game state and apply scaling
+                return gameBoard[d.properties.index]
+                  ? 0.02 * scalingFactor
+                  : 0.01 * scalingFactor;
+              }}
               polygonResolution={6} // Ensures hexagonal shape
               onPolygonClick={(polygon, event, coords) => {
-                if (gameMode) {
+                if (gameMode === "ticTacToe") {
                   const hexIndex = polygon.properties.index;
                   handleHexagonClick(hexIndex);
                 }
@@ -442,7 +712,7 @@ export default function Home() {
               }}
             />
             {/* Overlay for Game Symbols */}
-            {gameMode && (
+            {gameMode === "ticTacToe" && (
               <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
                 {sampleGeoJson.features.map((feature, index) => {
                   const { lat, lng } = getPolygonCenter(feature.geometry);
@@ -484,6 +754,18 @@ export default function Home() {
           </div>
         )}
 
+        {/* Overlay UI for Plane Collect Coins */}
+        {gameMode === "planeCollectCoins" && (
+          <div className="absolute top-0 left-0 w-full h-full pointer-events-none flex flex-col items-center justify-start p-4">
+            <div className="bg-gray-800 bg-opacity-70 text-white px-4 py-2 rounded mb-2">
+              Collected Coins: {collectedCoins} / 20
+            </div>
+            <div className="bg-gray-800 bg-opacity-70 text-white px-4 py-2 rounded">
+              Time Elapsed: {(elapsedTime / 1000).toFixed(1)} seconds
+            </div>
+          </div>
+        )}
+
         {/* Side Bubble for Hovered Marker */}
         {hoveredMarker && (
           <div className="fixed top-1/2 right-4 transform -translate-y-1/2 bg-gray-800 text-white p-6 rounded-lg shadow-lg max-w-xs z-50 transition-opacity duration-300">
@@ -511,14 +793,31 @@ export default function Home() {
           </div>
         )}
 
-        {/* Winner Notification */}
-        {winner && (
+        {/* Winner Notification for Tic-Tac-Toe */}
+        {winner && gameMode === "ticTacToe" && (
           <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
             <div className="bg-gray-800 rounded-lg p-6 text-white max-w-md mx-auto text-center">
               <h2 className="text-2xl font-semibold mb-4">
                 {winner === "Draw"
                   ? "It's a Draw!"
                   : `Player ${winner} Wins!`}
+              </h2>
+              <button
+                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                onClick={() => resetGame()}
+              >
+                Play Again
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Winner Notification for Plane Collect Coins */}
+        {gameMode === false && collectedCoins >= 20 && (
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+            <div className="bg-gray-800 rounded-lg p-6 text-white max-w-md mx-auto text-center">
+              <h2 className="text-2xl font-semibold mb-4">
+                Congratulations! You collected all coins in {(elapsedTime / 1000).toFixed(1)} seconds.
               </h2>
               <button
                 className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
