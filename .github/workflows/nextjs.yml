@@ -21,6 +21,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      
+      # Install pnpm globally to ensure it's available for the whole process
+      - name: Install pnpm
+        run: npm install -g pnpm
+
       - name: Detect package manager
         id: detect-package-manager
         run: |
@@ -43,17 +52,6 @@ jobs:
             echo "Unable to determine package manager"
             exit 1
           fi
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-          cache: ${{ steps.detect-package-manager.outputs.manager }}
-
-      # Install pnpm if detected
-      - name: Install pnpm
-        if: ${{ steps.detect-package-manager.outputs.manager == 'pnpm' }}
-        run: npm install -g pnpm
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
