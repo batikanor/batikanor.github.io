@@ -66,16 +66,16 @@ export default function Navbar() {
             <Link href="/">
               <span className="hover:text-gray-400 transition duration-200 cursor-pointer">Home</span>
             </Link>
-            <Link href="/blog">
+            {/* <Link href="/blog">
               <span className="hover:text-gray-400 transition duration-200 cursor-pointer">Blog</span>
             </Link>
             <Link href="/about">
               <span className="hover:text-gray-400 transition duration-200 cursor-pointer">About</span>
-            </Link>
+            </Link> */}
             <Link href="/cv">
               <span className="hover:text-gray-400 transition duration-200 cursor-pointer">CV</span>
             </Link>
-            <Link href="/contact">
+            {/* <Link href="/contact">
               <span className="hover:text-gray-400 transition duration-200 cursor-pointer">Contact</span>
             </Link>
             <Link href="/projects">
@@ -83,7 +83,7 @@ export default function Navbar() {
             </Link>
             <Link href="/demo">
               <span className="hover:text-gray-400 transition duration-200 cursor-pointer">Demo</span>
-            </Link>
+            </Link> */}
           </div>
         </div>
       )}

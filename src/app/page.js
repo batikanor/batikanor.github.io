@@ -570,6 +570,10 @@ export default function Home() {
         {/* Header and Menu */}
         <header className="text-center">
           <br />
+          <br />
+          <br />
+          <br />
+
           <h1 className="text-5xl sm:text-7xl font-bold tracking-tight">
             Batikanor
           </h1>
