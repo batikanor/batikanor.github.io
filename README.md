@@ -3,7 +3,8 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 ## Other commands
 remove built files
 `rm -rf .nextx`
-run before production
+`pnpm add packagename`
+`pnpm dev`
 `pnpm build` 
 `pnpm lint`
 ## Getting Started
