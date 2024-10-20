@@ -4,9 +4,7 @@ import Link from 'next/link';
 import { FaGithub, FaLinkedin, FaEnvelope } from 'react-icons/fa';
 
 export default function Footer() {
-  return (
-    // <nav className="bg-black text-white fixed top-0 left-0 right-0 z-50 shadow-md">
-    
+  return (    
     <footer className="bg-white dark:bg-gray-800 fixed bottom-3 left-0 right-0 z-50 shadow-inner">
       <div className="container mx-auto px-6 py-4 flex flex-col md:flex-row justify-between items-center">
         <p className="text-gray-600 dark:text-gray-300 text-sm">
