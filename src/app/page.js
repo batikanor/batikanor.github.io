@@ -5,9 +5,13 @@ import React, { useEffect, useState, useRef, forwardRef } from "react";
 // Dynamically import the Globe component and forward the ref
 const Globe = dynamic(
   () =>
-    import("react-globe.gl").then((mod) =>
-      forwardRef((props, ref) => <mod.default {...props} ref={ref} />)
-    ),
+    import("react-globe.gl").then((mod) => {
+      const GlobeComponent = forwardRef((props, ref) => (
+        <mod.default {...props} ref={ref} />
+      ));
+      GlobeComponent.displayName = "Globe";
+      return GlobeComponent;
+    }),
   { ssr: false }
 );
 
