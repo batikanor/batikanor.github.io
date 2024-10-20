@@ -1,3 +1,5 @@
+/* eslint-disable react/no-unescaped-entities */
+
 // src/app/cv/en/page.js
 export default function CvRedirect() {
     if (typeof window !== 'undefined') {
