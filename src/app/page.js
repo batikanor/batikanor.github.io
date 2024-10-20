@@ -577,7 +577,7 @@ export default function Home() {
           <h1 className="text-5xl sm:text-7xl font-bold tracking-tight">
             Batikanor
           </h1>
-          <p className="text-xl sm:text-2xl mt-4">Batıkan Bora Ormancı</p>
+          <p className="text-xl sm:text-m mt-4">Welcome! There isn't much going on here, so to learn more about me, just send a message on LinkedIn!</p>
         </header>
 
         {/* Toggle Buttons for Games */}
@@ -842,6 +842,10 @@ export default function Home() {
           pronounced the way &quot;e&quot; is pronounced while saying
           &quot;folder&quot;.
         </p>
+        <br/>
+        <br/>
+        <br/>
+
       </main>
     </div>
   );
