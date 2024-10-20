@@ -36,7 +36,7 @@ export default function RootLayout({ children }) {
           <div className="hidden lg:block bg-green-800 w-1/5"></div>
 
           {/* Main content section with more noticeable rounding and shadow */}
-          <main className="flex-1 p-8 sm:p-16 bg-gray-50 dark:bg-gray-800 rounded-2xl shadow-2xl z-10 relative lg:-mx-8">
+          <main className="flex-1 p-8 sm:p-16 bg-gray-50 dark:bg-gray-800 rounded-2xl    z-10 relative lg:-mx-8">
             {children}
           </main>
 
