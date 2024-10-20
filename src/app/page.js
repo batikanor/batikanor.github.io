@@ -1,3 +1,5 @@
+/* eslint-disable react/no-unescaped-entities */
+
 "use client";
 
 import dynamic from "next/dynamic";
@@ -873,10 +875,11 @@ export default function Home() {
 
         {/* Description Content */}
         <p className="text-center max-w-lg text-base sm:text-lg leading-relaxed">
-          The fourth letter of my name &quot;ı&quot; (i without a dot) is
-          pronounced the way &quot;e&quot; is pronounced while saying
-          &quot;folder&quot;.
+          The fourth letter of my name &apos;ı&apos; (i without a dot) is
+          pronounced the way &apos;e&apos; is pronounced while saying
+          &apos;folder&apos;.
         </p>
+
         <br/>
         <br/>
         <br/>
