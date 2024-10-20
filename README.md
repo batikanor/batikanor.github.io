@@ -1,9 +1,13 @@
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
+## Other commands
+remove built files
+`rm -rf .nextx`
+run before production
+`pnpm build` 
 ## Getting Started
 
 First, run the development server:
-
 ```bash
 npm run dev
 # or

@@ -23,7 +23,7 @@ export default function Home() {
 
       {/* Example description content */}
       <p className="text-center max-w-lg">
-        The fourth letter of my name "ı" (i without a dot) is pronounced the way "e" is pronounced while saying "folder".
+        The fourth letter of my name &quot;ı&quot; (i without a dot) is pronounced the way &quot;e&quot; is pronounced while saying &quot;folder&quot;.
       </p>
     </div>
   );
