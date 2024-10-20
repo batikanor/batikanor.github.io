@@ -15,10 +15,12 @@
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans);
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
+
 
 @layer utilities {
   .text-balance {
