@@ -1,8 +1,7 @@
 "use client";
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function CV() {
-  const iframeRef = useRef(null);
   const [scale, setScale] = useState(1);
   const [isMobile, setIsMobile] = useState(false);
 
@@ -13,7 +12,7 @@ export default function CV() {
 
       if (!isMobileDevice) {
         const cvWidth = 816; // Original CV width in pixels
-        const cvHeight = 1056; // Original CV height in pixels
+        const cvHeight = 700; // Original CV height in pixels
 
         const availableWidth = window.innerWidth;
         const availableHeight = window.innerHeight;
@@ -36,36 +35,27 @@ export default function CV() {
 
   return (
     <main className="flex flex-col items-center justify-center min-h-screen p-4">
+      <br/>
       <h1 className="text-4xl font-bold mb-4">Curriculum Vitae</h1>
       {isMobile ? (
-        // Fullscreen iframe for mobile devices
-        <iframe
-          ref={iframeRef}
-          src="https://docs.google.com/document/d/e/2PACX-1vTI_n0Epv5KdWd5cO9d_78Lbvzvpb2gN7IqtrOPrYEpLHBd9islycKCqAk3BoDcH0fEOMzypmLvVQan/pub?embedded=true"
-          style={{
-            width: '100%',
-            height: '100vh',
-            border: 'none',
-          }}
-          title="My CV"
-        ></iframe>
+        // Do not show CV on mobile, just show the download button or a message
+        <p className="text-center mb-4">Please download my CV below.</p>
       ) : (
         // Scaled iframe for larger screens
         <div
           className="overflow-hidden"
           style={{
             width: `${816 * scale}px`,
-            height: `${1056 * scale}px`,
+            height: `${1400 * scale}px`,
           }}
         >
           <iframe
-            ref={iframeRef}
             src="https://docs.google.com/document/d/e/2PACX-1vTI_n0Epv5KdWd5cO9d_78Lbvzvpb2gN7IqtrOPrYEpLHBd9islycKCqAk3BoDcH0fEOMzypmLvVQan/pub?embedded=true"
             style={{
               transform: `scale(${scale})`,
               transformOrigin: 'top left',
               width: '816px',
-              height: '1056px',
+              height: '3056px',
               border: 'none',
             }}
             title="My CV"
