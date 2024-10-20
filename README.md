@@ -5,6 +5,7 @@ remove built files
 `rm -rf .nextx`
 run before production
 `pnpm build` 
+`pnpm lint`
 ## Getting Started
 
 First, run the development server:
