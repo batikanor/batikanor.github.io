@@ -1,23 +1,31 @@
-"use client"
+"use client";
 import { useState, useEffect, useRef } from 'react';
 
 export default function CV() {
   const iframeRef = useRef(null);
   const [scale, setScale] = useState(1);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     const handleResize = () => {
-      const cvWidth = 816; // Original CV width in pixels
-      const cvHeight = 1056; // Original CV height in pixels
+      const isMobileDevice = window.innerWidth <= 768; // Adjust breakpoint as needed
+      setIsMobile(isMobileDevice);
 
-      const availableWidth = window.innerWidth;
-      const availableHeight = window.innerHeight;
+      if (!isMobileDevice) {
+        const cvWidth = 816; // Original CV width in pixels
+        const cvHeight = 1056; // Original CV height in pixels
 
-      const widthScale = availableWidth / cvWidth;
-      const heightScale = availableHeight / cvHeight;
-      const newScale = Math.min(widthScale, heightScale);
+        const availableWidth = window.innerWidth;
+        const availableHeight = window.innerHeight;
 
-      setScale(newScale);
+        const widthScale = availableWidth / cvWidth;
+        const heightScale = availableHeight / cvHeight;
+        const newScale = Math.min(widthScale, heightScale);
+
+        setScale(newScale);
+      } else {
+        setScale(1);
+      }
     };
 
     handleResize();
@@ -28,28 +36,42 @@ export default function CV() {
 
   return (
     <main className="flex flex-col items-center justify-center min-h-screen p-4">
-
-      <h1 className="text-4xl font-bold mb-4">My CV</h1>
-      <div
-        className="overflow-hidden"
-        style={{
-          width: `${816 * scale}px`,
-          height: `${1056 * scale}px`,
-        }}
-      >
+      <h1 className="text-4xl font-bold mb-4">Curriculum Vitae</h1>
+      {isMobile ? (
+        // Fullscreen iframe for mobile devices
         <iframe
           ref={iframeRef}
           src="https://docs.google.com/document/d/e/2PACX-1vTI_n0Epv5KdWd5cO9d_78Lbvzvpb2gN7IqtrOPrYEpLHBd9islycKCqAk3BoDcH0fEOMzypmLvVQan/pub?embedded=true"
           style={{
-            transform: `scale(${scale})`,
-            transformOrigin: 'top left',
-            width: '816px',
-            height: '1056px',
+            width: '100%',
+            height: '100vh',
             border: 'none',
           }}
           title="My CV"
         ></iframe>
-      </div>
+      ) : (
+        // Scaled iframe for larger screens
+        <div
+          className="overflow-hidden"
+          style={{
+            width: `${816 * scale}px`,
+            height: `${1056 * scale}px`,
+          }}
+        >
+          <iframe
+            ref={iframeRef}
+            src="https://docs.google.com/document/d/e/2PACX-1vTI_n0Epv5KdWd5cO9d_78Lbvzvpb2gN7IqtrOPrYEpLHBd9islycKCqAk3BoDcH0fEOMzypmLvVQan/pub?embedded=true"
+            style={{
+              transform: `scale(${scale})`,
+              transformOrigin: 'top left',
+              width: '816px',
+              height: '1056px',
+              border: 'none',
+            }}
+            title="My CV"
+          ></iframe>
+        </div>
+      )}
       <a
         href="https://docs.google.com/document/d/1ZVQcdNvOR46HBUCtVy6XKFOXocRYL9-TR_LLrRfJ2T8/export?format=pdf"
         download
