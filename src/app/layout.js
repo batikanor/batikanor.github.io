@@ -28,7 +28,6 @@ export default function RootLayout({ children }) {
         <header className="bg-white dark:bg-gray-800 shadow fixed top-0 left-0 right-0 z-50">
           <Navbar />
         </header>
-
         <div className="flex-1 flex flex-col lg:flex-row mt-[4rem]"> {/* Adjust the top margin */}
           {/* Left Sidebar */}
           <aside className="hidden lg:block lg:w-1/5 bg-gray-100 dark:bg-gray-900 p-4">
