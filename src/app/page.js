@@ -755,7 +755,7 @@ export default function Home() {
         )}
 
         {/* Overlay UI for Plane Collect Coins */}
-        {gameMode === "planeCollectCoins" && (
+        {/* {gameMode === "planeCollectCoins" && (
           <div className="absolute top-0 left-0 w-full h-full pointer-events-none flex flex-col items-center justify-start p-4">
             <div className="bg-gray-800 bg-opacity-70 text-white px-4 py-2 rounded mb-2">
               Collected Coins: {collectedCoins} / 20
@@ -764,7 +764,7 @@ export default function Home() {
               Time Elapsed: {(elapsedTime / 1000).toFixed(1)} seconds
             </div>
           </div>
-        )}
+        )} */}
 
         {/* Side Bubble for Hovered Marker */}
         {hoveredMarker && (
