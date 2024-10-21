@@ -117,6 +117,113 @@ const contestsAndActivities = [
     ],
 
   },
+  {
+    title: "2nd Place (team) & 1st Place (individual) at TUM AI Makeathon Main Challenge (Sponsor: Reply S.p.A.)",
+    location: "Munich/Germany",
+    date: "04/2024",
+    shortDescription: `Wind Turbine Preventive Maintenance Through Reinforcement Learning  (Role: RL Developer, Presenter)`,
+    longDescription: `The challenge given on the hackathon was called “Predictive Maintenance on Wind Turbine Data”.
+We started with cleaning and preprocessing the dataset provided by Reply S.p.A, available at govdata.de. We realised that it didn’t have any potential for turbine fault / maintenance prediction, and just like many other teams, we looked at alternative approaches.
+We first used standard q-learning on a very basic setting of a wind turbine maintenance problem, where we had 2 states (working, broken) and 2 actions (maintain, leave it be). I created a fullstack app (flask+react) to better visualise this during the pitch. Our first system showed an agent learning the ideal maintenance schedule for making sure turbines are productive and profitable. We then created a more sophisticated setting where the state had more detailed information such as rotor speed and orientation, observation space had wind speed and direction, power output, noise output, and current energy demand; and action space involved rotor orientation (cont.), alongside maintenance/start/stop actions. We implemented the second setting in an interactive environment and didn’t have the time to build a full-stack app to better display it. Also, most of the data we used were just stochastic (yet interdependent and somewhat realistic). For our second setting we used Proximal Policy Optimization (PPO) through stable_baselines_3, for we didn’t have enough time to consider other options (our team had a total working time of 24 hrs and it was just me and another teammate who worked on RL aspects). Despite that, we could successfully present positive outcomes.
+We also did web-scraping with Selenium to get more data regarding each turbine given in the original dataset, and argued that the data from there could be integrated into the complete system later on.
+We got second place as a team in the main track, and I personally got 1st place in the individual sidetrack of the same company, where the task was mainly pre-processing. They thought I deserved the reward due to the nice visualisations I provided and the novel way of decreasing ‘unique value’ count of some features through creating embedding similarity matrices and providing most-similar pairs to LLM’s to eventually retrieve pre-processing code for these columns.
+As a team, we think our solution was the best amongst all submissions, but we prepared the pitch very late and even though it was said that our pitch was great, we couldn’t focus a lot on the business aspects of the project, which we will pay more attention to in our future projects.
+We got invited to the company’s Munich office to further discuss our findings.
+`,
+    links: [
+      { label: "Github repo", url: "https://github.com/batikanor/predictive-maintenaince-wind-power" },
+      { label: "Proof of participation", url: "https://drive.google.com/file/d/1mm8m518Vt0QAB05JSVW61tzl9Pwt9bb0/view?usp=sharing" },
+
+    ],
+    technologies: ["Python Flask", "ReactJS"],
+    gdrive_embed: [
+      "https://docs.google.com/presentation/d/1S3xRlTyYaJTQ3EfpPzmKcZr36jvNNIkaytn5SEXGUqo/edit#slide=id.p",
+    ],
+
+  },
+  {
+    title: "Proof of Concept: Detecting line-breaks in football matches",
+    location: "Munich/Germany",
+    date: "01/2024",
+    shortDescription: `3D Visualization of football players as spheres during a live match, clustering them into lines and detecting line breaks, predictive analysis, providing an intuitive UI for configuration (Role: FullStack Developer).`,
+    longDescription: `We focused on the line breaks during football matches. We worked on clustering the players in lines, determining when lines (offensive/defensive) have been broken, predicting when line breaks are expected to come, and considering how this information can be used to evaluate game performance. We built a 3D Visualisation app of football players as spheres during a live match, clustering them into lines and counting line breaks, providing an intuitive UI for configuration. We also used classical data mining methods such as XGBoost, Random Forest, Shapley etc to conduct further predictive analysis. We worked on a special confidential cluster to which we don’t have access anymore, and we cannot share some other details due to the confidentiality clause.`,
+    links: [
+      { label: "Slide deck (too large to directly embed)", url: "https://docs.google.com/presentation/d/1yYBJeLSaPj4yY4KfLBv8zaDL6jK6daeF/edit?usp=sharing&ouid=108923877595249603456&rtpof=true&sd=true" },
+
+    ],
+    technologies: ["Python Flask", "ReactJS", "ThreeJS"],
+    gdrive_embed: [
+      // "https://docs.google.com/presentation/d/1yYBJeLSaPj4yY4KfLBv8zaDL6jK6daeF/edit?usp=sharing&ouid=108923877595249603456&rtpof=true&sd=true",
+    ],
+
+  },
+  {
+    title: "2nd Place at Dräger hackathon",
+    location: "Lübeck/Germany",
+    date: "10/2023",
+    shortDescription: `Predicting heart attacks through sensor readings (Role: AI Engineer).`,
+    longDescription: `Dräger produces technologies for medicine and security. Using the VitalDB dataset where there is a great count of sensor readings of thousands of patients available online, we modelled and trained an AI model that can predict whether there’ll be a ‘shock’ in the coming 30 seconds / 2.5 minutes / 5 minutes. We reached test accuracies ranging from 70% to 90% using the methods we developed, and demonstrated them live using the aforementioned monitor. We had a doctor in the team who guided us towards measuring shock index (SI) as HRT / ART_SBP. For predictions we experimented with different models, but within the limited time and without access to GPUs, we could only prepare our LSTM model in time (even on that model we had made simple training mistakes, which we could only -to some extent- fix in the last minutes of the event), with which we reached the aforementioned accuracies. We also had working code to extract frequency information from some sensor readings using Mexican hat wavelet transformations, but even though we made use of as much multithreading as we could think, we couldn’t transform all the necessary data within the given time. We also had trouble finding pretrained autoencoders/embedders with which we could embed the data in order to put it into more explainable models. My role in the team was mainly participating in AI brainstorming sessions and trying to implement respective transformations and hopefully run explainable models. The jury and other Dräger employers especially praised our team for demonstrating ‘order in chaos’ and shared expertise on the domain. The source code is confidential and thus cannot be shared here.`,
+    links: [
+      { label: "Sample dräger monitor", url: "https://i.imgur.com/YhTbGY8.jpg" },
+      { label: "VitalDB dataset", url: "https://vitaldb.net/dataset/?query=overview"},
+      { label: "Sample prediction graph", url: "https://i.imgur.com/LPN3kpk.png"},
+
+
+    ],
+    technologies: ["LSTMs", "XGBoost"],
+    gdrive_embed: [
+      "https://drive.google.com/file/d/14iqBE66SjUpp2y6eFLHI8hOeCDtHZ8sh/view?usp=sharing",
+    ],
+
+  },
+  {
+    title: "1st Place (Main Track) at the first Ethereum-focused hackathon in Munich.",
+    location: "TUM, Germany & PretzelDAO, Germany",
+    date: "08/2023",
+    shortDescription: `Built an NFT similarity judging tool (Role: Team Lead).`,
+    longDescription: `We programmed an NFT similarity detective assistant which took not only the rarities of certain attributes to consideration but also the embeddings of the description (via Bert)  and contents (via ResNet) of the images. We used various machine learning methods to present the user with a multitude of options and won the AI main track of the hackathon. We also won the Gateway.fm bounty award.`,
+    links: [
+      { label: "Github repository", url: "https://github.com/batikanor/ethmunich-gate" },
+      { label: "Devfolio page", url: "https://devfolio.co/projects/nft-similarity-detective-d8ef"},
+      { label: "POAP", url: "https://app.poap.xyz/token/6759252"},
+      { label: "NFT Proof for victory", url: "https://opensea.io/assets/arbitrum/0x020c3A900fdBd33795d709e2b40a1f3510fBe1Fc/18"}
+
+
+    ],
+    technologies: ["Gateway FM RPC", "Python"],
+    gdrive_embed: [
+      "https://drive.google.com/file/d/1-3hcEi9acIWug8ZNo0yoYe5UMrjzdTOE/view?usp=sharing",
+    ],
+
+  },
+  {
+    title: "1st Place at  MSG Code & Create Hackathon",
+    location: "TUM, Germany & PretzelDAO, Germany",
+    date: "08/2023",
+    shortDescription: `Won a hackathon organized by Münchner Softwaregesellschaft (MSG).`,
+    longDescription: `We programmed a CO-2 considering route planner called Navigo which takes into consideration self calculated metrics that we called ‘efficiency’ and ‘catastrophe score’. We aren’t hosting it live due to api costs.`,
+    links: [
+      { label: "1st Place Certificate", url: "https://www.batikanor.com/certificates/batikan/2023_msg_code_create_winner.pdf" },
+      { label: "Event video", url: "https://www.instagram.com/reel/Cvz9pn0owzz/?igshid=MTc4MmM1YmI2Ng%3D%3D"},
+    ],
+    technologies: ["Python Flask", "ReactJS"],
+    gdrive_embed: [
+      "https://drive.google.com/file/d/1xrktqeqkMM-8CWpFcZVLXR-ccGVcJvHR/view?usp=sharing",
+    ],
+
+  },
+  {
+    title: "Bachelor’s Thesis",
+    location: "Turkish-German University, Istanbul",
+    date: "2022",
+    shortDescription: `Cat identification using noseprints.`,
+    longDescription: `For the task of identification of pets and stray animals;  many methods, the ethicalness of which are questionable, are put to use. With this project, 16 different test cats (for each of which there were 4 to 20 examples) could be identified by the machine learning system using their nose images, face images or whole images with very high (99%, 100%, …) rank-1 to rank-5 accuracies without the model having been shown any example of their identity/class to the system in the training phase. Later on, the aim is to make the system more scalable and use it in end-user applications. For the project has an entrepreneurial side to it, the implementation will be kept confidential for at least a couple more years.`,
+    technologies: ["Siamese Networks", "Pytorch"],
+    gdrive_embed: [
+      "https://drive.google.com/file/d/1vkXClWm80q1e-R4MItsKIthmG21vG_4R/view?usp=sharing",
+    ],
+
+  },
 ];
 
 const ContestsAndActivities = () => {
