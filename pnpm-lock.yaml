@@ -35,6 +35,9 @@ importers:
       react-icons:
         specifier: ^5.3.0
         version: 5.3.0(react@18.3.1)
+      react-joystick-component:
+        specifier: ^6.2.1
+        version: 6.2.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       three:
         specifier: ^0.169.0
         version: 0.169.0
@@ -1568,6 +1571,12 @@ packages:
 
   react-is@16.13.1:
     resolution: {integrity: sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==}
+
+  react-joystick-component@6.2.1:
+    resolution: {integrity: sha512-0G5Y5aX4hNuXB3xJCwz6Q+nYQOtC6kprNGKmZxmfoPvhepNYUiid0DbLEGZxmr/UKip3S/LUbcQUobtRCuB8IQ==}
+    peerDependencies:
+      react: '>=17.0.2'
+      react-dom: '>=17.0.2'
 
   react-kapsule@2.4.1:
     resolution: {integrity: sha512-dAPhdUHZWbCH46lF2wHSqtJ3bdmNCYiV10v7QBgzYGAVMup/SZt6WHgP0PzURQvinVRKpq6PmsO4af1W37mQdg==}
@@ -3729,6 +3738,11 @@ snapshots:
       react: 18.3.1
 
   react-is@16.13.1: {}
+
+  react-joystick-component@6.2.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+    dependencies:
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
 
   react-kapsule@2.4.1(react@18.3.1):
     dependencies:

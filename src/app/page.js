@@ -10,6 +10,9 @@ import React, {
   useMemo,
 } from "react";
 import { debounce } from "lodash";
+import Projects from "../components/Projects"; // Adjust path based on your folder structure
+import CV from "./cv/page";
+import { Joystick } from "react-joystick-component"; // Import Joystick
 
 // Dynamically import the GlobeWrapper component without server-side rendering
 const Globe = dynamic(() => import("../components/GlobeWrapper"), { ssr: false });
@@ -53,6 +56,9 @@ export default function Home() {
   const [collectedCoins, setCollectedCoins] = useState(0);
   const [gameStartTime, setGameStartTime] = useState(null);
   const [elapsedTime, setElapsedTime] = useState(0);
+  const [triggeredMarkers, setTriggeredMarkers] = useState([]);
+
+  const [isMobile, setIsMobile] = useState(false);
 
   // Sample GeoJSON data for Egypt positioned polygons (3x3 grid)
   const sampleGeoJson = useMemo(
@@ -232,8 +238,45 @@ export default function Home() {
   // Ensure the Globe is only rendered on the client-side
   useEffect(() => {
     setIsClient(true);
+    setIsMobile(/Mobi|Android/i.test(navigator.userAgent)); // Detect mobile devices
   }, []);
+  // Handle Joystick movement
+  const handleJoystickMove = (event) => {
+    const { x, y } = event;
+    const speed = 0.2;
 
+    let { lat, lng } = planePosition;
+
+    // Correctly handle up (y > 0) and down (y < 0)
+    if (y > 0) {
+      lat += speed; // Move up when y is positive
+      if (lat > 90) lat = 90;
+    } else if (y < 0) {
+      lat -= speed; // Move down when y is negative
+      if (lat < -90) lat = -90;
+    }
+
+    // Correctly handle left (x < 0) and right (x > 0)
+    if (x < 0) {
+      lng -= speed; // Move left when x is negative
+      if (lng < -180) lng += 360;
+    } else if (x > 0) {
+      lng += speed; // Move right when x is positive
+      if (lng > 180) lng -= 360;
+    }
+
+    setPlanePosition({ lat, lng });
+  };
+
+  // Handle Joystick stop (reset movement)
+  const handleJoystickStop = () => {
+    setKeysPressed({
+      w: false,
+      a: false,
+      s: false,
+      d: false,
+    });
+  };
   // Get container dimensions after client renders
   useEffect(() => {
     if (globeContainerRef.current) {
@@ -270,14 +313,16 @@ export default function Home() {
   const markers = useMemo(
     () => [
       {
+        id: 0,
         lat: 41.0082, // Istanbul
         lng: 28.9784,
         label: "School & Achievements in Istanbul",
         size: 15,
         color: "red",
-        description: `School:<br/>- BSc Computer Engineering, Turkish-German University<br/><br/>Achievements in Istanbul:<br/>- Developed Upnotify Bot (2021)<br/>- Mentored Quantum Programming Workshop (2021)<br/>- Worked on data mining projects (2020-2023)<br/>- 3rd Place at BESTIstanbul Big Data Solutions Hackathon (2019)`,
+        description: `School:<br/>- BSc Computer Engineering, Turkish-German University<br/><br/>Achievements in Istanbul:<br/>- Mentored Quantum Programming Workshop (2021)<br/>- 3rd Place at BESTIstanbul Big Data Solutions Hackathon (2019)`,
       },
       {
+        id: 1,
         lat: 48.1351, // Munich
         lng: 11.582,
         label: "School & Achievements in Munich",
@@ -286,6 +331,7 @@ export default function Home() {
         description: `School:<br/>- MSc Informatics, Technical University of Munich<br/><br/>Achievements in Munich:<br/>- 1st Place at Thüga Solutions Hackathon (2024)<br/>- 2nd Place (team) & 1st Place (individual) at TUM AI Makeathon (2024)<br/>- 1st Place at EthMunich Hackathon (2023)`,
       },
       {
+        id: 2,
         lat: 47.3769, // Zurich
         lng: 8.5417,
         label: "Achievements in Zurich",
@@ -294,6 +340,7 @@ export default function Home() {
         description: `Achievements:<br/>- 1st Place & Audience Award at SwissHacks (2024)`,
       },
       {
+        id: 3,
         lat: 41.3851, // Barcelona
         lng: 2.1734,
         label: "Achievements in Barcelona",
@@ -302,14 +349,16 @@ export default function Home() {
         description: `Achievements:<br/>- 3rd Place at HackUPC Main Challenge (2024)`,
       },
       {
+        id: 4,
         lat: 51.3397, // Leipzig
         lng: 12.3731,
         label: "Achievements in Leipzig",
         size: 20,
         color: "purple",
-        description: `Achievements:<br/>- 2nd Place at DSAG Ideathon Leipzig (2024)`,
+        description: `Achievements:<br/>- 2nd Place at DSAG Jahreskongress AI Ideathon Leipzig (2024)`,
       },
       {
+        id: 5,
         lat: 49.0069, // Karlsruhe
         lng: 8.4037,
         label: "Achievements in Karlsruhe",
@@ -318,6 +367,7 @@ export default function Home() {
         description: `Achievements:<br/>- 1st Place at MSG Code & Create Hackathon (2023)`,
       },
       {
+        id: 6,
         lat: 53.8655, // Lübeck
         lng: 10.6866,
         label: "Achievements in Lübeck",
@@ -435,13 +485,13 @@ export default function Home() {
   // Handle Plane Movement with WASD using Continuous Movement
   useEffect(() => {
     if (gameMode !== "planeCollectCoins") return;
-
+  
     const speed = 0.9; // Degrees per frame
-
+  
     const updatePlanePosition = () => {
       let { lat, lng } = planePosition;
       let moved = false;
-
+  
       if (keysPressed.w) {
         lat += speed;
         if (lat > 90) lat = 90;
@@ -462,7 +512,7 @@ export default function Home() {
         if (lng > 180) lng -= 360;
         moved = true;
       }
-
+  
       if (moved) {
         setPlanePosition({ lat, lng });
         if (globeEl.current) {
@@ -471,7 +521,7 @@ export default function Home() {
             500
           );
         }
-
+  
         // Check for coin collection
         setCoins((prevCoins) => {
           const remainingCoins = prevCoins.filter((coin) => {
@@ -487,20 +537,32 @@ export default function Home() {
           });
           return remainingCoins;
         });
+  
+        // **New Logic: Check for Proximity to Markers**
+        markers.forEach(marker => {
+          const distance = Math.sqrt(
+            Math.pow(marker.lat - lat, 2) +
+            Math.pow(marker.lng - lng, 2)
+          );
+          if (distance < 2 && !triggeredMarkers.includes(marker.id)) {
+            setClickedMarker(marker);
+            setTriggeredMarkers(prev => [...prev, marker.id]);
+          }
+        });
       }
-
+  
       animationFrameRef.current = requestAnimationFrame(updatePlanePosition);
     };
-
+  
     // Start the animation loop
     animationFrameRef.current = requestAnimationFrame(updatePlanePosition);
-
+  
     // Clean up on unmount or game mode change
     return () => {
       cancelAnimationFrame(animationFrameRef.current);
     };
-  }, [gameMode, keysPressed, planePosition]);
-
+  }, [gameMode, keysPressed, planePosition, markers, triggeredMarkers]);
+    
   // Keyboard event handlers for continuous movement
   useEffect(() => {
     if (gameMode !== "planeCollectCoins") return;
@@ -592,8 +654,9 @@ export default function Home() {
     setElapsedTime(0);
     setGameStartTime(Date.now());
     generateRandomCoins();
+    setTriggeredMarkers([]); // Reset triggered markers
   };
-
+  
   // Check if all coins are collected
   useEffect(() => {
     if (gameMode === "planeCollectCoins" && coins.length === 0 && collectedCoins === 20) {
@@ -612,32 +675,11 @@ export default function Home() {
           <h1 className="text-5xl sm:text-7xl font-bold tracking-tight">
             Batikanor
           </h1>
-          <p className="text-xl sm:text-m mt-4">Welcome! There isn't much going on here, so to learn more about me, just send a message on LinkedIn!</p>
+          <p className="text-xl sm:text-m mt-4">Welcome!</p>
+          <p className="text-l sm:text-m mt-4">Some of my achievements are highlighted on the map below!</p>
+          <p className="text-l sm:text-m mt-4">Scroll down to learn about my past projects!</p>
         </header>
 
-        {/* Toggle Buttons for Games */}
-        <div className="flex flex-wrap space-x-4 mb-4 justify-center">
-          <button
-            onClick={() => setGameMode("ticTacToe")}
-            className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-purple-600 transition m-2"
-          >
-            Play Tic-Tac-Toe in Egypt
-          </button>
-          <button
-            onClick={startPlaneGame}
-            className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-green-600 transition m-2"
-          >
-            Play Plane Collect Coins (WIP)
-          </button>
-          {gameMode && (
-            <button
-              onClick={() => resetGame()}
-              className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition m-2"
-            >
-              Exit Game
-            </button>
-          )}
-        </div>
 
         {/* Display Current Player or Instructions */}
         {gameMode === "ticTacToe" && !winner && (
@@ -655,6 +697,7 @@ export default function Home() {
 
         {gameMode === "planeCollectCoins" && (
           <div className="mb-4 text-lg sm:text-xl font-semibold text-center">
+            <br/>
             <p>
               Use <span className="font-mono">W</span> (Up),{" "}
               <span className="font-mono">A</span> (Left),{" "}
@@ -669,7 +712,20 @@ export default function Home() {
             </p>
           </div>
         )}
-
+        {gameMode === "planeCollectCoins" && isMobile && (
+          <div
+            className="fixed bottom-10 left-1/2 transform -translate-x-1/2 z-50"
+            style={{ zIndex: 9999 }}  // Set a very high z-index to appear on top
+          >
+            <Joystick
+              size={100}
+              baseColor="gray"
+              stickColor="blue"
+              move={handleJoystickMove}
+              stop={handleJoystickStop}
+            />
+          </div>
+        )}
         {/* Spinnable Earth - Render only on the client */}
         {isClient && (
           <div
@@ -866,6 +922,30 @@ export default function Home() {
             </div>
           </div>
         )}
+        {/* Toggle Buttons for Games */}
+        <br/>
+        <div className="flex flex-wrap space-x-4 mb-4 justify-center">
+          <button
+            onClick={() => setGameMode("ticTacToe")}
+            className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-purple-600 transition m-2"
+          >
+            Play Tic-Tac-Toe in Egypt
+          </button>
+          <button
+            onClick={startPlaneGame}
+            className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-green-600 transition m-2"
+          >
+            Play Plane Collect Coins (WIP)
+          </button>
+          {gameMode && (
+            <button
+              onClick={() => resetGame()}
+              className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition m-2"
+            >
+              Exit Game
+            </button>
+          )}
+        </div>
 
         {/* Divider */}
         <hr className="w-full border-t border-gray-300 my-8" />
@@ -876,6 +956,13 @@ export default function Home() {
           pronounced the way &apos;e&apos; is pronounced while saying
           &apos;folder&apos;.
         </p>
+        <hr className="w-full border-t border-gray-300 my-8" />
+
+        <Projects />
+        <hr className="w-full border-t border-gray-300 my-8" />
+
+        <CV />
+
 
         <br/>
         <br/>

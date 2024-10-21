@@ -7,6 +7,7 @@ remove built files
 `pnpm dev`
 `pnpm build` 
 `pnpm lint`
+`pnpm dev --hostname 0.0.0.0` --> you can also test on mobile
 ## Getting Started
 
 First, run the development server:
