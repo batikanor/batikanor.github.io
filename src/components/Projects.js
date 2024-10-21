@@ -214,7 +214,7 @@ We got invited to the company’s Munich office to further discuss our findings.
   },
   {
     title: "Bachelor’s Thesis",
-    location: "Turkish-German University, Istanbul",
+    location: "Turkish-German University, Istanbul/Turkey",
     date: "2022",
     shortDescription: `Cat identification using noseprints.`,
     longDescription: `For the task of identification of pets and stray animals;  many methods, the ethicalness of which are questionable, are put to use. With this project, 16 different test cats (for each of which there were 4 to 20 examples) could be identified by the machine learning system using their nose images, face images or whole images with very high (99%, 100%, …) rank-1 to rank-5 accuracies without the model having been shown any example of their identity/class to the system in the training phase. Later on, the aim is to make the system more scalable and use it in end-user applications. For the project has an entrepreneurial side to it, the implementation will be kept confidential for at least a couple more years.`,
