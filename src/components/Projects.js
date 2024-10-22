@@ -148,12 +148,12 @@ We got invited to the company’s Munich office to further discuss our findings.
     shortDescription: `3D Visualization of football players as spheres during a live match, clustering them into lines and detecting line breaks, predictive analysis, providing an intuitive UI for configuration (Role: FullStack Developer).`,
     longDescription: `We focused on the line breaks during football matches. We worked on clustering the players in lines, determining when lines (offensive/defensive) have been broken, predicting when line breaks are expected to come, and considering how this information can be used to evaluate game performance. We built a 3D Visualisation app of football players as spheres during a live match, clustering them into lines and counting line breaks, providing an intuitive UI for configuration. We also used classical data mining methods such as XGBoost, Random Forest, Shapley etc to conduct further predictive analysis. We worked on a special confidential cluster to which we don’t have access anymore, and we cannot share some other details due to the confidentiality clause.`,
     links: [
-      { label: "Slide deck (too large to directly embed)", url: "https://docs.google.com/presentation/d/1yYBJeLSaPj4yY4KfLBv8zaDL6jK6daeF/edit?usp=sharing&ouid=108923877595249603456&rtpof=true&sd=true" },
-
     ],
     technologies: ["Python Flask", "ReactJS", "ThreeJS"],
     gdrive_embed: [
-      // "https://docs.google.com/presentation/d/1yYBJeLSaPj4yY4KfLBv8zaDL6jK6daeF/edit?usp=sharing&ouid=108923877595249603456&rtpof=true&sd=true",
+      "https://docs.google.com/presentation/d/1TjLC77f7rv1GVfNdqpKKlxQOdSntDlcw/edit?usp=sharing&ouid=108923877595249603456&rtpof=true&sd=true",
+      "https://drive.google.com/file/d/1IPYrb_iPpduONEgdEusn32_OH1wx-8ze/view?usp=sharing",
+      
     ],
 
   },
