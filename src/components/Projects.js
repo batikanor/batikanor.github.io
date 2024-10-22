@@ -247,25 +247,35 @@ const ContestsAndActivities = () => {
   useEffect(() => {
     const hash = window.location.hash;
     if (hash) {
-      const slug = hash.replace("#project-", "");
+      const slug = hash.replace("#", "");  
       const foundActivity = contestsAndActivities.find((activity) => activity.slug === slug);
       if (foundActivity) {
         setExpandedActivity(foundActivity);
       }
     }
   }, []);
+  
 
   const toggleExpandedView = (activity) => {
     setExpandedActivity(activity === expandedActivity ? null : activity);
   };
 
   const handleCopyLink = (slug) => {
-    const url = `${window.location.origin}${window.location.pathname}#project-${slug}`;
-    navigator.clipboard.writeText(url).then(() => {
-      alert("Link copied to clipboard!");
-    });
+    const url = `${window.location.origin}${window.location.pathname}#${slug}`;
+    
+    try {
+      navigator.clipboard.writeText(url).then(() => {
+        alert("Link copied to clipboard!");
+      }).catch(err => {
+        console.error("Failed to copy the link:", err);
+        alert("Unable to copy link. Please try again.");
+      });
+    } catch (err) {
+      console.error("Clipboard API error:", err);
+      alert("Clipboard operation failed. Please make sure the document is focused.");
+    }
   };
-
+  
   return (
     <div className="max-w-6xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
       <h2 className="text-3xl font-bold tracking-tight text-center mb-12 text-white">
@@ -293,7 +303,7 @@ const ContestsAndActivities = () => {
 
           return (
             <div
-              id={`project-${activity.slug}`}  // Unique ID for each project
+              id={activity.slug} 
               key={activity.slug}
               className={`${
                 isExpanded ? "col-span-1 sm:col-span-2" : ""
