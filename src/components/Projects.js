@@ -178,7 +178,7 @@ We got invited to the company’s Munich office to further discuss our findings.
   },
   {
     title: "1st Place (Main Track) at the first Ethereum-focused hackathon in Munich.",
-    location: "TUM, Germany & PretzelDAO, Germany",
+    location: "PretzelDAO & TUM, Munich/Germany",
     date: "08/2023",
     shortDescription: `Built an NFT similarity judging tool (Role: Team Lead).`,
     longDescription: `We programmed an NFT similarity detective assistant which took not only the rarities of certain attributes to consideration but also the embeddings of the description (via Bert)  and contents (via ResNet) of the images. We used various machine learning methods to present the user with a multitude of options and won the AI main track of the hackathon. We also won the Gateway.fm bounty award.`,
@@ -198,8 +198,8 @@ We got invited to the company’s Munich office to further discuss our findings.
   },
   {
     title: "1st Place at  MSG Code & Create Hackathon",
-    location: "TUM, Germany & PretzelDAO, Germany",
-    date: "08/2023",
+    location: "MSG, Karlsruhe/Germany",
+    date: "06/2023",
     shortDescription: `Won a hackathon organized by Münchner Softwaregesellschaft (MSG).`,
     longDescription: `We programmed a CO-2 considering route planner called Navigo which takes into consideration self calculated metrics that we called ‘efficiency’ and ‘catastrophe score’. We aren’t hosting it live due to api costs.`,
     links: [
