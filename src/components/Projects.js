@@ -112,6 +112,7 @@ const contestsAndActivities = [
     ],
     technologies: ["Python Flask", "ReactJS"],
     gdrive_embed: [
+      "https://drive.google.com/file/d/1sJlVjqHJDO9zx6p30pDoUyVUXdAlnNFV/view?usp=sharing",
       "https://www.youtube.com/embed/cjVDi2AY8yc",
       "https://docs.google.com/presentation/d/1eCo7cuh-HS7SYnlTHYASAdwcHIfLiFE7/edit?usp=sharing&ouid=108923877595249603456&rtpof=true&sd=true",
     ],
