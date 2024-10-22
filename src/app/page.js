@@ -699,10 +699,10 @@ export default function Home() {
           <div className="mb-4 text-lg sm:text-xl font-semibold text-center">
             <br/>
             <p>
-              Use <span className="font-mono">W</span> (Up),{" "}
-              <span className="font-mono">A</span> (Left),{" "}
-              <span className="font-mono">S</span> (Down),{" "}
-              <span className="font-mono">D</span> (Right) to fly the plane.
+              Use <span className="font-mono">W</span> (North),{" "}
+              <span className="font-mono">A</span> (West),{" "}
+              <span className="font-mono">S</span> (South),{" "}
+              <span className="font-mono">D</span> (East) to fly the plane.
             </p>
             <p className="mt-2">
               Collected Coins: {collectedCoins} / 20
