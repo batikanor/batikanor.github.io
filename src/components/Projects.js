@@ -203,7 +203,8 @@ We got invited to the company’s Munich office to further discuss our findings.
     shortDescription: `Won a hackathon organized by Münchner Softwaregesellschaft (MSG).`,
     longDescription: `We programmed a CO-2 considering route planner called Navigo which takes into consideration self calculated metrics that we called ‘efficiency’ and ‘catastrophe score’. We aren’t hosting it live due to api costs.`,
     links: [
-      { label: "1st Place Certificate", url: "https://www.batikanor.com/certificates/batikan/2023_msg_code_create_winner.pdf" },
+      { label: "GitHub repository", url: "https://github.com/batikanor/navigo"},
+      { label: "1st Place certificate", url: "https://www.batikanor.com/certificates/batikan/2023_msg_code_create_winner.pdf" },
       { label: "Event video", url: "https://www.instagram.com/reel/Cvz9pn0owzz/?igshid=MTc4MmM1YmI2Ng%3D%3D"},
     ],
     technologies: ["Python Flask", "ReactJS"],
