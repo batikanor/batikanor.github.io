@@ -67,7 +67,7 @@ const contestsAndActivities = [
   },
   {
     title: "2nd Place at Solana Superteam Ideathon",
-    location: "Tum Blockchain Conference, Munich/Germany",
+    location: "TUM Blockchain Conference, Munich/Germany",
     date: "09/2024",
     shortDescription: `Designed a solana microbetting solution.`,
     longDescription: `We prepared a microbetting solution that works on Solana. The system would also accept natural text bets, and enable “pinky-betting” style bets where “the house always wins” principle can be challenged. Liquidity pools can also be created through whale-funded AIs that are searching for newly opened bets that fulfil certain conditions. Closing of bets could be orchestrated through decentralised Oracles. We were voted 2nd through community voting. We won ourselves CUDIS AI rings and solana mousepads.`,
