@@ -84,7 +84,7 @@ const contestsAndActivities = [
   },
   {
     title: "1st Place on Swiss Exchange Track & Audience Award at SwissHacks2024",
-    location: "Tum Blockchain Conference, Munich/Germany",
+    location: "SIX Swiss Exchange, Zurich/Switzerland",
     date: "06/2024",
     shortDescription: `Developed “BizzWizz”, an AI-driven sustainability reporting assistance platform. Also presented in front of VC & on PointZero forum (Role: Back-End Dev)`,
     longDescription: `At SwissHacks2024 (flagship event by Swiss Financial Innovation Desk (FIND), backed by the Swiss government), our team won 1st place for the ‘SIX’ track and the Audience Award for developing BizzWizz, an AI-driven platform designed to revolutionise sustainability reporting. The platform allows companies to navigate the complexities of sustainability compliance by offering AI-driven framework assessments, KPI calculations, market tools, and peer analytics. My role as the Back-End Developer included constructing the scalable infrastructure to handle vast amounts of data and implementing the AI models for KPI suggestions and peer benchmark analytics. We used a stack comprising React for the web app and Flask for the backend, integrated with llm(s), leveraging emerging technologies like ChromaDB for Retrieval-Augmented Generation (RAG). The innovative framework assessment and KPI calculation features were particularly praised, leading to our double victory in the competition. They also invited us for a free tour of the Swiss parliament.`,
@@ -100,8 +100,8 @@ const contestsAndActivities = [
   },
   {
     title: "3rd Place at HackUPC Main Challenge (Sponsor: Intersystems)",
-    location: "Tum Blockchain Conference, Munich/Germany",
-    date: "06/2024",
+    location: "UPC, Barcelona/Spain",
+    date: "05/2024",
     shortDescription: `Advanced Travel Planning w/ user-interest & city-description embeddings using Intersystems Vector Search (Role: Fullstack Dev., Presenter)`,
     longDescription: `The challenge given on the hackathon was called “Best use of GenAI using InterSystems IRIS Vector Search”. Our team built a travel assistant tool that makes use of embeddings of user interests and city descriptions in order to suggest alternative flight routes s.t. Users with similar interests might be recommended to take the same flight OR users might be recommended to take flights to cities that they are likely to find interesting.  (Note: We improvised our presentation, and the video I embedded below wasn't meant to have sound, so please ignore the sound :D)`,
     links: [
