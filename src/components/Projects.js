@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 // Function to convert Google Drive link to embeddable format for videos and documents
 const getGoogleDriveEmbedUrl = (url) => {
@@ -14,6 +14,7 @@ const getGoogleDriveImageEmbedUrl = (url) => {
 
 const contestsAndActivities = [
   {
+    slug: "dsag-ideathon-2024",  // Unique slug for each project
     title: "2nd Place at DSAG Ideathon",
     location: "DSAG Jahreskonferenz, Leipzig/Germany",
     date: "10/2024",
@@ -33,6 +34,7 @@ const contestsAndActivities = [
     ],
   },
   {
+    slug: "circular-bsh-2024",  // Unique slug for each project
     title: "Best Business Opportunity Award Winner at Circular Hackfest",
     location: "Makerspace, Munich/Germany",
     date: "10/2024",
@@ -47,6 +49,7 @@ const contestsAndActivities = [
     ],
   },
   {
+    slug: "thuega-2024",  // Unique slug for each project
     title: "1st Place at Thüga Solutions Hackathon",
     location: "Thüga Solutions, Munich/Germany",
     date: "09/2024",
@@ -66,6 +69,7 @@ const contestsAndActivities = [
 
   },
   {
+    slug: "solana-ideathon-2024",  // Unique slug for each project
     title: "2nd Place at Solana Superteam Ideathon",
     location: "TUM Blockchain Conference, Munich/Germany",
     date: "09/2024",
@@ -83,6 +87,7 @@ const contestsAndActivities = [
 
   },
   {
+    slug: "six-swisshacks-2024",  // Unique slug for each project
     title: "1st Place on Swiss Exchange Track & Audience Award at SwissHacks2024",
     location: "SIX Swiss Exchange, Zurich/Switzerland",
     date: "06/2024",
@@ -99,6 +104,7 @@ const contestsAndActivities = [
 
   },
   {
+    slug: "hackupc-2024",  // Unique slug for each project
     title: "3rd Place at HackUPC Main Challenge (Sponsor: Intersystems)",
     location: "UPC, Barcelona/Spain",
     date: "05/2024",
@@ -119,6 +125,7 @@ const contestsAndActivities = [
 
   },
   {
+    slug: "makeathon-reply-2024",  // Unique slug for each project
     title: "2nd Place (team) & 1st Place (individual) at TUM AI Makeathon Main Challenge (Sponsor: Reply S.p.A.)",
     location: "Munich/Germany",
     date: "04/2024",
@@ -143,6 +150,7 @@ We got invited to the company’s Munich office to further discuss our findings.
 
   },
   {
+    slug: "mdsi-bundesliga-2024",  // Unique slug for each project
     title: "Proof of Concept: Detecting line-breaks in football matches",
     location: "Munich/Germany",
     date: "01/2024",
@@ -159,6 +167,7 @@ We got invited to the company’s Munich office to further discuss our findings.
 
   },
   {
+    slug: "draeger-2023",  // Unique slug for each project
     title: "2nd Place at Dräger hackathon",
     location: "Lübeck/Germany",
     date: "10/2023",
@@ -178,6 +187,7 @@ We got invited to the company’s Munich office to further discuss our findings.
 
   },
   {
+    slug: "ethmunich-2023",  // Unique slug for each project
     title: "1st Place (Main Track) at the first Ethereum-focused hackathon in Munich.",
     location: "PretzelDAO & TUM, Munich/Germany",
     date: "08/2023",
@@ -198,6 +208,7 @@ We got invited to the company’s Munich office to further discuss our findings.
 
   },
   {
+    slug: "msg-karlsruhe-2023",  // Unique slug for each project
     title: "1st Place at  MSG Code & Create Hackathon",
     location: "MSG, Karlsruhe/Germany",
     date: "06/2023",
@@ -215,6 +226,7 @@ We got invited to the company’s Munich office to further discuss our findings.
 
   },
   {
+    slug: "bachelors-thesis",  // Unique slug for each project
     title: "Bachelor’s Thesis",
     location: "Turkish-German University, Istanbul/Turkey",
     date: "2022",
@@ -231,28 +243,63 @@ We got invited to the company’s Munich office to further discuss our findings.
 const ContestsAndActivities = () => {
   const [expandedActivity, setExpandedActivity] = useState(null);
 
+  // Expand item based on URL hash
+  useEffect(() => {
+    const hash = window.location.hash;
+    if (hash) {
+      const slug = hash.replace("#project-", "");
+      const foundActivity = contestsAndActivities.find((activity) => activity.slug === slug);
+      if (foundActivity) {
+        setExpandedActivity(foundActivity);
+      }
+    }
+  }, []);
+
   const toggleExpandedView = (activity) => {
     setExpandedActivity(activity === expandedActivity ? null : activity);
   };
 
+  const handleCopyLink = (slug) => {
+    const url = `${window.location.origin}${window.location.pathname}#project-${slug}`;
+    navigator.clipboard.writeText(url).then(() => {
+      alert("Link copied to clipboard!");
+    });
+  };
+
   return (
-    <div className="max-w-6xl mx-auto py-8 px-4  sm:px-6 lg:px-8">
+    <div className="max-w-6xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
       <h2 className="text-3xl font-bold tracking-tight text-center mb-12 text-white">
         Past Project Samples
       </h2>
 
+      {/* Links to jump to specific sections */}
+      {/* <div className="mb-6">
+        {contestsAndActivities.map((activity) => (
+          <a
+            key={activity.slug}
+            href={`#project-${activity.slug}`}
+            onClick={() => setExpandedActivity(activity)} // Expand on click
+            className="text-blue-400 hover:underline block mb-2"
+          >
+            {activity.title}
+          </a>
+        ))}
+      </div> */}
+
       {/* Activities Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-7">
-        {contestsAndActivities.map((activity, index) => {
+        {contestsAndActivities.map((activity) => {
           const isExpanded = expandedActivity === activity;
+
           return (
             <div
-              key={index}
+              id={`project-${activity.slug}`}  // Unique ID for each project
+              key={activity.slug}
               className={`${
                 isExpanded ? "col-span-1 sm:col-span-2" : ""
               } transition-all duration-300`}
             >
-              <div className={`p-4 bg-gray-800 rounded-lg shadow-lg border border-gray-600`}>
+              <div className="p-4 bg-gray-800 rounded-lg shadow-lg border border-gray-600">
                 <div className="flex justify-between items-center">
                   <h3 className="text-2xl font-semibold mb-2 text-white">
                     {activity.title}
@@ -268,15 +315,21 @@ const ContestsAndActivities = () => {
                 <p className="text-gray-400 mb-4">{activity.date}</p>
 
                 {/* Display Short Description */}
-                <p className="text-gray-300 mb-4">
-                  {activity.shortDescription}
-                </p>
+                <p className="text-gray-300 mb-4">{activity.shortDescription}</p>
 
                 {/* Display Long Description if Expanded */}
                 {isExpanded && (
-                  <p className="text-gray-300 mb-4">
-                    {activity.longDescription}
-                  </p>
+                  <>
+                    <p className="text-gray-300 mb-4">{activity.longDescription}</p>
+
+                    {/* Copy Link Button */}
+                    <button
+                      onClick={() => handleCopyLink(activity.slug)}
+                      className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-500 mb-4"
+                    >
+                      Copy Link to this Project
+                    </button>
+                  </>
                 )}
 
                 {/* Used Technologies */}
