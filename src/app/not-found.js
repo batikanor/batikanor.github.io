@@ -29,6 +29,18 @@ const NotFoundPage = () => {
           </a>.
         </p>
 
+        <p className="text-lg text-gray-300 mb-4">
+          Are you looking for my old homepage? You can find it on{" "}
+          <a
+            href="http://batikanor.netlify.app"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-400 hover:underline"
+          >
+            here
+          </a>.
+        </p>
+
         {/* Link without <a> tag */}
         <Link href="/" passHref>
           <button className="bg-gray-700 text-white px-6 py-3 rounded hover:bg-gray-600">

@@ -967,6 +967,20 @@ export default function Home() {
         <br/>
         <br/>
         <br/>
+        <p className="text-lg text-gray-300 mb-4">
+          Are you looking for my old homepage? You can find it on{" "}
+          <a
+            href="http://batikanor.netlify.app"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-400 hover:underline"
+          >
+            here
+          </a>.
+        </p>
+        <br/>
+        <br/>
+        <br/>
 
       </main>
     </div>
