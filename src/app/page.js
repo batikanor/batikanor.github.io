@@ -24,6 +24,8 @@ export default function Home() {
   // Refs
   const globeContainerRef = useRef(null);
   const globeEl = useRef();
+  // **Ref for Hover Timeout**
+  const hoverTimeoutRef = useRef(null);
 
   // State for container dimensions
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
@@ -441,18 +443,39 @@ export default function Home() {
   const handlePointHover = useMemo(
     () =>
       debounce((point, prevPoint) => {
-        setHoveredMarker(point);
+        if (point) {
+          setHoveredMarker(point);
+          
+          // **Clear existing timeout if any**
+          if (hoverTimeoutRef.current) {
+            clearTimeout(hoverTimeoutRef.current);
+          }
+          
+          // **Set a new timeout to clear hoveredMarker after 10 seconds**
+          hoverTimeoutRef.current = setTimeout(() => {
+            setHoveredMarker(null);
+            hoverTimeoutRef.current = null;
+          }, 10000); // 10000 milliseconds = 10 seconds
+        } else {
+          // Optionally, you can decide whether to clear the marker immediately when not hovering
+          // For now, we'll let the timeout handle it
+        }
       }, 100), // 100ms debounce delay
     []
   );
 
-  // Clean up debounce on unmount
+
+  // Clean up debounce and timeout on unmount
   useEffect(() => {
     return () => {
       handlePointHover.cancel();
+      if (hoverTimeoutRef.current) {
+        clearTimeout(hoverTimeoutRef.current);
+      }
     };
   }, [handlePointHover]);
 
+  
   // Calculate the winner of the Tic Tac Toe game
   const calculateWinner = (board) => {
     const lines = [
@@ -860,6 +883,28 @@ export default function Home() {
             >
               {isFullscreen ? "❎" : "⛶"}
             </button>
+{/* 
+            {isFullscreen && (
+              <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z10">
+                <div className="bg-gray-800 text-white p-4 rounded">
+                  <p>Fullscreen mode is work in progress</p>
+                </div>
+              </div>
+            )} */}
+            {/* Modal Popup for Marker Click (Now Inside Fullscreen Container) */}
+            {clickedMarker && isFullscreen && (
+              <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+                <div className="bg-gray-800 rounded-lg p-6 text-white max-w-md mx-auto">
+                  <p className="text-lg font-semibold" dangerouslySetInnerHTML={{ __html: clickedMarker.description }} />
+                  <button
+                    className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                    onClick={() => setClickedMarker(null)}
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            )}
             {/* Overlay for Game Symbols */}
             {gameMode === "ticTacToe" && (
               <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
@@ -927,7 +972,7 @@ export default function Home() {
 
 
         {/* Modal Popup for Marker Click */}
-        {clickedMarker && (
+        {/* {clickedMarker && (
           <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
             <div className="bg-gray-800 rounded-lg p-6 text-white max-w-md mx-auto">
               <p className="text-lg font-semibold" dangerouslySetInnerHTML={{ __html: clickedMarker.description }} />
@@ -939,7 +984,10 @@ export default function Home() {
               </button>
             </div>
           </div>
-        )}
+        )} */}
+
+
+
 
         {/* Winner Notification for Tic-Tac-Toe */}
         {winner && gameMode === "ticTacToe" && (
