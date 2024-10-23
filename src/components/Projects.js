@@ -19,7 +19,7 @@ const contestsAndActivities = [
     location: "DSAG Jahreskonferenz, Leipzig/Germany",
     date: "10/2024",
     shortDescription: `We built a RL-based intricate fraud detection solution and pitched in front of 6000+ SAP user company CEO/CIO/CFO and experts. We later discussed partnership opportunities with many of them.`,
-    longDescription: `We designed a reinforcement-learning based, multi-transaction supporting fraud detection system and pitched it in front of 6000+ people from different SAP user companies. We made it to the final and secured 2nd Place through audience voting.`,
+    longDescription: `We designed a reinforcement-learning based, multi-transaction supporting fraud detection system and pitched it in front of 6000+ people, where we had an audience consisting of representatives from countless SAP user / partner companies in the DSAG Jahreskonferenz (German Speaking SAP Users Yearly Conference). We made it to the final, and in the final the top 3 were selected through a decibel-metre measuring the claps of the audience. We got 2nd Place and won Airpods Max’s for each of us. We called our system HippoSAP, where we used Hierarchical Proximal Policy Optimization to tell if a transaction in an SAP system is fraud or not based on time-series-graph data provided as context.`,
     links: [
       { label: "LinkedIn Winner Declaration", url: "https://www.linkedin.com/posts/dsag_dsagjk24-sap-digitaletransformation-activity-7251879625583116289-PA7Q?utm_source=share&utm_medium=member_android" },
     ],
@@ -105,7 +105,7 @@ const contestsAndActivities = [
   },
   {
     slug: "hackupc-2024",  // Unique slug for each project
-    title: "3rd Place at HackUPC Main Challenge (Sponsor: Intersystems)",
+    title: "3rd Place at HackUPC (Sponsor: Intersystems)",
     location: "UPC, Barcelona/Spain",
     date: "05/2024",
     shortDescription: `Advanced Travel Planning w/ user-interest & city-description embeddings using Intersystems Vector Search (Role: Fullstack Dev., Presenter). We got 3rd place out of 30+ teams.`,

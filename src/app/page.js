@@ -235,11 +235,56 @@ export default function Home() {
     []
   );
 
+
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
   // Ensure the Globe is only rendered on the client-side
   useEffect(() => {
     setIsClient(true);
     setIsMobile(/Mobi|Android/i.test(navigator.userAgent)); // Detect mobile devices
   }, []);
+
+
+  // **Fullscreen Toggle Function**
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      if (globeContainerRef.current.requestFullscreen) {
+        globeContainerRef.current.requestFullscreen();
+      } else if (globeContainerRef.current.webkitRequestFullscreen) { // Safari
+        globeContainerRef.current.webkitRequestFullscreen();
+      } else if (globeContainerRef.current.msRequestFullscreen) { // IE11
+        globeContainerRef.current.msRequestFullscreen();
+      }
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      }
+    }
+  };
+
+  // **Handle Fullscreen Change Events**
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      if (document.fullscreenElement === globeContainerRef.current) {
+        setIsFullscreen(true);
+      } else {
+        setIsFullscreen(false);
+      }
+    };
+
+    document.addEventListener("fullscreenchange", handleFullscreenChange);
+    document.addEventListener("webkitfullscreenchange", handleFullscreenChange); // Safari
+    document.addEventListener("mozfullscreenchange", handleFullscreenChange);
+    document.addEventListener("MSFullscreenChange", handleFullscreenChange);
+
+    return () => {
+      document.removeEventListener("fullscreenchange", handleFullscreenChange);
+      document.removeEventListener("webkitfullscreenchange", handleFullscreenChange);
+      document.removeEventListener("mozfullscreenchange", handleFullscreenChange);
+      document.removeEventListener("MSFullscreenChange", handleFullscreenChange);
+    };
+  }, []);
+
   // Handle Joystick movement
   const handleJoystickMove = (event) => {
     const { x, y } = event;
@@ -346,7 +391,7 @@ export default function Home() {
         label: "Achievements in Barcelona",
         size: 20,
         color: "orange",
-        description: `Achievements:<br/>- 3rd Place at HackUPC Main Challenge (2024)`,
+        description: `Achievements:<br/>- 3rd Place at HackUPC (Sponsor: Intersystems) (2024)`,
       },
       {
         id: 4,
@@ -741,8 +786,8 @@ export default function Home() {
                   ? { lat: planePosition.lat, lng: planePosition.lng, altitude: 2 }
                   : undefined // Let GlobeWrapper handle initialView for other modes
               }
-              width={dimensions.width}
-              height={dimensions.height}
+              width={isFullscreen ? window.innerWidth : dimensions.width}
+              height={isFullscreen ? window.innerHeight : dimensions.height}
               globeImageUrl="//unpkg.com/three-globe/example/img/earth-blue-marble.jpg"
               backgroundColor="rgba(0,0,0,0)"
               pointsData={allMarkers}
@@ -806,6 +851,15 @@ export default function Home() {
                 // Optional: Handle hover events (e.g., highlight)
               }}
             />
+
+            {/* **Fullscreen Button** */}
+            <button
+              onClick={toggleFullscreen}
+              className="absolute top-4 right-4 bg-gray-700 text-white rounded-full p-2 opacity-75 hover:opacity-100 transition-opacity"
+              aria-label="Toggle Fullscreen"
+            >
+              {isFullscreen ? "❎" : "⛶"}
+            </button>
             {/* Overlay for Game Symbols */}
             {gameMode === "ticTacToe" && (
               <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
