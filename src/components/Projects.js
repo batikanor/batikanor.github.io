@@ -241,6 +241,18 @@ We got invited to the company’s Munich office to further discuss our findings.
   },
 ];
 
+// Function to generate a deterministic color based on the slug
+const getDeterministicColor = (slug) => {
+  const colors = ["#FF6347", "#4682B4", "#32CD32", "#FFD700", "#8A2BE2", "#FF69B4", "#00CED1", "#FF4500"];
+  let hash = 0;
+  // Create a simple hash from the slug
+  for (let i = 0; i < slug?.length; i++) {
+    hash = slug.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  // Get a deterministic index based on the hash
+  const index = Math.abs(hash) % colors.length;
+  return colors[index];
+};
 const ContestsAndActivities = () => {
   const [expandedActivity, setExpandedActivity] = useState(null);
 
@@ -310,7 +322,14 @@ const ContestsAndActivities = () => {
                 isExpanded ? "col-span-1 sm:col-span-2" : ""
               } transition-all duration-300`}
             >
-              <div className="p-4 bg-gray-800 rounded-lg shadow-lg border border-gray-600">
+              <div className="relative p-4 bg-gray-800 rounded-lg shadow-lg border border-gray-600">
+                {/* Deterministic colored bar at the top */}
+                {!isExpanded && (
+                  <div
+                    style={{ backgroundColor: getDeterministicColor(activity.slug) }}
+                    className="absolute top-0 left-0 right-0 h-2 rounded-t-lg"
+                  ></div>
+                )}
                 <div className="flex justify-between items-center">
                   <h3 className="text-2xl font-semibold mb-2 text-white">
                     {activity.title}
