@@ -221,6 +221,7 @@ We got invited to the company’s Munich office to further discuss our findings.
     ],
     technologies: ["Python Flask", "ReactJS"],
     gdrive_embed: [
+      "https://drive.google.com/file/d/1JrOiAxGTxlG9GfMk4jL9CslwcYOHvcwr/view?usp=sharing",
       "https://drive.google.com/file/d/1xrktqeqkMM-8CWpFcZVLXR-ccGVcJvHR/view?usp=sharing",
     ],
 

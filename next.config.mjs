@@ -32,6 +32,12 @@ const nextConfig = {
      */
     assetPrefix: process.env.NODE_ENV === 'production' ? 'https://www.batikanor.com/' : '',
 
+    
+    /**
+     * Enable trailing slashes in exported URLs.
+     * This ensures that `/cv/` will resolve correctly.
+     */
+    trailingSlash: true,
     // These redirects dont work on static exports. 
     // async redirects() {
     //   return [
