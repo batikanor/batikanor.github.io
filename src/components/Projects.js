@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import "./Projects.css";
+
 // import ResizePanel from "react-resize-panel";
 const ResizePanel = typeof window !== "undefined" ? require("react-resize-panel").default : null;
 
@@ -21,7 +23,7 @@ const contestsAndActivities = [
     location: "Google Office, Munich/Germany",
     date: "10/2024",
     shortDescription: `We helped test the up-and-coming AI innovation platform built by Bayer based on Google Cloud Platform. We found valuable bugs and managed to solve a set of computer vision and bioinformatics related tasks.`,
-    longDescription: `The event was organized on Google's office in Munich. We've met with engineers from Bayer who've built and tested their AI Innovation Platform, and had valuable discussions regarding the product and its capabilities. I don't think it'd be ethical for me to detail on the bugs we've found on the app here, but we've reported them to the team nicely, whilst also solving the great bioinformatics and computer vision related challenges they've planned for us. We won GCP credits and 12 months free access to respective innovation platform. `,
+    longDescription: `The event was organised at Google's office in Munich. We've met with engineers from Bayer who've built and tested their AI Innovation Platform, and had valuable discussions regarding the product and its capabilities. I don't think it'd be ethical for me to detail on the bugs we've found on the app here, but we've reported them to the team nicely, whilst also solving the great bioinformatics and computer vision related challenges they've planned for us. We won GCP credits and 12 months free access to the respective innovation platform. `,
     links: [
       { label: "Hackathon Link", url: "https://hackathon.radiology.bayer.com/"},
       // { label: "LinkedIn Winner Declaration", url: "https://www.linkedin.com/posts/dsag_dsagjk24-sap-digitaletransformation-activity-7251879625583116289-PA7Q?utm_source=share&utm_medium=member_android" },
@@ -111,6 +113,7 @@ const contestsAndActivities = [
   },
   {
     slug: "six-swisshacks-2024",  // Unique slug for each project
+    highlighted: true,
     title: "1st Place on Swiss Exchange Track & Audience Award at SwissHacks2024",
     location: "SIX Swiss Exchange, Zurich/Switzerland",
     date: "06/2024",
@@ -211,6 +214,7 @@ We got invited to the company’s Munich office to further discuss our findings.
   },
   {
     slug: "ethmunich-2023",  // Unique slug for each project
+    highlighted: true,
     title: "1st Place (Main Track) at the first Ethereum-focused hackathon in Munich.",
     location: "PretzelDAO & TUM, Munich/Germany",
     date: "08/2023",
@@ -345,7 +349,11 @@ const ContestsAndActivities = () => {
                 isExpanded ? "col-span-1 sm:col-span-2" : ""
               } transition-all duration-300`}
             >
-              <div className="relative p-4 bg-gray-800 rounded-lg shadow-lg border border-gray-600">
+              {/* <div className="relative p-4 bg-gray-800 rounded-lg shadow-lg border border-gray-600"> */}
+              <div className={`relative p-4 bg-gray-800 rounded-lg shadow-lg border border-gray-600 ${
+                  activity.highlighted ? "highlight" : ""
+                }`}>
+
                 {/* Deterministic colored bar at the top */}
                 {!isExpanded && (
                   <div

@@ -1,0 +1,29 @@
+/* Projects.css */
+@keyframes wiggle {
+    0%, 100% {
+      transform: translateY(-50%) translateX(0); /* Original position */
+    }
+    50% {
+      transform: translateY(-50%) translateX(-5px); /* Move left slightly */
+    }
+  }
+  
+.highlight {
+    position: relative;
+    border: 2px solid #FFD700; /* Gold border */
+    box-shadow: 0 4px 10px rgba(255, 215, 0, 0.3); /* Golden shadow */
+    transform: scale(1.02); /* Slight zoom effect */
+    transition: all 0.3s ease-in-out;
+  }
+  
+  .highlight::before {
+    content: "";
+    position: absolute;
+    top: 50%; /* Center vertically */
+    right: -20px; /* Position arrow to the right */
+    transform: translateY(-50%);
+    border: 10px solid transparent; /* Arrow shape */
+    border-left: 10px solid #FFD700; /* Gold arrow color */
+    animation: wiggle 0.6s ease-in-out infinite; /* Wiggle animation */
+  }
+  
