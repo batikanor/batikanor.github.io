@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+// import ResizePanel from "react-resize-panel";
+const ResizePanel = typeof window !== "undefined" ? require("react-resize-panel").default : null;
 
 // Function to convert Google Drive link to embeddable format for videos and documents
 const getGoogleDriveEmbedUrl = (url) => {
@@ -13,6 +15,27 @@ const getGoogleDriveImageEmbedUrl = (url) => {
 };
 
 const contestsAndActivities = [
+  {
+    slug: "bayer-ai-2024",  // Unique slug for each project
+    title: "2nd Place at Bayer AI Innovation Platform Hackathon",
+    location: "Google Office, Munich/Germany",
+    date: "10/2024",
+    shortDescription: `We helped test the up-and-coming AI innovation platform built by Bayer based on Google Cloud Platform. We found valuable bugs and managed to solve a set of computer vision and bioinformatics related tasks.`,
+    longDescription: `The event was organized on Google's office in Munich. We've met with engineers from Bayer who've built and tested their AI Innovation Platform, and had valuable discussions regarding the product and its capabilities. I don't think it'd be ethical for me to detail on the bugs we've found on the app here, but we've reported them to the team nicely, whilst also solving the great bioinformatics and computer vision related challenges they've planned for us. We won GCP credits and 12 months free access to respective innovation platform. `,
+    links: [
+      { label: "Hackathon Link", url: "https://hackathon.radiology.bayer.com/"},
+      // { label: "LinkedIn Winner Declaration", url: "https://www.linkedin.com/posts/dsag_dsagjk24-sap-digitaletransformation-activity-7251879625583116289-PA7Q?utm_source=share&utm_medium=member_android" },
+    ],
+    technologies: ["Python", "Google Cloud Platform", "Computer Vision", "Test & Quality Assurance"],
+    // images: [
+      // "https://example.com/image1.jpg",
+      // "https://drive.google.com/file/d/1aBcDeFgHiJkLmNoPqRSuvWxyz/view?usp=sharing", // Google Drive image
+    // ],
+    // gdrive_embed: [
+    //   "https://docs.google.com/presentation/d/1FSCjiBlLvDn6dzIAjPaf_RC2LvJBzk5q/edit?usp=sharing&ouid=108923877595249603456&rtpof=true&sd=true", // Google Drive video
+    //   "https://drive.google.com/file/d/1vL77AmjuWV4hls8Mt75x_lOqaBaohr1D/view?usp=sharing",
+    // ],
+  },
   {
     slug: "dsag-ideathon-2024",  // Unique slug for each project
     title: "2nd Place at DSAG Ideathon",
@@ -91,7 +114,7 @@ const contestsAndActivities = [
     title: "1st Place on Swiss Exchange Track & Audience Award at SwissHacks2024",
     location: "SIX Swiss Exchange, Zurich/Switzerland",
     date: "06/2024",
-    shortDescription: `Developed “BizzWizz”, an AI-driven sustainability reporting assistance platform. Also presented in front of VC & on PointZero forum (Role: Back-End Dev)`,
+    shortDescription: `Developed “BizzWizz”, an AI-driven sustainability reporting assistance platform. Also presented in front of VC & on PointZero forum. Talks ongoing with Swiss Exchange business developers regarding turning this idea into a company.`,
     longDescription: `At SwissHacks2024 (flagship event by Swiss Financial Innovation Desk (FIND), backed by the Swiss government), our team won 1st place for the ‘SIX’ track and the Audience Award for developing BizzWizz, an AI-driven platform designed to revolutionise sustainability reporting. The platform allows companies to navigate the complexities of sustainability compliance by offering AI-driven framework assessments, KPI calculations, market tools, and peer analytics. My role as the Back-End Developer included constructing the scalable infrastructure to handle vast amounts of data and implementing the AI models for KPI suggestions and peer benchmark analytics. We used a stack comprising React for the web app and Flask for the backend, integrated with llm(s), leveraging emerging technologies like ChromaDB for Retrieval-Augmented Generation (RAG). The innovative framework assessment and KPI calculation features were particularly praised, leading to our double victory in the competition. They also invited us for a free tour of the Swiss parliament.`,
     links: [
       { label: "LinkedIn Announcement for winners", url: "https://www.linkedin.com/posts/tomakoliada_hackathon-winners-innovation-activity-7213532268726816768-2URo/" },
@@ -212,7 +235,7 @@ We got invited to the company’s Munich office to further discuss our findings.
     title: "1st Place at  MSG Code & Create Hackathon",
     location: "MSG, Karlsruhe/Germany",
     date: "06/2023",
-    shortDescription: `Won a hackathon organized by Münchner Softwaregesellschaft (MSG).`,
+    shortDescription: `Built a CO-2-considerate route planner which won a hackathon organized by Münchner Softwaregesellschaft (MSG).`,
     longDescription: `We programmed a CO-2 considering route planner called Navigo which takes into consideration self calculated metrics that we called ‘efficiency’ and ‘catastrophe score’. We aren’t hosting it live due to api costs.`,
     links: [
       { label: "GitHub repository", url: "https://github.com/batikanor/navigo"},
@@ -397,17 +420,18 @@ const ContestsAndActivities = () => {
                 {isExpanded && activity.gdrive_embed && (
                   <div className="mt-6 space-y-4">
                     {activity.gdrive_embed.map((embedUrl, i) => (
-                      <iframe
-                        key={i}
-                        src={getGoogleDriveEmbedUrl(embedUrl)}
-                        width="100%"
-                        height="315"
-                        allow="autoplay"
-                        className="rounded-lg"
-                        frameBorder="0"
-                        allowFullScreen
-                        title={`${activity.title} Google Drive Embed ${i + 1}`}
-                      ></iframe>
+                      <ResizePanel key={i} direction="s" style={{ marginBottom: "1rem", height: "30vh" }}>
+                        <iframe
+                          src={getGoogleDriveEmbedUrl(embedUrl)}
+                          width="100%"
+                          height="1000"
+                          allow="autoplay"
+                          className="rounded-lg"
+                          frameBorder="0"
+                          allowFullScreen
+                          title={`${activity.title} Google Drive Embed ${i + 1}`}
+                        ></iframe>
+                      </ResizePanel>
                     ))}
                   </div>
                 )}
