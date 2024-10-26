@@ -40,6 +40,7 @@ const contestsAndActivities = [
   },
   {
     slug: "dsag-ideathon-2024",  // Unique slug for each project
+    highlighted: true,
     title: "2nd Place at DSAG Ideathon",
     location: "DSAG Jahreskonferenz, Leipzig/Germany",
     date: "10/2024",
