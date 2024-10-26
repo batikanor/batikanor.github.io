@@ -375,7 +375,7 @@ export default function Home() {
         label: "School & Achievements in Munich",
         size: 20,
         color: "blue",
-        description: `School:<br/>- MSc Informatics, Technical University of Munich<br/><br/>Achievements in Munich:<br/>- 1st Place at Thüga Solutions Hackathon (2024)<br/>- 2nd Place (team) & 1st Place (individual) at TUM AI Makeathon (2024)<br/>- 1st Place at EthMunich Hackathon (2023)`,
+        description: `School:<br/>- MSc Informatics, Technical University of Munich<br/><br/>Achievements in Munich:<br/>- 2nd Place at Bayer AI Innovation Hackathon (2024)<br/>- 1st Place at Thüga Solutions Hackathon (2024)<br/>- 2nd Place (team) & 1st Place (individual) at TUM AI Makeathon (2024)<br/>- 1st Place at EthMunich Hackathon (2023)`,
       },
       {
         id: 2,
