@@ -338,7 +338,7 @@ export default function Home() {
       if (gameMode === "planeCollectCoins") {
         // Focus on plane's current position when Plane Collect Coins is active
         globeEl.current.pointOfView(
-          { lat: planePosition.lat, lng: planePosition.lng, altitude: 2 },
+          { lat: planePosition.lat, lng: planePosition.lng, altitude: 0.3 },
           1000
         );
       } else if (gameMode === "ticTacToe") {
@@ -798,7 +798,9 @@ export default function Home() {
         {isClient && (
           <div
             ref={globeContainerRef}
-            className="relative w-full max-w-2xl h-[700px] sm:h-[800px] md:h-[900px]"
+            // className="relative w-full max-w-2xl h-[700px] sm:h-[800px] md:h-[900px]"
+            className="relative w-full h-[700px] sm:h-[800px] md:h-[900px]"
+
           >
             <Globe
               onGlobeLoad={(globe) => {
