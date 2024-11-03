@@ -1,7 +1,7 @@
 export const contestsAndActivities = [
     {
       slug: "zurich-climathon-2024",  // Unique slug for each project
-      title: "Awarded 7000 CHF by the City of Zurich for AI-Based Employee Surveying Platform",
+      title: "Awarded 7000 CHF by the City of Zurich: AI-Based Employee Surveying Platform",
       mapData: {
         venue: "Kraftwerk",
         city: "Zurich",
@@ -13,6 +13,10 @@ export const contestsAndActivities = [
       technologies: ["AI", "Employee Engagement", "Sustainability", "Climate"],
       links: [],
       longDescription: ``,
+      gdrive_embed: [
+        "https://docs.google.com/presentation/d/13NjatYi07DAcC8oKYnAJxaIXW_GopTxigWBoWbUfwQo/edit#slide=id.p",
+        "https://docs.google.com/document/d/1Zp4I7-1y4VoNY0kydPNKfeSKhuO_41lfdlDqhQF_39I/edit?usp=sharing",
+      ],
     },
   
     {

@@ -95,19 +95,6 @@ const Projects = () => {
         Past Project Samples
       </h2>
 
-      {/* Links to jump to specific sections */}
-      {/* <div className="mb-6">
-        {contestsAndActivities.map((activity) => (
-          <a
-            key={activity.slug}
-            href={`#project-${activity.slug}`}
-            onClick={() => setExpandedActivity(activity)} // Expand on click
-            className="text-blue-400 hover:underline block mb-2"
-          >
-            {activity.title}
-          </a>
-        ))}
-      </div> */}
 
       {/* Activities Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-7">

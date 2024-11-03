@@ -29,10 +29,20 @@ export default function RootLayout({ children }) {
           <Navbar />
         </header>
         <div className="flex-1 flex flex-col lg:flex-row mt-[4rem]"> {/* Adjust the top margin */}
+          
           {/* Left Sidebar */}
-          <aside className="hidden lg:block lg:w-1/5 bg-gray-100 dark:bg-gray-900 p-4">
+          <aside className="hidden lg:block lg:w-1/5 p-4 bg-gray-100 dark:bg-gray-900 relative">
+            <div
+              className="absolute inset-0 bg-center opacity-20 dark:opacity-10"
+              style={{ 
+                backgroundImage: "url('/aside-pattern.png')",
+                backgroundSize: "150%", // Increase or decrease to rescale
+                backgroundPosition: "center"
+              }}
+            />
             {/* Add content here */}
           </aside>
+
 
           {/* Main Content */}
           <main className="flex-1 p-6 sm:p-12 bg-white dark:bg-gray-800">
@@ -40,9 +50,18 @@ export default function RootLayout({ children }) {
           </main>
 
           {/* Right Sidebar */}
-          <aside className="hidden lg:block lg:w-1/5 bg-gray-100 dark:bg-gray-900 p-4">
+          <aside className="hidden lg:block lg:w-1/5 p-4 bg-gray-100 dark:bg-gray-900 relative">
+            <div
+              className="absolute inset-0 bg-center opacity-20 dark:opacity-10"
+              style={{ 
+                backgroundImage: "url('/aside-pattern.png')",
+                backgroundSize: "150%", // Increase or decrease to rescale
+                backgroundPosition: "center"
+              }}
+            />
             {/* Add content here */}
           </aside>
+
         </div>
 
         {/* Footer */}
@@ -50,7 +69,6 @@ export default function RootLayout({ children }) {
           <Footer />
         </footer>
         <br/>
-
       </body>
     </html>
   );

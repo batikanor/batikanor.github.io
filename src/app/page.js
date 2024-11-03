@@ -386,76 +386,6 @@ export default function Home() {
     }));
   }, [citiesAndLocations]);
   
-  // const markers = useMemo(
-  //   () => [
-  //     {
-  //       id: 0,
-  //       lat: 41.0082, // Istanbul
-  //       lng: 28.9784,
-  //       label: "School & Achievements in Istanbul",
-  //       size: 15,
-  //       color: "red",
-  //       description: `School:<br/>- BSc Computer Engineering, Turkish-German University<br/><br/>Achievements in Istanbul:<br/>- Mentored Quantum Programming Workshop (2021)<br/>- 3rd Place at BESTIstanbul Big Data Solutions Hackathon (2019)`,
-  //     },
-  //     {
-  //       id: 1,
-  //       lat: 48.1351, // Munich
-  //       lng: 11.582,
-  //       label: "School & Achievements in Munich",
-  //       size: 20,
-  //       color: "blue",
-  //       description: `School:<br/>- MSc Informatics, Technical University of Munich<br/><br/>Achievements in Munich:<br/>- 2nd Place at Bayer AI Innovation Hackathon (2024)<br/>- 1st Place at Thüga Solutions Hackathon (2024)<br/>- 2nd Place (team) & 1st Place (individual) at TUM AI Makeathon (2024)<br/>- 1st Place at EthMunich Hackathon (2023)`,
-  //     },
-  //     {
-  //       id: 2,
-  //       lat: 47.3769, // Zurich
-  //       lng: 8.5417,
-  //       label: "Achievements in Zurich",
-  //       size: 20,
-  //       color: "green",
-  //       description: `Achievements:<br/>- 1st Place & Audience Award at SwissHacks (2024)`,
-  //     },
-  //     {
-  //       id: 3,
-  //       lat: 41.3851, // Barcelona
-  //       lng: 2.1734,
-  //       label: "Achievements in Barcelona",
-  //       size: 20,
-  //       color: "orange",
-  //       description: `Achievements:<br/>- 3rd Place at HackUPC (Sponsor: Intersystems) (2024)`,
-  //     },
-  //     {
-  //       id: 4,
-  //       lat: 51.3397, // Leipzig
-  //       lng: 12.3731,
-  //       label: "Achievements in Leipzig",
-  //       size: 20,
-  //       color: "purple",
-  //       description: `Achievements:<br/>- 2nd Place at DSAG Jahreskongress AI Ideathon Leipzig (2024)`,
-  //     },
-  //     {
-  //       id: 5,
-  //       lat: 49.0069, // Karlsruhe
-  //       lng: 8.4037,
-  //       label: "Achievements in Karlsruhe",
-  //       size: 20,
-  //       color: "yellow",
-  //       description: `Achievements:<br/>- 1st Place at MSG Code & Create Hackathon (2023)`,
-  //     },
-  //     {
-  //       id: 6,
-  //       lat: 53.8655, // Lübeck
-  //       lng: 10.6866,
-  //       label: "Achievements in Lübeck",
-  //       size: 20,
-  //       color: "pink",
-  //       description: `Achievements:<br/>- 2nd Place at Dräger Hackathon (2023)`,
-  //     },
-  //   ],
-  //   []
-  // );
-  
-  // Generate arcs between markers
   const arcs = useMemo(
     () =>
       markers.slice(0, -1).map((marker, i) => ({
@@ -769,12 +699,9 @@ export default function Home() {
         <header className="text-center">
           <br />
 
-          <h1 className="text-5xl sm:text-7xl font-bold tracking-tight">
-            Batikanor
+          <h1 className="text-5xl sm:text-4xl font-bold tracking-tight">
+            Achievements Map
           </h1>
-          <p className="text-xl sm:text-m mt-4">Welcome!</p>
-          <p className="text-l sm:text-m mt-4">Some of my achievements are highlighted on the map below!</p>
-          <p className="text-l sm:text-m mt-4">Scroll down to learn about my past projects!</p>
         </header>
 
 
