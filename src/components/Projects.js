@@ -4,6 +4,7 @@ import { contestsAndActivities } from "../data/contestsAndActivities";
 
 // import ResizePanel from "react-resize-panel";
 const ResizePanel = typeof window !== "undefined" ? require("react-resize-panel").default : null;
+const navbarHeight = 80; // Adjust based on your navbar height in pixels
 
 // Function to convert Google Drive link to embeddable format for videos and documents
 const getGoogleDriveEmbedUrl = (url) => {
@@ -36,10 +37,22 @@ const Projects = () => {
   useEffect(() => {
     const hash = window.location.hash;
     if (hash) {
-      const slug = hash.replace("#", "");  
+      const slug = hash.replace("#", "");
       const foundActivity = contestsAndActivities.find((activity) => activity.slug === slug);
       if (foundActivity) {
         setExpandedActivity(foundActivity);
+  
+        // Delay the scroll to ensure the element is in the DOM
+        setTimeout(() => {
+          const element = document.getElementById(foundActivity.slug);
+          if (element) {
+            const navbarHeight = 80; // Adjust this based on your navbar height
+            window.scrollTo({
+              top: element.getBoundingClientRect().top + window.scrollY - navbarHeight,
+              behavior: "smooth"
+            });
+          }
+        }, 100); // Adjust delay if needed to allow content to load
       }
     }
   }, []);
@@ -47,6 +60,17 @@ const Projects = () => {
 
   const toggleExpandedView = (activity) => {
     setExpandedActivity(activity === expandedActivity ? null : activity);
+    if (activity !== expandedActivity) {
+      setTimeout(() => {
+        const element = document.getElementById(activity.slug);
+        if (element) {
+          window.scrollTo({
+            top: element.getBoundingClientRect().top + window.scrollY - navbarHeight,
+            behavior: "smooth"
+          });
+        }
+      }, 0);
+    }
   };
 
   const handleCopyLink = (slug) => {
@@ -121,7 +145,7 @@ const Projects = () => {
                     {isExpanded ? "Collapse" : "See more"}
                   </button>
                 </div>
-                <p className="text-gray-300">{activity.location}</p>
+                <p className="text-gray-300">{activity.mapData.venue}, {activity.mapData.city}/{activity.mapData.country}</p>
                 <p className="text-gray-400 mb-4">{activity.date}</p>
 
                 {/* Display Short Description */}

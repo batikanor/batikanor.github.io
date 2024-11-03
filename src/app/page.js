@@ -13,6 +13,7 @@ import { debounce } from "lodash";
 import Projects from "../components/Projects"; // Adjust path based on your folder structure
 import CV from "./cv/page";
 import { Joystick } from "react-joystick-component"; // Import Joystick
+import { getCitiesAndLocations } from "../data/contestsAndActivities"; // Adjust path as needed
 
 // Dynamically import the GlobeWrapper component without server-side rendering
 const Globe = dynamic(() => import("../components/GlobeWrapper"), { ssr: false });
@@ -239,6 +240,7 @@ export default function Home() {
 
 
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const citiesAndLocations = useMemo(() => getCitiesAndLocations(), []);
 
   // Ensure the Globe is only rendered on the client-side
   useEffect(() => {
@@ -246,7 +248,12 @@ export default function Home() {
     setIsMobile(/Mobi|Android/i.test(navigator.userAgent)); // Detect mobile devices
   }, []);
 
-
+  const navigateWithRefresh = (slug) => {
+    const url = `${window.location.origin}${window.location.pathname}#${slug}`;
+    window.location.href = url;
+    window.location.reload(); // Forces a page refresh
+  };
+  
   // **Fullscreen Toggle Function**
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
@@ -357,74 +364,96 @@ export default function Home() {
     }
   }, [gameMode, planePosition]);
 
-  const markers = useMemo(
-    () => [
-      {
-        id: 0,
-        lat: 41.0082, // Istanbul
-        lng: 28.9784,
-        label: "School & Achievements in Istanbul",
-        size: 15,
-        color: "red",
-        description: `School:<br/>- BSc Computer Engineering, Turkish-German University<br/><br/>Achievements in Istanbul:<br/>- Mentored Quantum Programming Workshop (2021)<br/>- 3rd Place at BESTIstanbul Big Data Solutions Hackathon (2019)`,
-      },
-      {
-        id: 1,
-        lat: 48.1351, // Munich
-        lng: 11.582,
-        label: "School & Achievements in Munich",
-        size: 20,
-        color: "blue",
-        description: `School:<br/>- MSc Informatics, Technical University of Munich<br/><br/>Achievements in Munich:<br/>- 2nd Place at Bayer AI Innovation Hackathon (2024)<br/>- 1st Place at Thüga Solutions Hackathon (2024)<br/>- 2nd Place (team) & 1st Place (individual) at TUM AI Makeathon (2024)<br/>- 1st Place at EthMunich Hackathon (2023)`,
-      },
-      {
-        id: 2,
-        lat: 47.3769, // Zurich
-        lng: 8.5417,
-        label: "Achievements in Zurich",
-        size: 20,
-        color: "green",
-        description: `Achievements:<br/>- 1st Place & Audience Award at SwissHacks (2024)`,
-      },
-      {
-        id: 3,
-        lat: 41.3851, // Barcelona
-        lng: 2.1734,
-        label: "Achievements in Barcelona",
-        size: 20,
-        color: "orange",
-        description: `Achievements:<br/>- 3rd Place at HackUPC (Sponsor: Intersystems) (2024)`,
-      },
-      {
-        id: 4,
-        lat: 51.3397, // Leipzig
-        lng: 12.3731,
-        label: "Achievements in Leipzig",
-        size: 20,
-        color: "purple",
-        description: `Achievements:<br/>- 2nd Place at DSAG Jahreskongress AI Ideathon Leipzig (2024)`,
-      },
-      {
-        id: 5,
-        lat: 49.0069, // Karlsruhe
-        lng: 8.4037,
-        label: "Achievements in Karlsruhe",
-        size: 20,
-        color: "yellow",
-        description: `Achievements:<br/>- 1st Place at MSG Code & Create Hackathon (2023)`,
-      },
-      {
-        id: 6,
-        lat: 53.8655, // Lübeck
-        lng: 10.6866,
-        label: "Achievements in Lübeck",
-        size: 20,
-        color: "pink",
-        description: `Achievements:<br/>- 2nd Place at Dräger Hackathon (2023)`,
-      },
-    ],
-    []
-  );
+  // Convert locations to marker format for the globe component
+  // Convert locations to marker format for the globe component, skipping any without coordinates
+  // Convert locations to marker format for the globe component, skipping any without coordinates
+  const colorPalette = ["blue", "green", "orange", "purple", "red", "yellow", "pink", "cyan", "lime", "magenta"]; // Add more colors if needed
+
+  const markers = useMemo(() => {
+    return citiesAndLocations.map((location, index) => ({
+      id: index,
+      lat: location.coordinates.lat,
+      lng: location.coordinates.lng,
+      label: location.city,
+      size: 15,
+      color: colorPalette[index % colorPalette.length], // Assign unique color for each city
+      activities: location.activities.map(activity => ({
+        venue: activity.venue,
+        date: activity.date,
+        title: activity.title,
+        slug: activity.slug, // Add the slug here
+      })),
+    }));
+  }, [citiesAndLocations]);
+  
+  // const markers = useMemo(
+  //   () => [
+  //     {
+  //       id: 0,
+  //       lat: 41.0082, // Istanbul
+  //       lng: 28.9784,
+  //       label: "School & Achievements in Istanbul",
+  //       size: 15,
+  //       color: "red",
+  //       description: `School:<br/>- BSc Computer Engineering, Turkish-German University<br/><br/>Achievements in Istanbul:<br/>- Mentored Quantum Programming Workshop (2021)<br/>- 3rd Place at BESTIstanbul Big Data Solutions Hackathon (2019)`,
+  //     },
+  //     {
+  //       id: 1,
+  //       lat: 48.1351, // Munich
+  //       lng: 11.582,
+  //       label: "School & Achievements in Munich",
+  //       size: 20,
+  //       color: "blue",
+  //       description: `School:<br/>- MSc Informatics, Technical University of Munich<br/><br/>Achievements in Munich:<br/>- 2nd Place at Bayer AI Innovation Hackathon (2024)<br/>- 1st Place at Thüga Solutions Hackathon (2024)<br/>- 2nd Place (team) & 1st Place (individual) at TUM AI Makeathon (2024)<br/>- 1st Place at EthMunich Hackathon (2023)`,
+  //     },
+  //     {
+  //       id: 2,
+  //       lat: 47.3769, // Zurich
+  //       lng: 8.5417,
+  //       label: "Achievements in Zurich",
+  //       size: 20,
+  //       color: "green",
+  //       description: `Achievements:<br/>- 1st Place & Audience Award at SwissHacks (2024)`,
+  //     },
+  //     {
+  //       id: 3,
+  //       lat: 41.3851, // Barcelona
+  //       lng: 2.1734,
+  //       label: "Achievements in Barcelona",
+  //       size: 20,
+  //       color: "orange",
+  //       description: `Achievements:<br/>- 3rd Place at HackUPC (Sponsor: Intersystems) (2024)`,
+  //     },
+  //     {
+  //       id: 4,
+  //       lat: 51.3397, // Leipzig
+  //       lng: 12.3731,
+  //       label: "Achievements in Leipzig",
+  //       size: 20,
+  //       color: "purple",
+  //       description: `Achievements:<br/>- 2nd Place at DSAG Jahreskongress AI Ideathon Leipzig (2024)`,
+  //     },
+  //     {
+  //       id: 5,
+  //       lat: 49.0069, // Karlsruhe
+  //       lng: 8.4037,
+  //       label: "Achievements in Karlsruhe",
+  //       size: 20,
+  //       color: "yellow",
+  //       description: `Achievements:<br/>- 1st Place at MSG Code & Create Hackathon (2023)`,
+  //     },
+  //     {
+  //       id: 6,
+  //       lat: 53.8655, // Lübeck
+  //       lng: 10.6866,
+  //       label: "Achievements in Lübeck",
+  //       size: 20,
+  //       color: "pink",
+  //       description: `Achievements:<br/>- 2nd Place at Dräger Hackathon (2023)`,
+  //     },
+  //   ],
+  //   []
+  // );
   
   // Generate arcs between markers
   const arcs = useMemo(
@@ -885,19 +914,32 @@ export default function Home() {
             >
               {isFullscreen ? "❎" : "⛶"}
             </button>
-{/* 
-            {isFullscreen && (
-              <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z10">
-                <div className="bg-gray-800 text-white p-4 rounded">
-                  <p>Fullscreen mode is work in progress</p>
-                </div>
-              </div>
-            )} */}
+
             {/* Modal Popup for Marker Click (Now Inside Fullscreen Container) */}
+            {/* Clicked Marker Pop-up (Only in Fullscreen Mode) */}
             {clickedMarker && isFullscreen && (
               <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
                 <div className="bg-gray-800 rounded-lg p-6 text-white max-w-md mx-auto">
-                  <p className="text-lg font-semibold" dangerouslySetInnerHTML={{ __html: clickedMarker.description }} />
+                  <h2 className="text-lg font-semibold mb-4">
+                    {clickedMarker.label}
+                  </h2>
+                  <div className="max-h-64 overflow-y-auto space-y-2">
+                    {clickedMarker.activities.map((activity, index) => (
+                      <div key={index} className="bg-gray-700 p-3 rounded-md text-sm shadow-md">
+                        <strong>{activity.venue} - {activity.date}</strong><br />
+                        <span>{activity.title}</span>
+                        <button
+                          onClick={() => {
+                            navigateWithRefresh(activity.slug);
+                            setClickedMarker(null); // Close pop-up after click
+                          }}
+                          className="text-blue-400 hover:underline ml-2"
+                        >
+                          View Project
+                        </button>
+                      </div>
+                    ))}
+                  </div>
                   <button
                     className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
                     onClick={() => setClickedMarker(null)}
@@ -907,6 +949,9 @@ export default function Home() {
                 </div>
               </div>
             )}
+
+
+
             {/* Overlay for Game Symbols */}
             {gameMode === "ticTacToe" && (
               <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
@@ -950,25 +995,30 @@ export default function Home() {
           </div>
         )}
 
-        {/* Overlay UI for Plane Collect Coins */}
-        {/* {gameMode === "planeCollectCoins" && (
-          <div className="absolute top-0 left-0 w-full h-full pointer-events-none flex flex-col items-center justify-start p-4">
-            <div className="bg-gray-800 bg-opacity-70 text-white px-4 py-2 rounded mb-2">
-              Collected Coins: {collectedCoins} / 20
-            </div>
-            <div className="bg-gray-800 bg-opacity-70 text-white px-4 py-2 rounded">
-              Time Elapsed: {(elapsedTime / 1000).toFixed(1)} seconds
-            </div>
-          </div>
-        )} */}
-
         {/* Side Bubble for Hovered Marker */}
+        {/* Hovered Marker Pop-up */}
         {hoveredMarker && (
           <div className="fixed top-1/2 right-4 transform -translate-y-1/2 bg-gray-800 text-white p-6 rounded-lg shadow-lg max-w-xs z-50 transition-opacity duration-300">
-            <h2 className="text-xl font-semibold">
+            <h2 className="text-xl font-semibold mb-4">
               {hoveredMarker.label}
             </h2>
-            <p className="mt-2" dangerouslySetInnerHTML={{ __html: hoveredMarker.description }} />
+            <div className="max-h-64 overflow-y-auto space-y-2">
+              {hoveredMarker.activities.map((activity, index) => (
+                <div key={index} className="bg-gray-700 p-3 rounded-md text-sm shadow-md">
+                  <strong>{activity.venue} - {activity.date}</strong><br />
+                  <span>{activity.title}</span>
+                  <button
+                    onClick={() => {
+                      navigateWithRefresh(activity.slug);
+                      setHoveredMarker(null); // Close pop-up after click
+                    }}
+                    className="text-blue-400 hover:underline ml-2"
+                  >
+                    View Project
+                  </button>
+                </div>
+              ))}
+            </div>
             <button
               onClick={() => setHoveredMarker(null)}
               className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
@@ -977,25 +1027,6 @@ export default function Home() {
             </button>
           </div>
         )}
-
-
-
-        {/* Modal Popup for Marker Click */}
-        {/* {clickedMarker && (
-          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-            <div className="bg-gray-800 rounded-lg p-6 text-white max-w-md mx-auto">
-              <p className="text-lg font-semibold" dangerouslySetInnerHTML={{ __html: clickedMarker.description }} />
-              <button
-                className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                onClick={() => setClickedMarker(null)}
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        )} */}
-
-
 
 
         {/* Winner Notification for Tic-Tac-Toe */}
