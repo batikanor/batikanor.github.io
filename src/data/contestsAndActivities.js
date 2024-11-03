@@ -12,8 +12,13 @@ export const contestsAndActivities = [
       shortDescription: `Awarded funding for co-designing an AI-based employee surveying platform to enable sustainability and climate-related discussions between employees and employers. Pilot project currently planned in Zurich.`,
       technologies: ["AI", "Employee Engagement", "Sustainability", "Climate"],
       links: [],
-      longDescription: ``,
+      longDescription: `At the 2024 Zurich Climathon, our team developed GreenDoor, an AI-driven employee engagement platform designed to bring transparency and accountability to corporate sustainability practices. GreenDoor operates as a “Glassdoor for Sustainability,” providing employees with an anonymous platform to rate and review their companies’ environmental and sustainability efforts. This tool empowers employees to highlight their company’s commitment—or lack thereof—to sustainable practices, encouraging companies to improve based on transparent feedback.
+
+The platform supports sustainable decision-making and aligns with global Sustainable Development Goals (SDGs) by structuring survey questions around these objectives. To ensure relevance and accuracy, we aim to partner with sustainability certification bodies and industry ranking organizations to provide integrated insights. With a freemium model, GreenDoor offers free public data access while monetizing through premium features, such as predictive analytics for companies on meeting sustainability targets and advertisement placements for sustainability-focused job positions. Additionally, advanced AI-based bot detection and authentication methods guarantee data reliability and user anonymity.
+
+Our roadmap includes launching the platform in Zurich, gathering initial data, and progressively expanding features and geographic reach as data volume and revenue grow. GreenDoor aims not only to inform potential employees but also to encourage proactive change, providing companies with critical insights into employee expectations around sustainability. By fostering a community-driven approach to sustainable corporate transparency, GreenDoor breaks down barriers between employees and employers, opening the door to a greener, more accountable future for businesses.`,
       gdrive_embed: [
+        "https://drive.google.com/file/d/1XBhq5-55hGyOsYrkRKRZV-V5P1qPKPc1/view?usp=sharing",
         "https://docs.google.com/presentation/d/13NjatYi07DAcC8oKYnAJxaIXW_GopTxigWBoWbUfwQo/edit#slide=id.p",
         "https://docs.google.com/document/d/1Zp4I7-1y4VoNY0kydPNKfeSKhuO_41lfdlDqhQF_39I/edit?usp=sharing",
       ],
