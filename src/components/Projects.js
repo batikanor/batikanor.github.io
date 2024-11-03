@@ -281,7 +281,7 @@ const getDeterministicColor = (slug) => {
   const index = Math.abs(hash) % colors.length;
   return colors[index];
 };
-const ContestsAndActivities = () => {
+const Projects = () => {
   const [expandedActivity, setExpandedActivity] = useState(null);
 
   // Expand item based on URL hash
@@ -467,4 +467,4 @@ const ContestsAndActivities = () => {
   );
 };
 
-export default ContestsAndActivities;
+export default Projects;
