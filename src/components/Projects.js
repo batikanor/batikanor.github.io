@@ -135,9 +135,9 @@ const Projects = () => {
                   ></div>
                 )}
                 <div className="flex justify-between items-center">
-                  <h3 className="text-2xl font-semibold mb-2 text-white">
-                    {activity.title}
-                  </h3>
+                <h3 className="text-lg sm:text-2xl font-semibold mb-2 text-white">
+                  {activity.title}
+                </h3>
                   <button
                     onClick={() => toggleExpandedView(activity)}
                     className="bg-gray-700 text-white px-3 py-1 rounded hover:bg-gray-600"

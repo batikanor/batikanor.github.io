@@ -1,14 +1,15 @@
-/* styles/globals.css */
+/* Import Tailwind base, components, and utilities */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Custom CSS */
+/* Custom Root Variables */
 :root {
   --background: #ffffff;
   --foreground: #171717;
 }
 
+/* Dark Mode Variables */
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
@@ -16,6 +17,7 @@
   }
 }
 
+/* Global Styles */
 body {
   @apply antialiased flex flex-col min-h-screen;
   background-color: var(--background);
@@ -26,12 +28,48 @@ body {
   box-sizing: border-box;
 }
 
-/* Modern hover effect on links */
+/* Link Styling with Hover Effect */
 a {
   transition: color 0.2s ease-in-out;
 }
 
-/* Utility for balanced text wrapping and layout styles */
+/* Responsive Typography */
+body {
+  font-size: 1rem; /* Default font size */
+}
+
+@media (max-width: 640px) {
+  body {
+    font-size: 0.875rem; /* Smaller font size for mobile */
+  }
+}
+
+h1 {
+  @apply text-3xl font-bold;
+}
+
+h2 {
+  @apply text-2xl font-semibold;
+}
+
+h3 {
+  @apply text-xl font-medium;
+}
+
+/* Responsive Font Sizing for Headings */
+@media (max-width: 640px) {
+  h1 {
+    @apply text-2xl;
+  }
+  h2 {
+    @apply text-xl;
+  }
+  h3 {
+    @apply text-lg;
+  }
+}
+
+/* Custom Utility Classes */
 @layer utilities {
   .text-balance {
     text-wrap: balance;
@@ -39,11 +77,11 @@ a {
 
   /* Layout Utility Classes */
   .layout-header {
-    @apply bg-white dark:bg-gray-800 shadow;
+    @apply bg-white dark:bg-gray-800 shadow fixed top-0 left-0 right-0 z-50;
   }
 
   .layout-main {
-    @apply flex-1 flex flex-col lg:flex-row;
+    @apply flex-1 flex flex-col lg:flex-row mt-[4rem];
   }
 
   .layout-aside {
@@ -56,5 +94,16 @@ a {
 
   .layout-footer {
     @apply bg-white dark:bg-gray-800 shadow;
+  }
+}
+
+/* Utility for Global Layout Spacing */
+.container {
+  @apply mx-auto max-w-7xl;
+}
+
+@media (max-width: 640px) {
+  .container {
+    @apply px-4;
   }
 }
