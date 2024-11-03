@@ -1,5 +1,21 @@
 export const contestsAndActivities = [
     {
+      slug: "zurich-climathon-2024",  // Unique slug for each project
+      title: "Awarded 7000 CHF by the City of Zurich for AI-Based Employee Surveying Platform",
+      mapData: {
+        venue: "Kraftwerk",
+        city: "Zurich",
+        country: "Switzerland",
+        coordinates: { lat: 47.3769, lng: 8.5417 }
+      },
+      date: "11/2024",
+      shortDescription: `Awarded funding for co-designing an AI-based employee surveying platform to enable sustainability and climate-related discussions between employees and employers. Pilot project currently planned in Zurich.`,
+      technologies: ["AI", "Employee Engagement", "Sustainability", "Climate"],
+      links: [],
+      longDescription: ``,
+    },
+  
+    {
       slug: "bayer-ai-2024",  // Unique slug for each project
       title: "2nd Place at Bayer AI Innovation Platform Hackathon",
       mapData: {
