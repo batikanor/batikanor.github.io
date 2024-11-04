@@ -45,7 +45,12 @@ export default function RootLayout({ children }) {
 
 
           {/* Main Content */}
-          <main className="flex-1 p-6 sm:p-12 bg-white dark:bg-gray-800">
+          <main className="flex-1 p-6 sm:p-12 bg-white dark:bg-gray-800"
+                        style={{ 
+                          // backgroundImage: "url('/night-sky.png')",
+                          // backgroundSize: "150%", // Increase or decrease to rescale
+                          // backgroundPosition: "center"
+                        }}>
             {children}
           </main>
 

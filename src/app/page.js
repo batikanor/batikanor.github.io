@@ -375,16 +375,19 @@ export default function Home() {
       lat: location.coordinates.lat,
       lng: location.coordinates.lng,
       label: location.city,
-      size: 15,
-      color: colorPalette[index % colorPalette.length], // Assign unique color for each city
+      size: location.isMajorCity ? 20 : 15, // Different size for major cities
+      color: location.isMajorCity ? "gold" : colorPalette[index % colorPalette.length],
+      icon: location.isMajorCity ? "🏙️" : "📍", // Different icon for major cities
+      animation: location.isMajorCity ? "pulsate" : "none",
       activities: location.activities.map(activity => ({
         venue: activity.venue,
         date: activity.date,
         title: activity.title,
-        slug: activity.slug, // Add the slug here
+        slug: activity.slug,
       })),
     }));
   }, [citiesAndLocations]);
+  
   
   const arcs = useMemo(
     () =>
@@ -699,9 +702,11 @@ export default function Home() {
         <header className="text-center">
           <br />
 
-          <h1 className="text-5xl sm:text-4xl font-bold tracking-tight">
-            Achievements Map
+          <h1 className="flex items-center justify-center space-x-2">
+            <span>🌍</span>
+            <span>Achievements Map</span>
           </h1>
+
         </header>
 
 
@@ -769,16 +774,21 @@ export default function Home() {
               }
               width={isFullscreen ? window.innerWidth : dimensions.width}
               height={isFullscreen ? window.innerHeight : dimensions.height}
-              globeImageUrl="//unpkg.com/three-globe/example/img/earth-blue-marble.jpg"
+              // globeImageUrl="//unpkg.com/three-globe/example/img/earth-blue-marble.jpg"\
+              globeImageUrl="//unpkg.com/three-globe/example/img/earth-night.jpg"
+              // globeImageUrl="//unpkg.com/three-globe/example/img/earth-topology.png"
+
               backgroundColor="rgba(0,0,0,0)"
               pointsData={allMarkers}
               pointSize={(point) =>
                 hoveredMarker && hoveredMarker.label === point.label
                   ? point.size + 5
+                  : isMobile
+                  ? point.size + 10  // Increase size on mobile for easier tapping
                   : point.size
               }
               pointColor="color"
-              pointLabel={(point) => `${point.label}`}
+              pointLabel={(point) => `${point.icon} ${point.label}`}
               pointAltitude={0.05} // Increased altitude from 0.01 to 0.05
               pointResolution={4} // Increased resolution for smoother markers
               onPointClick={(point, event) => {
