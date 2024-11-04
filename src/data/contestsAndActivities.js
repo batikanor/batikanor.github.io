@@ -18,6 +18,7 @@ The platform supports sustainable decision-making and aligns with global Sustain
 
 Our roadmap includes launching the platform in Zurich, gathering initial data, and progressively expanding features and geographic reach as data volume and revenue grow. GreenDoor aims not only to inform potential employees but also to encourage proactive change, providing companies with critical insights into employee expectations around sustainability. By fostering a community-driven approach to sustainable corporate transparency, GreenDoor breaks down barriers between employees and employers, opening the door to a greener, more accountable future for businesses.`,
       gdrive_embed: [
+        "https://drive.google.com/file/d/12jv9_k9AbwCAeG_mMYdgFvX7LkR-xNOC/view?usp=sharing",
         "https://drive.google.com/file/d/1XBhq5-55hGyOsYrkRKRZV-V5P1qPKPc1/view?usp=sharing",
         "https://docs.google.com/presentation/d/13NjatYi07DAcC8oKYnAJxaIXW_GopTxigWBoWbUfwQo/edit#slide=id.p",
         "https://docs.google.com/document/d/1Zp4I7-1y4VoNY0kydPNKfeSKhuO_41lfdlDqhQF_39I/edit?usp=sharing",
