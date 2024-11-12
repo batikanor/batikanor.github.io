@@ -1,4 +1,50 @@
 export const contestsAndActivities = [
+  {
+    slug: "salzburg-tourism-2024",  // Unique slug for each project
+    title: "1st Place at the biggest Tourism Technology Festival in Europe",
+    mapData: {
+      venue: "Alles Für den GAST",
+      city: "Salzburg",
+      country: "Austria",
+      coordinates: { lat: 47.8014, lng: 13.0448 }
+    },
+    date: "11/2024",
+    shortDescription: `We built a touristic spot recommendation system that uses EEG data and machine learning, and won the Tourism Technology Festival in Salzburg, where we were rewarded 2500 Eur and also partially awarded a trip to japan where there'd be a Music & AI hackathon in a 1000 year old temple in Nara.`,
+    technologies: ["AI", "EEG", "Tourism", "Biosensors", "Python", "ReactJS"],
+    links: [
+      { label: "Muse 2 Details", url: "https://www.researchgate.net/figure/a-MUSE-2-headband-sensors-overview-b-Top-down-view-of-the-EEG-electrode-positions-on_fig1_357537669"},
+      { label: "Big 5 Personality Traits", url: "https://en.wikipedia.org/wiki/Big_Five_personality_traits"},
+      { label: "Klados, M.A., Konstantinidi, P., Dacosta-Aguayo, R., Kostaridou, V., Vinciarelli, A., & Zervakis, M.E. (2020). Automatic Recognition of Personality Profiles Using EEG Functional Connectivity during Emotional Processing. Brain Sciences, 10.", url: "https://www.semanticscholar.org/paper/Automatic-Recognition-of-Personality-Profiles-Using-Klados-Konstantinidi/82ab4e428452cd48b3b219d1d84c1f5c362d49dc"},
+      ],
+    longDescription: `
+    The pipeline we implemented works as follows:
+    
+    0) Assume you are working for marketing of Austria to tourists, and you are currently in a conference in Dubai. You have some 'technical stuff' in your stand, with which you draw attention. 
+    \n
+    1) You use a Muse 2 headband (see link 1) to collect EEG data from your visitor. Whilst doing that, the visitor is viewing semi-abstract images related to potential hobbies.
+    
+    2) Our program is extracting simple features from the collected EEG data, such as how concentrated the visitor is in every brief moment, and how strong their emotions are. We are especially keeping track of these for the brief moments (1 sec) each image is shown. For example, the frontal alpha asymmetry is calculated as: log(right_alpha) - log(left_alpha)  
+    
+    3) With the help of data from step 2 and raw EEG data passed through neural networks, we extract the 'big 5 personality traits' (see link 2).  
+
+    4) We feed the data from steps 2 and 3 into an LLM, and fetch the recommended travel spot through RAG from aforementioned travel hotspots in austria datasets. The LLM also provides an explanation regarding the decision.
+    
+
+    This was the first time our team worked with EEG data, and we only had 24 hours to complete everything. During the event we had conflicts within the team but we didn't let these stop us from winning. We got 1st place out of 25+ teams.
+
+    We've taken inspiration from Klados et al (link 3).
+
+
+
+
+
+    I wanted to share the code here, but we private'd the repository due to the wishes of some of our team members.
+    `,
+    gdrive_embed: [
+      "https://drive.google.com/file/d/1_chrnl3jKyyBcyZjBpodhtyYO0jwaGHE/view?usp=sharing",
+      "https://drive.google.com/file/d/1U4GgVCr_zNKcQcSS6prPBdPJGg0g3C6U/view?usp=sharing",
+    ],
+  },
     {
       slug: "zurich-climathon-2024",  // Unique slug for each project
       title: "Awarded 7000 CHF by the City of Zurich: AI-Based Employee Surveying Platform",

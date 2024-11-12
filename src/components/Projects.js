@@ -141,8 +141,10 @@ const Projects = () => {
                 {/* Display Long Description if Expanded */}
                 {isExpanded && (
                   <>
-                    <p className="text-gray-300 mb-4">{activity.longDescription}</p>
-
+                    {/* <p className="text-gray-300 mb-4">{activity.longDescription}</p> */}
+                    {activity.longDescription.split('\n').map((line, index) => (
+                      <p key={index}>{line}</p>
+                    ))}
                     {/* Copy Link Button */}
                     <button
                       onClick={() => handleCopyLink(activity.slug)}
