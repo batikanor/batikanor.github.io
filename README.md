@@ -3,10 +3,15 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 ## Other commands
 remove built files
 `rm -rf .nextx`
+
 `pnpm add packagename`
+
 `pnpm dev`
+
 `pnpm build` 
+
 `pnpm lint`
+
 `pnpm dev --hostname 0.0.0.0` --> you can also test on mobile
 ## Getting Started
 
