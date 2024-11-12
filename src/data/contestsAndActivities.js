@@ -15,7 +15,7 @@ export const contestsAndActivities = [
     links: [
       { label: "Muse 2 Details", url: "https://www.researchgate.net/figure/a-MUSE-2-headband-sensors-overview-b-Top-down-view-of-the-EEG-electrode-positions-on_fig1_357537669"},
       { label: "Big 5 Personality Traits", url: "https://en.wikipedia.org/wiki/Big_Five_personality_traits"},
-      { label: "Klados, M.A., Konstantinidi, P., Dacosta-Aguayo, R., Kostaridou, V., Vinciarelli, A., & Zervakis, M.E. (2020). Automatic Recognition of Personality Profiles Using EEG Functional Connectivity during Emotional Processing. Brain Sciences, 10.", url: "https://www.semanticscholar.org/paper/Automatic-Recognition-of-Personality-Profiles-Using-Klados-Konstantinidi/82ab4e428452cd48b3b219d1d84c1f5c362d49dc"},
+      { label: "Klados et al (2020). Automatic Recognition of Personality Profiles Using EEG Functional Connectivity during Emotional Processing. Brain Sciences, 10.", url: "https://www.semanticscholar.org/paper/Automatic-Recognition-of-Personality-Profiles-Using-Klados-Konstantinidi/82ab4e428452cd48b3b219d1d84c1f5c362d49dc"},
       ],
     longDescription: `
     The pipeline we implemented works as follows:

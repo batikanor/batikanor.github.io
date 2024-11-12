@@ -143,9 +143,10 @@ const Projects = () => {
                   <>
                     {/* <p className="text-gray-300 mb-4">{activity.longDescription}</p> */}
                     {activity.longDescription.split('\n').map((line, index) => (
-                      <p key={index}>{line}</p>
+                      <p className="text-white" key={index}>{line}</p>
                     ))}
                     {/* Copy Link Button */}
+                    <br/>
                     <button
                       onClick={() => handleCopyLink(activity.slug)}
                       className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-500 mb-4"
