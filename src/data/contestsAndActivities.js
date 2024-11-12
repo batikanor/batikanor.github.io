@@ -1,6 +1,7 @@
 export const contestsAndActivities = [
   {
     slug: "salzburg-tourism-2024",  // Unique slug for each project
+    highlighted: true,
     title: "1st Place at the biggest Tourism Technology Festival in Europe",
     mapData: {
       venue: "Alles Für den GAST",
