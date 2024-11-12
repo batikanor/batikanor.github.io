@@ -11,15 +11,11 @@ export default function CV() {
       setIsMobile(isMobileDevice);
 
       if (!isMobileDevice) {
-        const cvWidth = 816; // Original CV width in pixels
-        const cvHeight = 700; // Original CV height in pixels
-
+        const cvWidth = 1000; 
         const availableWidth = window.innerWidth;
-        const availableHeight = window.innerHeight;
-
         const widthScale = availableWidth / cvWidth;
-        const heightScale = availableHeight / cvHeight;
-        const newScale = Math.min(widthScale, heightScale);
+        const newScale = widthScale;
+
 
         setScale(newScale);
       } else {
@@ -46,7 +42,7 @@ export default function CV() {
           className="overflow-hidden"
           style={{
             width: `${816 * scale}px`,
-            height: `${1400 * scale}px`,
+            height: `${1450 * scale}px`,
           }}
         >
           <iframe
@@ -55,13 +51,14 @@ export default function CV() {
               transform: `scale(${scale})`,
               transformOrigin: 'top left',
               width: '816px',
-              height: '3056px',
+              height: '3156px',
               border: 'none',
             }}
             title="My CV"
           ></iframe>
         </div>
       )}
+
       <a
         href="https://docs.google.com/document/d/1ZVQcdNvOR46HBUCtVy6XKFOXocRYL9-TR_LLrRfJ2T8/export?format=pdf"
         download
