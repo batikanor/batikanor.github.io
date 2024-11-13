@@ -615,28 +615,27 @@ export default function GlobeGame({ navigateWithRefresh }) {
     () => ({
       lat: planePosition.lat,
       lng: planePosition.lng,
-      label: "✈️", // Plane emoji
+      label: "You are flying the plane!",
+      icon: "✈️", // Plane emoji
       size: 20, // Larger size for visibility
       color: "orange",
-      description: "You are flying the plane!",
     }),
     [planePosition]
   );
-
-  // Coin Markers
+  
   const coinMarkers = useMemo(
     () => coins.map((coin) => ({
       lat: coin.lat,
       lng: coin.lng,
-      label: "🪙", // Coin emoji
+      label: "A shiny coin to collect!",
+      icon: "🪙", // Coin emoji
       size: 10, // Size for coins
       color: "yellow",
-      description: "A shiny coin to collect!",
       id: coin.id,
     })),
     [coins]
   );
-
+  
   // All markers including the plane and coins
   const allMarkers = useMemo(() => {
     if (gameMode === "planeCollectCoins") {
@@ -830,7 +829,7 @@ export default function GlobeGame({ navigateWithRefresh }) {
                   {clickedMarker.label}
                 </h2>
                 <div className="max-h-64 overflow-y-auto space-y-2">
-                  {clickedMarker.activities.map((activity, index) => (
+                  {clickedMarker.activities?.map((activity, index) => (
                     <div key={index} className="bg-gray-700 p-3 rounded-md text-sm shadow-md">
                       <strong>{activity.venue} - {activity.date}</strong><br />
                       <span>{activity.title}</span>
@@ -899,38 +898,38 @@ export default function GlobeGame({ navigateWithRefresh }) {
         </div>
       )}
 
-      {/* Side Bubble for Hovered Marker */}
-      {/* Hovered Marker Pop-up */}
-      {hoveredMarker && (
-        <div className="fixed top-1/2 right-4 transform -translate-y-1/2 bg-gray-800 text-white p-6 rounded-lg shadow-lg max-w-xs z-50 transition-opacity duration-300">
-          <h2 className="text-xl font-semibold mb-4">
-            {hoveredMarker.label}
-          </h2>
-          <div className="max-h-64 overflow-y-auto space-y-2">
-            {hoveredMarker.activities.map((activity, index) => (
-              <div key={index} className="bg-gray-700 p-3 rounded-md text-sm shadow-md">
-                <strong>{activity.venue} - {activity.date}</strong><br />
-                <span>{activity.title}</span>
-                <button
-                  onClick={() => {
-                    navigateWithRefresh(activity.slug);
-                    setHoveredMarker(null); // Close pop-up after click
-                  }}
-                  className="text-blue-400 hover:underline ml-2"
-                >
-                  View Project
-                </button>
-              </div>
-            ))}
+  {/* Side Bubble for Hovered Marker */}
+  {hoveredMarker && (
+    <div className="fixed top-1/2 right-4 transform -translate-y-1/2 bg-gray-800 text-white p-6 rounded-lg shadow-lg max-w-xs z-50 transition-opacity duration-300">
+      <h2 className="text-xl font-semibold mb-4">
+        {hoveredMarker.label || ' '} {/* Render a space if label is undefined */}
+      </h2>
+      <div className="max-h-64 overflow-y-auto space-y-2">
+        {(hoveredMarker.activities || []).map((activity, index) => (
+          <div key={index} className="bg-gray-700 p-3 rounded-md text-sm shadow-md">
+            <strong>{activity.venue} - {activity.date}</strong><br />
+            <span>{activity.title}</span>
+            <button
+              onClick={() => {
+                navigateWithRefresh(activity.slug);
+                setHoveredMarker(null); // Close pop-up after click
+              }}
+              className="text-blue-400 hover:underline ml-2"
+            >
+              View Project
+            </button>
           </div>
-          <button
-            onClick={() => setHoveredMarker(null)}
-            className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-          >
-            Close
-          </button>
-        </div>
-      )}
+        ))}
+      </div>
+      <button
+        onClick={() => setHoveredMarker(null)}
+        className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+      >
+        Close
+      </button>
+    </div>
+  )}
+
 
       {/* Winner Notification for Tic-Tac-Toe */}
       {winner && gameMode === "ticTacToe" && (
