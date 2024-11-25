@@ -1,10 +1,9 @@
 "use client";
-// pages/index.js
 
-import React, { useState } from "react";
-import { Connection, PublicKey } from "@solana/web3.js";
+import React, { useState, useEffect } from "react";
+import dynamic from "next/dynamic";
+import { Connection } from "@solana/web3.js";
 import {
-  useWallet,
   WalletProvider,
   ConnectionProvider,
 } from "@solana/wallet-adapter-react";
@@ -13,11 +12,8 @@ import {
   WalletModalProvider,
   WalletMultiButton,
 } from "@solana/wallet-adapter-react-ui";
-import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
 
 import "@solana/wallet-adapter-react-ui/styles.css";
-import "leaflet/dist/leaflet.css";
-import L from "leaflet";
 
 // Material-UI Imports
 import { ThemeProvider, createTheme } from "@mui/material/styles";
@@ -31,17 +27,6 @@ import {
   Grid,
 } from "@mui/material";
 
-// Fix for default marker icon issues in Leaflet
-delete L.Icon.Default.prototype._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: require("leaflet/dist/images/marker-icon-2x.png"),
-  iconUrl: require("leaflet/dist/images/marker-icon.png"),
-  shadowUrl: require("leaflet/dist/images/marker-shadow.png"),
-});
-
-const wallets = [new PhantomWalletAdapter()];
-const network = "https://api.devnet.solana.com";
-
 const theme = createTheme({
   palette: {
     primary: { main: "#1976d2" },
@@ -49,20 +34,22 @@ const theme = createTheme({
   },
 });
 
-const App = () => {
+const wallets = [new PhantomWalletAdapter()];
+const network = "https://api.devnet.solana.com";
+
+const SolanaPage = () => {
   const [pdfFile, setPdfFile] = useState(null);
   const [pdfHash, setPdfHash] = useState("");
   const [latitude, setLatitude] = useState("");
   const [longitude, setLongitude] = useState("");
   const [price, setPrice] = useState("");
   const [logs, setLogs] = useState("");
-  const [selectedLocation, setSelectedLocation] = useState({
-    lat: 51.505,
-    lng: -0.09,
-  });
+  const [isClient, setIsClient] = useState(false);
 
-  const wallet = useWallet();
-  const connection = new Connection(network, "processed");
+  useEffect(() => {
+    // Ensure component renders only on the client
+    setIsClient(true);
+  }, []);
 
   const handleFileUpload = async (event) => {
     const file = event.target.files[0];
@@ -72,7 +59,9 @@ const App = () => {
         const arrayBuffer = await file.arrayBuffer();
         const hashBuffer = await crypto.subtle.digest("SHA-256", arrayBuffer);
         const hashArray = Array.from(new Uint8Array(hashBuffer));
-        const hashHex = hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
+        const hashHex = hashArray
+          .map((b) => b.toString(16).padStart(2, "0"))
+          .join("");
         setPdfHash(hashHex);
         console.log("PDF Hash:", hashHex);
       } catch (error) {
@@ -85,7 +74,7 @@ const App = () => {
     }
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
     if (!pdfHash || !latitude || !longitude || !price) {
@@ -93,37 +82,25 @@ const App = () => {
       return;
     }
 
-    setLogs("Data submitted successfully.");
-    console.log({
-      pdfHash,
-      latitude,
-      longitude,
-      price,
-    });
+    try {
+      console.log("Submitting Data:", { pdfHash, latitude, longitude, price });
+      setLogs("Data submitted successfully.");
+    } catch (error) {
+      console.error("Error submitting data:", error);
+      setLogs("Failed to submit data. See console for details.");
+    }
   };
 
-  const LocationMarker = () => {
-    useMapEvents({
-      click(e) {
-        const { lat, lng } = e.latlng;
-        setSelectedLocation({ lat, lng });
-        setLatitude(lat.toString());
-        setLongitude(lng.toString());
-      },
-    });
-
-    return selectedLocation ? (
-      <Marker position={selectedLocation}></Marker>
-    ) : null;
-  };
+  // Render only on the client
+  if (!isClient) return null;
 
   return (
-    <Container maxWidth="md" style={{ marginTop: "20px" }}>
-      <WalletModalProvider>
-        <WalletMultiButton />
-      </WalletModalProvider>
+    <ThemeProvider theme={theme}>
+      <Container maxWidth="md" style={{ marginTop: "20px" }}>
+        <WalletModalProvider>
+          <WalletMultiButton />
+        </WalletModalProvider>
 
-      {wallet.connected ? (
         <Card variant="outlined" style={{ marginTop: "20px" }}>
           <CardContent>
             <Typography variant="h5" gutterBottom>
@@ -141,26 +118,23 @@ const App = () => {
                     onChange={handleFileUpload}
                   />
                 </Grid>
-                <Grid item xs={12}>
+                <Grid item xs={6}>
                   <TextField
                     fullWidth
                     variant="outlined"
-                    value={`Lat: ${latitude}, Lng: ${longitude}`}
-                    label="Selected Location"
-                    InputProps={{ readOnly: true }}
+                    label="Latitude"
+                    value={latitude}
+                    onChange={(e) => setLatitude(e.target.value)}
                   />
-                  <div style={{ height: "400px", width: "100%", marginTop: "10px" }}>
-                    <MapContainer
-                      center={selectedLocation}
-                      zoom={13}
-                      style={{ height: "100%", width: "100%" }}
-                    >
-                      <TileLayer
-                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                      />
-                      <LocationMarker />
-                    </MapContainer>
-                  </div>
+                </Grid>
+                <Grid item xs={6}>
+                  <TextField
+                    fullWidth
+                    variant="outlined"
+                    label="Longitude"
+                    value={longitude}
+                    onChange={(e) => setLongitude(e.target.value)}
+                  />
                 </Grid>
                 <Grid item xs={12}>
                   <TextField
@@ -184,26 +158,22 @@ const App = () => {
                 </Grid>
               </Grid>
             </form>
-            {logs && <Typography style={{ marginTop: "10px" }}>{logs}</Typography>}
+            {logs && (
+              <Typography style={{ marginTop: "10px" }}>{logs}</Typography>
+            )}
           </CardContent>
         </Card>
-      ) : (
-        <Typography variant="body1" style={{ marginTop: "20px" }}>
-          Please connect your wallet to submit data.
-        </Typography>
-      )}
-    </Container>
+      </Container>
+    </ThemeProvider>
   );
 };
 
-const Home = () => (
-  <ThemeProvider theme={theme}>
-    <ConnectionProvider endpoint={network}>
-      <WalletProvider wallets={wallets} autoConnect>
-        <App />
-      </WalletProvider>
-    </ConnectionProvider>
-  </ThemeProvider>
+const SolanaApp = () => (
+  <ConnectionProvider endpoint={network}>
+    <WalletProvider wallets={wallets} autoConnect>
+      <SolanaPage />
+    </WalletProvider>
+  </ConnectionProvider>
 );
 
-export default Home;
+export default SolanaApp;
