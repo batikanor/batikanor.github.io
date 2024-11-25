@@ -16,6 +16,21 @@
     --foreground: #ededed;
   }
 }
+/* Input and Textarea Styling */
+input,
+textarea {
+  /* background-color: var(--background); */
+  color: black;
+  border: 1px solid var(--foreground);
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+}
+
+/* Placeholder Text Color */
+::placeholder {
+  color: var(--foreground);
+  opacity: 0.6; /* Adjust opacity as needed */
+}
 
 /* Global Styles */
 body {

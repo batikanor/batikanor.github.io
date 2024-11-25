@@ -1,0 +1,155 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Multiplayer Game Infrastructure using AWS SAM
+
+Resources:
+  ### DynamoDB Table for Players ###
+  PlayersTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: Players
+      AttributeDefinitions:
+        - AttributeName: player_id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: player_id
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+
+  ### WebSocket API ###
+  WebSocketApi:
+    Type: AWS::ApiGatewayV2::Api
+    Properties:
+      Name: MultiplayerGameWebSocketApi
+      ProtocolType: WEBSOCKET
+      RouteSelectionExpression: $request.body.action
+
+  ### WebSocket Routes ###
+  ConnectRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref WebSocketApi
+      RouteKey: $connect
+      Target: !Sub "integrations/${ConnectIntegration}"
+
+  DisconnectRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref WebSocketApi
+      RouteKey: $disconnect
+      Target: !Sub "integrations/${DisconnectIntegration}"
+
+  MessageRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref WebSocketApi
+      RouteKey: message
+      Target: !Sub "integrations/${MessageIntegration}"
+
+  ### WebSocket API Integrations ###
+  ConnectIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref WebSocketApi
+      IntegrationType: AWS_PROXY
+      IntegrationUri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ConnectFunction.Arn}/invocations"
+
+  DisconnectIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref WebSocketApi
+      IntegrationType: AWS_PROXY
+      IntegrationUri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DisconnectFunction.Arn}/invocations"
+
+  MessageIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref WebSocketApi
+      IntegrationType: AWS_PROXY
+      IntegrationUri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MessageFunction.Arn}/invocations"
+
+  ### WebSocket Connect Lambda ###
+  ConnectFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: connect.handler
+      Runtime: python3.11 # todo: also add version here, making sure its also added to path
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref PlayersTable
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - DynamoDBCrudPolicy:
+            TableName: !Ref PlayersTable
+
+  ### WebSocket Disconnect Lambda ###
+  DisconnectFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: disconnect.handler
+      Runtime: python3.11
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref PlayersTable
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - DynamoDBCrudPolicy:
+            TableName: !Ref PlayersTable
+
+  ### WebSocket Message Lambda ###
+  MessageFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: message.handler
+      Runtime: python3.11
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref PlayersTable
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - DynamoDBCrudPolicy:
+            TableName: !Ref PlayersTable
+
+  ### Permissions for API Gateway to invoke Lambdas ###
+  ConnectPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref ConnectFunction
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${WebSocketApi}/*/$connect"
+
+  DisconnectPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref DisconnectFunction
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${WebSocketApi}/*/$disconnect"
+
+  MessagePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref MessageFunction
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${WebSocketApi}/*/message"
+
+  ### WebSocket Deployment ###
+  WebSocketDeployment:
+    Type: AWS::ApiGatewayV2::Deployment
+    Properties:
+      ApiId: !Ref WebSocketApi
+    DependsOn:
+      - ConnectRoute
+      - DisconnectRoute
+      - MessageRoute
+
+  WebSocketStage:
+    Type: AWS::ApiGatewayV2::Stage
+    Properties:
+      StageName: prod
+      ApiId: !Ref WebSocketApi
+      DeploymentId: !Ref WebSocketDeployment
