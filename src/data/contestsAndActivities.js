@@ -299,6 +299,7 @@ Our roadmap includes launching the platform in Zurich, gathering initial data, a
       title: "2nd Place at Dräger hackathon",
       mapData: {
         venue: "Dräger",
+        // city: "Lübeck",
         city: "Lübeck",
         country: "Germany",
         coordinates: { lat: 53.8655, lng: 10.6866 }

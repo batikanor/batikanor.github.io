@@ -761,11 +761,15 @@ export default function GlobeGame({ navigateWithRefresh }) {
                 : point.size
             }
             pointColor="color"
-            pointLabel={(point) => `${point.icon} ${point.label}`}
+            // pointLabel={(point) => `${point.icon} ${point.label}`}
+            pointLabel={(point) => {
+              return `${point.icon} ${point.label}`;
+            }}
+            
             labelsData={allMarkers}
             labelLat={(point) => point.labelLat}
             labelLng={(point) => point.labelLng}
-            labelText={(point) => point.labelText}
+            labelText={(point) => point.labelText.replace("ü", "ue")}
             labelSize={(point) => 0.3}
             labelColor={(point) => point.labelColor || "white"}
             labelResolution={2}
