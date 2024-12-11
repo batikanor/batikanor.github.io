@@ -36,6 +36,7 @@ export default function GlobeGame({ navigateWithRefresh }) {
   // Game mode state
   // Possible values: 'ticTacToe', 'planeCollectCoins', false
   const [gameMode, setGameMode] = useState(false);
+  const [hoveredArc, setHoveredArc] = useState(null);
 
   // Tic-Tac-Toe game state
   const [gameBoard, setGameBoard] = useState(Array(9).fill(null));
@@ -365,10 +366,15 @@ export default function GlobeGame({ navigateWithRefresh }) {
       lat: location.coordinates.lat,
       lng: location.coordinates.lng,
       label: location.city,
-      size: location.isMajorCity ? 20 : 15, // Different size for major cities
+      size: location.isMajorCity ? 20 : 15,
       color: location.isMajorCity ? "gold" : colorPalette[index % colorPalette.length],
-      icon: location.isMajorCity ? "🏙️" : "📍", // Different icon for major cities
+      icon: location.isMajorCity ? "🏙️" : "📍",
       animation: location.isMajorCity ? "pulsate" : "none",
+      labelLat: location.coordinates.lat,
+      labelLng: location.coordinates.lng,
+      labelText: location.city,
+      labelSize: 0.7, // Adjust label size
+      labelColor: "rgba(255, 165, 0, 0.75)", // Optional: color for labels
       activities: location.activities.map(activity => ({
         venue: activity.venue,
         date: activity.date,
@@ -377,18 +383,19 @@ export default function GlobeGame({ navigateWithRefresh }) {
       })),
     }));
   }, [citiesAndLocations]);
+  
 
-  const arcs = useMemo(
-    () =>
-      markers.slice(0, -1).map((marker, i) => ({
-        startLat: marker.lat,
-        startLng: marker.lng,
-        endLat: markers[i + 1].lat,
-        endLng: markers[i + 1].lng,
-        color: [marker.color, markers[i + 1].color],
-      })),
-    [markers]
-  );
+  const arcs = useMemo(() => {
+    return markers.slice(0, -1).map((marker, i) => ({
+      airline: `Route ${i + 1}`,
+      srcIata: marker.label,
+      dstIata: markers[i + 1].label,
+      srcAirport: { lat: marker.lat, lng: marker.lng },
+      dstAirport: { lat: markers[i + 1].lat, lng: markers[i + 1].lng },
+      arcColor: [`rgba(0, 255, 0, 0.3)`, `rgba(255, 0, 0, 0.3)`],
+    }));
+  }, [markers]);
+  
 
   // Debounced hover handler to improve performance
   const handlePointHover = useMemo(
@@ -751,13 +758,20 @@ export default function GlobeGame({ navigateWithRefresh }) {
             pointSize={(point) =>
               hoveredMarker && hoveredMarker.label === point.label
                 ? point.size + 5
-                : isMobile
-                ? point.size + 10  // Increase size on mobile for easier tapping
                 : point.size
             }
             pointColor="color"
             pointLabel={(point) => `${point.icon} ${point.label}`}
-            pointAltitude={0.05} // Increased altitude from 0.01 to 0.05
+            labelsData={allMarkers}
+            labelLat={(point) => point.labelLat}
+            labelLng={(point) => point.labelLng}
+            labelText={(point) => point.labelText}
+            labelSize={(point) => 0.3}
+            labelColor={(point) => point.labelColor || "white"}
+            labelResolution={2}
+            // pointAltitude={0.05} // Increased altitude from 0.01 to 0.05
+            pointAltitude={0.01} // Increased altitude from 0.01 to 0.05
+
             pointResolution={4} // Increased resolution for smoother markers
             onPointClick={(point, event) => {
               setClickedMarker(point);
@@ -765,13 +779,24 @@ export default function GlobeGame({ navigateWithRefresh }) {
             onPointHover={handlePointHover}
             // Arcs properties
             arcsData={arcs}
-            arcColor="color"
-            arcStroke={0.5}
-            arcDashLength={0.25}
+            arcStartLat={(d) => d.srcAirport.lat}
+            arcStartLng={(d) => d.srcAirport.lng}
+            arcEndLat={(d) => d.dstAirport.lat}
+            arcEndLng={(d) => d.dstAirport.lng}
+            // arcLabel={(d) => `${d.airline}: ${d.srcIata} → ${d.dstIata}`}
+            // arcColor={(d) => d.arcColor}
+            arcColor={(d) =>
+              hoveredArc === d
+                ? [`rgba(0, 255, 0, 0.9)`, `rgba(255, 0, 0, 0.9)`]
+                : d.arcColor
+            }
+            arcDashLength={0.4}
             arcDashGap={0.2}
-            arcDashInitialGap={() => Math.random()}
             arcDashAnimateTime={1500}
-            arcsTransitionDuration={0}
+            onArcHover={(hoverArc) =>
+              setHoveredArc(hoverArc) // Example state to handle hover effects
+            }
+            
             // Custom Polygons Layer
             polygonsData={gameMode === "ticTacToe" ? sampleGeoJson.features : []}
             polygonCapColor={(d) =>
