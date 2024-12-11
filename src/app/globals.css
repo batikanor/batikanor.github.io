@@ -5,114 +5,91 @@
 
 /* Custom Root Variables */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Light Mode Colors */
+  --navbar-background-light: #ffffff; /* Crisp white for the navbar */
+  --sidepanel-background-light: #f8f9fa; /* Soft neutral for the side panel */
+  --mainpanel-background-light: #f5f5f5; /* Subtle gray for the main panel */
+  --footer-background-light: #e9ecef; /* Light gray for the footer */
+
+  --foreground-light: #212529; /* Deep neutral text color */
+  --border-light: #dee2e6; /* Gentle gray for borders */
 }
 
-/* Dark Mode Variables */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-/* Input and Textarea Styling */
-input,
-textarea {
-  /* background-color: var(--background); */
-  color: black;
-  border: 1px solid var(--foreground);
-  padding: 0.5rem;
-  border-radius: 0.25rem;
-}
+.dark {
+  /* Dark Mode Colors */
+  --navbar-background-dark: #1f1b17; /* Dark charcoal for the navbar */
+  --sidepanel-background-dark: #cbcbcb; /* Slightly lighter charcoal for the side panel */
+  --mainpanel-background-dark: #201b17; /* Deep gray for the main panel */
+  --footer-background-dark: #1f1f1f; /* A rich dark tone for the footer */
 
-/* Placeholder Text Color */
-::placeholder {
-  color: var(--foreground);
-  opacity: 0.6; /* Adjust opacity as needed */
+  --foreground-dark: #e9ecef; /* Soft light text color */
+  --border-dark: #495057; /* Muted gray for borders */
 }
 
 /* Global Styles */
 body {
   @apply antialiased flex flex-col min-h-screen;
-  background-color: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-geist-sans), sans-serif;
+  background-color: var(--mainpanel-background-light);
+  color: var(--foreground-light);
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-/* Link Styling with Hover Effect */
-a {
-  transition: color 0.2s ease-in-out;
+.dark body {
+  background-color: var(--mainpanel-background-dark);
+  color: var(--foreground-dark);
 }
 
-/* Responsive Typography */
-body {
-  font-size: 1rem; /* Default font size */
+/* Input and Textarea Styling */
+input,
+textarea {
+  background-color: var(--mainpanel-background-light);
+  color: var(--foreground-light);
+  border: 1px solid var(--border-light);
+  padding: 0.5rem;
+  border-radius: 0.25rem;
 }
 
-@media (max-width: 640px) {
-  body {
-    font-size: 0.875rem; /* Smaller font size for mobile */
-  }
+.dark input,
+.dark textarea {
+  background-color: var(--mainpanel-background-dark);
+  color: var(--foreground-dark);
+  border: 1px solid var(--border-dark);
+}
+/* Slightly darker background for child elements */
+.darker-background {
+  background-color: rgba(0, 0, 0, 0.01); /* Slightly darker overlay for light mode */
 }
 
+.dark .darker-background {
+  background-color: rgba(255, 255, 255, 0.01); /* Slightly lighter overlay for dark mode */
+}
+
+/* Placeholder Text Color */
+::placeholder {
+  color: var(--foreground-light);
+  opacity: 0.6;
+}
+
+.dark ::placeholder {
+  color: var(--foreground-dark);
+}
+
+/* Headings */
 h1 {
-  @apply text-3xl font-bold;
+  @apply text-3xl font-bold text-gray-900 dark:text-gray-100;
 }
 
 h2 {
-  @apply text-2xl font-semibold;
+  @apply text-2xl font-semibold text-gray-800 dark:text-gray-200;
 }
 
 h3 {
-  @apply text-xl font-medium;
+  @apply text-xl font-medium text-gray-700 dark:text-gray-300;
 }
 
-/* Responsive Font Sizing for Headings */
-@media (max-width: 640px) {
-  h1 {
-    @apply text-2xl;
-  }
-  h2 {
-    @apply text-xl;
-  }
-  h3 {
-    @apply text-lg;
-  }
-}
-
-/* Custom Utility Classes */
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
-
-  /* Layout Utility Classes */
-  .layout-header {
-    @apply bg-white dark:bg-gray-800 shadow fixed top-0 left-0 right-0 z-50;
-  }
-
-  .layout-main {
-    @apply flex-1 flex flex-col lg:flex-row mt-[4rem];
-  }
-
-  .layout-aside {
-    @apply hidden lg:block lg:w-1/5 bg-gray-100 dark:bg-gray-900 p-4;
-  }
-
-  .layout-content {
-    @apply flex-1 p-6 sm:p-12 bg-white dark:bg-gray-800;
-  }
-
-  .layout-footer {
-    @apply bg-white dark:bg-gray-800 shadow;
-  }
-}
-
-/* Utility for Global Layout Spacing */
+/* Layout Utility Classes */
 .container {
   @apply mx-auto max-w-7xl;
 }

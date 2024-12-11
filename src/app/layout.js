@@ -1,7 +1,9 @@
+// app/layout.js
 import localFont from 'next/font/local';
 import './globals.css';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import { ThemeProvider } from 'next-themes';
 
 const geistSans = localFont({
   src: './fonts/GeistVF.woff',
@@ -24,56 +26,52 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
       <body className="antialiased flex flex-col min-h-screen">
-        {/* Header */}
-        <header className="bg-white dark:bg-gray-800 shadow fixed top-0 left-0 right-0 z-50">
-          <Navbar />
-        </header>
-        <div className="flex-1 flex flex-col lg:flex-row mt-[4rem]"> {/* Adjust the top margin */}
-          
-          {/* Left Sidebar */}
-          <aside className="hidden lg:block lg:w-1/5 p-4 bg-gray-100 dark:bg-gray-900 relative">
-            <div
-              className="absolute inset-0 bg-center opacity-20 dark:opacity-10"
-              style={{ 
-                backgroundImage: "url('/aside-pattern.png')",
-                backgroundSize: "150%", // Increase or decrease to rescale
-                backgroundPosition: "center"
-              }}
-            />
-            {/* Add content here */}
-          </aside>
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
+          {/* Header */}
+          <header className="bg-[var(--navbar-background-light)] dark:bg-[var(--navbar-background-dark)] shadow fixed top-0 left-0 right-0 z-50">
+            <Navbar />
+          </header>
+          <div className="flex-1 flex flex-col lg:flex-row mt-[4rem]">
+            
+            {/* Left Sidebar */}
+            <aside className="hidden lg:block lg:w-1/5 p-4 bg-[var(--sidepanel-background-light)] dark:bg-[var(--sidepanel-background-dark)] relative">
+              <div
+                className="absolute inset-0 bg-center opacity-20 dark:opacity-60"
+                style={{ 
+                  backgroundImage: "url('/aside-pattern.png')",
+                  backgroundSize: "15vw",
+                  backgroundPosition: "center"
+                }}
+              />
+              {/* Add content here */}
+            </aside>
 
+            {/* Main Content */}
+            <main className="flex-1 p-6 sm:p-12 bg-[var(--mainpanel-background-light)] dark:bg-[var(--mainpanel-background-dark)]">
+              {children}
+            </main>
 
-          {/* Main Content */}
-          <main className="flex-1 p-6 sm:p-12 bg-white dark:bg-gray-800"
-                        style={{ 
-                          // backgroundImage: "url('/night-sky.png')",
-                          // backgroundSize: "150%", // Increase or decrease to rescale
-                          // backgroundPosition: "center"
-                        }}>
-            {children}
-          </main>
+            {/* Right Sidebar */}
+            <aside className="hidden lg:block lg:w-1/5 p-4 bg-[var(--sidepanel-background-light)] dark:bg-[var(--sidepanel-background-dark)] relative">
+              <div
+                className="absolute inset-0 bg-center opacity-20 dark:opacity-60"
+                style={{ 
+                  backgroundImage: "url('/aside-pattern.png')",
+                  backgroundSize: "15vw",
+                  backgroundPosition: "center"
+                }}
+              />
+              {/* Add content here */}
+            </aside>
 
-          {/* Right Sidebar */}
-          <aside className="hidden lg:block lg:w-1/5 p-4 bg-gray-100 dark:bg-gray-900 relative">
-            <div
-              className="absolute inset-0 bg-center opacity-20 dark:opacity-10"
-              style={{ 
-                backgroundImage: "url('/aside-pattern.png')",
-                backgroundSize: "150%", // Increase or decrease to rescale
-                backgroundPosition: "center"
-              }}
-            />
-            {/* Add content here */}
-          </aside>
+          </div>
 
-        </div>
-
-        {/* Footer */}
-        <footer className="bg-white dark:bg-gray-800 shadow">
-          <Footer />
-        </footer>
-        <br/>
+          {/* Footer */}
+          <footer className="bg-[var(--footer-background-light)] dark:bg-[var(--footer-background-dark)] shadow">
+            <Footer />
+          </footer>
+          <br/>
+        </ThemeProvider>
       </body>
     </html>
   );

@@ -91,7 +91,7 @@ const Projects = () => {
   
   return (
     <div className="max-w-6xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-      <h2 className="text-3xl font-bold tracking-tight text-center mb-12 text-white">
+      <h2 className="text-3xl font-bold tracking-tight text-center mb-12">
         Past Project Samples
       </h2>
 
@@ -110,7 +110,9 @@ const Projects = () => {
               } transition-all duration-300`}
             >
               {/* <div className="relative p-4 bg-gray-800 rounded-lg shadow-lg border border-gray-600"> */}
-              <div className={`relative p-4 bg-gray-800 rounded-lg shadow-lg border border-gray-600 ${
+              {/* <div className={`relative p-4 bg-gray-800 rounded-lg shadow-lg border border-gray-600 ${ */}
+              <div className={`relative p-4 rounded-lg shadow-lg border border-gray-600 ${
+
                   activity.highlighted ? "highlight" : ""
                 }`}>
 
@@ -122,28 +124,32 @@ const Projects = () => {
                   ></div>
                 )}
                 <div className="flex justify-between items-center">
-                <h3 className="text-lg sm:text-2xl font-semibold mb-2 text-white">
+                {/* <h3 className="text-lg sm:text-2xl font-semibold mb-2 text-white"> */}
+                <h3 className="text-lg sm:text-2xl font-semibold mb-2 ">
+
                   {activity.title}
                 </h3>
                   <button
                     onClick={() => toggleExpandedView(activity)}
-                    className="bg-gray-700 text-white px-3 py-1 rounded hover:bg-gray-600"
+                    // className="bg-gray-700 text-white px-3 py-1 rounded hover:bg-gray-600"
+                    className="px-3 py-1 rounded hover:bg-gray-500"
+
                   >
                     {isExpanded ? "Collapse" : "See more"}
                   </button>
                 </div>
-                <p className="text-gray-300">{activity.mapData.venue}, {activity.mapData.city}/{activity.mapData.country}</p>
-                <p className="text-gray-400 mb-4">{activity.date}</p>
+                <p className="dark:text-gray-300">{activity.mapData.venue}, {activity.mapData.city}/{activity.mapData.country}</p>
+                <p className="mb-4 dark:text-gray-300">{activity.date}</p>
 
                 {/* Display Short Description */}
-                <p className="text-gray-300 mb-4">{activity.shortDescription}</p>
+                <p className="mb-4 dark:text-gray-200">{activity.shortDescription}</p>
 
                 {/* Display Long Description if Expanded */}
                 {isExpanded && (
                   <>
                     {/* <p className="text-gray-300 mb-4">{activity.longDescription}</p> */}
                     {activity.longDescription.split('\n').map((line, index) => (
-                      <p className="text-white" key={index}>{line}</p>
+                      <p className="dark:text-white" key={index}>{line}</p>
                     ))}
                     {/* Copy Link Button */}
                     <br/>
