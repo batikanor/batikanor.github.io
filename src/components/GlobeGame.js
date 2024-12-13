@@ -20,6 +20,7 @@ export default function GlobeGame({ navigateWithRefresh }) {
   // State to ensure client-side rendering
   const [isClient, setIsClient] = useState(false);
 
+
   // Refs
   const globeContainerRef = useRef(null);
   const globeEl = useRef();
@@ -61,6 +62,7 @@ export default function GlobeGame({ navigateWithRefresh }) {
   const [triggeredMarkers, setTriggeredMarkers] = useState([]);
 
   const [isMobile, setIsMobile] = useState(false);
+  const [showMap, setShowMap] = useState(true); // Initially, do not show the map on mobile
 
   // Sample GeoJSON data for Egypt positioned polygons (3x3 grid)
   const sampleGeoJson = useMemo(
@@ -241,10 +243,32 @@ export default function GlobeGame({ navigateWithRefresh }) {
   const citiesAndLocations = useMemo(() => getCitiesAndLocations(), []);
 
   // Ensure the Globe is only rendered on the client-side
+  // useEffect(() => {
+  //   setIsClient(true);
+  //   setIsMobile(/Mobi|Android/i.test(navigator.userAgent)); // Detect mobile devices
+  //   setShowMap(!isMobile);
+  // }, []);
+
   useEffect(() => {
-    setIsClient(true);
-    setIsMobile(/Mobi|Android/i.test(navigator.userAgent)); // Detect mobile devices
+    // Use matchMedia to detect mobile devices
+    const mobileQuery = window.matchMedia("(max-width: 768px)"); // Adjust as per your mobile breakpoint
+    const handleDeviceChange = (event) => {
+      setIsMobile(event.matches);
+      setShowMap(!event.matches); // Show map by default for non-mobile devices
+    };
+  
+    // Initial check
+    handleDeviceChange(mobileQuery);
+  
+    // Add listener for screen size changes
+    mobileQuery.addEventListener("change", handleDeviceChange);
+  
+    // Clean up the listener on component unmount
+    return () => {
+      mobileQuery.removeEventListener("change", handleDeviceChange);
+    };
   }, []);
+  
 
   // **Fullscreen Toggle Function**
   const toggleFullscreen = () => {
@@ -735,8 +759,20 @@ export default function GlobeGame({ navigateWithRefresh }) {
           />
         </div>
       )}
+      {/* Show Button on Mobile to Display the Map */}
+      {!showMap && (
+        <div className="flex justify-center mt-6">
+          <button
+            onClick={() => setShowMap(true)}
+            className="px-4 py-2 border rounded hover:bg-blue-600 transition"
+          >
+            Show Map of Achievements
+          </button>
+        </div>
+      )}
+
       {/* Spinnable Earth - Render only on the client */}
-      {isClient && (
+      { showMap &&(
         <div
           ref={globeContainerRef}
           className="relative w-full h-[700px] sm:h-[800px] md:h-[900px]"
@@ -997,6 +1033,7 @@ export default function GlobeGame({ navigateWithRefresh }) {
       )}
       {/* Toggle Buttons for Games */}
       <br/>
+      { showMap &&(
       <div className="flex flex-wrap space-x-4 mb-4 justify-center">
         <button
           onClick={() => setGameMode("ticTacToe")}
@@ -1018,7 +1055,7 @@ export default function GlobeGame({ navigateWithRefresh }) {
             Exit Game
           </button>
         )}
-      </div>
+      </div>)}
     </div>
   );
 }
