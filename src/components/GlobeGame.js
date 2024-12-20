@@ -11,12 +11,26 @@ import React, {
 import dynamic from "next/dynamic";
 import { debounce } from "lodash";
 import { Joystick } from "react-joystick-component"; // Import Joystick
-import { getCitiesAndLocations } from "../data/contestsAndActivities"; // Adjust path as needed
+import { getCitiesAndLocations, contestsAndActivities } from "../data/contestsAndActivities"; // Adjust path as needed
+import { NAVBAR_HEIGHT } from '../constants/layout';
 
 // Dynamically import the GlobeWrapper component without server-side rendering
 const Globe = dynamic(() => import("../components/GlobeWrapper"), { ssr: false });
 
-export default function GlobeGame({ navigateWithRefresh }) {
+const scrollToElement = (elementId, offset = 0) => {
+  const element = document.getElementById(elementId);
+  if (element) {
+    const elementPosition = element.getBoundingClientRect().top;
+    const offsetPosition = elementPosition + window.pageYOffset - offset;
+
+    window.scrollTo({
+      top: offsetPosition,
+      behavior: 'smooth'
+    });
+  }
+};
+
+export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
   // State to ensure client-side rendering
   const [isClient, setIsClient] = useState(false);
 
@@ -356,30 +370,27 @@ export default function GlobeGame({ navigateWithRefresh }) {
     }
   }, [isClient]);
 
-  // Set the point of view based on game mode
+  // Set the point of view based on game mode - ONLY ON INITIAL MOUNT
   useEffect(() => {
     if (globeEl.current) {
       if (gameMode === "planeCollectCoins") {
-        // Focus on plane's current position when Plane Collect Coins is active
         globeEl.current.pointOfView(
           { lat: planePosition.lat, lng: planePosition.lng, altitude: 0.3 },
           1000
         );
       } else if (gameMode === "ticTacToe") {
-        // Focus on Egypt when Tic-Tac-Toe is active
         globeEl.current.pointOfView(
           { lat: 26, lng: 30, altitude: 2 }, // Egypt coordinates
           1000
         );
       } else {
-        // Default view (Istanbul)
         globeEl.current.pointOfView(
           { lat: 41.0082, lng: 28.9784, altitude: 2 }, // Istanbul coordinates
           1000
         );
       }
     }
-  }, [gameMode, planePosition]);
+  }, [gameMode]); // Remove planePosition dependency
 
   // Convert locations to marker format for the globe component
   const colorPalette = ["blue", "green", "orange", "purple", "red", "yellow", "pink", "cyan", "lime", "magenta"]; // Add more colors if needed
@@ -424,35 +435,23 @@ export default function GlobeGame({ navigateWithRefresh }) {
   // Debounced hover handler to improve performance
   const handlePointHover = useMemo(
     () =>
-      debounce((point, prevPoint) => {
+      debounce((point) => {
         if (point) {
           setHoveredMarker(point);
-
-          // **Clear existing timeout if any**
-          if (hoverTimeoutRef.current) {
-            clearTimeout(hoverTimeoutRef.current);
-          }
-
-          // **Set a new timeout to clear hoveredMarker after 10 seconds**
-          hoverTimeoutRef.current = setTimeout(() => {
-            setHoveredMarker(null);
-            hoverTimeoutRef.current = null;
-          }, 10000); // 10000 milliseconds = 10 seconds
-        } else {
-          // Optionally, you can decide whether to clear the marker immediately when not hovering
-          // For now, we'll let the timeout handle it
         }
-      }, 100), // 100ms debounce delay
+      }, 100),
     []
   );
 
-  // Clean up debounce and timeout on unmount
+  // Add a separate handler for closing the info window
+  const handleCloseInfoWindow = () => {
+    setHoveredMarker(null);
+  };
+
+  // Clean up debounce on unmount
   useEffect(() => {
     return () => {
       handlePointHover.cancel();
-      if (hoverTimeoutRef.current) {
-        clearTimeout(hoverTimeoutRef.current);
-      }
     };
   }, [handlePointHover]);
 
@@ -712,6 +711,69 @@ export default function GlobeGame({ navigateWithRefresh }) {
     }
   }, [coins, collectedCoins, gameMode]);
 
+  // Get the initial location from your activities data
+  const initialLocation = useMemo(() => {
+    const activities = getCitiesAndLocations();
+    // You can choose any activity, for example the first highlighted one
+    const highlightedActivity = contestsAndActivities.find(activity => activity.highlighted);
+    if (highlightedActivity && highlightedActivity.mapData) {
+      return {
+        lat: highlightedActivity.mapData.coordinates.lat,
+        lng: highlightedActivity.mapData.coordinates.lng,
+        altitude: 0.5
+      };
+    }
+    // Fallback to first activity if no highlighted one exists
+    return activities[0] ? {
+      lat: activities[0].coordinates.lat,
+      lng: activities[0].coordinates.lng,
+      altitude: 0.5
+    } : { lat: 41.0082, lng: 28.9784, altitude: 0.5 }; // Default to Istanbul if no activities
+  }, []);
+
+  const handleProjectClick = (slug) => {
+    const foundActivity = contestsAndActivities.find((activity) => activity.slug === slug);
+    if (foundActivity) {
+      setHoveredMarker(null); // Close the hover menu first
+      
+      // Call the parent's onProjectSelect to update expanded state
+      onProjectSelect(foundActivity);
+      
+      // If in fullscreen, exit first
+      if (isFullscreen && document.exitFullscreen) {
+        document.exitFullscreen().then(() => {
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+              const element = document.getElementById(slug);
+              if (element) {
+                const offset = element.offsetTop - NAVBAR_HEIGHT - 20;
+                window.scrollTo({
+                  top: offset,
+                  behavior: "smooth"
+                });
+              }
+            });
+          });
+        });
+      } else {
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            const element = document.getElementById(slug);
+            if (element) {
+              const offset = element.offsetTop - NAVBAR_HEIGHT - 20;
+              window.scrollTo({
+                top: offset,
+                behavior: "smooth"
+              });
+            }
+          });
+        });
+      }
+    }
+  };
+
+  const [isNavigating, setIsNavigating] = useState(false);
+
   return (
     <div>
       {/* Display Current Player or Instructions */}
@@ -775,19 +837,19 @@ export default function GlobeGame({ navigateWithRefresh }) {
       { showMap &&(
         <div
           ref={globeContainerRef}
-          className="relative w-full h-[700px] sm:h-[800px] md:h-[900px]"
+          className="relative w-full h-[700px] sm:h-[800px] md:h-[900px] globe-container"
         >
           <Globe
             onGlobeLoad={(globe) => {
               globeEl.current = globe;
+              setIsNavigating(false);
             }}
-            initialView={
-              gameMode === "planeCollectCoins"
-                ? { lat: planePosition.lat, lng: planePosition.lng, altitude: 2 }
-                : undefined // Let GlobeWrapper handle initialView for other modes
-            }
+            initialView={initialLocation}
             width={isFullscreen ? window.innerWidth : dimensions.width}
             height={isFullscreen ? window.innerHeight : dimensions.height}
+            enableZoom={!isNavigating}
+            enablePanning={!isNavigating}
+            enableRotate={!isNavigating}
             globeImageUrl="//unpkg.com/three-globe/example/img/earth-night.jpg"
             backgroundColor="rgba(0,0,0,0)"
             pointsData={allMarkers}
@@ -965,9 +1027,9 @@ export default function GlobeGame({ navigateWithRefresh }) {
 
   {/* Side Bubble for Hovered Marker */}
   {hoveredMarker && (
-    <div className="fixed top-1/2 right-4 transform -translate-y-1/2 bg-gray-800 text-white p-6 rounded-lg shadow-lg max-w-xs z-50 transition-opacity duration-300">
+    <div className="fixed top-1/2 right-4 transform -translate-y-1/2 bg-gray-800 text-white p-6 rounded-lg shadow-lg max-w-xs z-50">
       <h2 className="text-xl font-semibold mb-4">
-        {hoveredMarker.label || ' '} {/* Render a space if label is undefined */}
+        {hoveredMarker.label || ' '}
       </h2>
       <div className="max-h-64 overflow-y-auto space-y-2">
         {(hoveredMarker.activities || []).map((activity, index) => (
@@ -977,7 +1039,7 @@ export default function GlobeGame({ navigateWithRefresh }) {
             <button
               onClick={() => {
                 navigateWithRefresh(activity.slug);
-                setHoveredMarker(null); // Close pop-up after click
+                setHoveredMarker(null);
               }}
               className="text-blue-400 hover:underline ml-2"
             >
@@ -987,7 +1049,7 @@ export default function GlobeGame({ navigateWithRefresh }) {
         ))}
       </div>
       <button
-        onClick={() => setHoveredMarker(null)}
+        onClick={handleCloseInfoWindow}
         className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
       >
         Close

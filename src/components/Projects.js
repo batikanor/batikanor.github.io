@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import "./Projects.css";
 import { contestsAndActivities } from "../data/contestsAndActivities";
+import { NAVBAR_HEIGHT } from '../constants/layout';
 
 // import ResizePanel from "react-resize-panel";
 const ResizePanel = typeof window !== "undefined" ? require("react-resize-panel").default : null;
-const navbarHeight = 80; // Adjust based on your navbar height in pixels
 
 // Function to convert Google Drive link to embeddable format for videos and documents
 const getGoogleDriveEmbedUrl = (url) => {
@@ -33,43 +33,44 @@ const getDeterministicColor = (slug) => {
 const Projects = () => {
   const [expandedActivity, setExpandedActivity] = useState(null);
 
-  // Expand item based on URL hash
+  // Function to handle scrolling to a project
+  const scrollToProject = (slug) => {
+    const foundActivity = contestsAndActivities.find((activity) => activity.slug === slug);
+    if (foundActivity) {
+      setExpandedActivity(foundActivity);
+
+      // Wait for state update and content expansion
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          const element = document.getElementById(foundActivity.slug);
+          if (element) {
+            const offset = element.offsetTop - NAVBAR_HEIGHT - 20; // Added 20px padding
+            window.scrollTo({
+              top: offset,
+              behavior: "smooth"
+            });
+          }
+        });
+      });
+    }
+  };
+
+  // Handle initial load from URL hash
   useEffect(() => {
     const hash = window.location.hash;
     if (hash) {
       const slug = hash.replace("#", "");
-      const foundActivity = contestsAndActivities.find((activity) => activity.slug === slug);
-      if (foundActivity) {
-        setExpandedActivity(foundActivity);
-  
-        // Delay the scroll to ensure the element is in the DOM
-        setTimeout(() => {
-          const element = document.getElementById(foundActivity.slug);
-          if (element) {
-            const navbarHeight = 80; // Adjust this based on your navbar height
-            window.scrollTo({
-              top: element.getBoundingClientRect().top + window.scrollY - navbarHeight,
-              behavior: "smooth"
-            });
-          }
-        }, 100); // Adjust delay if needed to allow content to load
-      }
+      scrollToProject(slug);
     }
   }, []);
-  
 
+  // Handle project expansion toggle
   const toggleExpandedView = (activity) => {
-    setExpandedActivity(activity === expandedActivity ? null : activity);
-    if (activity !== expandedActivity) {
-      setTimeout(() => {
-        const element = document.getElementById(activity.slug);
-        if (element) {
-          window.scrollTo({
-            top: element.getBoundingClientRect().top + window.scrollY - navbarHeight,
-            behavior: "smooth"
-          });
-        }
-      }, 0);
+    const newExpandedActivity = activity === expandedActivity ? null : activity;
+    setExpandedActivity(newExpandedActivity);
+    
+    if (newExpandedActivity) {
+      scrollToProject(activity.slug);
     }
   };
 

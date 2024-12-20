@@ -17,21 +17,20 @@ import GlobeGL from "react-globe.gl";
  */
 const GlobeWrapper = ({ onGlobeLoad, initialView, ...props }) => {
   const globeRef = useRef();
+  const initialViewSet = useRef(false);
 
   useEffect(() => {
-    if (globeRef.current && initialView) {
-      // Set the initial point of view based on provided initialView prop
-      globeRef.current.pointOfView(initialView, 1000); // Animation duration in milliseconds
+    if (globeRef.current && initialView && !initialViewSet.current) {
+      // Set the initial point of view only once
+      globeRef.current.pointOfView(initialView, 1000);
+      initialViewSet.current = true;
+    }
 
-      // Pass the globe instance back to the parent component
-      if (onGlobeLoad) {
-        onGlobeLoad(globeRef.current);
-      }
-    } else if (globeRef.current && onGlobeLoad) {
-      // Pass the globe instance back to the parent component without setting POV
+    // Pass the globe instance back to the parent component
+    if (globeRef.current && onGlobeLoad) {
       onGlobeLoad(globeRef.current);
     }
-  }, [onGlobeLoad, initialView]);
+  }, [onGlobeLoad]);
 
   return <GlobeGL ref={globeRef} {...props} />;
 };

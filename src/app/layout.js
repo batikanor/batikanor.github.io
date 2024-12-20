@@ -31,7 +31,7 @@ export default function RootLayout({ children }) {
           <header className="bg-[var(--navbar-background-light)] dark:bg-[var(--navbar-background-dark)] shadow fixed top-0 left-0 right-0 z-50">
             <Navbar />
           </header>
-          <div className="flex-1 flex flex-col lg:flex-row mt-[4rem]">
+          <div className="flex-1 flex flex-col lg:flex-row mt-16">
             
             {/* Left Sidebar */}
             <aside className="hidden lg:block lg:w-1/5 p-4 bg-[var(--sidepanel-background-light)] dark:bg-[var(--sidepanel-background-dark)] relative">
