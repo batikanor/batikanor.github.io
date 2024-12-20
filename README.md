@@ -1,48 +1,65 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Batıkan Bora Ormancı's Portfolio
 
-## Other commands
-remove built files
-`rm -rf .nextx`
+Welcome to my portfolio website's repository! I'm Batıkan, a software engineer with a track record of winning hackathons and building innovative solutions. Feel free to check my portfolio out at [batikanor.com](https://batikanor.com)
 
-`pnpm add packagename`
+## Features
 
-`pnpm dev`
+- 🌍 Interactive 3D Globe with project locations
+- 🎮 Mini-games integrated into the globe interface
+- 🌓 Dark/Light theme support
+- 📱 Responsive design for all devices
+- 📄 Dynamic CV display and download options
+- 🏆 Comprehensive project showcase with location mapping
 
-`pnpm build` 
+## Tech Stack
 
-`pnpm lint`
+- Next.js 14
+- React
+- Three.js / React Three Fiber
+- TailwindCSS
+- WebSocket Integration
+- AWS Lambda (for serverless functions)
 
-`pnpm dev --hostname 0.0.0.0` --> you can also test on mobile
 ## Getting Started
 
-First, run the development server:
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+1. Install dependencies:
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+    pnpm install
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+2. Run the development server:
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+    pnpm dev
 
-## Learn More
+For mobile testing:
 
-To learn more about Next.js, take a look at the following resources:
+    pnpm dev --hostname 0.0.0.0
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Other useful commands:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+    # Remove built files
+    rm -rf .next
 
-## Deploy on Vercel
+    # Build for production
+    pnpm build
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+    # Run linter
+    pnpm lint
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+## Project Structure
+
+The project follows a standard Next.js 14 structure with App Router:
+
+- `/src/app`: Main application pages and layouts
+- `/src/components`: Reusable React components
+- `/src/data`: Project and content data
+- `/public`: Static assets
+
+## Contact
+
+- GitHub: [@batikanor](https://github.com/batikanor)
+- LinkedIn: [batikanor](https://linkedin.com/in/batikanor)
+- Email: batikanor@gmail.com
+
+## License
+
+All rights reserved © 2024 Batıkan Bora Ormancı
