@@ -767,6 +767,42 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
 
   const [isNavigating, setIsNavigating] = useState(false);
 
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash;
+      if (hash) {
+        const slug = hash.replace("#", "");
+        const activity = contestsAndActivities.find(a => a.slug === slug);
+        
+        if (activity && activity.mapData && globeEl.current) {
+          // Request fullscreen
+          if (globeContainerRef.current && !document.fullscreenElement) {
+            globeContainerRef.current.requestFullscreen().catch(err => {
+              console.error(`Error attempting to enable fullscreen: ${err.message}`);
+            });
+          }
+          
+          // Focus on the location
+          globeEl.current.pointOfView({
+            lat: activity.mapData.coordinates.lat,
+            lng: activity.mapData.coordinates.lng,
+            altitude: 0.5
+          }, 1000);
+        }
+      }
+    };
+
+    // Handle initial load
+    handleHashChange();
+    
+    // Listen for hash changes
+    window.addEventListener('hashchange', handleHashChange);
+    
+    return () => {
+      window.removeEventListener('hashchange', handleHashChange);
+    };
+  }, []);
+
   return (
     
     <div>

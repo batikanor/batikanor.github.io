@@ -140,7 +140,13 @@ const Projects = () => {
                     {isExpanded ? "Collapse" : "See more"}
                   </button>
                 </div>
-                <p className="dark:text-gray-300">{activity.mapData.venue}, {activity.mapData.city}/{activity.mapData.country}</p>
+                <p className="dark:text-gray-300 cursor-pointer hover:text-blue-400" 
+                   onClick={() => {
+                     const url = `${window.location.origin}/#${activity.slug}`;
+                     window.location.href = url;
+                   }}>
+                  {activity.mapData.venue}, {activity.mapData.city}/{activity.mapData.country}
+                </p>
                 <p className="mb-4 dark:text-gray-300">{activity.date}</p>
 
                 {/* Display Short Description */}
