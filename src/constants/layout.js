@@ -1,1 +1,2 @@
-export const NAVBAR_HEIGHT = -900; 
+export const NAVBAR_HEIGHT = 60;
+export const MAP_HEIGHT = -990;

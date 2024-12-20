@@ -12,7 +12,7 @@ import dynamic from "next/dynamic";
 import { debounce } from "lodash";
 import { Joystick } from "react-joystick-component"; // Import Joystick
 import { getCitiesAndLocations, contestsAndActivities } from "../data/contestsAndActivities"; // Adjust path as needed
-import { NAVBAR_HEIGHT } from '../constants/layout';
+import { NAVBAR_HEIGHT, MAP_HEIGHT } from '../constants/layout';
 
 // Dynamically import the GlobeWrapper component without server-side rendering
 const Globe = dynamic(() => import("../components/GlobeWrapper"), { ssr: false });
@@ -29,6 +29,9 @@ const scrollToElement = (elementId, offset = 0) => {
     });
   }
 };
+
+
+
 
 export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
   // State to ensure client-side rendering
@@ -744,28 +747,14 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
         document.exitFullscreen().then(() => {
           requestAnimationFrame(() => {
             requestAnimationFrame(() => {
-              const element = document.getElementById(slug);
-              if (element) {
-                const offset = element.offsetTop - NAVBAR_HEIGHT - 20;
-                window.scrollTo({
-                  top: offset,
-                  behavior: "smooth"
-                });
-              }
+              scrollToElement(slug, NAVBAR_HEIGHT + MAP_HEIGHT + 20);
             });
           });
         });
       } else {
         requestAnimationFrame(() => {
           requestAnimationFrame(() => {
-            const element = document.getElementById(slug);
-            if (element) {
-              const offset = element.offsetTop - NAVBAR_HEIGHT - 20;
-              window.scrollTo({
-                top: offset,
-                behavior: "smooth"
-              });
-            }
+            scrollToElement(slug, NAVBAR_HEIGHT + MAP_HEIGHT + 20);
           });
         });
       }
