@@ -14,6 +14,7 @@ import { Joystick } from "react-joystick-component"; // Import Joystick
 import { getCitiesAndLocations, contestsAndActivities } from "../data/contestsAndActivities"; // Adjust path as needed
 import { NAVBAR_HEIGHT, MAP_HEIGHT } from '../constants/layout';
 import MarkerInfo from './MarkerInfo';
+import { useTheme } from 'next-themes';
 
 // Dynamically import the GlobeWrapper component without server-side rendering
 const Globe = dynamic(() => import("../components/GlobeWrapper"), { ssr: false });
@@ -813,6 +814,8 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
     }
   }, []);
 
+  const { resolvedTheme } = useTheme();
+
   return (
     
     <div>
@@ -921,7 +924,11 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
             enableZoom={!isNavigating}
             enablePanning={!isNavigating}
             enableRotate={!isNavigating}
-            globeImageUrl="//unpkg.com/three-globe/example/img/earth-night.jpg"
+            globeImageUrl={
+              resolvedTheme === "dark"
+                ? "//unpkg.com/three-globe/example/img/earth-night.jpg"
+                : "//unpkg.com/three-globe/example/img/earth-blue-marble.jpg"
+            }
             backgroundColor="rgba(0,0,0,0)"
             pointsData={allMarkers}
             pointSize={(point) =>
