@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import GlobeGL from "react-globe.gl";
 
 /**
@@ -18,19 +18,28 @@ import GlobeGL from "react-globe.gl";
 const GlobeWrapper = ({ onGlobeLoad, initialView, ...props }) => {
   const globeRef = useRef();
   const initialViewSet = useRef(false);
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    if (globeRef.current && initialView && !initialViewSet.current) {
+    setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (isMounted && globeRef.current && initialView && !initialViewSet.current) {
       // Set the initial point of view only once
       globeRef.current.pointOfView(initialView, 1000);
       initialViewSet.current = true;
     }
 
     // Pass the globe instance back to the parent component
-    if (globeRef.current && onGlobeLoad) {
+    if (isMounted && globeRef.current && onGlobeLoad) {
       onGlobeLoad(globeRef.current);
     }
-  }, [onGlobeLoad]);
+  }, [onGlobeLoad, initialView, isMounted]);
+
+  if (!isMounted) {
+    return null; // or a loading placeholder
+  }
 
   return <GlobeGL ref={globeRef} {...props} />;
 };

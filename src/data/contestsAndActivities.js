@@ -1,6 +1,89 @@
 export const contestsAndActivities = [
   {
+    "slug": "huawei-agorize-2024",
+    "importance": 3,
+    "title": "(Ongoing) Finalist at Huawei AI Individual Head-Related Transfer Functions (HRTFs) Competition",
+    "mapData": {
+      "venue": "Huawei Research Center",
+      "city": "Munich",
+      "country": "Germany",
+      "coordinates":{ lat: 48.1351, lng: 11.5820 }
+    },
+    "date": "12/2024 - 01/2025",
+    "shortDescription": "Details to come later.",
+    "longDescription": "Details to come later.",
+    "links": [
+      // { "label": "Hackathon Link", "url": "https://lauzhack.com/" },
+      // { "label": "GitHub Repository", "url": "https://github.com/batikanor/MX-Focus" }
+      {"label": "Competition Link", "url": "https://huawei.agorize.com/en/challenges/techarena-munich2024"}
+    ],
+    "technologies": ["Machine Learning", "AI", "HRTFs"],
+    "images": [
+      // "https://example.com/image1.jpg",
+      // "https://drive.google.com/uc?id=1aBcDeFgHiJkLmNoPqRSuvWxyz"
+    ],
+    "gdrive_embed": [
+      // "https://drive.google.com/file/d/1vL77AmjuWV4hls8Mt75x_lOqaBaohr1D/preview"
+    ]
+  },
+  {
+    "slug": "masters-thesis",
+    "importance": 7,
+    "title": "Master's Thesis: (TEA) Trajectory Encoding Augmentation for Robust and Transferable Policies in Offline Reinforcement Learning",
+    "mapData": {
+      "venue": "Siemens AG",
+      "city": "Munich",
+      "country": "Germany",
+      "coordinates":{ lat: 48.1351, lng: 11.5820 }
+    },
+    "date": "12/2024",
+    "shortDescription": "(Grade: 1.0) (Submitted to a conference, currently under review)",
+    "longDescription": "In this paper, we investigate offline reinforcement learning (RL) with the goal of training a single robust policy that generalizes effectively across environments with unseen dynamics. We propose a novel approach, Trajectory Encoding Augmentation (TEA), which extends the state space by integrating latent representations of environmental dynamics obtained from sequence encoders, such as AutoEncoders. Our findings show that incorporating these encodings with TEA improves the transferability of a single policy to novel environments with new dynamics, surpassing methods that rely solely on unmodified states. These results indicate that TEA captures critical, environment-specific characteristics, enabling RL agents to generalize effectively across dynamic conditions.",
+    "links": [
+      { "label": "arXiv", "url": "https://arxiv.org/abs/2411.19133" },
+      // { "label": "GitHub Repository", "url": "https://github.com/batikanor/MX-Focus" }
+    ],
+    "technologies": ["Machine Learning", "AI", "HRTFs"],
+    "images": [
+      // "https://example.com/image1.jpg",
+      // "https://drive.google.com/uc?id=1aBcDeFgHiJkLmNoPqRSuvWxyz"
+    ],
+    "gdrive_embed": [
+      // "https://www.youtube.com/embed/HIuHFqtGaEs",
+      // "https://drive.google.com/file/d/1vL77AmjuWV4hls8Mt75x_lOqaBaohr1D/preview"
+    ]
+  },
+  {
+    "slug": "lauzhack-2024",
+    "importance": 3,
+    "title": "Finalist at LauzHack 2024: VR Classroom for Focus Improvement",
+    "mapData": {
+      "venue": "EPFL",
+      "city": "Lausanne",
+      "country": "Switzerland",
+      "coordinates": { "lat": 46.5191, "lng": 6.5668 }
+    },
+    "date": "11/2024",
+    "shortDescription": "We developed 'MX Focus,' a VR classroom environment designed to help students enhance their concentration during exams. Utilizing a Logitech MX Ink VR pen and a Muse 2 EEG headband, the system detects stress or lack of focus, introducing noise to the student's handwriting in real-time. This innovative approach trains students to maintain focus and composure under exam conditions.",
+    "longDescription": "Our project, 'MX Focus,' is a virtual reality application aimed at improving students' concentration during examinations. In this immersive VR classroom, students are equipped with a Logitech MX Ink VR pen and a Muse 2 EEG headband. The system monitors the student's focus levels; if a decline is detected, simulated handwriting degradation occurs, encouraging the student to maintain concentration. The VR environment replicates a real classroom, with virtual papers aligned to the physical desk. Teachers can input or modify questions in real-time via a Google Docs document, which updates instantly in the VR space. This setup allows for dynamic interaction between teachers and students, facilitating tasks such as math problem-solving. By introducing challenges like simulated handwriting issues when focus wanes, our application aims to train students to remain calm and attentive under exam conditions. We believe that regular use of 'MX Focus' can help students develop resilience and improve performance in high-pressure academic settings. We made it to the finals, and we were gifted MX Ink pens of around 200 usd value per piece for our efforts.",
+    "links": [
+      { "label": "Hackathon Link", "url": "https://lauzhack.com/" },
+      { "label": "GitHub Repository", "url": "https://github.com/batikanor/MX-Focus" }
+    ],
+    "technologies": ["C#", "Unity", "EEG", "Logitech MX Pen", "VR", "AI", "Meta Quest 3"],
+    "images": [
+      // "https://example.com/image1.jpg",
+      // "https://drive.google.com/uc?id=1aBcDeFgHiJkLmNoPqRSuvWxyz"
+    ],
+    "gdrive_embed": [
+      "https://www.youtube.com/embed/HIuHFqtGaEs",
+      // "https://drive.google.com/file/d/1vL77AmjuWV4hls8Mt75x_lOqaBaohr1D/preview"
+    ]
+  },
+  
+  {
     slug: "salzburg-tourism-2024",  // Unique slug for each project
+    importance: 8, // If less than 5, pink text
     highlighted: true,
     title: "1st Place at the biggest Tourism Technology Festival in Europe",
     mapData: {
@@ -48,6 +131,7 @@ export const contestsAndActivities = [
   },
     {
       slug: "zurich-climathon-2024",  // Unique slug for each project
+      importance: 7, // If less than 5, pink text
       title: "Awarded 7000 CHF by the City of Zurich: AI-Based Employee Surveying Platform",
       mapData: {
         venue: "Kraftwerk",
@@ -75,6 +159,8 @@ Our roadmap includes launching the platform in Zurich, gathering initial data, a
   
     {
       slug: "bayer-ai-2024",  // Unique slug for each project
+      importance: 5, // If less than 5, pink text
+
       title: "2nd Place at Bayer AI Innovation Platform Hackathon",
       mapData: {
         venue: "Google Office",
@@ -101,6 +187,8 @@ Our roadmap includes launching the platform in Zurich, gathering initial data, a
     },
     {
       slug: "dsag-ideathon-2024",  // Unique slug for each project
+      importance: 5, // If less than 5, pink text
+
       highlighted: true,
       title: "2nd Place at DSAG Ideathon",
       mapData: {
@@ -127,6 +215,8 @@ Our roadmap includes launching the platform in Zurich, gathering initial data, a
     },
     {
       slug: "circular-bsh-2024",  // Unique slug for each project
+      importance: 4, // If less than 5, pink text
+
       title: "Best Business Opportunity Award Winner at Circular Hackfest",
       mapData: {
         venue: "Makerspace",
@@ -147,6 +237,7 @@ Our roadmap includes launching the platform in Zurich, gathering initial data, a
     },
     {
       slug: "thuega-2024",  // Unique slug for each project
+      importance: 6, // If less than 5, pink text
       title: "1st Place at Thüga Solutions Hackathon",
       mapData: {
         venue: "Thüga Solutions",
@@ -172,6 +263,7 @@ Our roadmap includes launching the platform in Zurich, gathering initial data, a
     },
     {
       slug: "solana-ideathon-2024",  // Unique slug for each project
+      importance: 4, // If less than 5, pink text
       title: "2nd Place at Solana Superteam Ideathon",
       mapData: {
         venue: "TUM Blockchain Conference",
@@ -195,6 +287,7 @@ Our roadmap includes launching the platform in Zurich, gathering initial data, a
     },
     {
       slug: "six-swisshacks-2024",  // Unique slug for each project
+      importance: 8, // If less than 5, pink text
       highlighted: true,
       title: "1st Place on Swiss Exchange Track & Audience Award at SwissHacks2024",
       mapData: {
@@ -218,6 +311,8 @@ Our roadmap includes launching the platform in Zurich, gathering initial data, a
     },
     {
       slug: "hackupc-2024",  // Unique slug for each project
+      importance: 5, // If less than 5, pink text
+
       title: "3rd Place at HackUPC (Sponsor: Intersystems)",
       mapData: {
         venue: "UPC",
@@ -244,6 +339,8 @@ Our roadmap includes launching the platform in Zurich, gathering initial data, a
     },
     {
       slug: "makeathon-reply-2024",  // Unique slug for each project
+      importance: 5, // If less than 5, pink text
+
       title: "2nd Place (team) & 1st Place (individual) at TUM AI Makeathon Main Challenge (Sponsor: Reply S.p.A.)",
       mapData: {
         venue: "TUM AI Makeathon",
@@ -274,6 +371,8 @@ Our roadmap includes launching the platform in Zurich, gathering initial data, a
     },
     {
       slug: "mdsi-bundesliga-2024",  // Unique slug for each project
+      importance: 4, // If less than 5, pink text
+
       title: "Proof of Concept: Detecting line-breaks in football matches",
       mapData: {
         venue: "TUM MDSI",
@@ -296,6 +395,8 @@ Our roadmap includes launching the platform in Zurich, gathering initial data, a
     },
     {
       slug: "draeger-2023",  // Unique slug for each project
+      importance: 5, // If less than 5, pink text
+
       title: "2nd Place at Dräger hackathon",
       mapData: {
         venue: "Dräger",
@@ -322,6 +423,8 @@ Our roadmap includes launching the platform in Zurich, gathering initial data, a
     },
     {
       slug: "ethmunich-2023",  // Unique slug for each project
+      importance: 8, // If less than 5, pink text
+
       highlighted: true,
       title: "1st Place (Main Track) at the first Ethereum-focused hackathon in Munich.",
       mapData: {
@@ -349,6 +452,8 @@ Our roadmap includes launching the platform in Zurich, gathering initial data, a
     },
     {
       slug: "msg-karlsruhe-2023",  // Unique slug for each project
+      importance: 6, // If less than 5, pink text
+
       title: "1st Place at  MSG Code & Create Hackathon",
       mapData: {
         venue: "MSG",
@@ -373,7 +478,9 @@ Our roadmap includes launching the platform in Zurich, gathering initial data, a
     },
     {
       slug: "bachelors-thesis",  // Unique slug for each project
-      title: "Bachelor’s Thesis",
+      importance: 6, // If less than 5, pink text
+
+      title: "Bachelor’s Thesis: Cat identification using Noseprints.",
       mapData: {
         venue: "Turkish-German University",
         city: "Istanbul",
@@ -381,7 +488,7 @@ Our roadmap includes launching the platform in Zurich, gathering initial data, a
         coordinates: { lat: 41.0082, lng: 28.9784 }
       },
       date: "2022",
-      shortDescription: `Cat identification using noseprints.`,
+      shortDescription: `Cat identification using noseprints and siamese networks.`,
       longDescription: `For the task of identification of pets and stray animals;  many methods, the ethicalness of which are questionable, are put to use. With this project, 16 different test cats (for each of which there were 4 to 20 examples) could be identified by the machine learning system using their nose images, face images or whole images with very high (99%, 100%, …) rank-1 to rank-5 accuracies without the model having been shown any example of their identity/class to the system in the training phase. Later on, the aim is to make the system more scalable and use it in end-user applications. For the project has an entrepreneurial side to it, the implementation will be kept confidential for at least a couple more years.`,
       technologies: ["Siamese Networks", "Pytorch"],
       gdrive_embed: [
@@ -395,15 +502,16 @@ Our roadmap includes launching the platform in Zurich, gathering initial data, a
     const mapData = contestsAndActivities
       .filter((activity) => activity.mapData) // Ensure mapData exists
       .map((activity) => ({
-        ...activity.mapData,
+        ...activity.mapData, // spread operator: ... is used to get all attributes from mapData to here 
         shortDescription: activity.shortDescription,
         title: activity.title,
         date: activity.date,
         slug: activity.slug,
+        importance: activity.importance
       }));
   
     // Group activities by city and country
-    const cityGroups = mapData.reduce((acc, activity) => {
+    const cityGroups = mapData.reduce((acc, activity) => { 
       const key = `${activity.city}-${activity.country}`;
       
       if (!acc[key]) {
@@ -412,6 +520,7 @@ Our roadmap includes launching the platform in Zurich, gathering initial data, a
           country: activity.country,
           coordinates: activity.coordinates,
           activities: [],
+          maxImportance: activity.importance,
         };
       }
       acc[key].activities.push({
@@ -420,6 +529,9 @@ Our roadmap includes launching the platform in Zurich, gathering initial data, a
         title: activity.title,
         slug: activity.slug, 
       });
+      if (activity.importance > acc[key].maxImportance) {
+        acc[key].maxImportance = activity.importance;
+      }
       return acc;
     }, {});
   

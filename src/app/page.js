@@ -12,9 +12,12 @@ const GlobeGame = dynamic(() => import("../components/GlobeGame"), { ssr: false 
 
 export default function Home() {
   const navigateWithRefresh = (slug) => {
-    const url = `${window.location.origin}${window.location.pathname}#${slug}`;
+    // for now, just forward people to the projects page regardles of the current page
+    const url = `${window.location.origin}/projects#${slug}`;
+    // const url = `${window.location.origin}${window.location.pathname}#${slug}`;
     window.location.href = url;
-    window.location.reload(); // Forces a page refresh
+    // window.location.reload(); // Forces a page refresh
+    
   };
 
   return (
@@ -24,7 +27,7 @@ export default function Home() {
         <header className="text-center">
           <br />
           {/* <h1 className="flex items-center justify-center space-x-2 text-3xl font-bold">
-            <span>🌍</span>
+            <span>🌍</span>   
             <span>Achievements Map</span>
           </h1> */}
         </header>

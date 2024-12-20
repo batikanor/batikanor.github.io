@@ -75,7 +75,8 @@ const Projects = () => {
   };
 
   const handleCopyLink = (slug) => {
-    const url = `${window.location.origin}${window.location.pathname}#${slug}`;
+    const url = `${window.location.origin}/projects#${slug}`;
+    // const url = `${window.location.origin}${window.location.pathname}#${slug}`;
     
     try {
       navigator.clipboard.writeText(url).then(() => {

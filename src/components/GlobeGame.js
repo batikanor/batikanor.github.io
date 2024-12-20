@@ -399,6 +399,7 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
   const colorPalette = ["blue", "green", "orange", "purple", "red", "yellow", "pink", "cyan", "lime", "magenta"]; // Add more colors if needed
 
   const markers = useMemo(() => {
+    // console.log(citiesAndLocations);
     return citiesAndLocations.map((location, index) => ({
       id: index,
       lat: location.coordinates.lat,
@@ -412,7 +413,8 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
       labelLng: location.coordinates.lng,
       labelText: location.city,
       labelSize: 0.7, // Adjust label size
-      labelColor: "rgba(255, 165, 0, 0.75)", // Optional: color for labels
+      labelColor: location.maxImportance > 4 ? "rgba(255, 165, 0, 0.75)" : 'pink',  // Optional: color for labels
+      
       activities: location.activities.map(activity => ({
         venue: activity.venue,
         date: activity.date,
@@ -734,37 +736,41 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
     } : { lat: 41.0082, lng: 28.9784, altitude: 0.5 }; // Default to Istanbul if no activities
   }, []);
 
-  const handleProjectClick = (slug) => {
-    const foundActivity = contestsAndActivities.find((activity) => activity.slug === slug);
-    if (foundActivity) {
-      setHoveredMarker(null); // Close the hover menu first
+  // const handleProjectClick = (slug) => {
+  //   const foundActivity = contestsAndActivities.find((activity) => activity.slug === slug);
+  //   if (foundActivity) {
+  //     setHoveredMarker(null); // Close the hover menu first
       
-      // Call the parent's onProjectSelect to update expanded state
-      onProjectSelect(foundActivity);
+  //     // Call the parent's onProjectSelect to update expanded state
+  //     onProjectSelect(foundActivity);
       
-      // If in fullscreen, exit first
-      if (isFullscreen && document.exitFullscreen) {
-        document.exitFullscreen().then(() => {
-          requestAnimationFrame(() => {
-            requestAnimationFrame(() => {
-              scrollToElement(slug, NAVBAR_HEIGHT + MAP_HEIGHT + 20);
-            });
-          });
-        });
-      } else {
-        requestAnimationFrame(() => {
-          requestAnimationFrame(() => {
-            scrollToElement(slug, NAVBAR_HEIGHT + MAP_HEIGHT + 20);
-          });
-        });
-      }
-    }
-  };
+  //     // If in fullscreen, exit first
+  //     if (isFullscreen && document.exitFullscreen) {
+  //       document.exitFullscreen().then(() => {
+  //         requestAnimationFrame(() => {
+  //           requestAnimationFrame(() => {
+  //             scrollToElement(slug, MAP_HEIGHT + NAVBAR_HEIGHT);
+  //             // scrollToElement(slug, NAVBAR_HEIGHT + MAP_HEIGHT + 20);
+  //           });
+  //         });
+  //       });
+  //     } else {
+  //       requestAnimationFrame(() => {
+  //         requestAnimationFrame(() => {
+  //           scrollToElement(slug, MAP_HEIGHT + NAVBAR_HEIGHT);
+  //           // scrollToElement(slug, NAVBAR_HEIGHT + MAP_HEIGHT + 20);
+  //         });
+  //       });
+  //     }
+  //   }
+  // };
 
   const [isNavigating, setIsNavigating] = useState(false);
 
   return (
+    
     <div>
+
       {/* Display Current Player or Instructions */}
       {gameMode === "ticTacToe" && !winner && (
         <div className="mb-4 text-lg sm:text-xl font-semibold">
@@ -828,6 +834,19 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
           ref={globeContainerRef}
           className="relative w-full h-[700px] sm:h-[800px] md:h-[900px] globe-container"
         >
+          <div className="bsolute top-4 left-4 bg-opacity-75 p-4 rounded shadow-lg z-50">
+          {/* <h3 className="font-semibold mb-2">Legend</h3> */}
+          <ul>
+            <li>
+              <span className="text-pink-500">Pink Text:</span> Cities with only minor achievements.
+            </li>
+            <li>
+              <span className="text-yellow-500">Yellow Text:</span> Cities with at least one OK achievement.
+            </li>
+            {/* Add more legend items as needed */}
+          </ul>
+          <p>ToDo: Fill the map with <span className="text-yellow-500"> yellow</span></p>
+        </div>
           <Globe
             onGlobeLoad={(globe) => {
               globeEl.current = globe;
@@ -858,7 +877,11 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
             labelLng={(point) => point.labelLng}
             labelText={(point) => point.labelText.replace("ü", "ue")}
             labelSize={(point) => 0.3}
-            labelColor={(point) => point.labelColor || "white"}
+            // labelColor={(point) => point.labelColor || "white"}
+            // Inside the GlobeGame component, where you render the labels
+            labelColor={(point) => point.maxImportance < 5 ? "pink" : (point.labelColor || "white")}
+            // labelColor={(point) => "green"}
+
             labelResolution={2}
             // pointAltitude={0.05} // Increased altitude from 0.01 to 0.05
             pointAltitude={0.01} // Increased altitude from 0.01 to 0.05
@@ -952,6 +975,7 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
                       <button
                         onClick={() => {
                           navigateWithRefresh(activity.slug);
+                          // handleProjectClick(activity.slug);
                           setClickedMarker(null); // Close pop-up after click
                         }}
                         className="text-blue-400 hover:underline ml-2"
