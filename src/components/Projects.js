@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import "./Projects.css";
 import { contestsAndActivities } from "../data/contestsAndActivities";
 import { NAVBAR_HEIGHT } from '../constants/layout';
+import { FaGlobe } from 'react-icons/fa';
 
 // import ResizePanel from "react-resize-panel";
 const ResizePanel = typeof window !== "undefined" ? require("react-resize-panel").default : null;
@@ -91,6 +92,30 @@ const Projects = () => {
     }
   };
   
+  const handleLocationClick = (activity) => {
+    const url = `${window.location.origin}/?lat=${activity.mapData.coordinates.lat}&lng=${activity.mapData.coordinates.lng}`;
+    window.location.href = url;
+  };
+  
+  const LocationDisplay = ({ activity, onClick }) => {
+    return (
+      <div className="group relative inline-block">
+        <p 
+          className="flex items-center gap-2 dark:text-gray-300 cursor-pointer hover:text-blue-400"
+          onClick={onClick}
+        >
+          <FaGlobe className="text-blue-400" />
+          {activity.mapData.venue}, {activity.mapData.city}/{activity.mapData.country}
+          
+          {/* Tooltip */}
+          <span className="invisible group-hover:visible absolute left-0 top-full mt-2 w-48 p-2 bg-gray-800 text-white text-sm rounded shadow-lg z-10">
+            Click to view location on the map
+          </span>
+        </p>
+      </div>
+    );
+  };
+
   return (
     <div className="max-w-6xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
       <h2 className="text-3xl font-bold tracking-tight text-center mb-12">
@@ -140,13 +165,7 @@ const Projects = () => {
                     {isExpanded ? "Collapse" : "See more"}
                   </button>
                 </div>
-                <p className="dark:text-gray-300 cursor-pointer hover:text-blue-400" 
-                   onClick={() => {
-                     const url = `${window.location.origin}/#${activity.slug}`;
-                     window.location.href = url;
-                   }}>
-                  {activity.mapData.venue}, {activity.mapData.city}/{activity.mapData.country}
-                </p>
+                <LocationDisplay activity={activity} onClick={() => handleLocationClick(activity)} />
                 <p className="mb-4 dark:text-gray-300">{activity.date}</p>
 
                 {/* Display Short Description */}

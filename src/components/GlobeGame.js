@@ -13,6 +13,7 @@ import { debounce } from "lodash";
 import { Joystick } from "react-joystick-component"; // Import Joystick
 import { getCitiesAndLocations, contestsAndActivities } from "../data/contestsAndActivities"; // Adjust path as needed
 import { NAVBAR_HEIGHT, MAP_HEIGHT } from '../constants/layout';
+import MarkerInfo from './MarkerInfo';
 
 // Dynamically import the GlobeWrapper component without server-side rendering
 const Globe = dynamic(() => import("../components/GlobeWrapper"), { ssr: false });
@@ -29,9 +30,6 @@ const scrollToElement = (elementId, offset = 0) => {
     });
   }
 };
-
-
-
 
 export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
   // State to ensure client-side rendering
@@ -407,7 +405,8 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
       label: location.city,
       size: location.isMajorCity ? 20 : 15,
       color: location.isMajorCity ? "gold" : colorPalette[index % colorPalette.length],
-      icon: location.isMajorCity ? "🏙️" : "📍",
+      // icon: location.isMajorCity ? "🏙️" : "📍",
+      icon: '',
       animation: location.isMajorCity ? "pulsate" : "none",
       labelLat: location.coordinates.lat,
       labelLng: location.coordinates.lng,
@@ -775,14 +774,7 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
         const activity = contestsAndActivities.find(a => a.slug === slug);
         
         if (activity && activity.mapData && globeEl.current) {
-          // Request fullscreen
-          if (globeContainerRef.current && !document.fullscreenElement) {
-            globeContainerRef.current.requestFullscreen().catch(err => {
-              console.error(`Error attempting to enable fullscreen: ${err.message}`);
-            });
-          }
-          
-          // Focus on the location
+          // Focus on the location with animation
           globeEl.current.pointOfView({
             lat: activity.mapData.coordinates.lat,
             lng: activity.mapData.coordinates.lng,
@@ -801,6 +793,24 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
     return () => {
       window.removeEventListener('hashchange', handleHashChange);
     };
+  }, [contestsAndActivities]);
+
+  useEffect(() => {
+    if (globeEl.current && typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const lat = parseFloat(params.get('lat'));
+      const lng = parseFloat(params.get('lng'));
+      
+      if (!isNaN(lat) && !isNaN(lng)) {
+        globeEl.current.pointOfView(
+          { lat, lng, altitude: 1 },
+          1000
+        );
+        
+        // Clear the URL parameters after focusing
+        window.history.replaceState({}, '', '/');
+      }
+    }
   }, []);
 
   return (
@@ -887,6 +897,23 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
             onGlobeLoad={(globe) => {
               globeEl.current = globe;
               setIsNavigating(false);
+              
+              // Check URL parameters after globe is loaded
+              const params = new URLSearchParams(window.location.search);
+              const lat = parseFloat(params.get('lat'));
+              const lng = parseFloat(params.get('lng'));
+              
+              if (!isNaN(lat) && !isNaN(lng)) {
+                setTimeout(() => {
+                  globe.pointOfView(
+                    { lat, lng, altitude: 0.4 },
+                    1000
+                  );
+                  
+                  // Clear the URL parameters after focusing
+                  window.history.replaceState({}, '', '/');
+                }, 100);
+              }
             }}
             initialView={initialLocation}
             width={isFullscreen ? window.innerWidth : dimensions.width}
@@ -996,39 +1023,13 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
           </button>
 
           {/* Modal Popup for Marker Click (Now Inside Fullscreen Container) */}
-          {/* Clicked Marker Pop-up (Only in Fullscreen Mode) */}
           {clickedMarker && isFullscreen && (
-            <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-              <div className="bg-gray-800 rounded-lg p-6 text-white max-w-md mx-auto">
-                <h2 className="text-lg font-semibold mb-4">
-                  {clickedMarker.label}
-                </h2>
-                <div className="max-h-64 overflow-y-auto space-y-2">
-                  {clickedMarker.activities?.map((activity, index) => (
-                    <div key={index} className="bg-gray-700 p-3 rounded-md text-sm shadow-md">
-                      <strong>{activity.venue} - {activity.date}</strong><br />
-                      <span>{activity.title}</span>
-                      <button
-                        onClick={() => {
-                          navigateWithRefresh(activity.slug);
-                          // handleProjectClick(activity.slug);
-                          setClickedMarker(null); // Close pop-up after click
-                        }}
-                        className="text-blue-400 hover:underline ml-2"
-                      >
-                        View Project
-                      </button>
-                    </div>
-                  ))}
-                </div>
-                <button
-                  className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                  onClick={() => setClickedMarker(null)}
-                >
-                  Close
-                </button>
-              </div>
-            </div>
+            <MarkerInfo
+              marker={clickedMarker}
+              onClose={() => setClickedMarker(null)}
+              navigateWithRefresh={navigateWithRefresh}
+              isFullscreen={true}
+            />
           )}
 
           {/* Overlay for Game Symbols */}
@@ -1076,34 +1077,12 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
 
   {/* Side Bubble for Hovered Marker */}
   {hoveredMarker && (
-    <div className="fixed top-1/2 right-4 transform -translate-y-1/2 bg-gray-800 text-white p-6 rounded-lg shadow-lg max-w-xs z-50">
-      <h2 className="text-xl font-semibold mb-4">
-        {hoveredMarker.label || ' '}
-      </h2>
-      <div className="max-h-64 overflow-y-auto space-y-2">
-        {(hoveredMarker.activities || []).map((activity, index) => (
-          <div key={index} className="bg-gray-700 p-3 rounded-md text-sm shadow-md">
-            <strong>{activity.venue} - {activity.date}</strong><br />
-            <span>{activity.title}</span>
-            <button
-              onClick={() => {
-                navigateWithRefresh(activity.slug);
-                setHoveredMarker(null);
-              }}
-              className="text-blue-400 hover:underline ml-2"
-            >
-              View Project
-            </button>
-          </div>
-        ))}
-      </div>
-      <button
-        onClick={handleCloseInfoWindow}
-        className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-      >
-        Close
-      </button>
-    </div>
+    <MarkerInfo
+      marker={hoveredMarker}
+      onClose={handleCloseInfoWindow}
+      navigateWithRefresh={navigateWithRefresh}
+      isFullscreen={false}
+    />
   )}
 
 
