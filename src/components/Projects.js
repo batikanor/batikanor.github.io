@@ -124,61 +124,60 @@ const Projects = () => {
 
 
       {/* Activities Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-7">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-7">
         {contestsAndActivities.map((activity) => {
           const isExpanded = expandedActivity === activity;
+          const isMinor = activity.importance < 5;
 
           return (
             <div
               id={activity.slug} 
               key={activity.slug}
               className={`${
-                isExpanded ? "col-span-1 sm:col-span-2" : ""
+                isExpanded ? "col-span-1 sm:col-span-2 lg:col-span-4" : isMinor ? "col-span-1 sm:col-span-1 lg:col-span-1" : "col-span-1 sm:col-span-2 lg:col-span-2"
               } transition-all duration-300`}
             >
-              {/* <div className="relative p-4 bg-gray-800 rounded-lg shadow-lg border border-gray-600"> */}
-              {/* <div className={`relative p-4 bg-gray-800 rounded-lg shadow-lg border border-gray-600 ${ */}
               <div className={`relative p-4 rounded-lg shadow-lg border border-gray-600 ${
-
-                  activity.highlighted ? "highlight" : ""
-                }`}>
-
+                activity.highlighted ? "highlight" : ""
+              }`}>
+                
                 {/* Deterministic colored bar at the top */}
                 {!isExpanded && (
                   <div
                     style={{ backgroundColor: getDeterministicColor(activity.slug) }}
                     className="absolute top-0 left-0 right-0 h-2 rounded-t-lg"
-                  ></div>
+                  >
+                    {isMinor && <span className="minor-achievement">MINOR ACHIEVEMENT</span>}
+                  </div>
                 )}
+                
                 <div className="flex justify-between items-center">
-                {/* <h3 className="text-lg sm:text-2xl font-semibold mb-2 text-white"> */}
-                <h3 className="text-lg sm:text-2xl font-semibold mb-2 ">
-
-                  {activity.title}
-                </h3>
+                  <h3 className={`${
+                    isMinor ? 'text-sm sm:text-lg' : 'text-lg sm:text-2xl'
+                  } font-semibold mb-2`}>
+                    {activity.title}
+                  </h3>
                   <button
                     onClick={() => toggleExpandedView(activity)}
-                    // className="bg-gray-700 text-white px-3 py-1 rounded hover:bg-gray-600"
                     className="px-3 py-1 rounded hover:bg-gray-500"
-
                   >
                     {isExpanded ? "Collapse" : "See more"}
                   </button>
                 </div>
+                
                 <LocationDisplay activity={activity} onClick={() => handleLocationClick(activity)} />
+                
                 <p className="mb-4 dark:text-gray-300">{activity.date}</p>
-
+                
                 {/* Display Short Description */}
-                <p className="mb-4 dark:text-gray-200">{activity.shortDescription}</p>
-
+                {!isMinor && <p className="mb-4 dark:text-gray-200">{activity.shortDescription}</p>}
+                
                 {/* Display Long Description if Expanded */}
                 {isExpanded && (
                   <>
-                    {/* <p className="text-gray-300 mb-4">{activity.longDescription}</p> */}
                     {activity.longDescription.split('\n').map((line, index) => (
                       <p className="dark:text-white" key={index}>{line}</p>
                     ))}
-                    {/* Copy Link Button */}
                     <br/>
                     <button
                       onClick={() => handleCopyLink(activity.slug)}
@@ -186,72 +185,61 @@ const Projects = () => {
                     >
                       Copy Link to this Project
                     </button>
+                    
+                    {/* Add Links */}
+                    {activity.links && activity.links.length > 0 && (
+                      <div className="mb-4">
+                        <h4 className="font-semibold">Links:</h4>
+                        <ul>
+                          {activity.links.map((link, index) => (
+                            <li key={index}>
+                              <a href={link.url} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">
+                                {link.label}
+                              </a>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    {/* Add Technologies */}
+                    {activity.technologies && activity.technologies.length > 0 && (
+                      <div className="mt-4 mb-4 flex flex-wrap gap-2">
+                        {activity.technologies.map((tech, i) => (
+                          <span
+                            key={i}
+                            className="text-sm bg-gray-700 text-white px-3 py-1 rounded-full"
+                          >
+                            {tech}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Add Images or Embedded Content */}
+                    {activity.images && activity.images.length > 0 && (
+                      <div className="mb-4">
+                        <h4 className="font-semibold">Images:</h4>
+                        {activity.images.map((image, index) => (
+                          <img key={index} src={getGoogleDriveImageEmbedUrl(image)} alt={`Project image ${index + 1}`} className="mb-2" />
+                        ))}
+                      </div>
+                    )}
+
+                    {activity.gdrive_embed && activity.gdrive_embed.length > 0 && (
+                      <div className="mb-4">
+                        {activity.gdrive_embed.map((embedUrl, index) => (
+                          <iframe 
+                            key={index} 
+                            src={getGoogleDriveEmbedUrl(embedUrl)} 
+                            className="w-full h-64 mb-2" 
+                            frameBorder="0" 
+                            allowFullScreen
+                          ></iframe>
+                        ))}
+                      </div>
+                    )}
                   </>
-                )}
-
-                {/* Used Technologies */}
-                {activity.technologies && (
-                  <div className="mt-4 mb-4 flex flex-wrap">
-                    {activity.technologies.map((tech, i) => (
-                      <span
-                        key={i}
-                        className="text-xs bg-gray-700 text-white px-2 py-1 rounded-full mr-2 mb-2"
-                      >
-                        {tech}
-                      </span>
-                    ))}
-                  </div>
-                )}
-
-                {/* Display Links */}
-                {activity.links && (
-                  <div className="mt-4">
-                    {activity.links.map((link, i) => (
-                      <a
-                        key={i}
-                        href={link.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-400 hover:underline block"
-                      >
-                        {link.label}
-                      </a>
-                    ))}
-                  </div>
-                )}
-
-                {/* Embed Google Drive Media if Available */}
-                {isExpanded && activity.gdrive_embed && (
-                  <div className="mt-6 space-y-4">
-                    {activity.gdrive_embed.map((embedUrl, i) => (
-                      <ResizePanel key={i} direction="s" style={{ marginBottom: "1rem", height: "30vh" }}>
-                        <iframe
-                          src={getGoogleDriveEmbedUrl(embedUrl)}
-                          width="100%"
-                          height="1000"
-                          allow="autoplay"
-                          className="rounded-lg"
-                          frameBorder="0"
-                          allowFullScreen
-                          title={`${activity.title} Google Drive Embed ${i + 1}`}
-                        ></iframe>
-                      </ResizePanel>
-                    ))}
-                  </div>
-                )}
-
-                {/* Display Images if Available */}
-                {isExpanded && activity.images && (
-                  <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {activity.images.map((image, i) => (
-                      <img
-                        key={i}
-                        src={getGoogleDriveImageEmbedUrl(image)}
-                        alt={`Image for ${activity.title}`}
-                        className="w-full h-auto rounded-lg shadow-lg"
-                      />
-                    ))}
-                  </div>
                 )}
               </div>
             </div>

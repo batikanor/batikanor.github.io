@@ -26,3 +26,19 @@
     animation: wiggle 0.6s ease-in-out infinite; /* Wiggle animation */
   }
   
+  .minor-achievement {
+    font-size: 0.5rem; /* Tiny text for "MINOR ACHIEVEMENT" */
+    text-align: center;
+    color: #000000; /* Dark black color for the text */
+    padding: 2px 0;
+    letter-spacing: 0.3em; /* Increase spacing between letters */
+    white-space: nowrap; /* Prevent text from wrapping */
+    overflow: hidden; /* Ensure text doesn't overflow */
+    width: 100%; /* Take full width of the parent */
+    position: absolute; /* Position it absolutely within the parent */
+    top: 50%; /* Center vertically */
+    transform: translateY(-50%); /* Adjust for vertical centering */
+    font-weight: bold; /* Make text bold */
+    text-shadow: 1px 1px 2px #ffffff; /* Add white shadow */
+  }
+  
