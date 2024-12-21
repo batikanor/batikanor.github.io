@@ -426,7 +426,7 @@ Our roadmap includes launching the platform in Zurich, gathering initial data, a
       importance: 8, // If less than 5, pink text
 
       highlighted: true,
-      title: "1st Place (Main Track) at the first Ethereum-focused hackathon in Munich.",
+      title: "1st Place (Main Track) at the first Ethereum-focused hackathon in Munich",
       mapData: {
         venue: "PretzelDAO & TUM",
         city: "Munich",
@@ -480,19 +480,49 @@ Our roadmap includes launching the platform in Zurich, gathering initial data, a
       slug: "bachelors-thesis",  // Unique slug for each project
       importance: 6, // If less than 5, pink text
 
-      title: "Bachelor’s Thesis: Cat identification using Noseprints.",
+      title: "Bachelor’s Thesis: Cat identification using Noseprints",
       mapData: {
         venue: "Turkish-German University",
         city: "Istanbul",
         country: "Turkey",
         coordinates: { lat: 41.0082, lng: 28.9784 }
       },
-      date: "2022",
+      date: "06/2022",
       shortDescription: `Cat identification using noseprints and siamese networks.`,
       longDescription: `For the task of identification of pets and stray animals;  many methods, the ethicalness of which are questionable, are put to use. With this project, 16 different test cats (for each of which there were 4 to 20 examples) could be identified by the machine learning system using their nose images, face images or whole images with very high (99%, 100%, …) rank-1 to rank-5 accuracies without the model having been shown any example of their identity/class to the system in the training phase. Later on, the aim is to make the system more scalable and use it in end-user applications. For the project has an entrepreneurial side to it, the implementation will be kept confidential for at least a couple more years.`,
       technologies: ["Siamese Networks", "Pytorch"],
       gdrive_embed: [
         "https://drive.google.com/file/d/1vkXClWm80q1e-R4MItsKIthmG21vG_4R/view?usp=sharing",
+      ],
+  
+    },
+    {
+      slug: "tgu-perfect-gpa",  // Unique slug for each project
+      importance: 6, // If less than 5, pink text
+
+      title: "First student ever to graduate from TGU with Perfect GPA",
+      mapData: {
+        venue: "Turkish-German University",
+        city: "Istanbul",
+        country: "Turkey",
+        coordinates: { lat: 41.0082, lng: 28.9784 }
+      },
+      date: "06/2022",
+      shortDescription: `I was the first student ever to graduate from any faculty of the Turkish-German University with a perfect GPA.`,
+      longDescription: `
+
+      Turkish-German University is founded through the shared intentions of the Turkish & German governments, and even though the university is located in Istanbul, the lectures are 100% in German. There's this system that they call 'Flying Faculty', where half of our lecturers are coming from various german Universities through DAAD funding. This is a pretty neat thing, since it allows you to network with professors from Berlin, Aachen, Magdeburg, ...
+      \n
+    
+      Whilst TGU isn't the hardest university to get into, students still need to perform better than 99% of the country in the nationwide university entrance exam to get in.
+      \n
+      I was rarely the best student of an invidividual class, and I also was often not the most hardworking or the most intelligent student of a class. However, I consistently got good grades from all classes I took, which enabled me to graduate from computer science (Informatik / Bilgisayar Mühendisliği) program of TGU with a GPA of 4.00/4.00, and become the first graduate of any faculty of TGU with a perfect GPA. TGU is a relatively young university, and I owe my success partially to that. In the end of the day, this is a great thing to put on my CV, but it doesn't really make my future path better than other graduates of TGU. I just have one good-looking thing in my CV, and that's it. It feels weird to mention this in interviews, too. It sounds a bit too 'proud' to mention it. I still end up mentioning it sometimes... What can I do? I'm just trying to market myself...
+      \n
+      I was gifted a fancy hourglass from the rector after my valedictorian speech, which is also nice.`,  
+      
+      technologies: ["Academia", "Computer Science", "Turkish-German University."],
+      gdrive_embed: [
+        "https://drive.google.com/file/d/1M7Ca6-_t-u1_ERRk2I9YwkS_GdTbXUXz/view?usp=drive_link",
       ],
   
     },
