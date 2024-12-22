@@ -9,7 +9,6 @@ import React, {
 } from "react";
 import dynamic from "next/dynamic";
 import { debounce } from "lodash";
-import { Joystick } from "react-joystick-component";
 import { getCitiesAndLocations, contestsAndActivities } from "../data/contestsAndActivities";
 import { NAVBAR_HEIGHT, MAP_HEIGHT } from '../constants/layout';
 import MarkerInfo from './MarkerInfo';
@@ -213,73 +212,15 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
     };
   }, []);
 
-  // Handle Joystick movement (for mobile)
-  const handleJoystickMove = (event) => {
-    const { x, y } = event;
-    const speed = 0.2;
+  // Add ref for joystick
+  const joystickRef = useRef(null);
+  const [joystickPosition, setJoystickPosition] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
 
-    let { lat, lng } = planePosition;
-    if (y > 0) {
-      lat += speed; // Up
-      if (lat > 90) lat = 90;
-    } else if (y < 0) {
-      lat -= speed; // Down
-      if (lat < -90) lat = -90;
-    }
-    if (x < 0) {
-      lng -= speed; // Left
-      if (lng < -180) lng += 360;
-    } else if (x > 0) {
-      lng += speed; // Right
-      if (lng > 180) lng -= 360;
-    }
-    setPlanePosition({ lat, lng });
-  };
-
-  const handleJoystickStop = () => {
-    setKeysPressed({
-      w: false,
-      a: false,
-      s: false,
-      d: false,
-    });
-  };
-
-  // Get container dimensions after client renders
-  useEffect(() => {
-    if (globeContainerRef.current) {
-      const { clientWidth, clientHeight } = globeContainerRef.current;
-      setDimensions({ width: clientWidth, height: clientHeight });
-    }
-    setIsClient(true);
-  }, []);
-
-  // Set initial viewpoint each time gameMode changes
-  useEffect(() => {
-    if (!globeEl.current) return;
-
-    if (gameMode === "planeCollectCoins") {
-      globeEl.current.pointOfView(
-        { lat: planePosition.lat, lng: planePosition.lng, altitude: 0.3 },
-        1000
-      );
-    } else if (gameMode === "ticTacToe") {
-      globeEl.current.pointOfView(
-        { lat: 26, lng: 30, altitude: 0.4 },
-        1000
-      );
-    } else {
-      // Default
-      globeEl.current.pointOfView(
-        { lat: 41.0082, lng: 28.9784, altitude: 0.6 },
-        1000
-      );
-    }
-  }, [gameMode]);
-
-  // Convert locations to marker format
+  // Move colorPalette up here, before markers
   const colorPalette = ["blue", "green", "orange", "purple", "red", "yellow", "pink", "cyan", "lime", "magenta"];
 
+  // Now markers can use colorPalette
   const markers = useMemo(() => {
     const baseMarkers = citiesAndLocations.map((location, index) => ({
       id: `city-${index}`,
@@ -319,7 +260,7 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
       labelColor: "white",
     });
 
-    // Only add the “Plane Collect Coins” marker if NOT currently in plane game
+    // Only add the "Plane Collect Coins" marker if NOT currently in plane game
     if (gameMode !== "planeCollectCoins") {
       baseMarkers.push({
         id: "plane-collect-marker",
@@ -339,6 +280,164 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
 
     return baseMarkers;
   }, [citiesAndLocations, gameMode]);
+
+  // Replace the Joystick component with this div
+  const renderJoystick = () => {
+    if (gameMode !== "planeCollectCoins" || !isMobile) return null;
+
+    const handleTouchStart = (e) => {
+      e.preventDefault();
+      setIsDragging(true);
+    };
+
+    const handleTouchMove = (e) => {
+      if (!isDragging) return;
+      e.preventDefault();
+      
+      const touch = e.touches[0];
+      const joystick = e.target;
+      const rect = joystick.getBoundingClientRect();
+      
+      // Calculate center of the joystick container
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+      
+      // Calculate distance from center
+      let deltaX = touch.clientX - centerX;
+      let deltaY = touch.clientY - centerY;
+      
+      // Limit the joystick movement to a certain radius
+      const radius = 40;
+      const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+      if (distance > radius) {
+        deltaX = (deltaX / distance) * radius;
+        deltaY = (deltaY / distance) * radius;
+      }
+      
+      setJoystickPosition({ x: deltaX, y: deltaY });
+      
+      // Update plane position based on joystick position
+      const speed = 0.5;
+      let { lat, lng } = planePosition;
+      
+      lng += (deltaX / radius) * speed;
+      if (lng > 180) lng -= 360;
+      if (lng < -180) lng += 360;
+      
+      lat -= (deltaY / radius) * speed;
+      if (lat > 90) lat = 90;
+      if (lat < -90) lat = -90;
+      
+      // Check coin collection before updating position
+      setCoins((prevCoins) => {
+        return prevCoins.filter((coin) => {
+          const dist = Math.sqrt((coin.lat - lat) ** 2 + (coin.lng - lng) ** 2);
+          if (dist < 10) {
+            setCollectedCoins((prev) => prev + 1);
+            return false; // remove coin
+          }
+          return true;
+        });
+      });
+
+      // Check for marker proximity
+      markers.forEach((marker) => {
+        const dist = Math.sqrt((marker.lat - lat) ** 2 + (marker.lng - lng) ** 2);
+        if (dist < 2 && !triggeredMarkers.includes(marker.id)) {
+          setClickedMarker(marker);
+          setTriggeredMarkers((prev) => [...prev, marker.id]);
+        }
+      });
+      
+      setPlanePosition({ lat, lng });
+      
+      // Move globe POV with higher altitude for mobile
+      if (globeEl.current) {
+        globeEl.current.pointOfView({ lat, lng, altitude: 2 }, 0);
+      }
+    };
+
+    const handleTouchEnd = () => {
+      setIsDragging(false);
+      setJoystickPosition({ x: 0, y: 0 });
+    };
+
+    return (
+      <div className="fixed z-50 select-none touch-none"
+        style={{
+          left: '50%',
+          bottom: '100px',
+          transform: 'translateX(-50%)',
+        }}>
+        {/* Joystick container */}
+        <div
+          style={{
+            width: '120px',
+            height: '120px',
+            background: 'rgba(255, 255, 255, 0.2)',
+            borderRadius: '50%',
+            border: '2px solid rgba(255, 255, 255, 0.4)',
+            position: 'relative',
+            touchAction: 'none'
+          }}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+        >
+          {/* Joystick knob */}
+          <div
+            style={{
+              width: '40px',
+              height: '40px',
+              background: 'rgba(255, 255, 255, 0.8)',
+              borderRadius: '50%',
+              position: 'absolute',
+              left: '50%',
+              top: '50%',
+              transform: `translate(calc(-50% + ${joystickPosition.x}px), calc(-50% + ${joystickPosition.y}px))`,
+              transition: isDragging ? 'none' : 'transform 0.2s'
+            }}
+          />
+        </div>
+      </div>
+    );
+  };
+
+  // Get container dimensions after client renders
+  useEffect(() => {
+    if (globeContainerRef.current) {
+      const { clientWidth, clientHeight } = globeContainerRef.current;
+      setDimensions({ width: clientWidth, height: clientHeight });
+    }
+    setIsClient(true);
+  }, []);
+
+  // Set initial viewpoint each time gameMode changes
+  useEffect(() => {
+    if (!globeEl.current) return;
+
+    if (gameMode === "planeCollectCoins") {
+      globeEl.current.pointOfView(
+        { 
+          lat: planePosition.lat, 
+          lng: planePosition.lng, 
+          altitude: isMobile ? 2 : 0.3 
+        },
+        1000
+      );
+    } else if (gameMode === "ticTacToe") {
+      globeEl.current.pointOfView(
+        { lat: 26, lng: 30, altitude: 0.4 },
+        1000
+      );
+    } else {
+      // Default
+      globeEl.current.pointOfView(
+        { lat: 41.0082, lng: 28.9784, altitude: 0.6 },
+        1000
+      );
+    }
+  }, [gameMode, isMobile]);
 
   // Arcs (just a demo)
   const arcs = useMemo(() => {
@@ -619,8 +718,81 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
   const { resolvedTheme } = useTheme();
   const [isNavigating, setIsNavigating] = useState(false);
 
+  // Add this new function near your other handlers
+  const handleGlobeTouch = (event) => {
+    if (!gameMode === "planeCollectCoins" || !isFullscreen || !isMobile) return;
+
+    // Get touch coordinates relative to the globe container
+    const globeRect = globeContainerRef.current.getBoundingClientRect();
+    const centerX = globeRect.width / 2;
+    const centerY = globeRect.height / 2;
+    
+    // Calculate direction based on touch position relative to center
+    const touchX = event.touches[0].clientX - globeRect.left;
+    const touchY = event.touches[0].clientY - globeRect.top;
+    
+    // Calculate direction vector
+    const dirX = touchX - centerX;
+    const dirY = centerY - touchY; // Inverted because Y grows downward in screen coords
+    
+    // Normalize the vector
+    const length = Math.sqrt(dirX * dirX + dirY * dirY);
+    const normalizedX = dirX / length;
+    const normalizedY = dirY / length;
+    
+    // Update plane position
+    const speed = 0.5;
+    let { lat, lng } = planePosition;
+    
+    lng += normalizedX * speed;
+    if (lng > 180) lng -= 360;
+    if (lng < -180) lng += 360;
+    
+    lat += normalizedY * speed;
+    if (lat > 90) lat = 90;
+    if (lat < -90) lat = -90;
+    
+    setPlanePosition({ lat, lng });
+    
+    // Check coin collection (same logic as other movement handlers)
+    setCoins((prevCoins) => {
+      return prevCoins.filter((coin) => {
+        const dist = Math.sqrt((coin.lat - lat) ** 2 + (coin.lng - lng) ** 2);
+        if (dist < 10) {
+          setCollectedCoins((prev) => prev + 1);
+          return false;
+        }
+        return true;
+      });
+    });
+
+    // Check for marker proximity
+    markers.forEach((marker) => {
+      const dist = Math.sqrt((marker.lat - lat) ** 2 + (marker.lng - lng) ** 2);
+      if (dist < 2 && !triggeredMarkers.includes(marker.id)) {
+        setClickedMarker(marker);
+        setTriggeredMarkers((prev) => [...prev, marker.id]);
+      }
+    });
+  };
+
+  // Add a toggle button for mobile map visibility
+  const toggleMap = () => {
+    setShowMap(prev => !prev);
+  };
+
   return (
-    <div>
+    <div className="relative w-full">
+      {/* Move toggle button for mobile to top */}
+      {isMobile && (
+        <button
+          onClick={toggleMap}
+          className="py-2 px-4 font-bold text-lg rounded transition-colors duration-300 shadow-lg mx-auto block w-auto"
+        >
+          {showMap ? 'Hide Map' : 'Show Map'}
+        </button>
+      )}
+
       {gameMode === "ticTacToe" && !winner && (
         <div className={`text-lg sm:text-xl font-semibold
           ${isFullscreen ? 'absolute top-40 right-16 bg-black bg-opacity-75 p-4 rounded' : 'mb-4'}`}>
@@ -648,38 +820,12 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
         </div>
       )}
 
-      {gameMode === "planeCollectCoins" && isMobile && (
-        <div
-          className="fixed bottom-10 left-1/2 transform -translate-x-1/2 z-50"
-          style={{ zIndex: 9999 }}
-        >
-          <Joystick
-            size={100}
-            baseColor="gray"
-            stickColor="blue"
-            move={handleJoystickMove}
-            stop={handleJoystickStop}
-          />
-        </div>
-      )}
-
-      {!showMap && (
-        <div className="flex justify-center mt-6">
-          <button
-            onClick={() => setShowMap(true)}
-            className="px-4 py-2 border rounded hover:bg-blue-600 transition"
-          >
-            Show Map of Achievements
-          </button>
-        </div>
-      )}
-
       {showMap && (
         <div
           ref={globeContainerRef}
           className="relative w-full h-[700px] sm:h-[800px] md:h-[900px] globe-container"
         >
-          <div className={`text-white absolute ${isFullscreen ? 'top-4 right-16' : 'top-4 left-4'} bg-black bg-opacity-75 p-4 rounded shadow-lg z-50`}>
+          <div className={`text-white absolute ${isFullscreen ? 'top-4 right-16' : 'top-4 left-4'} bg-black bg-opacity-75 p-2 sm:p-4 rounded shadow-lg z-10 text-[10px] sm:text-sm md:text-base max-w-[200px] sm:max-w-none`}>
             <ul>
               <li>
                 <span className="text-pink-500">Pink Text:</span> minor achievements
@@ -808,7 +954,12 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
               }
               // ignore clicks for plane polygons
             }}
+            onGlobeClick={handleGlobeTouch}
+            onGlobeTouchStart={handleGlobeTouch}
+            onGlobeTouchMove={handleGlobeTouch}
           />
+
+          {renderJoystick()}
 
           <button
             onClick={toggleFullscreen}
@@ -828,19 +979,21 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
               isGameMode={gameMode !== false}
             >
               {gameMode === "planeCollectCoins" && (
-                <div className="mt-10 mb-4 text-lg sm:text-xl font-semibold text-center">
+                <div className={`mt-4 text-center ${isMobile ? 'text-xs' : ''}`}>
                   <p>Plane game is ongoing!</p>
-                  <p className="mb-4">
-                    Use <span className="font-mono">W</span> (North),{" "}
-                    <span className="font-mono">A</span> (West),{" "}
-                    <span className="font-mono">S</span> (South),{" "}
-                    <span className="font-mono">D</span> (East) to fly.
-                  </p>
+                  {!isMobile && (
+                    <p className="mb-4">
+                      Use <span className="font-mono">W</span> (North),{" "}
+                      <span className="font-mono">A</span> (West),{" "}
+                      <span className="font-mono">S</span> (South),{" "}
+                      <span className="font-mono">D</span> (East) to fly.
+                    </p>
+                  )}
                   <p>Collected Coins: {collectedCoins} / 20</p>
                   <p className="mt-2">Time Elapsed: {(elapsedTime / 1000).toFixed(1)} seconds</p>
                   <button
                     onClick={resetGame}
-                    className="mt-4 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
+                    className={`mt-2 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors ${isMobile ? 'text-xs' : 'text-sm sm:text-base'}`}
                   >
                     End Game
                   </button>
@@ -913,7 +1066,7 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
               className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
               onClick={resetGame}
             >
-              End Game
+            End Game
             </button>
           </div>
         </div>

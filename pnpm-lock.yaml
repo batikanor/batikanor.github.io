@@ -71,6 +71,9 @@ importers:
       next-themes:
         specifier: ^0.4.4
         version: 0.4.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      nipplejs:
+        specifier: ^0.10.2
+        version: 0.10.2
       pino-pretty:
         specifier: ^13.0.0
         version: 13.0.0
@@ -4813,6 +4816,9 @@ packages:
         optional: true
       sass:
         optional: true
+
+  nipplejs@0.10.2:
+    resolution: {integrity: sha512-XGxFY8C2DOtobf1fK+MXINTzkkXJLjZDDpfQhOUZf4TSytbc9s4bmA0lB9eKKM8iDivdr9NQkO7DpIQfsST+9g==}
 
   no-case@3.0.4:
     resolution: {integrity: sha512-fgAN3jGAh+RoxUGZHTSOLJIqUc2wmoBwGR4tbpNAKmmovFoWq0OdRkb0VkldReO2a2iBT/OEulG9XSUc10r3zg==}
@@ -12578,6 +12584,8 @@ snapshots:
     transitivePeerDependencies:
       - '@babel/core'
       - babel-plugin-macros
+
+  nipplejs@0.10.2: {}
 
   no-case@3.0.4:
     dependencies:
