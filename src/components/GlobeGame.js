@@ -486,7 +486,7 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
 
         // Move globe POV
         if (globeEl.current) {
-          globeEl.current.pointOfView({ lat, lng, altitude: 2 }, 500);
+          globeEl.current.pointOfView({ lat, lng, altitude: 0.8 }, 500);
         }
 
         // Check coin collection
@@ -830,6 +830,12 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
               {gameMode === "planeCollectCoins" && (
                 <div className="mt-10 mb-4 text-lg sm:text-xl font-semibold text-center">
                   <p>Plane game is ongoing!</p>
+                  <p className="mb-4">
+                    Use <span className="font-mono">W</span> (North),{" "}
+                    <span className="font-mono">A</span> (West),{" "}
+                    <span className="font-mono">S</span> (South),{" "}
+                    <span className="font-mono">D</span> (East) to fly.
+                  </p>
                   <p>Collected Coins: {collectedCoins} / 20</p>
                   <p className="mt-2">Time Elapsed: {(elapsedTime / 1000).toFixed(1)} seconds</p>
                   <button
