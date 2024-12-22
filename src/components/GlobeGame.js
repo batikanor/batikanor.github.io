@@ -1,5 +1,4 @@
 /* eslint-disable react/no-unescaped-entities */
-
 "use client";
 
 import React, {
@@ -10,8 +9,8 @@ import React, {
 } from "react";
 import dynamic from "next/dynamic";
 import { debounce } from "lodash";
-import { Joystick } from "react-joystick-component"; // Import Joystick
-import { getCitiesAndLocations, contestsAndActivities } from "../data/contestsAndActivities"; // Adjust path as needed
+import { Joystick } from "react-joystick-component";
+import { getCitiesAndLocations, contestsAndActivities } from "../data/contestsAndActivities";
 import { NAVBAR_HEIGHT, MAP_HEIGHT } from '../constants/layout';
 import MarkerInfo from './MarkerInfo';
 import { useTheme } from 'next-themes';
@@ -24,7 +23,6 @@ const scrollToElement = (elementId, offset = 0) => {
   if (element) {
     const elementPosition = element.getBoundingClientRect().top;
     const offsetPosition = elementPosition + window.pageYOffset - offset;
-
     window.scrollTo({
       top: offsetPosition,
       behavior: 'smooth'
@@ -35,7 +33,6 @@ const scrollToElement = (elementId, offset = 0) => {
 export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
   // State to ensure client-side rendering
   const [isClient, setIsClient] = useState(false);
-
 
   // Refs
   const globeContainerRef = useRef(null);
@@ -78,179 +75,42 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
   const [triggeredMarkers, setTriggeredMarkers] = useState([]);
 
   const [isMobile, setIsMobile] = useState(false);
-  const [showMap, setShowMap] = useState(true); // Initially, do not show the map on mobile
+  const [showMap, setShowMap] = useState(true); // Initially, show map for non-mobile
 
-  // Sample GeoJSON data for Egypt positioned polygons (3x3 grid)
+  // Sample GeoJSON data for the Tic-Tac-Toe polygons
   const sampleGeoJson = useMemo(
     () => ({
       type: "FeatureCollection",
       features: [
-        // Row 1
-        {
-          type: "Feature",
-          properties: { name: "Egypt", index: 0 },
-          geometry: {
-            type: "Polygon",
-            coordinates: [
-              [
-                [24.5, 24.5],
-                [25.5, 25.4],
-                [26.5, 24.5],
-                [26.5, 23.6],
-                [25.5, 22.7],
-                [24.5, 23.6],
-                [24.5, 24.5],
-              ],
-            ],
-          },
-        },
-        {
-          type: "Feature",
-          properties: { name: "Egypt", index: 1 },
-          geometry: {
-            type: "Polygon",
-            coordinates: [
-              [
-                [26.5, 24.5],
-                [27.5, 25.4],
-                [28.5, 24.5],
-                [28.5, 23.6],
-                [27.5, 22.7],
-                [26.5, 23.6],
-                [26.5, 24.5],
-              ],
-            ],
-          },
-        },
-        {
-          type: "Feature",
-          properties: { name: "Egypt", index: 2 },
-          geometry: {
-            type: "Polygon",
-            coordinates: [
-              [
-                [28.5, 24.5],
-                [29.5, 25.4],
-                [30.5, 24.5],
-                [30.5, 23.6],
-                [29.5, 22.7],
-                [28.5, 23.6],
-                [28.5, 24.5],
-              ],
-            ],
-          },
-        },
-        // Row 2
-        {
-          type: "Feature",
-          properties: { name: "Egypt", index: 3 },
-          geometry: {
-            type: "Polygon",
-            coordinates: [
-              [
-                [24.5, 26.5],
-                [25.5, 27.4],
-                [26.5, 26.5],
-                [26.5, 25.6],
-                [25.5, 24.7],
-                [24.5, 25.6],
-                [24.5, 26.5],
-              ],
-            ],
-          },
-        },
-        {
-          type: "Feature",
-          properties: { name: "Egypt", index: 4 },
-          geometry: {
-            type: "Polygon",
-            coordinates: [
-              [
-                [26.5, 26.5],
-                [27.5, 27.4],
-                [28.5, 26.5],
-                [28.5, 25.6],
-                [27.5, 24.7],
-                [26.5, 25.6],
-                [26.5, 26.5],
-              ],
-            ],
-          },
-        },
-        {
-          type: "Feature",
-          properties: { name: "Egypt", index: 5 },
-          geometry: {
-            type: "Polygon",
-            coordinates: [
-              [
-                [28.5, 26.5],
-                [29.5, 27.4],
-                [30.5, 26.5],
-                [30.5, 25.6],
-                [29.5, 24.7],
-                [28.5, 25.6],
-                [28.5, 26.5],
-              ],
-            ],
-          },
-        },
-        // Row 3
-        {
-          type: "Feature",
-          properties: { name: "Egypt", index: 6 },
-          geometry: {
-            type: "Polygon",
-            coordinates: [
-              [
-                [24.5, 28.5],
-                [25.5, 29.4],
-                [26.5, 28.5],
-                [26.5, 27.6],
-                [25.5, 26.7],
-                [24.5, 27.6],
-                [24.5, 28.5],
-              ],
-            ],
-          },
-        },
-        {
-          type: "Feature",
-          properties: { name: "Egypt", index: 7 },
-          geometry: {
-            type: "Polygon",
-            coordinates: [
-              [
-                [26.5, 28.5],
-                [27.5, 29.4],
-                [28.5, 28.5],
-                [28.5, 27.6],
-                [27.5, 26.7],
-                [26.5, 27.6],
-                [26.5, 28.5],
-              ],
-            ],
-          },
-        },
-        {
-          type: "Feature",
-          properties: { name: "Egypt", index: 8 },
-          geometry: {
-            type: "Polygon",
-            coordinates: [
-              [
-                [28.5, 28.5],
-                [29.5, 29.4],
-                [30.5, 28.5],
-                [30.5, 27.6],
-                [29.5, 26.7],
-                [28.5, 27.6],
-                [28.5, 28.5],
-              ],
-            ],
-          },
-        },
-      ],
+        // 9 polygons in a 3x3 arrangement
+        // Each polygon has a "properties.index" from 0..8
+        ...[...Array(9)].map((_, i) => {
+          // This is just an example layout for polygons near Egypt-like coords
+          const row = Math.floor(i / 3);
+          const col = i % 3;
+
+          // Adjust these values to position your 3x3 grid
+          const baseLat = 24.5 + row * 2;
+          const baseLng = 24.5 + col * 2;
+
+          return {
+            type: "Feature",
+            properties: { name: "Egypt", index: i },
+            geometry: {
+              type: "Polygon",
+              coordinates: [[
+                [baseLng,       baseLat],
+                [baseLng+1,     baseLat+0.9],
+                [baseLng+2,     baseLat],
+                [baseLng+2,     baseLat-0.9],
+                [baseLng+1,     baseLat-1.8],
+                [baseLng,       baseLat-0.9],
+                [baseLng,       baseLat]
+              ]]
+            }
+          };
+        })
+      ]
     }),
     []
   );
@@ -258,33 +118,19 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const citiesAndLocations = useMemo(() => getCitiesAndLocations(), []);
 
-  // Ensure the Globe is only rendered on the client-side
-  // useEffect(() => {
-  //   setIsClient(true);
-  //   setIsMobile(/Mobi|Android/i.test(navigator.userAgent)); // Detect mobile devices
-  //   setShowMap(!isMobile);
-  // }, []);
-
   useEffect(() => {
-    // Use matchMedia to detect mobile devices
-    const mobileQuery = window.matchMedia("(max-width: 768px)"); // Adjust as per your mobile breakpoint
+    // Detect mobile devices
+    const mobileQuery = window.matchMedia("(max-width: 768px)");
     const handleDeviceChange = (event) => {
       setIsMobile(event.matches);
-      setShowMap(!event.matches); // Show map by default for non-mobile devices
+      setShowMap(!event.matches);
     };
-  
-    // Initial check
     handleDeviceChange(mobileQuery);
-  
-    // Add listener for screen size changes
     mobileQuery.addEventListener("change", handleDeviceChange);
-  
-    // Clean up the listener on component unmount
     return () => {
       mobileQuery.removeEventListener("change", handleDeviceChange);
     };
   }, []);
-  
 
   // **Fullscreen Toggle Function**
   const toggleFullscreen = () => {
@@ -312,9 +158,8 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
         setIsFullscreen(false);
       }
     };
-
     document.addEventListener("fullscreenchange", handleFullscreenChange);
-    document.addEventListener("webkitfullscreenchange", handleFullscreenChange); // Safari
+    document.addEventListener("webkitfullscreenchange", handleFullscreenChange);
     document.addEventListener("mozfullscreenchange", handleFullscreenChange);
     document.addEventListener("MSFullscreenChange", handleFullscreenChange);
 
@@ -326,35 +171,29 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
     };
   }, []);
 
-  // Handle Joystick movement
+  // Handle Joystick movement (for mobile)
   const handleJoystickMove = (event) => {
     const { x, y } = event;
     const speed = 0.2;
 
     let { lat, lng } = planePosition;
-
-    // Correctly handle up (y > 0) and down (y < 0)
     if (y > 0) {
-      lat += speed; // Move up when y is positive
+      lat += speed; // Up
       if (lat > 90) lat = 90;
     } else if (y < 0) {
-      lat -= speed; // Move down when y is negative
+      lat -= speed; // Down
       if (lat < -90) lat = -90;
     }
-
-    // Correctly handle left (x < 0) and right (x > 0)
     if (x < 0) {
-      lng -= speed; // Move left when x is negative
+      lng -= speed; // Left
       if (lng < -180) lng += 360;
     } else if (x > 0) {
-      lng += speed; // Move right when x is positive
+      lng += speed; // Right
       if (lng > 180) lng -= 360;
     }
-
     setPlanePosition({ lat, lng });
   };
 
-  // Handle Joystick stop (reset movement)
   const handleJoystickStop = () => {
     setKeysPressed({
       w: false,
@@ -372,40 +211,41 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
     }
   }, [isClient]);
 
-  // Set the point of view based on game mode - ONLY ON INITIAL MOUNT
+  // Set initial viewpoint each time gameMode changes
   useEffect(() => {
-    if (globeEl.current) {
-      if (gameMode === "planeCollectCoins") {
-        globeEl.current.pointOfView(
-          { lat: planePosition.lat, lng: planePosition.lng, altitude: 0.3 },
-          1000
-        );
-      } else if (gameMode === "ticTacToe") {
-        globeEl.current.pointOfView(
-          { lat: 26, lng: 30, altitude: 0.4 }, // Egypt coordinates
-          1000
-        );
-      } else {
-        globeEl.current.pointOfView(
-          { lat: 41.0082, lng: 28.9784, altitude: 0.6 }, // Istanbul coordinates
-          1000
-        );
-      }
-    }
-  }, [gameMode]); // Remove planePosition dependency
+    if (!globeEl.current) return;
 
-  // Convert locations to marker format for the globe component
-  const colorPalette = ["blue", "green", "orange", "purple", "red", "yellow", "pink", "cyan", "lime", "magenta"]; // Add more colors if needed
+    if (gameMode === "planeCollectCoins") {
+      globeEl.current.pointOfView(
+        { lat: planePosition.lat, lng: planePosition.lng, altitude: 0.3 },
+        1000
+      );
+    } else if (gameMode === "ticTacToe") {
+      globeEl.current.pointOfView(
+        { lat: 26, lng: 30, altitude: 0.4 },
+        1000
+      );
+    } else {
+      // Default
+      globeEl.current.pointOfView(
+        { lat: 41.0082, lng: 28.9784, altitude: 0.6 },
+        1000
+      );
+    }
+  }, [gameMode]);
+
+  // Convert locations to marker format
+  const colorPalette = ["blue", "green", "orange", "purple", "red", "yellow", "pink", "cyan", "lime", "magenta"];
 
   const markers = useMemo(() => {
     const baseMarkers = citiesAndLocations.map((location, index) => ({
-      id: index,
+      id: `city-${index}`,
       lat: location.coordinates.lat,
       lng: location.coordinates.lng,
       label: location.city,
       size: location.isMajorCity ? 20 : 15,
       color: location.isMajorCity ? "gold" : colorPalette[index % colorPalette.length],
-      icon: '',
+      icon: "",
       animation: location.isMajorCity ? "pulsate" : "none",
       labelLat: location.coordinates.lat,
       labelLng: location.coordinates.lng,
@@ -422,9 +262,9 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
 
     // Add a marker for Tic-Tac-Toe on Cyprus
     baseMarkers.push({
-      id: baseMarkers.length,
-      lat: 35.1264, // Latitude for Cyprus
-      lng: 33.4299, // Longitude for Cyprus
+      id: "tic-tac-toe-marker",
+      lat: 35.1264,
+      lng: 33.4299,
       label: "Tic-Tac-Toe",
       size: 25,
       color: "white",
@@ -436,74 +276,76 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
       labelColor: "white",
     });
 
-    // Add a marker for Plane Collect Coins on the Mediterranean
-    baseMarkers.push({
-      id: baseMarkers.length + 1,
-      lat: 34.0, // Slightly different latitude for separation
-      lng: 33.0, // Slightly different longitude for separation
-      label: "Plane Collect Coins",
-      size: 25,
-      color: "white",
-      icon: "✈️",
-      labelLat: 34.0,
-      labelLng: 33.0,
-      labelText: "Plane Collect Coins",
-      labelSize: 1,
-      labelColor: "white",
-    });
+    // Only add the “Plane Collect Coins” marker if NOT currently in plane game:
+    if (gameMode !== "planeCollectCoins") {
+      baseMarkers.push({
+        id: "plane-collect-marker",
+        lat: 34.0,
+        lng: 33.0,
+        label: "Plane Collect Coins",
+        size: 25,
+        color: "white",
+        icon: "✈️",
+        labelLat: 34.0,
+        labelLng: 33.0,
+        labelText: "Plane Collect Coins",
+        labelSize: 1,
+        labelColor: "white",
+      });
+    }
 
     return baseMarkers;
-  }, [citiesAndLocations]);
-  
+  }, [citiesAndLocations, gameMode]);
 
+  // Arcs (just a demo)
   const arcs = useMemo(() => {
-    return markers.slice(0, -1).map((marker, i) => ({
-      airline: `Route ${i + 1}`,
-      srcIata: marker.label,
-      dstIata: markers[i + 1].label,
-      srcAirport: { lat: marker.lat, lng: marker.lng },
-      dstAirport: { lat: markers[i + 1].lat, lng: markers[i + 1].lng },
-      arcColor: [`rgba(0, 255, 0, 0.3)`, `rgba(255, 0, 0, 0.3)`],
-    }));
+    // Example arcs from marker[i] to marker[i+1]
+    // Adjust to your liking or remove if you don't need arcs
+    const arcsArray = [];
+    for (let i = 0; i < markers.length - 2; i++) {
+      arcsArray.push({
+        airline: `Route ${i + 1}`,
+        srcIata: markers[i].label,
+        dstIata: markers[i + 1].label,
+        srcAirport: { lat: markers[i].lat, lng: markers[i].lng },
+        dstAirport: { lat: markers[i + 1].lat, lng: markers[i + 1].lng },
+        arcColor: [`rgba(0, 255, 0, 0.3)`, `rgba(255, 0, 0, 0.3)`],
+      });
+    }
+    return arcsArray;
   }, [markers]);
-  
 
-  // Debounced hover handler to improve performance
+  // Debounced hover handler
   const handlePointHover = useMemo(
     () =>
       debounce((point) => {
-        if (point) {
-          setHoveredMarker(point);
-        }
+        if (point) setHoveredMarker(point);
       }, 100),
     []
   );
 
-  // Add a separate handler for closing the info window
   const handleCloseInfoWindow = () => {
     setHoveredMarker(null);
   };
 
-  // Clean up debounce on unmount
   useEffect(() => {
     return () => {
       handlePointHover.cancel();
     };
   }, [handlePointHover]);
 
-  // Calculate the winner of the Tic Tac Toe game
+  // Calculate the winner of Tic Tac Toe
   const calculateWinner = (board) => {
     const lines = [
-      [0, 1, 2], // Rows
+      [0, 1, 2],
       [3, 4, 5],
       [6, 7, 8],
-      [0, 3, 6], // Columns
+      [0, 3, 6],
       [1, 4, 7],
       [2, 5, 8],
-      [0, 4, 8], // Diagonals
+      [0, 4, 8],
       [2, 4, 6],
     ];
-
     for (let line of lines) {
       const [a, b, c] = line;
       if (board[a] && board[a] === board[b] && board[a] === board[c]) {
@@ -513,10 +355,9 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
     return null;
   };
 
-  // Handle polygon (hexagon) clicks for Tic-Tac-Toe
+  // Handle polygon click for Tic-Tac-Toe
   const handleHexagonClick = (hexIndex) => {
-    if (winner || gameBoard[hexIndex]) return; // Ignore if game over or cell occupied
-
+    if (winner || gameBoard[hexIndex]) return;
     const newBoard = [...gameBoard];
     newBoard[hexIndex] = currentPlayer;
     setGameBoard(newBoard);
@@ -531,58 +372,55 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
     }
   };
 
-  // Reset the game
   const resetGame = () => {
     setGameBoard(Array(9).fill(null));
     setCurrentPlayer("X");
     setWinner(null);
     setGameMode(false);
-    setPlanePosition({ lat: 55.7558, lng: 37.6173 }); // Reset plane to Moscow
+    setPlanePosition({ lat: 55.7558, lng: 37.6173 });
     setCoins([]);
     setCollectedCoins(0);
     setElapsedTime(0);
     setGameStartTime(null);
+    setTriggeredMarkers([]);
   };
 
-  // Helper function to get the center of a polygon
+  // Helper for polygon center
   const getPolygonCenter = (geometry) => {
-    const coordinates = geometry.coordinates[0];
-    const latitudes = coordinates.map((coord) => coord[1]);
-    const longitudes = coordinates.map((coord) => coord[0]);
+    const coords = geometry.coordinates[0];
+    const latitudes = coords.map((c) => c[1]);
+    const longitudes = coords.map((c) => c[0]);
     const lat = latitudes.reduce((a, b) => a + b, 0) / latitudes.length;
     const lng = longitudes.reduce((a, b) => a + b, 0) / longitudes.length;
     return { lat, lng };
   };
 
-  // Generate 20 random coins on the globe
+  // Generate random coins for plane game
   const generateRandomCoins = () => {
     const newCoins = [];
     for (let i = 0; i < 20; i++) {
-      const lat = Math.random() * 180 - 90; // Latitude between -90 and 90
-      const lng = Math.random() * 360 - 180; // Longitude between -180 and 180
-      newCoins.push({ lat, lng, id: i });
+      const lat = Math.random() * 180 - 90;
+      const lng = Math.random() * 360 - 180;
+      newCoins.push({ lat, lng, id: `coin-${i}` });
     }
     setCoins(newCoins);
   };
 
-  // Handle Plane Movement with WASD using Continuous Movement
+  // Handle plane movement with WASD
   useEffect(() => {
     if (gameMode !== "planeCollectCoins") return;
 
-    const speed = 0.9; // Degrees per frame
-
+    const speed = 0.9; // degrees per frame
     const updatePlanePosition = () => {
       let { lat, lng } = planePosition;
       let moved = false;
 
       if (keysPressed.w) {
-        lat += speed;
-        if (lat > 90) lat = 90;
+        lat = Math.min(lat + speed, 90);
         moved = true;
       }
       if (keysPressed.s) {
-        lat -= speed;
-        if (lat < -90) lat = -90;
+        lat = Math.max(lat - speed, -90);
         moved = true;
       }
       if (keysPressed.a) {
@@ -598,58 +436,45 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
 
       if (moved) {
         setPlanePosition({ lat, lng });
+
+        // Move globe POV
         if (globeEl.current) {
-          globeEl.current.pointOfView(
-            { lat, lng, altitude: 2 },
-            500
-          );
+          globeEl.current.pointOfView({ lat, lng, altitude: 2 }, 500);
         }
 
-        // Check for coin collection
+        // Check coin collection
         setCoins((prevCoins) => {
-          const remainingCoins = prevCoins.filter((coin) => {
-            const distance = Math.sqrt(
-              Math.pow(coin.lat - lat, 2) +
-              Math.pow(coin.lng - lng, 2)
-            );
-            if (distance < 10) { // Threshold distance for collection
+          return prevCoins.filter((coin) => {
+            const dist = Math.sqrt((coin.lat - lat) ** 2 + (coin.lng - lng) ** 2);
+            if (dist < 10) {
               setCollectedCoins((prev) => prev + 1);
-              return false; // Remove the coin
+              return false; // remove coin
             }
             return true;
           });
-          return remainingCoins;
         });
 
-        // **New Logic: Check for Proximity to Markers**
-        markers.forEach(marker => {
-          const distance = Math.sqrt(
-            Math.pow(marker.lat - lat, 2) +
-            Math.pow(marker.lng - lng, 2)
-          );
-          if (distance < 2 && !triggeredMarkers.includes(marker.id)) {
+        // Check for marker proximity
+        markers.forEach((marker) => {
+          const dist = Math.sqrt((marker.lat - lat) ** 2 + (marker.lng - lng) ** 2);
+          if (dist < 2 && !triggeredMarkers.includes(marker.id)) {
             setClickedMarker(marker);
-            setTriggeredMarkers(prev => [...prev, marker.id]);
+            setTriggeredMarkers((prev) => [...prev, marker.id]);
           }
         });
       }
-
       animationFrameRef.current = requestAnimationFrame(updatePlanePosition);
     };
 
-    // Start the animation loop
     animationFrameRef.current = requestAnimationFrame(updatePlanePosition);
-
-    // Clean up on unmount or game mode change
     return () => {
       cancelAnimationFrame(animationFrameRef.current);
     };
   }, [gameMode, keysPressed, planePosition, markers, triggeredMarkers]);
 
-  // Keyboard event handlers for continuous movement
+  // Keyboard event handlers
   useEffect(() => {
     if (gameMode !== "planeCollectCoins") return;
-
     const handleKeyDown = (e) => {
       const key = e.key.toLowerCase();
       if (["w", "a", "s", "d"].includes(key)) {
@@ -657,7 +482,6 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
         setKeysPressed((prev) => ({ ...prev, [key]: true }));
       }
     };
-
     const handleKeyUp = (e) => {
       const key = e.key.toLowerCase();
       if (["w", "a", "s", "d"].includes(key)) {
@@ -665,140 +489,80 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
         setKeysPressed((prev) => ({ ...prev, [key]: false }));
       }
     };
-
     window.addEventListener("keydown", handleKeyDown);
     window.addEventListener("keyup", handleKeyUp);
-
-    // Clean up
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
       window.removeEventListener("keyup", handleKeyUp);
     };
   }, [gameMode]);
 
-  // Plane Marker
-  const planeMarker = useMemo(
-    () => ({
-      lat: planePosition.lat,
-      lng: planePosition.lng,
-      label: "You are flying the plane!",
-      icon: "✈️", // Plane emoji
-      size: 20, // Larger size for visibility
-      color: "red",
-    }),
-    [planePosition]
-  );
-  
-  const coinMarkers = useMemo(
-    () => coins.map((coin) => ({
-      lat: coin.lat,
-      lng: coin.lng,
-      label: "A shiny coin to collect!",
-      icon: "🪙", // Coin emoji
-      size: 10, // Size for coins
-      color: "yellow",
-      id: coin.id,
-    })),
-    [coins]
-  );
-  
-  // Add a new state to keep track of the last 10 positions
-  const [trajectory, setTrajectory] = useState([]);
-
-  // All markers including the plane and coins
-  const allMarkers = useMemo(() => {
-    if (gameMode === "planeCollectCoins") {
-      // Filter out collected coins
-      const availableCoinMarkers = coinMarkers.filter(coin => !triggeredMarkers.includes(coin.id));
-
-      // Get the newest 10 plane markers
-      const recentPlaneMarkers = trajectory.slice(-10).map((point, index) => ({
-        lat: point.lat,
-        lng: point.lng,
-        size: 5,
-        color: `rgba(255, ${255 - (index * 25)}, ${255 - (index * 25)}, 1)`, // Gradient from white to red
-      }));
-
-      console.log("Available Coin Markers:", availableCoinMarkers);
-      console.log("Recent Plane Markers:", recentPlaneMarkers);
-
-      return [...markers, ...availableCoinMarkers, ...recentPlaneMarkers];
-    }
-    return markers;
-  }, [markers, gameMode, coinMarkers, trajectory, triggeredMarkers]);
-
-  // Timer Effect
+  // Timer
   useEffect(() => {
     let timerInterval;
-
     if (gameMode === "planeCollectCoins") {
       if (!gameStartTime) {
         setGameStartTime(Date.now());
       }
-
       timerInterval = setInterval(() => {
         setElapsedTime(Date.now() - (gameStartTime || Date.now()));
       }, 1000);
     }
-
     return () => {
       if (timerInterval) clearInterval(timerInterval);
     };
   }, [gameMode, gameStartTime]);
 
-  // Start Plane Collect Coins Game
+  // Start plane game
   const startPlaneGame = () => {
     setGameMode("planeCollectCoins");
     setCollectedCoins(0);
     setElapsedTime(0);
     setGameStartTime(Date.now());
     generateRandomCoins();
-    setTriggeredMarkers([]); // Reset triggered markers
+    setTriggeredMarkers([]);
   };
 
-  // Check if all coins are collected
+  // Check if all coins collected
   useEffect(() => {
     if (gameMode === "planeCollectCoins" && coins.length === 0 && collectedCoins === 20) {
-      // Player has collected all coins
+      // Player got them all
       setGameMode(false);
     }
   }, [coins, collectedCoins, gameMode]);
 
-  // Get the initial location from your activities data
+  // Find an initial location from your data
   const initialLocation = useMemo(() => {
     const activities = getCitiesAndLocations();
-    // You can choose any activity, for example the first highlighted one
-    const highlightedActivity = contestsAndActivities.find(activity => activity.highlighted);
-    if (highlightedActivity && highlightedActivity.mapData) {
+    const highlighted = contestsAndActivities.find(a => a.highlighted);
+    if (highlighted && highlighted.mapData) {
       return {
-        lat: highlightedActivity.mapData.coordinates.lat,
-        lng: highlightedActivity.mapData.coordinates.lng,
+        lat: highlighted.mapData.coordinates.lat,
+        lng: highlighted.mapData.coordinates.lng,
         altitude: 0.5
       };
     }
-    // Fallback to first activity if no highlighted one exists
-    return activities[0] ? {
-      lat: activities[0].coordinates.lat,
-      lng: activities[0].coordinates.lng,
-      altitude: 0.5
-    } : { lat: 41.0082, lng: 28.9784, altitude: 0.5 }; // Default to Istanbul if no activities
+    // fallback
+    return activities[0]
+      ? { lat: activities[0].coordinates.lat, lng: activities[0].coordinates.lng, altitude: 0.5 }
+      : { lat: 41.0082, lng: 28.9784, altitude: 0.5 };
   }, []);
 
-  // Modify the onPointClick handler to start/stop games
-  const onPointClick = (point, event) => {
+  // On point click
+  const onPointClick = (point) => {
     if (point.label === "Tic-Tac-Toe") {
       if (gameMode === "ticTacToe") {
         resetGame();
       } else {
         setGameMode("ticTacToe");
-        setClickedMarker(null); // Ensure no marker is set for Tic-Tac-Toe
+        setClickedMarker(null);
       }
     } else if (point.label === "Plane Collect Coins") {
       if (gameMode === "planeCollectCoins") {
         resetGame();
       } else {
         startPlaneGame();
-        setClickedMarker(point); // Open the window on the right for Plane game
+        setClickedMarker(point);
       }
     } else {
       setClickedMarker(point);
@@ -806,13 +570,57 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
   };
 
   const { resolvedTheme } = useTheme();
-
-  // Add this line to define the state for isNavigating
   const [isNavigating, setIsNavigating] = useState(false);
 
-  // Update the handlePlaneMovement function to track the trajectory
-  const handlePlaneMovement = () => {
-    const speed = 0.9; // Degrees per frame
+  // Prepare final markers array
+  const allMarkers = useMemo(() => {
+    // Always include base markers
+    const baseMarkers = markers;
+
+    // Add plane marker and coin markers if we're in "planeCollectCoins"
+    if (gameMode === "planeCollectCoins") {
+      // Plane marker (the moving plane)
+      const planeMarker = {
+        id: "plane-marker",
+        lat: planePosition.lat,
+        lng: planePosition.lng,
+        label: "Your Plane",
+        icon: "✈️",
+        size: 20,
+        color: "red",
+      };
+
+      // Coin markers
+      const coinMarkers = coins.map((coin) => ({
+        id: coin.id,
+        lat: coin.lat,
+        lng: coin.lng,
+        label: "A shiny coin!",
+        icon: "🪙",
+        size: 10,
+        color: "yellow",
+      }));
+
+      return [...baseMarkers, ...coinMarkers, planeMarker];
+    }
+
+    // Not in plane game, no plane or coins
+    return baseMarkers;
+  }, [markers, gameMode, planePosition, coins]);
+
+  // For plane movement on small interval
+  useEffect(() => {
+    if (gameMode !== "planeCollectCoins") return;
+
+    const interval = setInterval(() => {
+      movePlaneContinuously();
+    }, 100);
+
+    return () => clearInterval(interval);
+  }, [keysPressed, gameMode]);
+
+  const movePlaneContinuously = () => {
+    const speed = 0.9;
     let { lat, lng } = planePosition;
     let moved = false;
 
@@ -825,105 +633,31 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
       moved = true;
     }
     if (keysPressed.a) {
-      lng = (lng - speed + 360) % 360;
+      lng -= speed;
+      if (lng < -180) lng += 360;
       moved = true;
     }
     if (keysPressed.d) {
-      lng = (lng + speed) % 360;
+      lng += speed;
+      if (lng > 180) lng -= 360;
       moved = true;
     }
 
     if (moved) {
       setPlanePosition({ lat, lng });
-      updateGlobeView(lat, lng);
-      checkCoinCollection(lat, lng);
-      checkMarkerProximity(lat, lng);
-
-      // Update the trajectory
-      setTrajectory(prev => {
-        const newTrajectory = [...prev, { lat, lng }];
-        if (newTrajectory.length > 10) {
-          newTrajectory.shift(); // Keep only the last 10 positions
-        }
-        return newTrajectory;
-      });
-    }
-  };
-
-  const updateGlobeView = (lat, lng) => {
-    if (globeEl.current) {
-      globeEl.current.pointOfView({ lat, lng, altitude: 2 }, 500);
-    }
-  };
-
-  const checkCoinCollection = (lat, lng) => {
-    setCoins(prevCoins => {
-      const remainingCoins = prevCoins.filter(coin => {
-        const distance = calculateDistance(coin.lat, coin.lng, lat, lng);
-        if (distance < 10) {
-          setCollectedCoins(prev => prev + 1);
-          // Add visual feedback here, e.g., animation or sound
-          return false;
-        }
-        return true;
-      });
-      return remainingCoins;
-    });
-  };
-
-  const checkMarkerProximity = (lat, lng) => {
-    markers.forEach(marker => {
-      const distance = calculateDistance(marker.lat, marker.lng, lat, lng);
-      if (distance < 2 && !triggeredMarkers.includes(marker.id)) {
-        setClickedMarker(marker);
-        setTriggeredMarkers(prev => [...prev, marker.id]);
+      if (globeEl.current) {
+        globeEl.current.pointOfView({ lat, lng, altitude: 2 }, 500);
       }
-    });
+      // Check coins & markers again if you like, or skip here
+    }
   };
-
-  const calculateDistance = (lat1, lng1, lat2, lng2) => {
-    return Math.sqrt(Math.pow(lat1 - lat2, 2) + Math.pow(lng1 - lng2, 2));
-  };
-
-  // Handle key press events
-  useEffect(() => {
-    const handleKeyDown = (event) => {
-      setKeysPressed(prev => ({ ...prev, [event.key.toLowerCase()]: true }));
-    };
-
-    const handleKeyUp = (event) => {
-      setKeysPressed(prev => ({ ...prev, [event.key.toLowerCase()]: false }));
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    window.addEventListener('keyup', handleKeyUp);
-
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-      window.removeEventListener('keyup', handleKeyUp);
-    };
-  }, []);
-
-  // Update plane movement
-  useEffect(() => {
-    const interval = setInterval(() => {
-      handlePlaneMovement();
-    }, 100); // Adjust interval as needed for smooth updates
-
-    return () => clearInterval(interval);
-  }, [keysPressed]);
 
   return (
     <div>
-      {/* Display Current Player or Instructions */}
       {gameMode === "ticTacToe" && !winner && (
         <div className="mb-4 text-lg sm:text-xl font-semibold">
           Current Player:{" "}
-          <span
-            className={`${
-              currentPlayer === "X" ? "text-red-500" : "text-blue-500"
-            }`}
-          >
+          <span className={currentPlayer === "X" ? "text-red-500" : "text-blue-500"}>
             {currentPlayer}
           </span>
         </div>
@@ -931,25 +665,24 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
 
       {gameMode === "planeCollectCoins" && (
         <div className="mb-4 text-lg sm:text-xl font-semibold text-center">
-          <br/>
+          <br />
           <p>
             Use <span className="font-mono">W</span> (North),{" "}
             <span className="font-mono">A</span> (West),{" "}
             <span className="font-mono">S</span> (South),{" "}
-            <span className="font-mono">D</span> (East) to fly the plane.
+            <span className="font-mono">D</span> (East) to fly.
           </p>
-          <p className="mt-2">
-            Collected Coins: {collectedCoins} / 20
-          </p>
+          <p className="mt-2">Collected Coins: {collectedCoins} / 20</p>
           <p className="mt-2">
             Time Elapsed: {(elapsedTime / 1000).toFixed(1)} seconds
           </p>
         </div>
       )}
+
       {gameMode === "planeCollectCoins" && isMobile && (
         <div
           className="fixed bottom-10 left-1/2 transform -translate-x-1/2 z-50"
-          style={{ zIndex: 9999 }}  // Set a very high z-index to appear on top
+          style={{ zIndex: 9999 }}
         >
           <Joystick
             size={100}
@@ -960,7 +693,7 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
           />
         </div>
       )}
-      {/* Show Button on Mobile to Display the Map */}
+
       {!showMap && (
         <div className="flex justify-center mt-6">
           <button
@@ -972,44 +705,39 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
         </div>
       )}
 
-      {/* Spinnable Earth - Render only on the client */}
-      { showMap &&(
+      {showMap && (
         <div
           ref={globeContainerRef}
           className="relative w-full h-[700px] sm:h-[800px] md:h-[900px] globe-container"
         >
-          <div className="bsolute top-4 left-4 bg-opacity-75 p-4 rounded shadow-lg z-50">
-          {/* <h3 className="font-semibold mb-2">Legend</h3> */}
-          <ul>
-            <li>
-              <span className="text-pink-500">Pink Text:</span> Cities with only minor achievements.
-            </li>
-            <li>
-              <span className="text-yellow-500">Yellow Text:</span> Cities with at least one OK achievement.
-            </li>
-            {/* Add more legend items as needed */}
-          </ul>
-          <p>ToDo: Fill the map with <span className="text-yellow-500"> yellow</span></p>
-        </div>
+          <div className="text-white absolute top-4 left-4 bg-opacity-75 p-4 rounded shadow-lg z-50">
+            <ul>
+              <li>
+                <span className="text-pink-500">Pink Text:</span> minor achievements
+              </li>
+              <li>
+                <span className="text-yellow-500">Yellow Text:</span> at least one OK achievement
+              </li>
+            </ul>
+            <p>
+              ToDo: Fill the map with <span className="text-yellow-500">yellow</span>
+            </p>
+          </div>
+
           <Globe
             onGlobeLoad={(globe) => {
               globeEl.current = globe;
               setIsNavigating(false);
-              
-              // Check URL parameters after globe is loaded
+
+              // check URL query params
               const params = new URLSearchParams(window.location.search);
-              const lat = parseFloat(params.get('lat'));
-              const lng = parseFloat(params.get('lng'));
-              
+              const lat = parseFloat(params.get("lat"));
+              const lng = parseFloat(params.get("lng"));
+
               if (!isNaN(lat) && !isNaN(lng)) {
                 setTimeout(() => {
-                  globe.pointOfView(
-                    { lat, lng, altitude: 0.4 },
-                    1000
-                  );
-                  
-                  // Clear the URL parameters after focusing
-                  window.history.replaceState({}, '', '/');
+                  globe.pointOfView({ lat, lng, altitude: 0.4 }, 1000);
+                  window.history.replaceState({}, "", "/");
                 }, 100);
               }
             }}
@@ -1026,39 +754,31 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
             }
             backgroundColor="rgba(0,0,0,0)"
             pointsData={allMarkers}
+            // Force a complete re-render of points each time
+            pointsMerge={false}
             pointSize={(point) =>
               hoveredMarker && hoveredMarker.label === point.label
                 ? point.size + 5
                 : point.size
             }
             pointColor="color"
-            pointLabel={(point) => `${point.icon} ${point.label}`}
-            
+            pointLabel={(point) => `${point.icon || ""} ${point.label}`}
             labelsData={allMarkers}
             labelLat={(point) => point.labelLat}
             labelLng={(point) => point.labelLng}
             labelText={(point) => point.labelText?.replace("ü", "ue")}
-            labelSize={(point) => 0.3}
-            // labelColor={(point) => point.labelColor || "white"}
-            // Inside the GlobeGame component, where you render the labels
+            labelSize={() => 0.3}
             labelColor={(point) => point.maxImportance < 5 ? "pink" : (point.labelColor || "white")}
-            // labelColor={(point) => "green"}
-
             labelResolution={2}
-            // pointAltitude={0.05} // Increased altitude from 0.01 to 0.05
-            pointAltitude={0.01} // Increased altitude from 0.01 to 0.05
-
-            pointResolution={4} // Increased resolution for smoother markers
+            pointAltitude={0.01}
+            pointResolution={4}
             onPointClick={onPointClick}
             onPointHover={handlePointHover}
-            // Arcs properties
             arcsData={arcs}
             arcStartLat={(d) => d.srcAirport.lat}
             arcStartLng={(d) => d.srcAirport.lng}
             arcEndLat={(d) => d.dstAirport.lat}
             arcEndLng={(d) => d.dstAirport.lng}
-            // arcLabel={(d) => `${d.airline}: ${d.srcIata} → ${d.dstIata}`}
-            // arcColor={(d) => d.arcColor}
             arcColor={(d) =>
               hoveredArc === d
                 ? [`rgba(0, 255, 0, 0.9)`, `rgba(255, 0, 0, 0.9)`]
@@ -1067,50 +787,36 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
             arcDashLength={0.4}
             arcDashGap={0.2}
             arcDashAnimateTime={1500}
-            onArcHover={(hoverArc) =>
-              setHoveredArc(hoverArc) // Example state to handle hover effects
-            }
-            
-            // Custom Polygons Layer
+            onArcHover={setHoveredArc}
             polygonsData={gameMode === "ticTacToe" ? sampleGeoJson.features : []}
-            polygonCapColor={(d) =>
-              d.properties.index !== undefined
-                ? gameBoard[d.properties.index]
-                  ? gameBoard[d.properties.index] === "X"
-                    ? "rgba(255, 0, 0, 0.6)" // Red for X
-                    : "rgba(0, 0, 255, 0.6)" // Blue for O
-                  : "rgba(255, 165, 0, 0.6)" // Orange for empty
-                : "rgba(0, 0, 0, 0)" // Transparent
-            }
+            polygonCapColor={(d) => {
+              const idx = d.properties.index;
+              if (idx === undefined) return "rgba(0,0,0,0)";
+              if (gameBoard[idx]) {
+                // "X" => red, "O" => blue
+                return gameBoard[idx] === "X"
+                  ? "rgba(255, 0, 0, 0.6)"
+                  : "rgba(0, 0, 255, 0.6)";
+              }
+              return "rgba(255, 165, 0, 0.6)";
+            }}
             polygonSideColor={() => "rgba(0, 0, 0, 0.1)"}
             polygonStrokeColor={() => "#000"}
             polygonAltitude={(d) => {
               if (d.properties.index === undefined) return 0;
-
-              // Extract the latitude from the polygon's geometry
-              // Using the center latitude for better accuracy
               const { lat } = getPolygonCenter(d.geometry);
-              const latitudeRadians = (lat * Math.PI) / 180;
-              const scalingFactor = Math.cos(latitudeRadians);
-
-              // Determine altitude based on game state and apply scaling
-              return gameBoard[d.properties.index]
-                ? 0.02 * scalingFactor
-                : 0.01 * scalingFactor;
+              const scale = Math.cos((lat * Math.PI) / 180);
+              return gameBoard[d.properties.index] ? 0.02 * scale : 0.01 * scale;
             }}
-            polygonResolution={6} // Ensures hexagonal shape
-            onPolygonClick={(polygon, event, coords) => {
+            polygonResolution={6}
+            onPolygonClick={(polygon) => {
               if (gameMode === "ticTacToe") {
                 const hexIndex = polygon.properties.index;
                 handleHexagonClick(hexIndex);
               }
             }}
-            onPolygonHover={(polygon, prevPolygon) => {
-              // Optional: Handle hover events (e.g., highlight)
-            }}
           />
 
-          {/* **Fullscreen Button** */}
           <button
             onClick={toggleFullscreen}
             className="absolute top-4 right-4 bg-gray-700 text-white rounded-full p-2 opacity-75 hover:opacity-100 transition-opacity"
@@ -1119,7 +825,7 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
             {isFullscreen ? "❎" : "⛶"}
           </button>
 
-          {/* Modal Popup for Marker Click (Now Inside Fullscreen Container) */}
+          {/* Modal Popup for Marker Click (in fullscreen mode) */}
           {clickedMarker && isFullscreen && (
             <MarkerInfo
               marker={clickedMarker}
@@ -1129,38 +835,34 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
             />
           )}
 
-          {/* Overlay for Game Symbols */}
+          {/* Overlay for TicTacToe symbols */}
           {gameMode === "ticTacToe" && (
             <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
               {sampleGeoJson.features.map((feature, index) => {
                 const { lat, lng } = getPolygonCenter(feature.geometry);
-                const screenCoords = globeEl.current
+                const screen = globeEl.current
                   ? globeEl.current.getScreenCoords(lat, lng)
                   : { x: 0, y: 0 };
-
-                // Ensure screenCoords are valid and within the visible viewport
                 if (
-                  !screenCoords ||
-                  screenCoords.x < 50 ||
-                  screenCoords.x > dimensions.width - 50 ||
-                  screenCoords.y < 50 ||
-                  screenCoords.y > dimensions.height - 50
-                )
+                  !screen ||
+                  screen.x < 50 ||
+                  screen.x > dimensions.width - 50 ||
+                  screen.y < 50 ||
+                  screen.y > dimensions.height - 50
+                ) {
                   return null;
-
+                }
                 const style = {
                   position: "absolute",
-                  left: `${screenCoords.x}px`,
-                  top: `${screenCoords.y}px`,
+                  left: screen.x + "px",
+                  top: screen.y + "px",
                   transform: "translate(-50%, -50%)",
-                  pointerEvents: "none", // Prevent blocking interactions
-                  color:
-                    gameBoard[index] === "X" ? "red" : "blue",
-                  fontSize: "32px", // Increased font size for better visibility
+                  pointerEvents: "none",
+                  color: gameBoard[index] === "X" ? "red" : "blue",
+                  fontSize: "32px",
                   fontWeight: "bold",
                   textShadow: "0 0 5px black",
                 };
-
                 return (
                   <div key={index} style={style}>
                     {gameBoard[index]}
@@ -1172,18 +874,20 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
         </div>
       )}
 
-  {/* Side Bubble for Hovered Marker */}
-  {hoveredMarker && hoveredMarker.label !== "Plane Collect Coins" && hoveredMarker.label !== "Tic-Tac-Toe" && (
-    <MarkerInfo
-      marker={hoveredMarker}
-      onClose={handleCloseInfoWindow}
-      navigateWithRefresh={navigateWithRefresh}
-      isFullscreen={false}
-    />
-  )}
+      {/* Side Bubble for Hovered Marker (non-fullscreen) */}
+      {hoveredMarker &&
+        hoveredMarker.label !== "Plane Collect Coins" &&
+        hoveredMarker.label !== "Tic-Tac-Toe" && (
+          <MarkerInfo
+            marker={hoveredMarker}
+            onClose={handleCloseInfoWindow}
+            navigateWithRefresh={navigateWithRefresh}
+            isFullscreen={false}
+          />
+        )
+      }
 
-
-      {/* Winner Notification for Tic-Tac-Toe */}
+      {/* Tic-Tac-Toe winner message */}
       {winner && gameMode === "ticTacToe" && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="bg-gray-800 rounded-lg p-6 text-white max-w-md mx-auto text-center">
@@ -1194,7 +898,7 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
             </h2>
             <button
               className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-              onClick={() => resetGame()}
+              onClick={resetGame}
             >
               Play Again
             </button>
@@ -1202,16 +906,16 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
         </div>
       )}
 
-      {/* Winner Notification for Plane Collect Coins */}
+      {/* Plane Collect Coins - All coins collected message */}
       {gameMode === false && collectedCoins >= 20 && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="bg-gray-800 rounded-lg p-6 text-white max-w-md mx-auto text-center">
             <h2 className="text-2xl font-semibold mb-4">
-              Congratulations! You collected all coins in {(elapsedTime / 1000).toFixed(1)} seconds.
+              Congratulations! You collected all coins in {(elapsedTime / 1000).toFixed(1)}s.
             </h2>
             <button
               className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-              onClick={() => resetGame()}
+              onClick={resetGame}
             >
               Play Again
             </button>
@@ -1219,8 +923,8 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
         </div>
       )}
 
-      {/* JSX for displaying the right window with elapsed time and collected coins */}
-      {clickedMarker && gameMode === "planeCollectCoins" && (
+      {/* Right-window popup if plane-collect game is active and marker was clicked */}
+      {clickedMarker && gameMode === "planeCollectCoins" && !isFullscreen && (
         <MarkerInfo
           marker={clickedMarker}
           onClose={() => setClickedMarker(null)}
@@ -1228,16 +932,11 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
           isFullscreen={false}
         >
           <div className="mb-4 text-lg sm:text-xl font-semibold text-center">
-            <p>
-              Collected Coins: {collectedCoins} / 20
-            </p>
-            <p className="mt-2">
-              Time Elapsed: {(elapsedTime / 1000).toFixed(1)} seconds
-            </p>
+            <p>Collected Coins: {collectedCoins} / 20</p>
+            <p className="mt-2">Time Elapsed: {(elapsedTime / 1000).toFixed(1)} seconds</p>
           </div>
         </MarkerInfo>
       )}
     </div>
   );
 }
-  
