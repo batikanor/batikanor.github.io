@@ -147,11 +147,11 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
     const features = [];
 
     // The single plane polygon
-    features.push(createPolygon(planePosition.lat, planePosition.lng, "plane", 9999));
+    features.push(createPolygon(planePosition.lat, planePosition.lng, "plane", "plane"));
 
-    // Each coin as a polygon
-    coins.forEach((coin, idx) => {
-      features.push(createPolygon(coin.lat, coin.lng, "coin", idx));
+    // Each coin as a polygon - use stable IDs
+    coins.forEach((coin) => {
+      features.push(createPolygon(coin.lat, coin.lng, "coin", coin.id));
     });
 
     return { type: "FeatureCollection", features };
@@ -767,6 +767,8 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
                 ? planeGameGeoJson.features
                 : []
             }
+            polygonId={d => d.properties.index || d.properties.objType + '-' + d.properties.index}
+            polygonsTransitionDuration={0}
             polygonCapColor={(d) => {
               if (gameMode === "ticTacToe") {
                 const idx = d.properties.index;
@@ -792,9 +794,9 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
               if (gameMode === "ticTacToe" && d.properties.index !== undefined) {
                 return gameBoard[d.properties.index] ? 0.02 : 0.01;
               }
-              // For Plane/Coins, use a fixed altitude
+              // For Plane/Coins, use different altitudes
               if (gameMode === "planeCollectCoins") {
-                return 0.01;
+                return d.properties.objType === "plane" ? 0.05 : 0.03; // Increased from 0.01
               }
               return 0;
             }}
@@ -806,7 +808,6 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
               }
               // ignore clicks for plane polygons
             }}
-            polygonsTransitionDuration={600}
           />
 
           <button
