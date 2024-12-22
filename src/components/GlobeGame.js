@@ -779,12 +779,17 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
     <div className="relative w-full">
       {/* Move toggle button for mobile to top */}
       {isMobile && (
-        <button
-          onClick={toggleMap}
-          className="py-2 px-4 font-bold text-lg rounded transition-colors duration-300 shadow-lg mx-auto block w-auto"
-        >
-          {showMap ? 'Hide Map' : 'Show Map'}
-        </button>
+        <>
+          <button
+            onClick={toggleMap}
+            className="py-2 px-4 font-bold text-lg rounded transition-colors duration-300 shadow-lg mx-auto block w-auto"
+          >
+            {showMap ? 'Hide Map' : 'Show Map'}
+          </button>
+          <p className=" mb-2 text-xs text-center mt-2">
+            Desktop version is recommended.
+          </p>
+        </>
       )}
 
       {gameMode === "ticTacToe" && !winner && (
@@ -1049,7 +1054,7 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
           {winner && gameMode === "ticTacToe" && (
             <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-[9999]">
               <div className="bg-gray-800 rounded-lg p-6 text-white max-w-md mx-auto text-center">
-                <h2 className="text-2xl text-white  font-semibold mb-4">
+                <h2 className="text-2xl text-white font-semibold mb-4">
                   {winner === "Draw"
                     ? "It's a Draw!"
                     : `Player ${winner} Wins!`}
