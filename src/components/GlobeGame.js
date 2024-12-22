@@ -1044,12 +1044,31 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
               })}
             </div>
           )}
+
+          {/* Move the winner message inside the globe container when in fullscreen */}
+          {winner && gameMode === "ticTacToe" && isFullscreen && (
+            <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 z-[9999]">
+              <div className="bg-gray-800 rounded-lg p-6 text-white max-w-md mx-auto text-center">
+                <h2 className="text-2xl font-semibold mb-4">
+                  {winner === "Draw"
+                    ? "It's a Draw!"
+                    : `Player ${winner} Wins!`}
+                </h2>
+                <button
+                  className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                  onClick={resetGame}
+                >
+                  End Game
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
-      {/* Tic-Tac-Toe winner message */}
-      {winner && gameMode === "ticTacToe" && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+      {/* Show winner message outside container for non-fullscreen mode */}
+      {winner && gameMode === "ticTacToe" && !isFullscreen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-[9999]">
           <div className="bg-gray-800 rounded-lg p-6 text-white max-w-md mx-auto text-center">
             <h2 className="text-2xl font-semibold mb-4">
               {winner === "Draw"
@@ -1057,10 +1076,10 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
                 : `Player ${winner} Wins!`}
             </h2>
             <button
-              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
               onClick={resetGame}
             >
-            End Game
+              End Game
             </button>
           </div>
         </div>
