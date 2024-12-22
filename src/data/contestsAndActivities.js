@@ -498,8 +498,8 @@ Our roadmap includes launching the platform in Zurich, gathering initial data, a
     },
     {
       slug: "tgu-perfect-gpa",  // Unique slug for each project
-      importance: 6, // If less than 5, pink text
-
+      importance: 9, // If less than 5, pink text
+      highlighted: true,
       title: "First student ever to graduate from TGU with Perfect GPA",
       mapData: {
         venue: "Turkish-German University",
