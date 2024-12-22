@@ -30,6 +30,29 @@ const scrollToElement = (elementId, offset = 0) => {
   }
 };
 
+// Helper function to create a small polygon around lat/lng
+function createPolygon(lat, lng, objType, index) {
+  // This produces a small diamond-shaped polygon around (lat, lng)
+  const offset = 1.0;
+  return {
+    type: "Feature",
+    properties: {
+      objType,
+      index
+    },
+    geometry: {
+      type: "Polygon",
+      coordinates: [[
+        [lng,        lat],
+        [lng+offset, lat+offset],
+        [lng+2*offset, lat],
+        [lng+offset, lat-offset],
+        [lng,        lat]
+      ]]
+    }
+  };
+}
+
 export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
   // State to ensure client-side rendering
   const [isClient, setIsClient] = useState(false);
@@ -83,7 +106,6 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
       type: "FeatureCollection",
       features: [
         // 9 polygons in a 3x3 arrangement
-        // Each polygon has a "properties.index" from 0..8
         ...[...Array(9)].map((_, i) => {
           // This is just an example layout for polygons near Egypt-like coords
           const row = Math.floor(i / 3);
@@ -114,6 +136,26 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
     }),
     []
   );
+
+  // Create polygons for plane & coins
+  // This will be used only if gameMode === "planeCollectCoins"
+  const planeGameGeoJson = useMemo(() => {
+    if (gameMode !== "planeCollectCoins") {
+      return { type: "FeatureCollection", features: [] };
+    }
+
+    const features = [];
+
+    // The single plane polygon
+    features.push(createPolygon(planePosition.lat, planePosition.lng, "plane", 9999));
+
+    // Each coin as a polygon
+    coins.forEach((coin, idx) => {
+      features.push(createPolygon(coin.lat, coin.lng, "coin", idx));
+    });
+
+    return { type: "FeatureCollection", features };
+  }, [gameMode, planePosition, coins]);
 
   const [isFullscreen, setIsFullscreen] = useState(false);
   const citiesAndLocations = useMemo(() => getCitiesAndLocations(), []);
@@ -209,7 +251,8 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
       const { clientWidth, clientHeight } = globeContainerRef.current;
       setDimensions({ width: clientWidth, height: clientHeight });
     }
-  }, [isClient]);
+    setIsClient(true);
+  }, []);
 
   // Set initial viewpoint each time gameMode changes
   useEffect(() => {
@@ -276,7 +319,7 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
       labelColor: "white",
     });
 
-    // Only add the “Plane Collect Coins” marker if NOT currently in plane game:
+    // Only add the “Plane Collect Coins” marker if NOT currently in plane game
     if (gameMode !== "planeCollectCoins") {
       baseMarkers.push({
         id: "plane-collect-marker",
@@ -572,86 +615,6 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
   const { resolvedTheme } = useTheme();
   const [isNavigating, setIsNavigating] = useState(false);
 
-  // Prepare final markers array
-  const allMarkers = useMemo(() => {
-    // Always include base markers
-    const baseMarkers = markers;
-
-    // Add plane marker and coin markers if we're in "planeCollectCoins"
-    if (gameMode === "planeCollectCoins") {
-      // Plane marker (the moving plane)
-      const planeMarker = {
-        id: "plane-marker",
-        lat: planePosition.lat,
-        lng: planePosition.lng,
-        label: "Your Plane",
-        icon: "✈️",
-        size: 20,
-        color: "red",
-      };
-
-      // Coin markers
-      const coinMarkers = coins.map((coin) => ({
-        id: coin.id,
-        lat: coin.lat,
-        lng: coin.lng,
-        label: "A shiny coin!",
-        icon: "🪙",
-        size: 10,
-        color: "yellow",
-      }));
-
-      return [...baseMarkers, ...coinMarkers, planeMarker];
-    }
-
-    // Not in plane game, no plane or coins
-    return baseMarkers;
-  }, [markers, gameMode, planePosition, coins]);
-
-  // For plane movement on small interval
-  useEffect(() => {
-    if (gameMode !== "planeCollectCoins") return;
-
-    const interval = setInterval(() => {
-      movePlaneContinuously();
-    }, 100);
-
-    return () => clearInterval(interval);
-  }, [keysPressed, gameMode]);
-
-  const movePlaneContinuously = () => {
-    const speed = 0.9;
-    let { lat, lng } = planePosition;
-    let moved = false;
-
-    if (keysPressed.w) {
-      lat = Math.min(lat + speed, 90);
-      moved = true;
-    }
-    if (keysPressed.s) {
-      lat = Math.max(lat - speed, -90);
-      moved = true;
-    }
-    if (keysPressed.a) {
-      lng -= speed;
-      if (lng < -180) lng += 360;
-      moved = true;
-    }
-    if (keysPressed.d) {
-      lng += speed;
-      if (lng > 180) lng -= 360;
-      moved = true;
-    }
-
-    if (moved) {
-      setPlanePosition({ lat, lng });
-      if (globeEl.current) {
-        globeEl.current.pointOfView({ lat, lng, altitude: 2 }, 500);
-      }
-      // Check coins & markers again if you like, or skip here
-    }
-  };
-
   return (
     <div>
       {gameMode === "ticTacToe" && !winner && (
@@ -753,7 +716,7 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
                 : "//unpkg.com/three-globe/example/img/earth-blue-marble.jpg"
             }
             backgroundColor="rgba(0,0,0,0)"
-            pointsData={allMarkers}
+            pointsData={markers}
             // Force a complete re-render of points each time
             pointsMerge={false}
             pointSize={(point) =>
@@ -763,12 +726,14 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
             }
             pointColor="color"
             pointLabel={(point) => `${point.icon || ""} ${point.label}`}
-            labelsData={allMarkers}
+            labelsData={markers}
             labelLat={(point) => point.labelLat}
             labelLng={(point) => point.labelLng}
             labelText={(point) => point.labelText?.replace("ü", "ue")}
             labelSize={() => 0.3}
-            labelColor={(point) => point.maxImportance < 5 ? "pink" : (point.labelColor || "white")}
+            labelColor={(point) => 
+              point.maxImportance < 5 ? "pink" : (point.labelColor || "white")
+            }
             labelResolution={2}
             pointAltitude={0.01}
             pointResolution={4}
@@ -788,25 +753,48 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
             arcDashGap={0.2}
             arcDashAnimateTime={1500}
             onArcHover={setHoveredArc}
-            polygonsData={gameMode === "ticTacToe" ? sampleGeoJson.features : []}
+            // Show TicTacToe polygons OR plane polygons
+            polygonsData={
+              gameMode === "ticTacToe"
+                ? sampleGeoJson.features
+                : gameMode === "planeCollectCoins"
+                ? planeGameGeoJson.features
+                : []
+            }
             polygonCapColor={(d) => {
-              const idx = d.properties.index;
-              if (idx === undefined) return "rgba(0,0,0,0)";
-              if (gameBoard[idx]) {
-                // "X" => red, "O" => blue
-                return gameBoard[idx] === "X"
-                  ? "rgba(255, 0, 0, 0.6)"
-                  : "rgba(0, 0, 255, 0.6)";
+              if (gameMode === "ticTacToe") {
+                const idx = d.properties.index;
+                if (idx === undefined) return "rgba(0,0,0,0)";
+                if (gameBoard[idx]) {
+                  // "X" => red, "O" => blue
+                  return gameBoard[idx] === "X"
+                    ? "rgba(255, 0, 0, 0.6)"
+                    : "rgba(0, 0, 255, 0.6)";
+                }
+                return "rgba(255, 165, 0, 0.6)";
+              } else if (gameMode === "planeCollectCoins") {
+                return d.properties.objType === "plane"
+                  ? "rgba(255, 0, 0, 0.6)"     // plane in red
+                  : "rgba(255, 215, 0, 0.6)"; // coins in gold
               }
-              return "rgba(255, 165, 0, 0.6)";
+              return "rgba(0,0,0,0)";
             }}
             polygonSideColor={() => "rgba(0, 0, 0, 0.1)"}
             polygonStrokeColor={() => "#000"}
             polygonAltitude={(d) => {
-              if (d.properties.index === undefined) return 0;
-              const { lat } = getPolygonCenter(d.geometry);
-              const scale = Math.cos((lat * Math.PI) / 180);
-              return gameBoard[d.properties.index] ? 0.02 * scale : 0.01 * scale;
+              // For ticTacToe
+              if (gameMode === "ticTacToe" && d.properties.index !== undefined) {
+                const { lat } = getPolygonCenter(d.geometry);
+                const scale = Math.cos((lat * Math.PI) / 180);
+                return gameBoard[d.properties.index] ? 0.02 * scale : 0.01 * scale;
+              }
+              // For plane/coins polygons
+              if (gameMode === "planeCollectCoins") {
+                const { lat } = getPolygonCenter(d.geometry);
+                const scale = Math.cos((lat * Math.PI) / 180);
+                return 0.02 * scale; // slightly raised
+              }
+              return 0;
             }}
             polygonResolution={6}
             onPolygonClick={(polygon) => {
@@ -814,6 +802,7 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
                 const hexIndex = polygon.properties.index;
                 handleHexagonClick(hexIndex);
               }
+              // We won't do clicks for plane polygons.
             }}
           />
 
@@ -843,6 +832,7 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
                 const screen = globeEl.current
                   ? globeEl.current.getScreenCoords(lat, lng)
                   : { x: 0, y: 0 };
+
                 if (
                   !screen ||
                   screen.x < 50 ||
