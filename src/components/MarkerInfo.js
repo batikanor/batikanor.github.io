@@ -1,4 +1,4 @@
-const MarkerInfo = ({ marker, onClose, navigateWithRefresh, isFullscreen = false }) => {
+const MarkerInfo = ({ marker, onClose, navigateWithRefresh, isFullscreen = false, children }) => {
   const containerClasses = isFullscreen
     ? "fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
     : "fixed top-1/2 right-4 transform -translate-y-1/2 z-50";
@@ -30,6 +30,7 @@ const MarkerInfo = ({ marker, onClose, navigateWithRefresh, isFullscreen = false
             </div>
           ))}
         </div>
+        {children}
         <button
           onClick={onClose}
           className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
