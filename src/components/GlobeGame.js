@@ -362,9 +362,11 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
   const handlePointHover = useMemo(
     () =>
       debounce((point) => {
-        if (point) setHoveredMarker(point);
+        if (!isFullscreen && point) {
+          setHoveredMarker(point);
+        }
       }, 100),
-    []
+    [isFullscreen]
   );
 
   const handleCloseInfoWindow = () => {
@@ -426,6 +428,8 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
     setElapsedTime(0);
     setGameStartTime(null);
     setTriggeredMarkers([]);
+    setHoveredMarker(null);
+    setClickedMarker(null);
   };
 
   // Helper for polygon center
@@ -618,7 +622,8 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
   return (
     <div>
       {gameMode === "ticTacToe" && !winner && (
-        <div className="mb-4 text-lg sm:text-xl font-semibold">
+        <div className={`text-lg sm:text-xl font-semibold
+          ${isFullscreen ? 'absolute top-40 right-16 bg-black bg-opacity-75 p-4 rounded' : 'mb-4'}`}>
           Current Player:{" "}
           <span className={currentPlayer === "X" ? "text-red-500" : "text-blue-500"}>
             {currentPlayer}
@@ -627,7 +632,8 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
       )}
 
       {gameMode === "planeCollectCoins" && (
-        <div className="mb-4 text-lg sm:text-xl font-semibold text-center">
+        <div className={`text-lg sm:text-xl font-semibold text-center 
+          ${isFullscreen ? 'absolute top-40 right-16 bg-black bg-opacity-75 p-4 rounded' : 'mb-4'}`}>
           <br />
           <p>
             Use <span className="font-mono">W</span> (North),{" "}
@@ -673,7 +679,7 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
           ref={globeContainerRef}
           className="relative w-full h-[700px] sm:h-[800px] md:h-[900px] globe-container"
         >
-          <div className="text-white absolute top-4 left-4 bg-opacity-75 p-4 rounded shadow-lg z-50">
+          <div className={`text-white absolute ${isFullscreen ? 'top-4 right-16' : 'top-4 left-4'} bg-black bg-opacity-75 p-4 rounded shadow-lg z-50`}>
             <ul>
               <li>
                 <span className="text-pink-500">Pink Text:</span> minor achievements
@@ -782,17 +788,13 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
             polygonSideColor={() => "rgba(0, 0, 0, 0.1)"}
             polygonStrokeColor={() => "#000"}
             polygonAltitude={(d) => {
-              // For ticTacToe
+              // For Tic-Tac-Toe, keep the slight raise
               if (gameMode === "ticTacToe" && d.properties.index !== undefined) {
-                const { lat } = getPolygonCenter(d.geometry);
-                const scale = Math.cos((lat * Math.PI) / 180);
-                return gameBoard[d.properties.index] ? 0.02 * scale : 0.01 * scale;
+                return gameBoard[d.properties.index] ? 0.02 : 0.01;
               }
-              // For plane/coins polygons
+              // For Plane/Coins, use a fixed altitude
               if (gameMode === "planeCollectCoins") {
-                const { lat } = getPolygonCenter(d.geometry);
-                const scale = Math.cos((lat * Math.PI) / 180);
-                return 0.02 * scale; // slightly raised
+                return 0.01;
               }
               return 0;
             }}
@@ -802,8 +804,9 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
                 const hexIndex = polygon.properties.index;
                 handleHexagonClick(hexIndex);
               }
-              // We won't do clicks for plane polygons.
+              // ignore clicks for plane polygons
             }}
+            polygonsTransitionDuration={600}
           />
 
           <button
@@ -811,17 +814,43 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
             className="absolute top-4 right-4 bg-gray-700 text-white rounded-full p-2 opacity-75 hover:opacity-100 transition-opacity"
             aria-label="Toggle Fullscreen"
           >
-            {isFullscreen ? "❎" : "⛶"}
+            {isFullscreen ? "X" : "⛶"}
           </button>
 
-          {/* Modal Popup for Marker Click (in fullscreen mode) */}
-          {clickedMarker && isFullscreen && (
+          {/* Marker Info - Show in both fullscreen and non-fullscreen modes */}
+          {((clickedMarker && isFullscreen) || (hoveredMarker && !isFullscreen)) && (
             <MarkerInfo
-              marker={clickedMarker}
-              onClose={() => setClickedMarker(null)}
+              marker={clickedMarker || hoveredMarker}
+              onClose={() => isFullscreen ? setClickedMarker(null) : handleCloseInfoWindow()}
               navigateWithRefresh={navigateWithRefresh}
-              isFullscreen={true}
-            />
+              isFullscreen={isFullscreen}
+              isGameMode={gameMode !== false}
+            >
+              {gameMode === "planeCollectCoins" && (
+                <div className="mt-10 mb-4 text-lg sm:text-xl font-semibold text-center">
+                  <p>Plane game is ongoing!</p>
+                  <p>Collected Coins: {collectedCoins} / 20</p>
+                  <p className="mt-2">Time Elapsed: {(elapsedTime / 1000).toFixed(1)} seconds</p>
+                  <button
+                    onClick={resetGame}
+                    className="mt-4 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
+                  >
+                    End Game
+                  </button>
+                </div>
+              )}
+              {gameMode === "ticTacToe" && (
+                <div className="mt-10 mb-4 text-lg sm:text-xl font-semibold text-center">
+                  <p>Tic-Tac-Toe game is ongoing!</p>
+                  <button
+                    onClick={resetGame}
+                    className="mt-4 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
+                  >
+                    End Game
+                  </button>
+                </div>
+              )}
+            </MarkerInfo>
           )}
 
           {/* Overlay for TicTacToe symbols */}
@@ -864,19 +893,6 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
         </div>
       )}
 
-      {/* Side Bubble for Hovered Marker (non-fullscreen) */}
-      {hoveredMarker &&
-        hoveredMarker.label !== "Plane Collect Coins" &&
-        hoveredMarker.label !== "Tic-Tac-Toe" && (
-          <MarkerInfo
-            marker={hoveredMarker}
-            onClose={handleCloseInfoWindow}
-            navigateWithRefresh={navigateWithRefresh}
-            isFullscreen={false}
-          />
-        )
-      }
-
       {/* Tic-Tac-Toe winner message */}
       {winner && gameMode === "ticTacToe" && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
@@ -911,21 +927,6 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
             </button>
           </div>
         </div>
-      )}
-
-      {/* Right-window popup if plane-collect game is active and marker was clicked */}
-      {clickedMarker && gameMode === "planeCollectCoins" && !isFullscreen && (
-        <MarkerInfo
-          marker={clickedMarker}
-          onClose={() => setClickedMarker(null)}
-          navigateWithRefresh={navigateWithRefresh}
-          isFullscreen={false}
-        >
-          <div className="mb-4 text-lg sm:text-xl font-semibold text-center">
-            <p>Collected Coins: {collectedCoins} / 20</p>
-            <p className="mt-2">Time Elapsed: {(elapsedTime / 1000).toFixed(1)} seconds</p>
-          </div>
-        </MarkerInfo>
       )}
     </div>
   );
