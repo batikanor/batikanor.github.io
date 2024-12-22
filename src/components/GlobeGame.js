@@ -1075,7 +1075,7 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
       {gameMode === false && collectedCoins >= 20 && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="bg-gray-800 rounded-lg p-6 text-white max-w-md mx-auto text-center">
-            <h2 className="text-2xl font-semibold mb-4">
+            <h2 className="text-2xl text-white font-semibold mb-4">
               Congratulations! You collected all coins in {(elapsedTime / 1000).toFixed(1)}s.
             </h2>
             <button
