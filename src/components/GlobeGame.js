@@ -94,7 +94,6 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
   const [collectedCoins, setCollectedCoins] = useState(0);
   const [gameStartTime, setGameStartTime] = useState(null);
   const [elapsedTime, setElapsedTime] = useState(0);
-  const [triggeredMarkers, setTriggeredMarkers] = useState([]);
 
   const [isMobile, setIsMobile] = useState(false);
   const [showMap, setShowMap] = useState(true); // Initially, show map for non-mobile
@@ -343,9 +342,8 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
       // Check for marker proximity
       markers.forEach((marker) => {
         const dist = Math.sqrt((marker.lat - lat) ** 2 + (marker.lng - lng) ** 2);
-        if (dist < 2 && !triggeredMarkers.includes(marker.id)) {
+        if (dist < 2) {
           setClickedMarker(marker);
-          setTriggeredMarkers((prev) => [...prev, marker.id]);
         }
       });
       
@@ -526,7 +524,6 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
     setCollectedCoins(0);
     setElapsedTime(0);
     setGameStartTime(null);
-    setTriggeredMarkers([]);
     setHoveredMarker(null);
     setClickedMarker(null);
   };
@@ -603,9 +600,8 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
         // Check for marker proximity
         markers.forEach((marker) => {
           const dist = Math.sqrt((marker.lat - lat) ** 2 + (marker.lng - lng) ** 2);
-          if (dist < 2 && !triggeredMarkers.includes(marker.id)) {
+          if (dist < 2) {
             setClickedMarker(marker);
-            setTriggeredMarkers((prev) => [...prev, marker.id]);
           }
         });
       }
@@ -616,7 +612,7 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
     return () => {
       cancelAnimationFrame(animationFrameRef.current);
     };
-  }, [gameMode, keysPressed, planePosition, markers, triggeredMarkers]);
+  }, [gameMode, keysPressed, planePosition, markers]);
 
   // Keyboard event handlers
   useEffect(() => {
@@ -666,7 +662,6 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
     setElapsedTime(0);
     setGameStartTime(Date.now());
     generateRandomCoins();
-    setTriggeredMarkers([]);
   };
 
   // Check if all coins collected
@@ -769,9 +764,8 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
     // Check for marker proximity
     markers.forEach((marker) => {
       const dist = Math.sqrt((marker.lat - lat) ** 2 + (marker.lng - lng) ** 2);
-      if (dist < 2 && !triggeredMarkers.includes(marker.id)) {
+      if (dist < 2) {
         setClickedMarker(marker);
-        setTriggeredMarkers((prev) => [...prev, marker.id]);
       }
     });
   };
