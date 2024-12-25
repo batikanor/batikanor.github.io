@@ -102,6 +102,8 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
   const [showBorders, setShowBorders] = useState(false);
   const [showChoropleth, setShowChoropleth] = useState(false);
   const [countryData, setCountryData] = useState({ features: [] });
+  const [hoveredPolygon, setHoveredPolygon] = useState(null);
+  
   // Sample GeoJSON data for the Tic-Tac-Toe polygons
   const sampleGeoJson = useMemo(
     () => ({
@@ -904,6 +906,13 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
     loadData();
   }, []);
 
+  const handlePolygonHover = (polygon) => {
+    if (!polygon || polygon.properties?.type) return; // Ignore control polygons
+    if (gameMode) return; // Ignore during games
+    if (!showChoropleth) return; // Only show hover effects when choropleth is active
+    setHoveredPolygon(polygon);
+  };
+
   return (
     <div className="relative w-full">
       {/* Move toggle button for mobile to top */}
@@ -1084,6 +1093,7 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
                   : "rgba(255, 215, 0, 0.6)";
               }
               if (showChoropleth) {
+                if (hoveredPolygon === d) return 'steelblue';
                 const gdpValue = d.properties?.GDP_MD_EST || 0;
                 const popValue = Math.max(1e5, d.properties?.POP_EST || 1e5);
                 const gdpPerCapita = gdpValue / popValue;
@@ -1105,8 +1115,8 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
               if (gameMode === "planeCollectCoins") {
                 return d.properties.objType === "plane" ? 0.05 : 0.03;
               }
-              if (showChoropleth) {
-                return 0.01;
+              if (showChoropleth && d.properties?.ISO_A2) {
+                return hoveredPolygon === d ? 0.12 : 0.06;
               }
               return 0;
             }}
@@ -1116,6 +1126,23 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
             onGlobeTouchStart={handleGlobeTouch}
             onGlobeTouchMove={handleGlobeTouch}
             cloudOpacity={cloudOpacity}
+            onPolygonHover={handlePolygonHover}
+            polygonLabel={(d) => {
+              if (d.properties?.type || gameMode) return null; // No labels for controls or during games
+              if (!showChoropleth) return null;
+              if (!d.properties?.ADMIN) return null;
+              
+              const gdpValue = d.properties?.GDP_MD_EST || 0;
+              const popValue = d.properties?.POP_EST || 0;
+              
+              return `
+                <div class="bg-black bg-opacity-75 p-2 rounded">
+                  <b>${d.properties.ADMIN} ${d.properties.ISO_A2 ? `(${d.properties.ISO_A2})` : ''}</b><br />
+                  GDP: <i>${gdpValue.toLocaleString()}</i> M$<br/>
+                  Population: <i>${popValue.toLocaleString()}</i>
+                </div>
+              `;
+            }}
           />
 
           {renderJoystick()}
