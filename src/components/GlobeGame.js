@@ -100,6 +100,7 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
   const { resolvedTheme } = useTheme();
   const [isNavigating, setIsNavigating] = useState(false);
   const [showBorders, setShowBorders] = useState(false);
+  const [showChoropleth, setShowChoropleth] = useState(false);
   const [countryData, setCountryData] = useState({ features: [] });
   // Sample GeoJSON data for the Tic-Tac-Toe polygons
   const sampleGeoJson = useMemo(
@@ -169,7 +170,7 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
     const baseCoords = { lat: 34, lng: 19 }; // Mediterranean position
     const spacing = 2; // Spacing between controls
     
-    // First create the cloud controls
+    // Cloud controls
     const cloudControls = [0, 0.25, 0.5, 1].map((opacity, index) => ({
       type: "Feature",
       properties: { 
@@ -199,29 +200,50 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
       }
     }));
 
-    // Add border toggle control
-    const borderControl = {
-      type: "Feature",
-      properties: { 
-        type: "borderControl",
-        isActive: showBorders,
-        label: `Borders: ${showBorders ? 'ON' : 'OFF'}`,
-        labelHeight: baseCoords.lat + 0.8
+    // Controls for borders and choropleth
+    const controls = [
+      {
+        type: "Feature",
+        properties: { 
+          type: "borderControl",
+          isActive: showBorders,
+          label: `Borders: ${showBorders ? 'ON' : 'OFF'}`,
+          labelHeight: baseCoords.lat + 0.8
+        },
+        geometry: {
+          type: "Polygon",
+          coordinates: [[
+            [baseCoords.lng + (4.5 * spacing), baseCoords.lat],
+            [baseCoords.lng + (4.5 * spacing) + 0.5, baseCoords.lat + 0.5],
+            [baseCoords.lng + (4.5 * spacing) + 1, baseCoords.lat],
+            [baseCoords.lng + (4.5 * spacing) + 0.5, baseCoords.lat - 0.5],
+            [baseCoords.lng + (4.5 * spacing), baseCoords.lat]
+          ]]
+        }
       },
-      geometry: {
-        type: "Polygon",
-        coordinates: [[
-          [baseCoords.lng + (6 * spacing), baseCoords.lat],
-          [baseCoords.lng + (6 * spacing) + 0.5, baseCoords.lat + 0.5],
-          [baseCoords.lng + (6 * spacing) + 1, baseCoords.lat],
-          [baseCoords.lng + (6 * spacing) + 0.5, baseCoords.lat - 0.5],
-          [baseCoords.lng + (6 * spacing), baseCoords.lat]
-        ]]
+      {
+        type: "Feature",
+        properties: { 
+          type: "choroplethControl",
+          isActive: showChoropleth,
+          label: `GDP per capita: ${showChoropleth ? 'ON' : 'OFF'}`,
+          labelHeight: baseCoords.lat + 0.8
+        },
+        geometry: {
+          type: "Polygon",
+          coordinates: [[
+            [baseCoords.lng + (7 * spacing), baseCoords.lat],
+            [baseCoords.lng + (7 * spacing) + 0.5, baseCoords.lat + 0.5],
+            [baseCoords.lng + (7 * spacing) + 1, baseCoords.lat],
+            [baseCoords.lng + (7 * spacing) + 0.5, baseCoords.lat - 0.5],
+            [baseCoords.lng + (7 * spacing), baseCoords.lat]
+          ]]
+        }
       }
-    };
+    ];
 
-    return [...cloudControls, borderControl];
-  }, [cloudOpacity, showBorders]);
+    return [...cloudControls, ...controls];
+  }, [cloudOpacity, showBorders, showChoropleth]);
 
   // Modify your existing polygonsData to include cloud controls
   const polygonsData = useMemo(() => {
@@ -231,12 +253,12 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
       return planeGameGeoJson.features;
     } else {
       const controls = cloudControlPolygons;
-      if (showBorders && countryData.features) {
+      if (showBorders || showChoropleth) {
         return [...controls, ...countryData.features];
       }
       return controls;
     }
-  }, [gameMode, sampleGeoJson.features, planeGameGeoJson.features, cloudControlPolygons, showBorders, countryData]);
+  }, [gameMode, sampleGeoJson.features, planeGameGeoJson.features, cloudControlPolygons, showBorders, showChoropleth, countryData]);
 
   useEffect(() => {
     // Detect mobile devices
@@ -860,6 +882,8 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
       setCloudOpacity(polygon.properties.opacity);
     } else if (polygon.properties.type === "borderControl") {
       setShowBorders(prev => !prev);
+    } else if (polygon.properties.type === "choroplethControl") {
+      setShowChoropleth(prev => !prev);
     } else if (gameMode === "ticTacToe") {
       handleHexagonClick(polygon.properties.index);
     }
@@ -934,8 +958,13 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
               <li>
                 <span className="text-pink-500">Pink Text:</span> minor achievements
               </li>
+              {showChoropleth && (
+                <li>
+                  <span className="text-red-500">Red Intensity:</span> GDP per capita
+                </li>
+              )}
               <li>
-                <span className="text-yellow-500">Yellow Text:</span> at least one OK achievement
+                <span className="text-yellow-500">Gold Text:</span> major achievements
               </li>
             </ul>
             <p>
@@ -984,28 +1013,28 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
             pointLabel={(point) => `${point.icon || ""} ${point.label}`}
             labelsData={[
               ...markers,
-              ...polygonsData.filter(d => d.properties?.type === "cloudControl" || d.properties?.type === "borderControl")
+              ...polygonsData.filter(d => d.properties?.type === "cloudControl" || d.properties?.type === "borderControl" || d.properties?.type === "choroplethControl")
             ]}
             labelLat={d => {
-              if (d.properties?.type === "cloudControl" || d.properties?.type === "borderControl") {
+              if (d.properties?.type === "cloudControl" || d.properties?.type === "borderControl" || d.properties?.type === "choroplethControl") {
                 return d.properties.labelHeight;
               }
               return d.labelLat;
             }}
             labelLng={d => {
-              if (d.properties?.type === "cloudControl" || d.properties?.type === "borderControl") {
+              if (d.properties?.type === "cloudControl" || d.properties?.type === "borderControl" || d.properties?.type === "choroplethControl") {
                 return d.geometry.coordinates[0][0][0];
               }
               return d.labelLng;
             }}
             labelText={d => {
-              if (d.properties?.type === "cloudControl" || d.properties?.type === "borderControl") {
+              if (d.properties?.type === "cloudControl" || d.properties?.type === "borderControl" || d.properties?.type === "choroplethControl") {
                 return d.properties.label;
               }
               return d.labelText;
             }}
             labelSize={d => {
-              if (d.properties?.type === "cloudControl") return 0.2;
+              if (d.properties?.type === "cloudControl" || d.properties?.type === "borderControl" || d.properties?.type === "choroplethControl") return 0.2;
               return 0.3;
             }}
             labelColor={d => d.labelColor || "white"}
@@ -1037,14 +1066,13 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
               if (d.properties.type === "cloudControl") {
                 return d.properties.isActive ? "orange" : "gray";
               }
-              if (d.properties.type === "borderControl") {
+              if (d.properties.type === "borderControl" || d.properties.type === "choroplethControl") {
                 return d.properties.isActive ? "green" : "gray";
               }
               if (gameMode === "ticTacToe") {
                 const idx = d.properties.index;
                 if (idx === undefined) return "rgba(0,0,0,0)";
                 if (gameBoard[idx]) {
-                  // "X" => red, "O" => blue
                   return gameBoard[idx] === "X"
                     ? "rgba(255, 0, 0, 0.6)"
                     : "rgba(0, 0, 255, 0.6)";
@@ -1052,28 +1080,33 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
                 return "rgba(255, 165, 0, 0.6)";
               } else if (gameMode === "planeCollectCoins") {
                 return d.properties.objType === "plane"
-                  ? "rgba(255, 0, 0, 0.6)"     // plane in red
-                  : "rgba(255, 215, 0, 0.6)"; // coins in gold
+                  ? "rgba(255, 0, 0, 0.6)"
+                  : "rgba(255, 215, 0, 0.6)";
+              }
+              if (showChoropleth) {
+                const gdpValue = d.properties?.GDP_MD_EST || 0;
+                const popValue = Math.max(1e5, d.properties?.POP_EST || 1e5);
+                const gdpPerCapita = gdpValue / popValue;
+                const maxGdpPerCapita = 0.1;
+                const intensity = Math.min(gdpPerCapita / maxGdpPerCapita, 1);
+                return `rgba(255, ${Math.floor(255 * (1-intensity))}, 0, 0.8)`;
               }
               if (showBorders) {
-                // Use GDP data from the geojson file for border coloring
-                const gdpValue = d.properties?.GDP_MD_EST || 0;
-                const maxGDP = 21500000; // Example max GDP value
-                const intensity = gdpValue / maxGDP;
-                return `rgba(0, ${Math.floor(255 * intensity)}, 0, 0.6)`;
+                return 'rgba(0, 0, 0, 0.1)';
               }
               return "rgba(0,0,0,0)";
             }}
             polygonSideColor={() => "rgba(0, 0, 0, 0.1)"}
             polygonStrokeColor={() => "#000"}
             polygonAltitude={(d) => {
-              // For Tic-Tac-Toe, keep the slight raise
               if (gameMode === "ticTacToe" && d.properties.index !== undefined) {
                 return gameBoard[d.properties.index] ? 0.02 : 0.01;
               }
-              // For Plane/Coins, use different altitudes
               if (gameMode === "planeCollectCoins") {
-                return d.properties.objType === "plane" ? 0.05 : 0.03; // Increased from 0.01
+                return d.properties.objType === "plane" ? 0.05 : 0.03;
+              }
+              if (showChoropleth) {
+                return 0.01;
               }
               return 0;
             }}
