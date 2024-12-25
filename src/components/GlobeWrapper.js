@@ -20,6 +20,7 @@ const GlobeWrapper = ({ onGlobeLoad, initialView, cloudOpacity = 0.25, ...props 
   const cloudsRef = useRef();
   const initialViewSet = useRef(false);
   const [isMounted, setIsMounted] = useState(false);
+  const [showBorders, setShowBorders] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);

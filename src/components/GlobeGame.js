@@ -97,7 +97,10 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
 
   const [isMobile, setIsMobile] = useState(false);
   const [showMap, setShowMap] = useState(true); // Initially, show map for non-mobile
-
+  const { resolvedTheme } = useTheme();
+  const [isNavigating, setIsNavigating] = useState(false);
+  const [showBorders, setShowBorders] = useState(false);
+  const [countryData, setCountryData] = useState({ features: [] });
   // Sample GeoJSON data for the Tic-Tac-Toe polygons
   const sampleGeoJson = useMemo(
     () => ({
@@ -164,9 +167,10 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
   // Add this to your useMemo for polygons
   const cloudControlPolygons = useMemo(() => {
     const baseCoords = { lat: 34, lng: 19 }; // Mediterranean position
-    const spacing = 2; // Reduced spacing between cloud shapes
+    const spacing = 2; // Spacing between controls
     
-    return [0, 0.25, 0.5, 1].map((opacity, index) => ({
+    // First create the cloud controls
+    const cloudControls = [0, 0.25, 0.5, 1].map((opacity, index) => ({
       type: "Feature",
       properties: { 
         type: "cloudControl",
@@ -178,7 +182,6 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
       geometry: {
         type: "Polygon",
         coordinates: [[
-          // Smaller, more organic cloud shape with more points
           [baseCoords.lng + (index * spacing), baseCoords.lat],
           [baseCoords.lng + (index * spacing) + 0.2, baseCoords.lat + 0.3],
           [baseCoords.lng + (index * spacing) + 0.4, baseCoords.lat + 0.4],
@@ -195,7 +198,30 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
         ]]
       }
     }));
-  }, [cloudOpacity]);
+
+    // Add border toggle control
+    const borderControl = {
+      type: "Feature",
+      properties: { 
+        type: "borderControl",
+        isActive: showBorders,
+        label: `Borders: ${showBorders ? 'ON' : 'OFF'}`,
+        labelHeight: baseCoords.lat + 0.8
+      },
+      geometry: {
+        type: "Polygon",
+        coordinates: [[
+          [baseCoords.lng + (6 * spacing), baseCoords.lat],
+          [baseCoords.lng + (6 * spacing) + 0.5, baseCoords.lat + 0.5],
+          [baseCoords.lng + (6 * spacing) + 1, baseCoords.lat],
+          [baseCoords.lng + (6 * spacing) + 0.5, baseCoords.lat - 0.5],
+          [baseCoords.lng + (6 * spacing), baseCoords.lat]
+        ]]
+      }
+    };
+
+    return [...cloudControls, borderControl];
+  }, [cloudOpacity, showBorders]);
 
   // Modify your existing polygonsData to include cloud controls
   const polygonsData = useMemo(() => {
@@ -204,9 +230,13 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
     } else if (gameMode === "planeCollectCoins") {
       return planeGameGeoJson.features;
     } else {
-      return cloudControlPolygons;
+      const controls = cloudControlPolygons;
+      if (showBorders && countryData.features) {
+        return [...controls, ...countryData.features];
+      }
+      return controls;
     }
-  }, [gameMode, sampleGeoJson.features, planeGameGeoJson.features, cloudControlPolygons]);
+  }, [gameMode, sampleGeoJson.features, planeGameGeoJson.features, cloudControlPolygons, showBorders, countryData]);
 
   useEffect(() => {
     // Detect mobile devices
@@ -760,8 +790,7 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
     }
   };
 
-  const { resolvedTheme } = useTheme();
-  const [isNavigating, setIsNavigating] = useState(false);
+
 
   // Add this new function near your other handlers
   const handleGlobeTouch = (event) => {
@@ -829,10 +858,27 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
   const handlePolygonClick = (polygon) => {
     if (polygon.properties.type === "cloudControl") {
       setCloudOpacity(polygon.properties.opacity);
+    } else if (polygon.properties.type === "borderControl") {
+      setShowBorders(prev => !prev);
     } else if (gameMode === "ticTacToe") {
       handleHexagonClick(polygon.properties.index);
     }
   };
+
+
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const response = await fetch('/ne_110m_admin_0_countries.geojson');
+        const data = await response.json();
+        setCountryData(data);
+      } catch (error) {
+        console.error('Error loading GeoJSON:', error);
+        setCountryData({ features: [] });
+      }
+    };
+    loadData();
+  }, []);
 
   return (
     <div className="relative w-full">
@@ -936,27 +982,33 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
             }
             pointColor="color"
             pointLabel={(point) => `${point.icon || ""} ${point.label}`}
-            labelsData={gameMode === false ? [...cloudControlPolygons, ...markers] : markers}
+            labelsData={[
+              ...markers,
+              ...polygonsData.filter(d => d.properties?.type === "cloudControl" || d.properties?.type === "borderControl")
+            ]}
             labelLat={d => {
-              if (d.properties?.type === "cloudControl") return d.properties.labelHeight;
+              if (d.properties?.type === "cloudControl" || d.properties?.type === "borderControl") {
+                return d.properties.labelHeight;
+              }
               return d.labelLat;
             }}
             labelLng={d => {
-              if (d.properties?.type === "cloudControl") return d.geometry.coordinates[0][0][0];
+              if (d.properties?.type === "cloudControl" || d.properties?.type === "borderControl") {
+                return d.geometry.coordinates[0][0][0];
+              }
               return d.labelLng;
             }}
             labelText={d => {
-              if (d.properties?.type === "cloudControl") return d.properties.label;
+              if (d.properties?.type === "cloudControl" || d.properties?.type === "borderControl") {
+                return d.properties.label;
+              }
               return d.labelText;
             }}
             labelSize={d => {
               if (d.properties?.type === "cloudControl") return 0.2;
               return 0.3;
             }}
-            labelColor={d => {
-              if (d.properties?.type === "cloudControl") return "white";
-              return d.maxImportance < 5 ? "pink" : (d.labelColor || "white");
-            }}
+            labelColor={d => d.labelColor || "white"}
             labelDotRadius={0}
             labelAltitude={0.01}
             pointAltitude={0.01}
@@ -985,6 +1037,9 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
               if (d.properties.type === "cloudControl") {
                 return d.properties.isActive ? "orange" : "gray";
               }
+              if (d.properties.type === "borderControl") {
+                return d.properties.isActive ? "green" : "gray";
+              }
               if (gameMode === "ticTacToe") {
                 const idx = d.properties.index;
                 if (idx === undefined) return "rgba(0,0,0,0)";
@@ -999,6 +1054,13 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
                 return d.properties.objType === "plane"
                   ? "rgba(255, 0, 0, 0.6)"     // plane in red
                   : "rgba(255, 215, 0, 0.6)"; // coins in gold
+              }
+              if (showBorders) {
+                // Use GDP data from the geojson file for border coloring
+                const gdpValue = d.properties?.GDP_MD_EST || 0;
+                const maxGDP = 21500000; // Example max GDP value
+                const intensity = gdpValue / maxGDP;
+                return `rgba(0, ${Math.floor(255 * intensity)}, 0, 0.6)`;
               }
               return "rgba(0,0,0,0)";
             }}
