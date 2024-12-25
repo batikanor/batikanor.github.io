@@ -1070,7 +1070,7 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
             // Show TicTacToe polygons OR plane polygons
             polygonsData={polygonsData}
             polygonId={d => d.properties.index || d.properties.objType + '-' + d.properties.index}
-            polygonsTransitionDuration={0}
+            polygonsTransitionDuration={300}
             polygonCapColor={(d) => {
               if (d.properties.type === "cloudControl") {
                 return d.properties.isActive ? "orange" : "gray";
