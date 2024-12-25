@@ -30,24 +30,53 @@ const scrollToElement = (elementId, offset = 0) => {
 };
 
 // Helper function to create a small polygon around lat/lng
-function createPolygon(lat, lng, objType, index) {
-  // This produces a small diamond-shaped polygon around (lat, lng)
-  const offset = 1.0;
+function createPolygon(lat, lng, objType, index, size = 1, rotation = 0) {
+  // Create a more visible polygon shape
+  const offset = size;
+  const coords = [];
+  
+  if (objType === "plane") {
+    // Create a plane-shaped polygon (arrow-like)
+    const front = 1.5 * offset;
+    const width = offset;
+    const rad = (rotation * Math.PI) / 180;
+    const cos = Math.cos(rad);
+    const sin = Math.sin(rad);
+
+    const points = [
+      [0, front],      // nose
+      [width, -offset], // right wing
+      [0, -offset/2],  // body indent
+      [-width, -offset],// left wing
+      [0, front]       // back to nose
+    ];
+
+    // Rotate and translate points
+    coords.push(...points.map(([x, y]) => [
+      lng + (x * cos - y * sin),
+      lat + (x * sin + y * cos)
+    ]));
+  } else {
+    // Default diamond shape for coins and other objects
+    coords.push(
+      [lng, lat],
+      [lng + offset, lat + offset],
+      [lng + 2 * offset, lat],
+      [lng + offset, lat - offset],
+      [lng, lat]
+    );
+  }
+
   return {
     type: "Feature",
     properties: {
       objType,
-      index
+      index,
+      rotation
     },
     geometry: {
       type: "Polygon",
-      coordinates: [[
-        [lng,        lat],
-        [lng+offset, lat+offset],
-        [lng+2*offset, lat],
-        [lng+offset, lat-offset],
-        [lng,        lat]
-      ]]
+      coordinates: [coords]
     }
   };
 }
@@ -103,7 +132,9 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
   const [showChoropleth, setShowChoropleth] = useState(false);
   const [countryData, setCountryData] = useState({ features: [] });
   const [hoveredPolygon, setHoveredPolygon] = useState(null);
-  
+  const [planeRotation, setPlaneRotation] = useState(0);
+  const [polygonTransitionDuration, setPolygonTransitionDuration] = useState(0);
+
   // Sample GeoJSON data for the Tic-Tac-Toe polygons
   const sampleGeoJson = useMemo(
     () => ({
@@ -150,23 +181,31 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
 
     const features = [];
 
-    // The single plane polygon
-    features.push(createPolygon(planePosition.lat, planePosition.lng, "plane", "plane"));
+    // Create the plane polygon with current rotation
+    features.push(createPolygon(
+      planePosition.lat,
+      planePosition.lng,
+      "plane",
+      "plane",
+      1.5, // larger size
+      planeRotation // use the rotation state
+    ));
 
-    // Each coin as a polygon - use stable IDs
+    // Each coin as a polygon
     coins.forEach((coin) => {
-      features.push(createPolygon(coin.lat, coin.lng, "coin", coin.id));
+      features.push(createPolygon(coin.lat, coin.lng, "coin", coin.id, 1));
     });
 
     return { type: "FeatureCollection", features };
-  }, [gameMode, planePosition, coins]);
+  }, [gameMode, planePosition, planeRotation, coins]);
 
   const [isFullscreen, setIsFullscreen] = useState(false);
   const citiesAndLocations = useMemo(() => getCitiesAndLocations(), []);
 
   // Add this to your state declarations
   const [cloudOpacity, setCloudOpacity] = useState(0.25);
-
+  const [planeVelocity, setPlaneVelocity] = useState({ x: 0, y: 0 });
+  const [particles, setParticles] = useState([]);
   // Add this to your useMemo for polygons
   const cloudControlPolygons = useMemo(() => {
     const baseCoords = { lat: 34, lng: 19 }; // Mediterranean position
@@ -523,7 +562,7 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
         { 
           lat: planePosition.lat, 
           lng: planePosition.lng, 
-          altitude: isMobile ? 2 : 0.3 
+          // altitude: 2  // Set initial altitude but allow user to change it
         },
         1000
       );
@@ -539,7 +578,7 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
         1000
       );
     }
-  }, [gameMode, isMobile]);
+  }, [gameMode, planePosition]);
 
   // Arcs (just a demo)
   const arcs = useMemo(() => {
@@ -630,6 +669,7 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
     setGameStartTime(null);
     setHoveredMarker(null);
     setClickedMarker(null);
+    setPolygonTransitionDuration(0);
   };
 
   // Helper for polygon center
@@ -653,70 +693,127 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
     setCoins(newCoins);
   };
 
-  // Handle plane movement with WASD
+  // Add these new state variables after the existing state declarations
+
+
+  // Add these constants at the top of your component
+  const ACCELERATION = 0.02;
+  const DECELERATION = 0.98;
+  const MAX_SPEED = 1;
+
+  // Replace the existing plane movement logic with this improved version
   useEffect(() => {
     if (gameMode !== "planeCollectCoins") return;
 
-    const speed = 0.9; // degrees per frame
     const updatePlanePosition = () => {
-      let { lat, lng } = planePosition;
-      let moved = false;
+      let newVelocity = { ...planeVelocity };
 
-      if (keysPressed.w) {
-        lat = Math.min(lat + speed, 90);
-        moved = true;
-      }
-      if (keysPressed.s) {
-        lat = Math.max(lat - speed, -90);
-        moved = true;
-      }
-      if (keysPressed.a) {
-        lng -= speed;
-        if (lng < -180) lng += 360;
-        moved = true;
-      }
-      if (keysPressed.d) {
-        lng += speed;
-        if (lng > 180) lng -= 360;
-        moved = true;
+      // Apply acceleration based on keys pressed
+      if (keysPressed.w) newVelocity.y += ACCELERATION;
+      if (keysPressed.s) newVelocity.y -= ACCELERATION;
+      if (keysPressed.a) newVelocity.x -= ACCELERATION;
+      if (keysPressed.d) newVelocity.x += ACCELERATION;
+
+      // Apply deceleration
+      newVelocity.x *= DECELERATION;
+      newVelocity.y *= DECELERATION;
+
+      // Limit maximum speed
+      const speed = Math.sqrt(newVelocity.x ** 2 + newVelocity.y ** 2);
+      if (speed > MAX_SPEED) {
+        newVelocity.x = (newVelocity.x / speed) * MAX_SPEED;
+        newVelocity.y = (newVelocity.y / speed) * MAX_SPEED;
       }
 
-      if (moved) {
-        setPlanePosition({ lat, lng });
+      // Calculate rotation based on movement direction
+      if (Math.abs(newVelocity.x) > 0.01 || Math.abs(newVelocity.y) > 0.01) {
+        const angle = Math.atan2(newVelocity.y, newVelocity.x);
+        setPlaneRotation((angle * (180 / Math.PI)) - 90);
+      }
 
-        // Move globe POV
-        if (globeEl.current) {
-          globeEl.current.pointOfView({ lat, lng, altitude: 0.8 }, 500);
-        }
+      // Update position
+      let newLat = planePosition.lat + newVelocity.y;
+      let newLng = planePosition.lng + newVelocity.x;
 
-        // Check coin collection
-        setCoins((prevCoins) => {
-          return prevCoins.filter((coin) => {
-            const dist = Math.sqrt((coin.lat - lat) ** 2 + (coin.lng - lng) ** 2);
-            if (dist < 10) {
-              setCollectedCoins((prev) => prev + 1);
-              return false; // remove coin
-            }
-            return true;
-          });
-        });
+      // Wrap around longitude
+      if (newLng > 180) newLng -= 360;
+      if (newLng < -180) newLng += 360;
 
-        // Check for marker proximity
-        markers.forEach((marker) => {
-          const dist = Math.sqrt((marker.lat - lat) ** 2 + (marker.lng - lng) ** 2);
+      // Clamp latitude
+      newLat = Math.max(-85, Math.min(85, newLat));
+
+      // Check coin collection and update camera in a single frame
+      setCoins(prevCoins => {
+        const remainingCoins = prevCoins.filter(coin => {
+          const dist = Math.sqrt((coin.lat - newLat) ** 2 + (coin.lng - newLng) ** 2);
           if (dist < 2) {
-            setClickedMarker(marker);
+            createCoinCollectionEffect(coin.lat, coin.lng);
+            setCollectedCoins(prev => prev + 1);
+            return false;
           }
+          return true;
         });
-      }
-      animationFrameRef.current = requestAnimationFrame(updatePlanePosition);
+        
+        // Update plane position and camera together
+        setPlanePosition({ lat: newLat, lng: newLng });
+        setPlaneVelocity(newVelocity);
+        
+        if (globeEl.current) {
+          // Get current altitude
+          // const currentPov = globeEl.current.pointOfView();
+          // Only update lat/lng, keep current altitude
+          globeEl.current.pointOfView(
+            { 
+              lat: newLat, 
+              lng: newLng, 
+              // altitude: currentPov.altitude 
+            },
+            0
+          );
+        }
+        
+        return remainingCoins;
+      });
     };
 
-    animationFrameRef.current = requestAnimationFrame(updatePlanePosition);
-    return () => {
-      cancelAnimationFrame(animationFrameRef.current);
+    const frameId = requestAnimationFrame(updatePlanePosition);
+    return () => cancelAnimationFrame(frameId);
+  }, [keysPressed, planePosition, planeVelocity, gameMode]);
+
+  // Add this function to create particle effects
+  const createCoinCollectionEffect = (lat, lng) => {
+    const newParticles = Array.from({ length: 10 }, () => ({
+      id: Math.random(),
+      lat,
+      lng,
+      velocity: {
+        x: (Math.random() - 0.5) * 0.2,
+        y: (Math.random() - 0.5) * 0.2
+      },
+      life: 1
+    }));
+
+    setParticles(prev => [...prev, ...newParticles]);
+  };
+
+  // Add particle animation effect
+  useEffect(() => {
+    if (particles.length === 0) return;
+
+    const updateParticles = () => {
+      setParticles(prev => 
+        prev.map(p => ({
+          ...p,
+          lat: p.lat + p.velocity.y,
+          lng: p.lng + p.velocity.x,
+          life: p.life - 0.02
+        })).filter(p => p.life > 0)
+      );
     };
-  }, [gameMode, keysPressed, planePosition, markers]);
+
+    const particleInterval = setInterval(updateParticles, 16);
+    return () => clearInterval(particleInterval);
+  }, [particles]);
 
   // Keyboard event handlers
   useEffect(() => {
@@ -885,7 +982,12 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
     } else if (polygon.properties.type === "borderControl") {
       setShowBorders(prev => !prev);
     } else if (polygon.properties.type === "choroplethControl") {
-      setShowChoropleth(prev => !prev);
+      setShowChoropleth(prev => {
+        const newValue = !prev;
+        // Set transition duration based on choropleth state
+        setPolygonTransitionDuration(newValue ? 1000 : 0);
+        return newValue;
+      });
     } else if (gameMode === "ticTacToe") {
       handleHexagonClick(polygon.properties.index);
     }
@@ -1001,7 +1103,7 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
             initialView={initialLocation}
             width={isFullscreen ? window.innerWidth : dimensions.width}
             height={isFullscreen ? window.innerHeight : dimensions.height}
-            enableZoom={!isNavigating}
+            enableZoom={true}
             enablePanning={!isNavigating}
             enableRotate={!isNavigating}
             globeImageUrl={
@@ -1070,8 +1172,20 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
             // Show TicTacToe polygons OR plane polygons
             polygonsData={polygonsData}
             polygonId={d => d.properties.index || d.properties.objType + '-' + d.properties.index}
-            polygonsTransitionDuration={300}
+            polygonsTransitionDuration={polygonTransitionDuration}
             polygonCapColor={(d) => {
+              // Handle plane game polygons first
+              if (d.properties.objType === "plane") {
+                return `rgba(255, 69, 0, 0.8)`; // Solid orange-red color for plane
+              }
+              if (d.properties.objType === "coin") {
+                return `rgba(255, 215, 0, ${0.6 + Math.sin(Date.now() / 300) * 0.3})`; // Shimmering effect
+              }
+              if (d.properties.objType === "particle") {
+                return `rgba(255, 215, 0, ${d.properties.life})`;
+              }
+
+              // Handle other polygon types
               if (d.properties.type === "cloudControl") {
                 return d.properties.isActive ? "orange" : "gray";
               }
@@ -1082,17 +1196,13 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
                 const idx = d.properties.index;
                 if (idx === undefined) return "rgba(0,0,0,0)";
                 if (gameBoard[idx]) {
-                  return gameBoard[idx] === "X"
-                    ? "rgba(255, 0, 0, 0.6)"
-                    : "rgba(0, 0, 255, 0.6)";
+                  return gameBoard[idx] === "X" ? "rgba(255, 0, 0, 0.6)" : "rgba(0, 0, 255, 0.6)";
                 }
                 return "rgba(255, 165, 0, 0.6)";
-              } else if (gameMode === "planeCollectCoins") {
-                return d.properties.objType === "plane"
-                  ? "rgba(255, 0, 0, 0.6)"
-                  : "rgba(255, 215, 0, 0.6)";
               }
-              if (showChoropleth) {
+              
+              // Handle choropleth and borders
+              if (showChoropleth && d.properties?.ISO_A2) {
                 if (hoveredPolygon === d) return 'steelblue';
                 const gdpValue = d.properties?.GDP_MD_EST || 0;
                 const popValue = Math.max(1e5, d.properties?.POP_EST || 1e5);
@@ -1109,11 +1219,17 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
             polygonSideColor={() => "rgba(0, 0, 0, 0.1)"}
             polygonStrokeColor={() => "#000"}
             polygonAltitude={(d) => {
+              // Handle plane game altitude first
+                if (d.properties.objType === "plane") {
+                  return 0.05;
+                }
+              if (d.properties.objType === "coin") {
+                return 0.03;
+              }
+              
+              // Handle other polygon types
               if (gameMode === "ticTacToe" && d.properties.index !== undefined) {
                 return gameBoard[d.properties.index] ? 0.02 : 0.01;
-              }
-              if (gameMode === "planeCollectCoins") {
-                return d.properties.objType === "plane" ? 0.05 : 0.03;
               }
               if (showChoropleth && d.properties?.ISO_A2) {
                 return hoveredPolygon === d ? 0.12 : 0.06;
