@@ -158,6 +158,56 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const citiesAndLocations = useMemo(() => getCitiesAndLocations(), []);
 
+  // Add this to your state declarations
+  const [cloudOpacity, setCloudOpacity] = useState(0.25);
+
+  // Add this to your useMemo for polygons
+  const cloudControlPolygons = useMemo(() => {
+    const baseCoords = { lat: 34, lng: 19 }; // Mediterranean position
+    const spacing = 2; // Reduced spacing between cloud shapes
+    
+    return [0, 0.25, 0.5, 1].map((opacity, index) => ({
+      type: "Feature",
+      properties: { 
+        type: "cloudControl",
+        opacity: opacity,
+        isActive: opacity === cloudOpacity,
+        label: `Cloud: ${(opacity * 100).toFixed(0)}%`,
+        labelHeight: baseCoords.lat + 0.8
+      },
+      geometry: {
+        type: "Polygon",
+        coordinates: [[
+          // Smaller, more organic cloud shape with more points
+          [baseCoords.lng + (index * spacing), baseCoords.lat],
+          [baseCoords.lng + (index * spacing) + 0.2, baseCoords.lat + 0.3],
+          [baseCoords.lng + (index * spacing) + 0.4, baseCoords.lat + 0.4],
+          [baseCoords.lng + (index * spacing) + 0.6, baseCoords.lat + 0.35],
+          [baseCoords.lng + (index * spacing) + 0.8, baseCoords.lat + 0.25],
+          [baseCoords.lng + (index * spacing) + 1.0, baseCoords.lat + 0.15],
+          [baseCoords.lng + (index * spacing) + 1.1, baseCoords.lat],
+          [baseCoords.lng + (index * spacing) + 1.0, baseCoords.lat - 0.15],
+          [baseCoords.lng + (index * spacing) + 0.8, baseCoords.lat - 0.25],
+          [baseCoords.lng + (index * spacing) + 0.6, baseCoords.lat - 0.3],
+          [baseCoords.lng + (index * spacing) + 0.4, baseCoords.lat - 0.25],
+          [baseCoords.lng + (index * spacing) + 0.2, baseCoords.lat - 0.15],
+          [baseCoords.lng + (index * spacing), baseCoords.lat]
+        ]]
+      }
+    }));
+  }, [cloudOpacity]);
+
+  // Modify your existing polygonsData to include cloud controls
+  const polygonsData = useMemo(() => {
+    if (gameMode === "ticTacToe") {
+      return sampleGeoJson.features;
+    } else if (gameMode === "planeCollectCoins") {
+      return planeGameGeoJson.features;
+    } else {
+      return cloudControlPolygons;
+    }
+  }, [gameMode, sampleGeoJson.features, planeGameGeoJson.features, cloudControlPolygons]);
+
   useEffect(() => {
     // Detect mobile devices
     const mobileQuery = window.matchMedia("(max-width: 768px)");
@@ -226,13 +276,13 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
       lat: location.coordinates.lat,
       lng: location.coordinates.lng,
       label: location.city,
+      labelText: location.city.replace(/ü/g, 'ue'),
       size: location.isMajorCity ? 20 : 15,
       color: location.isMajorCity ? "gold" : colorPalette[index % colorPalette.length],
       icon: "",
       animation: location.isMajorCity ? "pulsate" : "none",
       labelLat: location.coordinates.lat,
       labelLng: location.coordinates.lng,
-      labelText: location.city,
       labelSize: 0.7,
       labelColor: location.maxImportance > 4 ? "rgba(255, 165, 0, 0.75)" : 'pink',
       activities: location.activities.map(activity => ({
@@ -243,17 +293,17 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
       })),
     }));
 
-    // Add a marker for Tic-Tac-Toe on Cyprus
+    // Add a marker for Tic-Tac-Toe in Mediterranean
     baseMarkers.push({
       id: "tic-tac-toe-marker",
-      lat: 35.1264,
-      lng: 33.4299,
+      lat: 32.5, // Mediterranean position
+      lng: 29.0, // Place it to the right of cloud controls
       label: "Tic-Tac-Toe",
       size: 25,
       color: "white",
       icon: "🎮",
-      labelLat: 35.1264,
-      labelLng: 33.4299,
+      labelLat: 32.5,
+      labelLng: 29.0,
       labelText: "Tic-Tac-Toe",
       labelSize: 1,
       labelColor: "white",
@@ -263,14 +313,14 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
     if (gameMode !== "planeCollectCoins") {
       baseMarkers.push({
         id: "plane-collect-marker",
-        lat: 34.0,
-        lng: 33.0,
+        lat: 32.5, // Mediterranean position
+        lng: 25.0, // Place it between Tic-Tac-Toe and cloud controls
         label: "Plane Collect Coins",
         size: 25,
         color: "white",
         icon: "✈️",
-        labelLat: 34.0,
-        labelLng: 33.0,
+        labelLat: 32.5,
+        labelLng: 25.0,
         labelText: "Plane Collect Coins",
         labelSize: 1,
         labelColor: "white",
@@ -775,6 +825,15 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
     setShowMap(prev => !prev);
   };
 
+  // Add this to your polygon click handler
+  const handlePolygonClick = (polygon) => {
+    if (polygon.properties.type === "cloudControl") {
+      setCloudOpacity(polygon.properties.opacity);
+    } else if (gameMode === "ticTacToe") {
+      handleHexagonClick(polygon.properties.index);
+    }
+  };
+
   return (
     <div className="relative w-full">
       {/* Move toggle button for mobile to top */}
@@ -877,15 +936,29 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
             }
             pointColor="color"
             pointLabel={(point) => `${point.icon || ""} ${point.label}`}
-            labelsData={markers}
-            labelLat={(point) => point.labelLat}
-            labelLng={(point) => point.labelLng}
-            labelText={(point) => point.labelText?.replace("ü", "ue")}
-            labelSize={() => 0.3}
-            labelColor={(point) => 
-              point.maxImportance < 5 ? "pink" : (point.labelColor || "white")
-            }
-            labelResolution={2}
+            labelsData={gameMode === false ? [...cloudControlPolygons, ...markers] : markers}
+            labelLat={d => {
+              if (d.properties?.type === "cloudControl") return d.properties.labelHeight;
+              return d.labelLat;
+            }}
+            labelLng={d => {
+              if (d.properties?.type === "cloudControl") return d.geometry.coordinates[0][0][0];
+              return d.labelLng;
+            }}
+            labelText={d => {
+              if (d.properties?.type === "cloudControl") return d.properties.label;
+              return d.labelText;
+            }}
+            labelSize={d => {
+              if (d.properties?.type === "cloudControl") return 0.2;
+              return 0.3;
+            }}
+            labelColor={d => {
+              if (d.properties?.type === "cloudControl") return "white";
+              return d.maxImportance < 5 ? "pink" : (d.labelColor || "white");
+            }}
+            labelDotRadius={0}
+            labelAltitude={0.01}
             pointAltitude={0.01}
             pointResolution={4}
             onPointClick={onPointClick}
@@ -905,16 +978,13 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
             arcDashAnimateTime={1500}
             onArcHover={setHoveredArc}
             // Show TicTacToe polygons OR plane polygons
-            polygonsData={
-              gameMode === "ticTacToe"
-                ? sampleGeoJson.features
-                : gameMode === "planeCollectCoins"
-                ? planeGameGeoJson.features
-                : []
-            }
+            polygonsData={polygonsData}
             polygonId={d => d.properties.index || d.properties.objType + '-' + d.properties.index}
             polygonsTransitionDuration={0}
             polygonCapColor={(d) => {
+              if (d.properties.type === "cloudControl") {
+                return d.properties.isActive ? "orange" : "gray";
+              }
               if (gameMode === "ticTacToe") {
                 const idx = d.properties.index;
                 if (idx === undefined) return "rgba(0,0,0,0)";
@@ -946,16 +1016,11 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
               return 0;
             }}
             polygonResolution={6}
-            onPolygonClick={(polygon) => {
-              if (gameMode === "ticTacToe") {
-                const hexIndex = polygon.properties.index;
-                handleHexagonClick(hexIndex);
-              }
-              // ignore clicks for plane polygons
-            }}
+            onPolygonClick={handlePolygonClick}
             onGlobeClick={handleGlobeTouch}
             onGlobeTouchStart={handleGlobeTouch}
             onGlobeTouchMove={handleGlobeTouch}
+            cloudOpacity={cloudOpacity}
           />
 
           {renderJoystick()}
