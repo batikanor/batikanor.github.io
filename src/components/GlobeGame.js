@@ -6,6 +6,7 @@ import React, {
   useState,
   useRef,
   useMemo,
+  useCallback,
 } from "react";
 import dynamic from "next/dynamic";
 import { debounce } from "lodash";
@@ -21,25 +22,16 @@ const PATHS_INSTEAD_OF_ARCS = true;
 
 const PATHS_CONFIG = {
   numPaths: 100,              // Fixed number of paths to create
-  pointsPerPath: 10,         // Points per path
-  maxDeviation: 0.5,         // Maximum lateral deviation in degrees
-  maxHeight: 5.915,          // Maximum height
-  minDistance: 20,           // Minimum distance between markers to create a path
-  randomizeConnections: false, // If true, creates random connections instead of sequential
-  
-  // New style-related properties
+  pointsPerPath: 200,         // Points per path
+  maxDeviation: 0.1,         // Maximum lateral deviation in degrees
+  maxHeight: 0.905,          // Maximum height
+  minHeight: 0.001,          // Minimum height for paths
+  minDistance: 5,           // Minimum distance between markers to create a path
+  randomizeConnections: true, // If true, creates random connections instead of sequential
   pathColor: ['rgba(255,0,0,1)', 'rgba(255,0,0,1)'], // Start and end colors for path gradient
-  // pathWidth: 920,              // Width of the path line
-  // pathOpacity: 0.9,          // Base opacity of paths
-  // pathDashLength: 0.71,      // Length of dash segments
-  // pathDashGap: 0.004,        // Gap between dash segments
-  // pathDashAnimateTime: 100000, // Animation duration in milliseconds
-  // pathGlow: true,            // Whether to add glow effect
-  // glowColor: 'rgba(255,255,255,0.2)', // Color of the glow effect
-  // glowWidth: 40,              // Width of the glow effect
-  // fadeEffect: false,          // Whether paths should fade in/out
-  // fadeInDuration: 1000,      // Duration of fade in animation
-  // fadeOutDuration: 500       // Duration of fade out animation
+  changeInterval: 4000,  // Interval in milliseconds to regenerate paths
+  fadeOutDuration: 0,    // Set to 0 to remove fade out animation
+  pathOpacity: 1,       // Base opacity for paths
 };
 
 const scrollToElement = (elementId, offset = 0) => {
@@ -801,7 +793,91 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
   };
 
   // Add these new state variables after the existing state declarations
+  const [currentPaths, setCurrentPaths] = useState([]);
 
+  // Add this function before the return statement
+  const generateNewPaths = useCallback(() => {
+    console.log('generateNewPaths called');
+    const pathsArray = [];
+    const locations = citiesAndLocations;
+    
+    if (PATHS_CONFIG.randomizeConnections) {
+      // Keep track of how many connections each city has
+      const connectionCounts = new Map();
+      locations.forEach(loc => connectionCounts.set(loc.city, 0));
+
+      // Create random connections
+      for (let i = 0; i < PATHS_CONFIG.numPaths; i++) {
+        const availableStartCities = locations.filter(loc => 
+          connectionCounts.get(loc.city) < 2
+        );
+        
+        if (availableStartCities.length === 0) break;
+        
+        const startIdx = Math.floor(Math.random() * availableStartCities.length);
+        const startLocation = availableStartCities[startIdx];
+        
+        // Find available end cities (excluding those with 2 connections and the start city)
+        const availableEndCities = locations.filter(loc => 
+          connectionCounts.get(loc.city) < 2 && loc.city !== startLocation.city
+        );
+        
+        if (availableEndCities.length === 0) continue;
+        
+        const endIdx = Math.floor(Math.random() * availableEndCities.length);
+        const endLocation = availableEndCities[endIdx];
+
+        // Increment connection counts
+        connectionCounts.set(startLocation.city, connectionCounts.get(startLocation.city) + 1);
+        connectionCounts.set(endLocation.city, connectionCounts.get(endLocation.city) + 1);
+
+        console.log(`Creating path from ${startLocation.city} to ${endLocation.city}`);
+
+        // Create path points
+        const path = [];
+        let currentLat = startLocation.coordinates.lat;
+        let currentLng = startLocation.coordinates.lng;
+        let currentAlt = PATHS_CONFIG.minHeight;
+
+        path.push([currentLat, currentLng, currentAlt]);
+
+        // Generate intermediate points
+        for (let j = 0; j < PATHS_CONFIG.pointsPerPath; j++) {
+          const progress = j / PATHS_CONFIG.pointsPerPath;
+          const latBias = (endLocation.coordinates.lat - currentLat) * progress;
+          const lngBias = (endLocation.coordinates.lng - currentLng) * progress;
+
+          currentLat += latBias + (Math.random() * 2 - 1) * PATHS_CONFIG.maxDeviation;
+          currentLng += lngBias + (Math.random() * 2 - 1) * PATHS_CONFIG.maxDeviation;
+          currentAlt = PATHS_CONFIG.minHeight + Math.sin(progress * Math.PI) * PATHS_CONFIG.maxHeight;
+
+          path.push([currentLat, currentLng, currentAlt]);
+        }
+
+        path.push([endLocation.coordinates.lat, endLocation.coordinates.lng, PATHS_CONFIG.minHeight]);
+        pathsArray.push(path);
+      }
+    }
+
+    console.log('Generated paths:', pathsArray);
+    setCurrentPaths(pathsArray);
+  }, [citiesAndLocations]);
+
+  // Add this useEffect to trigger path generation
+  useEffect(() => {
+    if (!PATHS_INSTEAD_OF_ARCS || gameMode) return;
+
+    console.log('Starting path generation...');
+    generateNewPaths();
+
+    // Set up interval for path regeneration
+    const interval = setInterval(() => {
+      console.log('Regenerating paths...');
+      generateNewPaths();
+    }, PATHS_CONFIG.changeInterval);
+
+    return () => clearInterval(interval);
+  }, [generateNewPaths, gameMode]);
 
   // Add these constants at the top of your component
   const ACCELERATION = 0.02;
@@ -1263,13 +1339,13 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
             onPointClick={onPointClick}
             onPointHover={handlePointHover}
             {...(PATHS_INSTEAD_OF_ARCS ? {
-              pathsData: arcsAndPaths,
+              pathsData: currentPaths,
               pathColor: () => ['rgba(0,0,255,0.6)', 'rgba(255,0,0,0.6)'],
               pathDashLength: 0.01,
               pathDashGap: 0.004,
               pathDashAnimateTime: 100000,
               pathPointAlt: pnt => Math.min(pnt[2] * 0.3, 0.005),
-              pathTransitionDuration: 4000
+              pathTransitionDuration: 1000
             } : {
               arcsData: arcsAndPaths,
               arcStartLat: (d) => d.srcAirport.lat,
