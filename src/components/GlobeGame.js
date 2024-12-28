@@ -17,6 +17,31 @@ import { useTheme } from 'next-themes';
 // Dynamically import the GlobeWrapper component without server-side rendering
 const Globe = dynamic(() => import("../components/GlobeWrapper"), { ssr: false });
 
+const PATHS_INSTEAD_OF_ARCS = true;
+
+const PATHS_CONFIG = {
+  numPaths: 100,              // Fixed number of paths to create
+  pointsPerPath: 10,         // Points per path
+  maxDeviation: 0.5,         // Maximum lateral deviation in degrees
+  maxHeight: 5.915,          // Maximum height
+  minDistance: 20,           // Minimum distance between markers to create a path
+  randomizeConnections: false, // If true, creates random connections instead of sequential
+  
+  // New style-related properties
+  pathColor: ['rgba(255,0,0,1)', 'rgba(255,0,0,1)'], // Start and end colors for path gradient
+  // pathWidth: 920,              // Width of the path line
+  // pathOpacity: 0.9,          // Base opacity of paths
+  // pathDashLength: 0.71,      // Length of dash segments
+  // pathDashGap: 0.004,        // Gap between dash segments
+  // pathDashAnimateTime: 100000, // Animation duration in milliseconds
+  // pathGlow: true,            // Whether to add glow effect
+  // glowColor: 'rgba(255,255,255,0.2)', // Color of the glow effect
+  // glowWidth: 40,              // Width of the glow effect
+  // fadeEffect: false,          // Whether paths should fade in/out
+  // fadeInDuration: 1000,      // Duration of fade in animation
+  // fadeOutDuration: 500       // Duration of fade out animation
+};
+
 const scrollToElement = (elementId, offset = 0) => {
   const element = document.getElementById(elementId);
   if (element) {
@@ -581,22 +606,104 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
   }, [gameMode, planePosition]);
 
   // Arcs (just a demo)
-  const arcs = useMemo(() => {
-    // Example arcs from marker[i] to marker[i+1]
-    // Adjust to your liking or remove if you don't need arcs
-    const arcsArray = [];
-    for (let i = 0; i < markers.length - 2; i++) {
-      arcsArray.push({
-        airline: `Route ${i + 1}`,
-        srcIata: markers[i].label,
-        dstIata: markers[i + 1].label,
-        srcAirport: { lat: markers[i].lat, lng: markers[i].lng },
-        dstAirport: { lat: markers[i + 1].lat, lng: markers[i + 1].lng },
-        arcColor: [`rgba(0, 255, 0, 0.3)`, `rgba(255, 0, 0, 0.3)`],
-      });
+  const arcsAndPaths = useMemo(() => {
+    if (!PATHS_INSTEAD_OF_ARCS) {
+      // Original arcs logic
+      const arcsArray = [];
+      for (let i = 0; i < markers.length - 2; i++) {
+        arcsArray.push({
+          airline: `Route ${i + 1}`,
+          srcIata: markers[i].label,
+          dstIata: markers[i + 1].label,
+          srcAirport: { lat: markers[i].lat, lng: markers[i].lng },
+          dstAirport: { lat: markers[i + 1].lat, lng: markers[i + 1].lng },
+          arcColor: [`rgba(0, 255, 0, 0.3)`, `rgba(255, 0, 0, 0.3)`],
+        });
+      }
+      return arcsArray;
+    } else {
+      const pathsArray = [];
+      
+      if (PATHS_CONFIG.randomizeConnections) {
+        // Create random connections
+        for (let i = 0; i < PATHS_CONFIG.numPaths; i++) {
+          const startIdx = Math.floor(Math.random() * markers.length);
+          let endIdx;
+          do {
+            endIdx = Math.floor(Math.random() * markers.length);
+          } while (startIdx === endIdx);
+
+          const startMarker = markers[startIdx];
+          const endMarker = markers[endIdx];
+
+          // Calculate distance between markers
+          const distance = Math.sqrt(
+            Math.pow(startMarker.lat - endMarker.lat, 2) +
+            Math.pow(startMarker.lng - endMarker.lng, 2)
+          );
+
+          // Only create path if markers are far enough apart
+          if (distance >= PATHS_CONFIG.minDistance) {
+            let currentLat = startMarker.lat;
+            let currentLng = startMarker.lng;
+            let currentAlt = 0;
+
+            const path = [[currentLat, currentLng, currentAlt]];
+
+            for (let j = 0; j < PATHS_CONFIG.pointsPerPath; j++) {
+              const progress = j / PATHS_CONFIG.pointsPerPath;
+              const latBias = (endMarker.lat - currentLat) * progress;
+              const lngBias = (endMarker.lng - currentLng) * progress;
+
+              currentLat += latBias + (Math.random() * 2 - 1) * PATHS_CONFIG.maxDeviation;
+              currentLng += lngBias + (Math.random() * 2 - 1) * PATHS_CONFIG.maxDeviation;
+              currentAlt += (Math.random() * 2 - 1) * PATHS_CONFIG.maxHeight;
+              currentAlt = Math.max(0, currentAlt);
+
+              path.push([currentLat, currentLng, currentAlt]);
+            }
+
+            path.push([endMarker.lat, endMarker.lng, 0]);
+            pathsArray.push(path);
+          }
+        }
+      } else {
+        // Original sequential logic...
+        for (let i = 0; i < markers.length - 2; i++) {
+          const startLat = markers[i].lat;
+          const startLng = markers[i].lng;
+          const endLat = markers[i + 1].lat;
+          const endLng = markers[i + 1].lng;
+
+          let currentLat = startLat;
+          let currentLng = startLng;
+          let currentAlt = 0;
+
+          const path = [];
+          path.push([currentLat, currentLng, currentAlt]);
+
+          // Generate random points between start and end
+          for (let j = 0; j < PATHS_CONFIG.pointsPerPath; j++) {
+            // Bias the random movement towards the destination
+            const latBias = (endLat - currentLat) / (PATHS_CONFIG.pointsPerPath - j);
+            const lngBias = (endLng - currentLng) / (PATHS_CONFIG.pointsPerPath - j);
+
+            currentLat += latBias + (Math.random() * 2 - 1) * PATHS_CONFIG.maxDeviation;
+            currentLng += lngBias + (Math.random() * 2 - 1) * PATHS_CONFIG.maxDeviation;
+            currentAlt += (Math.random() * 2 - 1) * PATHS_CONFIG.maxHeight;
+            currentAlt = Math.max(0, currentAlt);
+
+            path.push([currentLat, currentLng, currentAlt]);
+          }
+
+          // Ensure the path ends at the destination
+          path.push([endLat, endLng, 0]);
+          pathsArray.push(path);
+        }
+      }
+      return pathsArray;
     }
-    return arcsArray;
-  }, [markers]);
+  }, [markers, PATHS_INSTEAD_OF_ARCS]);
 
   // Debounced hover handler
   const handlePointHover = useMemo(
@@ -1155,19 +1262,27 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
             pointResolution={4}
             onPointClick={onPointClick}
             onPointHover={handlePointHover}
-            arcsData={arcs}
-            arcStartLat={(d) => d.srcAirport.lat}
-            arcStartLng={(d) => d.srcAirport.lng}
-            arcEndLat={(d) => d.dstAirport.lat}
-            arcEndLng={(d) => d.dstAirport.lng}
-            arcColor={(d) =>
-              hoveredArc === d
+            {...(PATHS_INSTEAD_OF_ARCS ? {
+              pathsData: arcsAndPaths,
+              pathColor: () => ['rgba(0,0,255,0.6)', 'rgba(255,0,0,0.6)'],
+              pathDashLength: 0.01,
+              pathDashGap: 0.004,
+              pathDashAnimateTime: 100000,
+              pathPointAlt: pnt => Math.min(pnt[2] * 0.3, 0.005),
+              pathTransitionDuration: 4000
+            } : {
+              arcsData: arcsAndPaths,
+              arcStartLat: (d) => d.srcAirport.lat,
+              arcStartLng: (d) => d.srcAirport.lng,
+              arcEndLat: (d) => d.dstAirport.lat,
+              arcEndLng: (d) => d.dstAirport.lng,
+              arcColor: (d) => hoveredArc === d
                 ? [`rgba(0, 255, 0, 0.9)`, `rgba(255, 0, 0, 0.9)`]
-                : d.arcColor
-            }
-            arcDashLength={0.4}
-            arcDashGap={0.2}
-            arcDashAnimateTime={1500}
+                : d.arcColor,
+              arcDashLength: 0.4,
+              arcDashGap: 0.2,
+              arcDashAnimateTime: 1500
+            })}
             onArcHover={setHoveredArc}
             // Show TicTacToe polygons OR plane polygons
             polygonsData={polygonsData}
