@@ -1552,9 +1552,16 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
           </button>
 
           {/* Marker Info - Show in both fullscreen and non-fullscreen modes */}
-          {((clickedMarker && isFullscreen) || (hoveredMarker && !isFullscreen)) && (
+          {(
+            (clickedMarker && isFullscreen) || 
+            (hoveredMarker && !isFullscreen) || 
+            gameMode === "planeCollectCoins"
+          ) && (
             <MarkerInfo
-              marker={clickedMarker || hoveredMarker}
+              marker={clickedMarker || hoveredMarker || {
+                label: "Plane Game Status",
+                description: "Collect all coins to win!"
+              }}
               onClose={() => isFullscreen ? setClickedMarker(null) : handleCloseInfoWindow()}
               navigateWithRefresh={navigateWithRefresh}
               isFullscreen={isFullscreen}
