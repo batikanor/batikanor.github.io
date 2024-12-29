@@ -460,6 +460,18 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
     const handleTouchStart = (e) => {
       e.preventDefault();
       setIsDragging(true);
+      
+      // Reset joystick position when touch starts
+      const touch = e.touches[0];
+      const joystick = e.target;
+      const rect = joystick.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+      
+      setJoystickPosition({
+        x: touch.clientX - centerX,
+        y: touch.clientY - centerY
+      });
     };
 
     const handleTouchMove = (e) => {
@@ -487,56 +499,6 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
       }
       
       setJoystickPosition({ x: deltaX, y: deltaY });
-      
-      // Update plane position based on joystick position
-      const speed = 0.5;
-      let { lat, lng } = planePosition;
-      
-      lng += (deltaX / radius) * speed;
-      if (lng > 180) lng -= 360;
-      if (lng < -180) lng += 360;
-      
-      lat -= (deltaY / radius) * speed;
-      if (lat > 90) lat = 90;
-      if (lat < -90) lat = -90;
-      
-      // Check coin collection before updating position
-      setCoins((prevCoins) => {
-        return prevCoins.filter((coin) => {
-          const dist = Math.sqrt((coin.lat - lat) ** 2 + (coin.lng - lng) ** 2);
-          if (dist < 10) {
-            createCoinCollectionEffect(coin.lat, coin.lng);
-            setCollectedCoins((prev) => prev + 1);
-            return false; // remove coin
-          }
-          return true;
-        });
-      });
-
-      // Check for marker proximity
-      markers.forEach((marker) => {
-        const dist = Math.sqrt((marker.lat - lat) ** 2 + (marker.lng - lng) ** 2);
-        if (dist < 2) {
-          setClickedMarker(marker);
-        }
-      });
-      
-      setPlanePosition({ lat, lng });
-      
-      // Move globe POV with higher altitude for mobile
-      if (globeEl.current) {
-        // Get current altitude
-        // const currentPov = globeEl.current.pointOfView();
-        // Only update lat/lng, keep current altitude
-        globeEl.current.pointOfView(
-          { 
-            lat: newLat, 
-            lng: newLng, 
-            // altitude: currentPov.altitude 
-          },
-          0
-        );
-      }
     };
 
     const handleTouchEnd = () => {
@@ -553,6 +515,7 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
         }}>
         {/* Joystick container */}
         <div
+          ref={joystickRef}
           style={{
             width: '120px',
             height: '120px',
@@ -915,11 +878,19 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
     const updatePlanePosition = () => {
       let newVelocity = { ...planeVelocity };
 
-      // Apply acceleration based on keys pressed
+      // Handle keyboard inputs
       if (keysPressed.w) newVelocity.y += ACCELERATION;
       if (keysPressed.s) newVelocity.y -= ACCELERATION;
       if (keysPressed.a) newVelocity.x -= ACCELERATION;
       if (keysPressed.d) newVelocity.x += ACCELERATION;
+
+      // Handle joystick input for mobile
+      if (isDragging && (joystickPosition.x !== 0 || joystickPosition.y !== 0)) {
+        // Convert joystick position to velocity
+        // Normalize by 40 (radius used in handleTouchMove)
+        newVelocity.x += (joystickPosition.x / 40) * ACCELERATION * 2;
+        newVelocity.y -= (joystickPosition.y / 40) * ACCELERATION * 2; // Inverted Y for correct direction
+      }
 
       // Apply deceleration
       newVelocity.x *= DECELERATION;
@@ -985,7 +956,7 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
 
     const frameId = requestAnimationFrame(updatePlanePosition);
     return () => cancelAnimationFrame(frameId);
-  }, [keysPressed, planePosition, planeVelocity, gameMode]);
+  }, [keysPressed, planePosition, planeVelocity, gameMode, isDragging, joystickPosition]);
 
   // Add this function to create particle effects
   const createCoinCollectionEffect = (lat, lng) => {
