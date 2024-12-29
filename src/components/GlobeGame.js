@@ -1512,7 +1512,7 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
                 return hoveredPolygon === d ? 0.01 : 0.002;
               }
               if (showChoropleth && d.properties?.ISO_A2) {
-                return hoveredPolygon === d ? 0.02 : 0.005;
+                return hoveredPolygon === d ? 0.02 : 0.009;
               }
               return 0;
             }}
