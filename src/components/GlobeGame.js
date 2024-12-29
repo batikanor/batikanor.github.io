@@ -316,16 +316,16 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
           game: "ticTacToe",
           isActive: gameMode === "ticTacToe",
           label: "Tic-Tac-Toe",
-          labelHeight: 35 // Adjusted for Mediterranean position
+          labelHeight: 33 // Adjusted for Mediterranean position
         },
         geometry: {
           type: "Polygon",
           coordinates: [[
-            [19 + (9.5 * CONTROL_SPACING), 34], // Using same base coordinates + offset
-            [19 + (9.5 * CONTROL_SPACING) + 0.5, 34.5],
-            [19 + (9.5 * CONTROL_SPACING) + 1, 34],
-            [19 + (9.5 * CONTROL_SPACING) + 0.5, 33.5],
-            [19 + (9.5 * CONTROL_SPACING), 34]
+            [10 + (9.5 * CONTROL_SPACING), 32], // Using same base coordinates + offset
+            [10 + (9.5 * CONTROL_SPACING) + 0.5, 32.5],
+            [10 + (9.5 * CONTROL_SPACING) + 1, 32],
+            [10 + (9.5 * CONTROL_SPACING) + 0.5, 31.5],
+            [10 + (9.5 * CONTROL_SPACING), 32]
           ]]
         }
       },
@@ -336,16 +336,16 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
           game: "planeCollectCoins",
           isActive: gameMode === "planeCollectCoins",
           label: "Plane Game",
-          labelHeight: 35 // Adjusted for Mediterranean position
+          labelHeight: 33 // Adjusted for Mediterranean position
         },
         geometry: {
           type: "Polygon",
           coordinates: [[
-            [19 + (12 * CONTROL_SPACING), 34], // Using same base coordinates + further offset
-            [19 + (12 * CONTROL_SPACING) + 0.5, 34.5],
-            [19 + (12 * CONTROL_SPACING) + 1, 34],
-            [19 + (12 * CONTROL_SPACING) + 0.5, 33.5],
-            [19 + (12 * CONTROL_SPACING), 34]
+            [8 + (12 * CONTROL_SPACING), 32], // Using same base coordinates + further offset
+            [8 + (12 * CONTROL_SPACING) + 0.5, 32.5],
+            [8 + (12 * CONTROL_SPACING) + 1, 32],
+            [8 + (12 * CONTROL_SPACING) + 0.5, 31.5],
+            [8 + (12 * CONTROL_SPACING), 32]
           ]]
         }
       }
@@ -1363,7 +1363,7 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
               return d.labelText;
             }}
             labelSize={d => {
-              if (d.properties?.type === "gameControl") return 0.5; // Slightly larger for game controls
+              if (d.properties?.type === "gameControl") return 0.3; // Slightly larger for game controls
               if (d.properties?.type) return 0.2;
               return 0.3;
             }}
@@ -1428,15 +1428,30 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
                 return d.properties.isActive ? "purple" : "gray";
               }
 
-              // Rest of the existing conditions...
+              // Handle choropleth coloring
+              if (showChoropleth && d.properties?.GDP_MD_EST) {
+                const gdpValue = d.properties.GDP_MD_EST;
+                const popValue = d.properties.POP_EST || 1;
+                const gdpPerCapita = gdpValue * 1000000 / popValue;
+                
+                // Modified intensity calculation for more contrast
+                const intensity = Math.min(0.9, Math.max(0.05, Math.log(gdpPerCapita/1000) / 10));
+                
+                // Adjust the red color based on intensity
+                const redValue = Math.round(255 - (intensity * 100)); // Darker reds for higher values
+                return `rgba(${redValue}, 0, 0, ${intensity * 1.2})`; // Increased opacity multiplier
+              }
+
+              // Default color for non-choropleth countries
+              return 'rgba(255, 255, 255, 0.3)';
             }}
             polygonSideColor={() => "rgba(0, 0, 0, 0.1)"}
             polygonStrokeColor={() => "#000"}
             polygonAltitude={(d) => {
               // Handle plane game altitude first
-                if (d.properties.objType === "plane") {
-                  return 0.05;
-                }
+              if (d.properties.objType === "plane") {
+                return 0.05;
+              }
               if (d.properties.objType === "coin") {
                 return 0.03;
               }
@@ -1446,7 +1461,7 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
                 return gameBoard[d.properties.index] ? 0.02 : 0.01;
               }
               if (showChoropleth && d.properties?.ISO_A2) {
-                return hoveredPolygon === d ? 0.12 : 0.06;
+                return hoveredPolygon === d ? 0.03 : 0.01;
               }
               return 0;
             }}
