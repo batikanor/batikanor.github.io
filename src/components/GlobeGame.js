@@ -34,6 +34,8 @@ const PATHS_CONFIG = {
   pathOpacity: 1,       // Base opacity for paths
 };
 
+const CONTROL_SPACING = 2; // Spacing between controls
+
 const scrollToElement = (elementId, offset = 0) => {
   const element = document.getElementById(elementId);
   if (element) {
@@ -226,7 +228,6 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
   // Add this to your useMemo for polygons
   const cloudControlPolygons = useMemo(() => {
     const baseCoords = { lat: 34, lng: 19 }; // Mediterranean position
-    const spacing = 2; // Spacing between controls
     
     // Cloud controls
     const cloudControls = [0, 0.25, 0.5, 1].map((opacity, index) => ({
@@ -241,19 +242,19 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
       geometry: {
         type: "Polygon",
         coordinates: [[
-          [baseCoords.lng + (index * spacing), baseCoords.lat],
-          [baseCoords.lng + (index * spacing) + 0.2, baseCoords.lat + 0.3],
-          [baseCoords.lng + (index * spacing) + 0.4, baseCoords.lat + 0.4],
-          [baseCoords.lng + (index * spacing) + 0.6, baseCoords.lat + 0.35],
-          [baseCoords.lng + (index * spacing) + 0.8, baseCoords.lat + 0.25],
-          [baseCoords.lng + (index * spacing) + 1.0, baseCoords.lat + 0.15],
-          [baseCoords.lng + (index * spacing) + 1.1, baseCoords.lat],
-          [baseCoords.lng + (index * spacing) + 1.0, baseCoords.lat - 0.15],
-          [baseCoords.lng + (index * spacing) + 0.8, baseCoords.lat - 0.25],
-          [baseCoords.lng + (index * spacing) + 0.6, baseCoords.lat - 0.3],
-          [baseCoords.lng + (index * spacing) + 0.4, baseCoords.lat - 0.25],
-          [baseCoords.lng + (index * spacing) + 0.2, baseCoords.lat - 0.15],
-          [baseCoords.lng + (index * spacing), baseCoords.lat]
+          [baseCoords.lng + (index * CONTROL_SPACING), baseCoords.lat],
+          [baseCoords.lng + (index * CONTROL_SPACING) + 0.2, baseCoords.lat + 0.3],
+          [baseCoords.lng + (index * CONTROL_SPACING) + 0.4, baseCoords.lat + 0.4],
+          [baseCoords.lng + (index * CONTROL_SPACING) + 0.6, baseCoords.lat + 0.35],
+          [baseCoords.lng + (index * CONTROL_SPACING) + 0.8, baseCoords.lat + 0.25],
+          [baseCoords.lng + (index * CONTROL_SPACING) + 1.0, baseCoords.lat + 0.15],
+          [baseCoords.lng + (index * CONTROL_SPACING) + 1.1, baseCoords.lat],
+          [baseCoords.lng + (index * CONTROL_SPACING) + 1.0, baseCoords.lat - 0.15],
+          [baseCoords.lng + (index * CONTROL_SPACING) + 0.8, baseCoords.lat - 0.25],
+          [baseCoords.lng + (index * CONTROL_SPACING) + 0.6, baseCoords.lat - 0.3],
+          [baseCoords.lng + (index * CONTROL_SPACING) + 0.4, baseCoords.lat - 0.25],
+          [baseCoords.lng + (index * CONTROL_SPACING) + 0.2, baseCoords.lat - 0.15],
+          [baseCoords.lng + (index * CONTROL_SPACING), baseCoords.lat]
         ]]
       }
     }));
@@ -271,11 +272,11 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
         geometry: {
           type: "Polygon",
           coordinates: [[
-            [baseCoords.lng + (4.5 * spacing), baseCoords.lat],
-            [baseCoords.lng + (4.5 * spacing) + 0.5, baseCoords.lat + 0.5],
-            [baseCoords.lng + (4.5 * spacing) + 1, baseCoords.lat],
-            [baseCoords.lng + (4.5 * spacing) + 0.5, baseCoords.lat - 0.5],
-            [baseCoords.lng + (4.5 * spacing), baseCoords.lat]
+            [baseCoords.lng + (4.5 * CONTROL_SPACING), baseCoords.lat],
+            [baseCoords.lng + (4.5 * CONTROL_SPACING) + 0.5, baseCoords.lat + 0.5],
+            [baseCoords.lng + (4.5 * CONTROL_SPACING) + 1, baseCoords.lat],
+            [baseCoords.lng + (4.5 * CONTROL_SPACING) + 0.5, baseCoords.lat - 0.5],
+            [baseCoords.lng + (4.5 * CONTROL_SPACING), baseCoords.lat]
           ]]
         }
       },
@@ -290,31 +291,76 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
         geometry: {
           type: "Polygon",
           coordinates: [[
-            [baseCoords.lng + (7 * spacing), baseCoords.lat],
-            [baseCoords.lng + (7 * spacing) + 0.5, baseCoords.lat + 0.5],
-            [baseCoords.lng + (7 * spacing) + 1, baseCoords.lat],
-            [baseCoords.lng + (7 * spacing) + 0.5, baseCoords.lat - 0.5],
-            [baseCoords.lng + (7 * spacing), baseCoords.lat]
+            [baseCoords.lng + (7 * CONTROL_SPACING), baseCoords.lat],
+            [baseCoords.lng + (7 * CONTROL_SPACING) + 0.5, baseCoords.lat + 0.5],
+            [baseCoords.lng + (7 * CONTROL_SPACING) + 1, baseCoords.lat],
+            [baseCoords.lng + (7 * CONTROL_SPACING) + 0.5, baseCoords.lat - 0.5],
+            [baseCoords.lng + (7 * CONTROL_SPACING), baseCoords.lat]
           ]]
         }
       }
     ];
 
+    // Remove game controls from here
     return [...cloudControls, ...controls];
-  }, [cloudOpacity, showBorders, showChoropleth]);
+  }, [cloudOpacity, showBorders, showChoropleth]); // Remove gameMode from dependencies
 
-  // Modify your existing polygonsData to include cloud controls
+  // Modify your existing polygonsData to include game controls
   const polygonsData = useMemo(() => {
+    // Always include game controls, regardless of game mode
+    const gameControls = [
+      {
+        type: "Feature",
+        properties: { 
+          type: "gameControl",
+          game: "ticTacToe",
+          isActive: gameMode === "ticTacToe",
+          label: "Tic-Tac-Toe",
+          labelHeight: 35 // Adjusted for Mediterranean position
+        },
+        geometry: {
+          type: "Polygon",
+          coordinates: [[
+            [19 + (9.5 * CONTROL_SPACING), 34], // Using same base coordinates + offset
+            [19 + (9.5 * CONTROL_SPACING) + 0.5, 34.5],
+            [19 + (9.5 * CONTROL_SPACING) + 1, 34],
+            [19 + (9.5 * CONTROL_SPACING) + 0.5, 33.5],
+            [19 + (9.5 * CONTROL_SPACING), 34]
+          ]]
+        }
+      },
+      {
+        type: "Feature",
+        properties: { 
+          type: "gameControl",
+          game: "planeCollectCoins",
+          isActive: gameMode === "planeCollectCoins",
+          label: "Plane Game",
+          labelHeight: 35 // Adjusted for Mediterranean position
+        },
+        geometry: {
+          type: "Polygon",
+          coordinates: [[
+            [19 + (12 * CONTROL_SPACING), 34], // Using same base coordinates + further offset
+            [19 + (12 * CONTROL_SPACING) + 0.5, 34.5],
+            [19 + (12 * CONTROL_SPACING) + 1, 34],
+            [19 + (12 * CONTROL_SPACING) + 0.5, 33.5],
+            [19 + (12 * CONTROL_SPACING), 34]
+          ]]
+        }
+      }
+    ];
+
     if (gameMode === "ticTacToe") {
-      return sampleGeoJson.features;
+      return [...gameControls, ...sampleGeoJson.features];
     } else if (gameMode === "planeCollectCoins") {
-      return planeGameGeoJson.features;
+      return [...gameControls, ...planeGameGeoJson.features];
     } else {
       const controls = cloudControlPolygons;
       if (showBorders || showChoropleth) {
-        return [...controls, ...countryData.features];
+        return [...controls, ...gameControls, ...countryData.features];
       }
-      return controls;
+      return [...controls, ...gameControls];
     }
   }, [gameMode, sampleGeoJson.features, planeGameGeoJson.features, cloudControlPolygons, showBorders, showChoropleth, countryData]);
 
@@ -403,42 +449,9 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
       })),
     }));
 
-    // Add a marker for Tic-Tac-Toe in Mediterranean
-    baseMarkers.push({
-      id: "tic-tac-toe-marker",
-      lat: 32.5, // Mediterranean position
-      lng: 29.0, // Place it to the right of cloud controls
-      label: "Tic-Tac-Toe",
-      size: 25,
-      color: "white",
-      icon: "🎮",
-      labelLat: 32.5,
-      labelLng: 29.0,
-      labelText: "Tic-Tac-Toe",
-      labelSize: 1,
-      labelColor: "white",
-    });
-
-    // Only add the "Plane Collect Coins" marker if NOT currently in plane game
-    if (gameMode !== "planeCollectCoins") {
-      baseMarkers.push({
-        id: "plane-collect-marker",
-        lat: 32.5, // Mediterranean position
-        lng: 25.0, // Place it between Tic-Tac-Toe and cloud controls
-        label: "Plane Collect Coins",
-        size: 25,
-        color: "white",
-        icon: "✈️",
-        labelLat: 32.5,
-        labelLng: 25.0,
-        labelText: "Plane Collect Coins",
-        labelSize: 1,
-        labelColor: "white",
-      });
-    }
-
+    // No longer add game markers here
     return baseMarkers;
-  }, [citiesAndLocations, gameMode]);
+  }, [citiesAndLocations]);
 
   // Replace the Joystick component with this div
   const renderJoystick = () => {
@@ -492,6 +505,7 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
         return prevCoins.filter((coin) => {
           const dist = Math.sqrt((coin.lat - lat) ** 2 + (coin.lng - lng) ** 2);
           if (dist < 10) {
+            createCoinCollectionEffect(coin.lat, coin.lng);
             setCollectedCoins((prev) => prev + 1);
             return false; // remove coin
           }
@@ -511,7 +525,17 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
       
       // Move globe POV with higher altitude for mobile
       if (globeEl.current) {
-        globeEl.current.pointOfView({ lat, lng, altitude: 2 }, 0);
+        // Get current altitude
+        // const currentPov = globeEl.current.pointOfView();
+        // Only update lat/lng, keep current altitude
+        globeEl.current.pointOfView(
+          { 
+            lat: newLat, 
+            lng: newLng, 
+            // altitude: currentPov.altitude 
+          },
+          0
+        );
       }
     };
 
@@ -932,7 +956,7 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
           if (dist < 2) {
             createCoinCollectionEffect(coin.lat, coin.lng);
             setCollectedCoins(prev => prev + 1);
-            return false;
+            return false; // remove coin
           }
           return true;
         });
@@ -1073,25 +1097,9 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
       : { lat: 41.0082, lng: 28.9784, altitude: 0.5 };
   }, []);
 
-  // On point click
+  // On point click - simplified to only handle city/location markers
   const onPointClick = (point) => {
-    if (point.label === "Tic-Tac-Toe") {
-      if (gameMode === "ticTacToe") {
-        resetGame();
-      } else {
-        setGameMode("ticTacToe");
-        setClickedMarker(null);
-      }
-    } else if (point.label === "Plane Collect Coins") {
-      if (gameMode === "planeCollectCoins") {
-        resetGame();
-      } else {
-        startPlaneGame();
-        setClickedMarker(point);
-      }
-    } else {
-      setClickedMarker(point);
-    }
+    setClickedMarker(point);
   };
 
 
@@ -1171,6 +1179,21 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
         setPolygonTransitionDuration(newValue ? 1000 : 0);
         return newValue;
       });
+    } else if (polygon.properties.type === "gameControl") {
+      const game = polygon.properties.game;
+      if (game === "ticTacToe") {
+        if (gameMode === "ticTacToe") {
+          resetGame();
+        } else {
+          setGameMode("ticTacToe");
+        }
+      } else if (game === "planeCollectCoins") {
+        if (gameMode === "planeCollectCoins") {
+          resetGame();
+        } else {
+          startPlaneGame();
+        }
+      }
     } else if (gameMode === "ticTacToe") {
       handleHexagonClick(polygon.properties.index);
     }
@@ -1307,31 +1330,49 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
             pointLabel={(point) => `${point.icon || ""} ${point.label}`}
             labelsData={[
               ...markers,
-              ...polygonsData.filter(d => d.properties?.type === "cloudControl" || d.properties?.type === "borderControl" || d.properties?.type === "choroplethControl")
+              ...polygonsData.filter(d => d.properties?.type === "cloudControl" || 
+                                         d.properties?.type === "borderControl" || 
+                                         d.properties?.type === "choroplethControl" ||
+                                         d.properties?.type === "gameControl")
             ]}
             labelLat={d => {
-              if (d.properties?.type === "cloudControl" || d.properties?.type === "borderControl" || d.properties?.type === "choroplethControl") {
+              if (d.properties?.type === "cloudControl" || 
+                  d.properties?.type === "borderControl" || 
+                  d.properties?.type === "choroplethControl" ||
+                  d.properties?.type === "gameControl") {
                 return d.properties.labelHeight;
               }
               return d.labelLat;
             }}
             labelLng={d => {
-              if (d.properties?.type === "cloudControl" || d.properties?.type === "borderControl" || d.properties?.type === "choroplethControl") {
+              if (d.properties?.type === "cloudControl" || 
+                  d.properties?.type === "borderControl" || 
+                  d.properties?.type === "choroplethControl" ||
+                  d.properties?.type === "gameControl") {
                 return d.geometry.coordinates[0][0][0];
               }
               return d.labelLng;
             }}
             labelText={d => {
-              if (d.properties?.type === "cloudControl" || d.properties?.type === "borderControl" || d.properties?.type === "choroplethControl") {
+              if (d.properties?.type === "cloudControl" || 
+                  d.properties?.type === "borderControl" || 
+                  d.properties?.type === "choroplethControl" ||
+                  d.properties?.type === "gameControl") {
                 return d.properties.label;
               }
               return d.labelText;
             }}
             labelSize={d => {
-              if (d.properties?.type === "cloudControl" || d.properties?.type === "borderControl" || d.properties?.type === "choroplethControl") return 0.2;
+              if (d.properties?.type === "gameControl") return 0.5; // Slightly larger for game controls
+              if (d.properties?.type) return 0.2;
               return 0.3;
             }}
-            labelColor={d => d.labelColor || "white"}
+            labelColor={d => {
+              if (d.properties?.type === "gameControl") {
+                return d.properties.isActive ? "purple" : "white";
+              }
+              return d.labelColor || "white";
+            }}
             labelDotRadius={0}
             labelAltitude={0.01}
             pointAltitude={0.01}
@@ -1367,45 +1408,27 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
             polygonCapColor={(d) => {
               // Handle plane game polygons first
               if (d.properties.objType === "plane") {
-                return `rgba(255, 69, 0, 0.8)`; // Solid orange-red color for plane
+                return `rgba(255, 69, 0, 0.8)`;
               }
               if (d.properties.objType === "coin") {
-                return `rgba(255, 215, 0, ${0.6 + Math.sin(Date.now() / 300) * 0.3})`; // Shimmering effect
+                return `rgba(255, 215, 0, ${0.6 + Math.sin(Date.now() / 300) * 0.3})`;
               }
               if (d.properties.objType === "particle") {
                 return `rgba(255, 215, 0, ${d.properties.life})`;
               }
 
-              // Handle other polygon types
+              // Handle control polygons
               if (d.properties.type === "cloudControl") {
                 return d.properties.isActive ? "orange" : "gray";
               }
               if (d.properties.type === "borderControl" || d.properties.type === "choroplethControl") {
                 return d.properties.isActive ? "green" : "gray";
               }
-              if (gameMode === "ticTacToe") {
-                const idx = d.properties.index;
-                if (idx === undefined) return "rgba(0,0,0,0)";
-                if (gameBoard[idx]) {
-                  return gameBoard[idx] === "X" ? "rgba(255, 0, 0, 0.6)" : "rgba(0, 0, 255, 0.6)";
-                }
-                return "rgba(255, 165, 0, 0.6)";
+              if (d.properties.type === "gameControl") {
+                return d.properties.isActive ? "purple" : "gray";
               }
-              
-              // Handle choropleth and borders
-              if (showChoropleth && d.properties?.ISO_A2) {
-                if (hoveredPolygon === d) return 'steelblue';
-                const gdpValue = d.properties?.GDP_MD_EST || 0;
-                const popValue = Math.max(1e5, d.properties?.POP_EST || 1e5);
-                const gdpPerCapita = gdpValue / popValue;
-                const maxGdpPerCapita = 0.1;
-                const intensity = Math.min(gdpPerCapita / maxGdpPerCapita, 1);
-                return `rgba(255, ${Math.floor(255 * (1-intensity))}, 0, 0.8)`;
-              }
-              if (showBorders) {
-                return 'rgba(0, 0, 0, 0.1)';
-              }
-              return "rgba(0,0,0,0)";
+
+              // Rest of the existing conditions...
             }}
             polygonSideColor={() => "rgba(0, 0, 0, 0.1)"}
             polygonStrokeColor={() => "#000"}
