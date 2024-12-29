@@ -1171,12 +1171,25 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
     if (polygon.properties.type === "cloudControl") {
       setCloudOpacity(polygon.properties.opacity);
     } else if (polygon.properties.type === "borderControl") {
-      setShowBorders(prev => !prev);
+      setShowBorders(prev => {
+        const newValue = !prev;
+        // If turning on borders, turn off choropleth
+        if (newValue) {
+          setShowChoropleth(false);
+          setPolygonTransitionDuration(0);
+        }
+        return newValue;
+      });
     } else if (polygon.properties.type === "choroplethControl") {
       setShowChoropleth(prev => {
         const newValue = !prev;
-        // Set transition duration based on choropleth state
-        setPolygonTransitionDuration(newValue ? 1000 : 0);
+        // If turning on choropleth, turn off borders
+        if (newValue) {
+          setShowBorders(false);
+          setPolygonTransitionDuration(1000);
+        } else {
+          setPolygonTransitionDuration(0);
+        }
         return newValue;
       });
     } else if (polygon.properties.type === "gameControl") {
@@ -1217,7 +1230,7 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
   const handlePolygonHover = (polygon) => {
     if (!polygon || polygon.properties?.type) return; // Ignore control polygons
     if (gameMode) return; // Ignore during games
-    if (!showChoropleth) return; // Only show hover effects when choropleth is active
+    if (!showChoropleth && !showBorders) return; // Only show hover effects when choropleth or borders are active
     setHoveredPolygon(polygon);
   };
 
@@ -1428,22 +1441,56 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
                 return d.properties.isActive ? "purple" : "gray";
               }
 
+              // Handle borders mode
+              if (showBorders && !showChoropleth && d.properties?.ISO_A2) {
+                return `rgba(100, 100, 100, 0.3)`;  // Light gray for borders mode
+              }
+
               // Handle choropleth coloring
               if (showChoropleth && d.properties?.GDP_MD_EST) {
                 const gdpValue = d.properties.GDP_MD_EST;
                 const popValue = d.properties.POP_EST || 1;
                 const gdpPerCapita = gdpValue * 1000000 / popValue;
                 
-                // Modified intensity calculation for more contrast
-                const intensity = Math.min(0.9, Math.max(0.05, Math.log(gdpPerCapita/1000) / 10));
+                // Create more distinct ranges for GDP per capita
+                let intensity, redValue, greenValue;
                 
-                // Adjust the red color based on intensity
-                const redValue = Math.round(255 - (intensity * 100)); // Darker reds for higher values
-                return `rgba(${redValue}, 0, 0, ${intensity * 1.2})`; // Increased opacity multiplier
+                if (gdpPerCapita < 1000) {
+                  intensity = 0.3;
+                  redValue = 255;
+                  greenValue = 200;
+                } else if (gdpPerCapita < 5000) {
+                  intensity = 0.4;
+                  redValue = 220;
+                  greenValue = 150;
+                } else if (gdpPerCapita < 15000) {
+                  intensity = 0.5;
+                  redValue = 180;
+                  greenValue = 100;
+                } else if (gdpPerCapita < 30000) {
+                  intensity = 0.6;
+                  redValue = 140;
+                  greenValue = 50;
+                } else if (gdpPerCapita < 50000) {
+                  intensity = 0.7;
+                  redValue = 100;
+                  greenValue = 25;
+                } else {
+                  intensity = 0.8;
+                  redValue = 60;
+                  greenValue = 0;
+                }
+
+                return `rgba(${redValue}, ${greenValue}, 0, ${intensity})`;
               }
 
-              // Default color for non-choropleth countries
-              return 'rgba(255, 255, 255, 0.3)';
+              // Default color for controls
+              if (d.properties?.type) {
+                return 'gray';
+              }
+
+              // Default transparent for other cases
+              return 'rgba(0, 0, 0, 0.1)';
             }}
             polygonSideColor={() => "rgba(0, 0, 0, 0.1)"}
             polygonStrokeColor={() => "#000"}
@@ -1460,8 +1507,12 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
               if (gameMode === "ticTacToe" && d.properties.index !== undefined) {
                 return gameBoard[d.properties.index] ? 0.02 : 0.01;
               }
+              // Increase altitude for borders mode
+              if (showBorders && d.properties?.ISO_A2) {
+                return hoveredPolygon === d ? 0.01 : 0.002;
+              }
               if (showChoropleth && d.properties?.ISO_A2) {
-                return hoveredPolygon === d ? 0.03 : 0.01;
+                return hoveredPolygon === d ? 0.02 : 0.005;
               }
               return 0;
             }}
