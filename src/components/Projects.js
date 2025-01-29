@@ -19,18 +19,23 @@ const getGoogleDriveImageEmbedUrl = (url) => {
   return fileIdMatch ? `https://drive.google.com/uc?export=view&id=${fileIdMatch[0]}` : url;
 };
 
-// Function to generate a deterministic color based on the slug
-const getDeterministicColor = (slug) => {
-  const colors = ["#FF6347", "#4682B4", "#32CD32", "#FFD700", "#8A2BE2", "#FF69B4", "#00CED1", "#FF4500"];
-  let hash = 0;
-  // Create a simple hash from the slug
-  for (let i = 0; i < slug?.length; i++) {
-    hash = slug.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  // Get a deterministic index based on the hash
-  const index = Math.abs(hash) % colors.length;
-  return colors[index];
+// Function to generate a deterministic color based on the importance
+const getDeterministicColor = (importance) => {
+  // Define start and end colors (red to gold)
+  const startColor = { r: 255, g: 0, b: 0 };    // Red
+  const endColor = { r: 0, g: 255, b: 0 };    // Green
+
+  // Normalize importance to a 0-1 scale (assuming max importance is 10)
+  const normalizedImportance = Math.min(importance / 10, 1);
+
+  // Interpolate between colors
+  const r = Math.round(startColor.r + (endColor.r - startColor.r) * normalizedImportance);
+  const g = Math.round(startColor.g + (endColor.g - startColor.g) * normalizedImportance);
+  const b = Math.round(startColor.b + (endColor.b - startColor.b) * normalizedImportance);
+
+  return `rgb(${r}, ${g}, ${b})`;
 };
+
 const Projects = () => {
   const [expandedActivity, setExpandedActivity] = useState(null);
 
@@ -127,14 +132,19 @@ const Projects = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-7">
         {contestsAndActivities.map((activity) => {
           const isExpanded = expandedActivity === activity;
-          const isMinor = activity.importance < 5;
+          const isMicro = activity.importance < 2;
+          const isMinor = activity.importance >= 2 && activity.importance < 5;
 
           return (
             <div
               id={activity.slug} 
               key={activity.slug}
               className={`${
-                isExpanded ? "col-span-1 sm:col-span-2 lg:col-span-4" : isMinor ? "col-span-1 sm:col-span-1 lg:col-span-1" : "col-span-1 sm:col-span-2 lg:col-span-2"
+                isExpanded ? "col-span-1 sm:col-span-2 lg:col-span-4" : 
+                // make hte col span even smaller for micro achievements
+                isMicro ? "col-span-1" : 
+                isMinor ? "col-span-1 sm:col-span-1 lg:col-span-1" : 
+                "col-span-1 sm:col-span-2 lg:col-span-2"
               } transition-all duration-300`}
             >
               <div className={`relative p-4 rounded-lg shadow-lg border border-gray-600 ${
@@ -144,16 +154,19 @@ const Projects = () => {
                 {/* Deterministic colored bar at the top */}
                 {!isExpanded && (
                   <div
-                    style={{ backgroundColor: getDeterministicColor(activity.slug) }}
+                    style={{ backgroundColor: getDeterministicColor(activity.importance) }}
                     className="absolute top-0 left-0 right-0 h-2 rounded-t-lg"
                   >
+                    {isMicro && <span className="micro-achievement">MICRO ACHIEVEMENT</span>}
                     {isMinor && <span className="minor-achievement">MINOR ACHIEVEMENT</span>}
                   </div>
                 )}
                 
                 <div className="flex justify-between items-center">
                   <h3 className={`${
-                    isMinor ? 'text-sm sm:text-lg' : 'text-lg sm:text-2xl'
+                    isMicro ? 'text-xs sm:text-base' :
+                    isMinor ? 'text-sm sm:text-lg' : 
+                    'text-lg sm:text-2xl'
                   } font-semibold mb-2`}>
                     {activity.title}
                   </h3>

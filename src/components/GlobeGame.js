@@ -28,7 +28,7 @@ const PATHS_CONFIG = {
   minHeight: 0.001,          // Minimum height for paths
   minDistance: 5,           // Minimum distance between markers to create a path
   randomizeConnections: true, // If true, creates random connections instead of sequential
-  pathColor: ['rgba(255,0,0,1)', 'rgba(255,0,0,1)'], // Start and end colors for path gradient
+  pathColor: ['rgba(0,255,0,0.6)', 'rgba(255,0,0,0.6)'], // Start and end colors for path gradient
   changeInterval: 4000,  // Interval in milliseconds to regenerate paths
   fadeOutDuration: 0,    // Set to 0 to remove fade out animation
   pathOpacity: 1,       // Base opacity for paths
@@ -99,6 +99,23 @@ function createPolygon(lat, lng, objType, index, size = 1, rotation = 0) {
     }
   };
 }
+
+// Function to generate a deterministic color based on the importance
+const getDeterministicColor = (importance) => {
+  // Define start and end colors (red to green)
+  const startColor = { r: 255, g: 0, b: 0 };    // Red
+  const endColor = { r: 0, g: 255, b: 0 };    // Green
+
+  // Normalize importance to a 0-1 scale (assuming max importance is 10)
+  const normalizedImportance = Math.min(importance / 10, 1);
+
+  // Interpolate between colors
+  const r = Math.round(startColor.r + (endColor.r - startColor.r) * normalizedImportance);
+  const g = Math.round(startColor.g + (endColor.g - startColor.g) * normalizedImportance);
+  const b = Math.round(startColor.b + (endColor.b - startColor.b) * normalizedImportance);
+
+  return `rgb(${r}, ${g}, ${b})`;
+};
 
 export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
   // State to ensure client-side rendering
@@ -425,22 +442,22 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
   // Move colorPalette up here, before markers
   const colorPalette = ["blue", "green", "orange", "purple", "red", "yellow", "pink", "cyan", "lime", "magenta"];
 
-  // Now markers can use colorPalette
+  // Now markers can use the deterministic color
   const markers = useMemo(() => {
-    const baseMarkers = citiesAndLocations.map((location, index) => ({
-      id: `city-${index}`,
+    const baseMarkers = citiesAndLocations.map((location) => ({
+      id: `city-${location.city}`,
       lat: location.coordinates.lat,
       lng: location.coordinates.lng,
       label: location.city,
       labelText: location.city.replace(/ü/g, 'ue'),
-      size: location.isMajorCity ? 20 : 15,
-      color: location.isMajorCity ? "gold" : colorPalette[index % colorPalette.length],
+      size: location.maxImportance >= 5 ? 20 : 15,
+      color: getDeterministicColor(location.maxImportance),
       icon: "",
-      animation: location.isMajorCity ? "pulsate" : "none",
+      animation: location.maxImportance >= 8 ? "pulsate" : "none",
       labelLat: location.coordinates.lat,
       labelLng: location.coordinates.lng,
       labelSize: 0.7,
-      labelColor: location.maxImportance > 4 ? "rgba(255, 165, 0, 0.75)" : 'pink',
+      labelColor: getDeterministicColor(location.maxImportance),
       activities: location.activities.map(activity => ({
         venue: activity.venue,
         date: activity.date,
@@ -449,7 +466,6 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
       })),
     }));
 
-    // No longer add game markers here
     return baseMarkers;
   }, [citiesAndLocations]);
 
@@ -1257,19 +1273,19 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
           <div className={`text-white absolute ${isFullscreen ? 'top-4 right-16' : 'top-4 left-4'} bg-black bg-opacity-75 p-2 sm:p-4 rounded shadow-lg z-10 text-[10px] sm:text-sm md:text-base max-w-[200px] sm:max-w-none`}>
             <ul>
               <li>
-                <span className="text-pink-500">Pink Text:</span> minor achievements
+                <span className="text-red-500">Red Markers:</span> Cities with minor achievements
+              </li>
+              <li>
+                <span className="text-green-500">Green Markers:</span> Cities with major achievements
               </li>
               {showChoropleth && (
                 <li>
                   <span className="text-red-500">Red Intensity:</span> GDP per capita
                 </li>
               )}
-              <li>
-                <span className="text-yellow-500">Gold Text:</span> major achievements
-              </li>
             </ul>
             <p>
-              ToDo: Fill the map with <span className="text-yellow-500">yellow</span>
+              ToDo: Fill the map with achievements
             </p>
           </div>
 
@@ -1365,8 +1381,8 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
             onPointHover={handlePointHover}
             {...(PATHS_INSTEAD_OF_ARCS ? {
               pathsData: currentPaths,
-              pathColor: () => ['rgba(0,0,255,0.6)', 'rgba(255,0,0,0.6)'],
-              pathDashLength: 0.01,
+              pathColor: () => ['rgba(0,255,0,0.6)', 'rgba(255,0,0,0.6)'],
+              pathDashLength: 0.1,
               pathDashGap: 0.004,
               pathDashAnimateTime: 100000,
               pathPointAlt: pnt => Math.min(pnt[2] * 0.3, 0.005),

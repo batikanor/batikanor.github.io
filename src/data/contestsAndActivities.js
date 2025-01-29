@@ -1,8 +1,27 @@
 export const contestsAndActivities = [
   {
+    "slug": "tech-berlin-ai-hackathon-2",
+    "importance": 1,
+    "title": "(to be updated) Winner of Balderton Capital Challenge at {Tech: Berlin} AI Hackathon",
+    "mapData": {
+      "venue": "CODE Berlin",
+      "city": "Berlin",
+      "country": "Germany",
+      "coordinates": { lat: 52.520008, lng: 13.404954 }
+    },
+    "date": "01/2025",
+    "shortDescription": "To be updated",
+    "longDescription": "To be updated",
+    "technologies": ["AI"],
+    "links": [
+      { label: "Hackathon Details", url: "https://trusted-grill-16a.notion.site/Tech-Berlin-AI-Hackathon-2-1746dbf0dcd78058ae8edd7b1cb6083f" },
+      {label: "Detailed LinkedIn Post Regarding the Project", url: "https://www.linkedin.com/posts/martin-mohammed_ai-graphrag-activity-7287020028309176320-BIIT?utm_source=share&utm_medium=member_desktop"}
+    ],
+  },
+  {
     "slug": "huawei-agorize-2024",
     "importance": 3,
-    "title": "(Ongoing) Finalist at Huawei AI Individual Head-Related Transfer Functions (HRTFs) Competition",
+    "title": "(to be updated) Finalist at Huawei AI Individual Head-Related Transfer Functions (HRTFs) Competition",
     "mapData": {
       "venue": "Huawei Research Center",
       "city": "Munich",

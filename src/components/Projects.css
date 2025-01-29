@@ -39,6 +39,33 @@
     top: 50%; /* Center vertically */
     transform: translateY(-50%); /* Adjust for vertical centering */
     font-weight: bold; /* Make text bold */
-    text-shadow: 1px 1px 2px #ffffff; /* Add white shadow */
+    text-shadow: 1px 1px 2px pink; /* Add shadow */
+    font-style: italic; 
+
+  }
+  
+  .micro-achievement {
+    font-size: 0.5rem; /* Even smaller than minor achievement */
+    text-align: center;
+    color: #000000;
+    padding: 2px 0;
+    letter-spacing: 0.3em;
+    white-space: nowrap;
+    overflow: hidden;
+    width: 100%;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-weight: bold;
+    text-shadow: 1px 1px 2px white;
+    font-style: italic; 
+  }
+  
+  .circle-indicator {
+    transition: all 0.3s ease-in-out;
+  }
+  
+  .circle-indicator:hover {
+    transform: translate(-50%, -50%) scale(1.2);
   }
   
