@@ -29,12 +29,14 @@ export const contestsAndActivities = [
       "coordinates":{ lat: 48.1351, lng: 11.5820 }
     },
     "date": "12/2024 - 01/2025",
-    "shortDescription": "Details to come later.",
-    "longDescription": "Details to come later.",
+    "shortDescription": "Estimating HRTFs from multi-view pinna images.",
+    "longDescription": "Out of the 100+ teams that attended from 88 universities across Europe, our team (Fırat Fuat Olcay, Serdar Pehlivan & me) was one of the winners of the Huawei 2024 Munich Tech Arena competition! Our team represented Turkey & Germany (Since we all did our bachelor's at the Turkish-German University in Istanbul), and we were the only team representing Turkey. \n\n The competition, held from September 2024 to January 2025, was related to generating precise individual HRTFs (head related transfer functions) associated with the listener's anthropometric data based on multi-view pinna images. Winner teams were determined through a leaderboard of accuracy scores (which is nice. Can be more objective than jury decisions, but not always better). \
+     \n\n\n\n In case you are interested in our method, feel free to check out the slides attached below. \n\n",
     "links": [
       // { "label": "Hackathon Link", "url": "https://lauzhack.com/" },
       // { "label": "GitHub Repository", "url": "https://github.com/batikanor/MX-Focus" }
-      {"label": "Competition Link", "url": "https://huawei.agorize.com/en/challenges/techarena-munich2024"}
+      {"label": "Competition Link", "url": "https://huawei.agorize.com/en/challenges/techarena-munich2024"},
+      {"label": "LinkedIn Post", "url": "https://www.linkedin.com/feed/update/urn:li:activity:7295074966390099968/"}
     ],
     "technologies": ["Machine Learning", "AI", "HRTFs"],
     "gdrive_embed": [
@@ -56,7 +58,7 @@ export const contestsAndActivities = [
       "coordinates":{ lat: 48.1351, lng: 11.5820 }
     },
     "date": "12/2024",
-    "shortDescription": "(Grade: 1.0) (Submitted to a conference, currently under review)",
+    "shortDescription": "(Grade: 1.0) (Accepted at ESANN 2025)",
     "longDescription": "In this paper, we investigate offline reinforcement learning (RL) with the goal of training a single robust policy that generalizes effectively across environments with unseen dynamics. We propose a novel approach, Trajectory Encoding Augmentation (TEA), which extends the state space by integrating latent representations of environmental dynamics obtained from sequence encoders, such as AutoEncoders. Our findings show that incorporating these encodings with TEA improves the transferability of a single policy to novel environments with new dynamics, surpassing methods that rely solely on unmodified states. These results indicate that TEA captures critical, environment-specific characteristics, enabling RL agents to generalize effectively across dynamic conditions.",
     "links": [
       { "label": "arXiv", "url": "https://arxiv.org/abs/2411.19133" },
