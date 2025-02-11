@@ -1,7 +1,7 @@
 export const contestsAndActivities = [
   {
     "slug": "tech-berlin-ai-hackathon-2",
-    "importance": 1,
+    "importance": 2,
     "title": "(to be updated) Winner of Balderton Capital Challenge at {Tech: Berlin} AI Hackathon",
     "mapData": {
       "venue": "CODE Berlin",
@@ -20,8 +20,8 @@ export const contestsAndActivities = [
   },
   {
     "slug": "huawei-agorize-2024",
-    "importance": 3,
-    "title": "(to be updated) Finalist at Huawei AI Individual Head-Related Transfer Functions (HRTFs) Competition",
+    "importance": 5,
+    "title": "Outstanding Award Winner at Huawei AI Individual Head-Related Transfer Functions (HRTFs) Competition",
     "mapData": {
       "venue": "Huawei Research Center",
       "city": "Munich",
@@ -37,12 +37,12 @@ export const contestsAndActivities = [
       {"label": "Competition Link", "url": "https://huawei.agorize.com/en/challenges/techarena-munich2024"}
     ],
     "technologies": ["Machine Learning", "AI", "HRTFs"],
-    "images": [
-      // "https://example.com/image1.jpg",
-      // "https://drive.google.com/uc?id=1aBcDeFgHiJkLmNoPqRSuvWxyz"
-    ],
     "gdrive_embed": [
       // "https://drive.google.com/file/d/1vL77AmjuWV4hls8Mt75x_lOqaBaohr1D/preview"
+      "https://docs.google.com/presentation/d/1gwv_dG_OYWu-U_rlkEqX3nc8eBm9KfqD/edit#slide=id.g323a7e8b31b_0_337",
+      "https://drive.google.com/file/d/1ozUoDpXIXS0QCASqIzK6KmjtUvafX-Iu/view?usp=sharing",
+      "https://drive.google.com/file/d/1Z2OEXOpJ10GXUou8XJJ7oGTG2heXV7wI/view?usp=sharing",
+      "https://drive.google.com/file/d/1HR7vYuOflNDRaODlDte0WaVCv-v35Vcn/view?usp=sharing",
     ]
   },
   {
