@@ -201,10 +201,11 @@ Our roadmap includes launching the platform in Zurich, gathering initial data, a
         // "https://example.com/image1.jpg",
         // "https://drive.google.com/file/d/1aBcDeFgHiJkLmNoPqRSuvWxyz/view?usp=sharing", // Google Drive image
       // ],
-      // gdrive_embed: [
-      //   "https://docs.google.com/presentation/d/1FSCjiBlLvDn6dzIAjPaf_RC2LvJBzk5q/edit?usp=sharing&ouid=108923877595249603456&rtpof=true&sd=true", // Google Drive video
-      //   "https://drive.google.com/file/d/1vL77AmjuWV4hls8Mt75x_lOqaBaohr1D/view?usp=sharing",
-      // ],
+      gdrive_embed: [
+        "https://drive.google.com/file/d/1r9y5cFobyG1CgPJQxxEHHyM29hyrfL19/view?usp=sharing",
+        // "https://docs.google.com/presentation/d/1FSCjiBlLvDn6dzIAjPaf_RC2LvJBzk5q/edit?usp=sharing&ouid=108923877595249603456&rtpof=true&sd=true", // Google Drive video
+        // "https://drive.google.com/file/d/1vL77AmjuWV4hls8Mt75x_lOqaBaohr1D/view?usp=sharing",
+      ],
     },
     {
       slug: "dsag-ideathon-2024",  // Unique slug for each project
