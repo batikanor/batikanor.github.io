@@ -2,7 +2,7 @@
 
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import Projects from "../components/Projects"; // Adjust path based on your folder structure
 import CV from "./cv/page";
@@ -11,10 +11,21 @@ import CV from "./cv/page";
 const GlobeGame = dynamic(() => import("../components/GlobeGame"), { ssr: false });
 
 export default function Home() {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const navigateWithRefresh = (slug) => {
     const url = `${window.location.origin}/projects#${slug}`;
     window.location.href = url;
   };
+
+  // Prevent hydration mismatch by not rendering until client-side
+  if (!mounted) {
+    return null; // or a loading skeleton
+  }
 
   return (
     <div>
@@ -24,7 +35,7 @@ export default function Home() {
         </header>
 
         {/* Render the GlobeGame component */}
-        <div className="w-full py-8">
+        <div className="w-full py-8 globe-container">
           <GlobeGame navigateWithRefresh={navigateWithRefresh} />
         </div>
 

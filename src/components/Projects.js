@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import { motion } from "framer-motion";
+import VanillaTilt from 'vanilla-tilt';
 import "./Projects.css";
 import { contestsAndActivities } from "../data/contestsAndActivities";
 import { NAVBAR_HEIGHT } from '../constants/layout';
@@ -19,25 +21,95 @@ const getGoogleDriveImageEmbedUrl = (url) => {
   return fileIdMatch ? `https://drive.google.com/uc?export=view&id=${fileIdMatch[0]}` : url;
 };
 
-// Function to generate a deterministic color based on the importance
-const getDeterministicColor = (importance) => {
-  // Define start and end colors (red to gold)
-  const startColor = { r: 255, g: 0, b: 0 };    // Red
-  const endColor = { r: 0, g: 255, b: 0 };    // Green
+// Replace getDeterministicColor with getImportanceStyles
+const getImportanceStyles = (importance) => {
+  // Define different style configurations based on importance ranges
+  if (importance >= 8) {
+    return {
+      borderStyle: 'border-l-4 border-t-4',
+      borderColor: 'border-yellow-400',
+      bgGradient: 'bg-gradient-to-r from-yellow-100/10 to-transparent'
+    };
+  } else if (importance >= 5) {
+    return {
+      borderStyle: 'border-l-4',
+      borderColor: 'border-blue-400',
+      bgGradient: 'bg-gradient-to-r from-blue-100/10 to-transparent'
+    };
+  } else if (importance >= 2) {
+    return {
+      borderStyle: 'border-l-2',
+      borderColor: 'border-purple-400',
+      bgGradient: 'bg-gradient-to-r from-purple-100/10 to-transparent'
+    };
+  } else {
+    return {
+      borderStyle: 'border-l',
+      borderColor: 'border-gray-400',
+      bgGradient: 'bg-gradient-to-r from-gray-100/10 to-transparent'
+    };
+  }
+};
 
-  // Normalize importance to a 0-1 scale (assuming max importance is 10)
-  const normalizedImportance = Math.min(importance / 10, 1);
+// Update the iframe component to be resizable
+const ResizableEmbed = ({ url, initialHeight = 300 }) => {
+  const [height, setHeight] = useState(initialHeight);
+  const resizeRef = useRef(null);
+  
+  useEffect(() => {
+    if (!resizeRef.current) return;
+    
+    let startY;
+    let startHeight;
+    
+    const onMouseDown = (e) => {
+      startY = e.clientY;
+      startHeight = height;
+      document.addEventListener('mousemove', onMouseMove);
+      document.addEventListener('mouseup', onMouseUp);
+    };
+    
+    const onMouseMove = (e) => {
+      const delta = e.clientY - startY;
+      setHeight(Math.max(200, startHeight + delta)); // Minimum height of 200px
+    };
+    
+    const onMouseUp = () => {
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+    };
+    
+    resizeRef.current.addEventListener('mousedown', onMouseDown);
+    
+    return () => {
+      if (resizeRef.current) {
+        resizeRef.current.removeEventListener('mousedown', onMouseDown);
+      }
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+    };
+  }, [height]);
 
-  // Interpolate between colors
-  const r = Math.round(startColor.r + (endColor.r - startColor.r) * normalizedImportance);
-  const g = Math.round(startColor.g + (endColor.g - startColor.g) * normalizedImportance);
-  const b = Math.round(startColor.b + (endColor.b - startColor.b) * normalizedImportance);
-
-  return `rgb(${r}, ${g}, ${b})`;
+  return (
+    <div className="relative mb-4">
+      <iframe 
+        src={getGoogleDriveEmbedUrl(url)} 
+        className="w-full border-0"
+        style={{ height: `${height}px` }}
+        allowFullScreen
+      />
+      <div 
+        ref={resizeRef}
+        className="absolute bottom-0 left-0 right-0 h-2 bg-gray-200 hover:bg-gray-300 cursor-ns-resize"
+        title="Drag to resize"
+      />
+    </div>
+  );
 };
 
 const Projects = () => {
   const [expandedActivity, setExpandedActivity] = useState(null);
+  const [isMobile, setIsMobile] = useState(false);
 
   // Function to handle scrolling to a project
   const scrollToProject = (slug) => {
@@ -121,145 +193,186 @@ const Projects = () => {
     );
   };
 
-  return (
-    <div className="max-w-6xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-      <h2 className="text-3xl font-bold tracking-tight text-center mb-12">
-        Past Project Samples
-      </h2>
+  // Add this useEffect for mobile detection
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
+  // Add this useEffect for tilt effect
+  useEffect(() => {
+    // Initialize tilt effect on all project cards
+    const tiltElements = document.querySelectorAll(".tilt-card");
+    if (!isMobile) {
+      tiltElements.forEach(element => {
+        VanillaTilt.init(element, {
+          max: 3, // Reduced tilt for cards
+          scale: 1.02, // Subtle scale
+          speed: 800,
+          glare: true,
+          "max-glare": 0.1,
+          perspective: 1000,
+        });
+      });
+    }
+  }, [isMobile, expandedActivity]); // Re-run when cards expand/collapse
+
+  return (
+    <motion.div 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+      className="max-w-6xl mx-auto py-8 px-4 sm:px-6 lg:px-8"
+    >
+      <motion.h2 
+        initial={{ y: -20 }}
+        animate={{ y: 0 }}
+        className="text-3xl font-bold tracking-tight text-center mb-12"
+      >
+        Past Project Samples
+      </motion.h2>
 
       {/* Activities Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-7">
-        {contestsAndActivities.map((activity) => {
+        {contestsAndActivities.map((activity, index) => {
           const isExpanded = expandedActivity === activity;
           const isMicro = activity.importance < 2;
           const isMinor = activity.importance >= 2 && activity.importance < 5;
 
           return (
-            <div
-              id={activity.slug} 
+            <motion.div
+              id={activity.slug}
               key={activity.slug}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: index * 0.1 }}
               className={`${
                 isExpanded ? "col-span-1 sm:col-span-2 lg:col-span-4" : 
-                // make hte col span even smaller for micro achievements
                 isMicro ? "col-span-1" : 
                 isMinor ? "col-span-1 sm:col-span-1 lg:col-span-1" : 
                 "col-span-1 sm:col-span-2 lg:col-span-2"
               } transition-all duration-300`}
             >
-              <div className={`relative p-4 rounded-lg shadow-lg border border-gray-600 ${
-                activity.highlighted ? "highlight" : ""
-              }`}>
-                
-                {/* Deterministic colored bar at the top */}
+              <div 
+                className={`tilt-card relative p-4 rounded-lg shadow-lg bg-white dark:bg-gray-900/40 border-[3px] border-gray-300 ${
+                  activity.highlighted ? "highlight" : ""
+                } ${!isExpanded ? `${getImportanceStyles(activity.importance).borderStyle} ${getImportanceStyles(activity.importance).borderColor}` : ""}`}
+                style={{ transformStyle: 'preserve-3d' }}
+              >
+                {/* Replace the colored bar with a subtle gradient background */}
                 {!isExpanded && (
-                  <div
-                    style={{ backgroundColor: getDeterministicColor(activity.importance) }}
-                    className="absolute top-0 left-0 right-0 h-2 rounded-t-lg"
-                  >
-                    {isMicro && <span className="micro-achievement">MICRO ACHIEVEMENT</span>}
-                    {isMinor && <span className="minor-achievement">MINOR ACHIEVEMENT</span>}
+                  <div className={`absolute inset-0 ${getImportanceStyles(activity.importance).bgGradient} pointer-events-none rounded-lg`} />
+                )}
+                
+                {/* Remove the old colored bar div and continue with existing content */}
+                <div className="relative z-20">
+                  <div className="flex justify-between items-start">
+                    <h3 className={`${
+                      isMicro ? 'text-xs sm:text-base' :
+                      isMinor ? 'text-sm sm:text-lg' : 
+                      'text-lg sm:text-2xl'
+                    } font-semibold mb-2`}>
+                      {activity.title}
+                    </h3>
+                    <div className="flex flex-col items-end gap-2">
+                      {!isExpanded && (isMicro || isMinor) && (
+                        <span className={`text-xs px-2 py-1 rounded-full ${
+                          isMicro ? 'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300' : 
+                          'bg-purple-200 text-purple-700 dark:bg-purple-700 dark:text-purple-200'
+                        }`}>
+                          {isMicro ? 'MICRO' : 'MINOR ACHIEVEMENT'}
+                        </span>
+                      )}
+                      <button
+                        onClick={() => toggleExpandedView(activity)}
+                        className="px-3 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700"
+                      >
+                        {isExpanded ? "Collapse" : "See more"}
+                      </button>
+                    </div>
                   </div>
-                )}
-                
-                <div className="flex justify-between items-center">
-                  <h3 className={`${
-                    isMicro ? 'text-xs sm:text-base' :
-                    isMinor ? 'text-sm sm:text-lg' : 
-                    'text-lg sm:text-2xl'
-                  } font-semibold mb-2`}>
-                    {activity.title}
-                  </h3>
-                  <button
-                    onClick={() => toggleExpandedView(activity)}
-                    className="px-3 py-1 rounded hover:bg-gray-500"
-                  >
-                    {isExpanded ? "Collapse" : "See more"}
-                  </button>
-                </div>
-                
-                <LocationDisplay activity={activity} onClick={() => handleLocationClick(activity)} />
-                
-                <p className="mb-4 dark:text-gray-300">{activity.date}</p>
-                
-                {/* Display Short Description */}
-                {!isMinor && <p className="mb-4 dark:text-gray-200">{activity.shortDescription}</p>}
-                
-                {/* Display Long Description if Expanded */}
-                {isExpanded && (
-                  <>
-                    {activity.longDescription.split('\n').map((line, index) => (
-                      <p className="dark:text-white" key={index}>{line}</p>
-                    ))}
-                    <br/>
-                    <button
-                      onClick={() => handleCopyLink(activity.slug)}
-                      className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-500 mb-4"
-                    >
-                      Copy Link to this Project
-                    </button>
-                    
-                    {/* Add Links */}
-                    {activity.links && activity.links.length > 0 && (
-                      <div className="mb-4">
-                        <h4 className="font-semibold">Links:</h4>
-                        <ul>
-                          {activity.links.map((link, index) => (
-                            <li key={index}>
-                              <a href={link.url} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">
-                                {link.label}
-                              </a>
-                            </li>
+                  
+                  <LocationDisplay activity={activity} onClick={() => handleLocationClick(activity)} />
+                  
+                  <p className="mb-4 dark:text-gray-300">{activity.date}</p>
+                  
+                  {/* Display Short Description */}
+                  {!isMinor && <p className="mb-4 dark:text-gray-200">{activity.shortDescription}</p>}
+                  
+                  {/* Display Long Description if Expanded */}
+                  {isExpanded && (
+                    <>
+                      {activity.longDescription.split('\n').map((line, index) => (
+                        <p className="dark:text-white" key={index}>{line}</p>
+                      ))}
+                      <br/>
+                      <button
+                        onClick={() => handleCopyLink(activity.slug)}
+                        className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-500 mb-4"
+                      >
+                        Copy Link to this Project
+                      </button>
+                      
+                      {/* Add Links */}
+                      {activity.links && activity.links.length > 0 && (
+                        <div className="mb-4">
+                          <h4 className="font-semibold">Links:</h4>
+                          <ul>
+                            {activity.links.map((link, index) => (
+                              <li key={index}>
+                                <a href={link.url} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">
+                                  {link.label}
+                                </a>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+
+                      {/* Add Technologies */}
+                      {activity.technologies && activity.technologies.length > 0 && (
+                        <div className="mt-4 mb-4 flex flex-wrap gap-2">
+                          {activity.technologies.map((tech, i) => (
+                            <span
+                              key={i}
+                              className="text-sm bg-gray-700 text-white px-3 py-1 rounded-full"
+                            >
+                              {tech}
+                            </span>
                           ))}
-                        </ul>
-                      </div>
-                    )}
+                        </div>
+                      )}
 
-                    {/* Add Technologies */}
-                    {activity.technologies && activity.technologies.length > 0 && (
-                      <div className="mt-4 mb-4 flex flex-wrap gap-2">
-                        {activity.technologies.map((tech, i) => (
-                          <span
-                            key={i}
-                            className="text-sm bg-gray-700 text-white px-3 py-1 rounded-full"
-                          >
-                            {tech}
-                          </span>
-                        ))}
-                      </div>
-                    )}
+                      {/* Add Images or Embedded Content */}
+                      {activity.images && activity.images.length > 0 && (
+                        <div className="mb-4">
+                          <h4 className="font-semibold">Images:</h4>
+                          {activity.images.map((image, index) => (
+                            <img key={index} src={getGoogleDriveImageEmbedUrl(image)} alt={`Project image ${index + 1}`} className="mb-2" />
+                          ))}
+                        </div>
+                      )}
 
-                    {/* Add Images or Embedded Content */}
-                    {activity.images && activity.images.length > 0 && (
-                      <div className="mb-4">
-                        <h4 className="font-semibold">Images:</h4>
-                        {activity.images.map((image, index) => (
-                          <img key={index} src={getGoogleDriveImageEmbedUrl(image)} alt={`Project image ${index + 1}`} className="mb-2" />
-                        ))}
-                      </div>
-                    )}
-
-                    {activity.gdrive_embed && activity.gdrive_embed.length > 0 && (
-                      <div className="mb-4">
-                        {activity.gdrive_embed.map((embedUrl, index) => (
-                          <iframe 
-                            key={index} 
-                            src={getGoogleDriveEmbedUrl(embedUrl)} 
-                            className="w-full h-64 mb-2" 
-                            frameBorder="0" 
-                            allowFullScreen
-                          ></iframe>
-                        ))}
-                      </div>
-                    )}
-                  </>
-                )}
+                      {activity.gdrive_embed && activity.gdrive_embed.length > 0 && (
+                        <div className="mb-4">
+                          {activity.gdrive_embed.map((embedUrl, index) => (
+                            <ResizableEmbed key={index} url={embedUrl} />
+                          ))}
+                        </div>
+                      )}
+                    </>
+                  )}
+                </div>
               </div>
-            </div>
+            </motion.div>
           );
         })}
       </div>
-    </div>
+    </motion.div>
   );
 };
 

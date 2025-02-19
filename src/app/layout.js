@@ -24,9 +24,9 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
-      <body className="antialiased flex flex-col min-h-screen">
-        <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
+    <html lang="en" suppressHydrationWarning className={`${geistSans.variable} ${geistMono.variable}`}>
+      <body className="antialiased flex flex-col min-h-screen" suppressHydrationWarning>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           {/* Header */}
           <header className="bg-[var(--navbar-background-light)] dark:bg-[var(--navbar-background-dark)] shadow fixed top-0 left-0 right-0 z-50">
             <Navbar />
@@ -34,9 +34,9 @@ export default function RootLayout({ children }) {
           <div className="flex-1 flex flex-col lg:flex-row mt-16">
             
             {/* Left Sidebar */}
-            <aside className="hidden lg:block lg:w-1/5 p-4 bg-[var(--sidepanel-background-light)] dark:bg-[var(--sidepanel-background-dark)] relative">
+            <aside className="hidden lg:block lg:w-1/6 p-4 bg-[var(--sidepanel-background-light)] dark:bg-[var(--sidepanel-background-dark)] relative">
               <div
-                className="absolute inset-0 bg-center opacity-20 dark:opacity-60"
+                className="absolute inset-0 bg-center opacity-60 dark:opacity-60"
                 style={{ 
                   backgroundImage: "url('/aside-pattern.png')",
                   backgroundSize: "15vw",
@@ -52,9 +52,9 @@ export default function RootLayout({ children }) {
             </main>
 
             {/* Right Sidebar */}
-            <aside className="hidden lg:block lg:w-1/5 p-4 bg-[var(--sidepanel-background-light)] dark:bg-[var(--sidepanel-background-dark)] relative">
+            <aside className="hidden lg:block lg:w-1/6 p-4 bg-[var(--sidepanel-background-light)] dark:bg-[var(--sidepanel-background-dark)] relative">
               <div
-                className="absolute inset-0 bg-center opacity-20 dark:opacity-60"
+                className="absolute inset-0 bg-center opacity-60 dark:opacity-60"
                 style={{ 
                   backgroundImage: "url('/aside-pattern.png')",
                   backgroundSize: "15vw",

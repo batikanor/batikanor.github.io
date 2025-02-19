@@ -69,3 +69,16 @@
     transform: translate(-50%, -50%) scale(1.2);
   }
   
+  .resize-handle {
+    width: 100%;
+    height: 10px;
+    background: #e5e7eb;
+    cursor: row-resize;
+    transition: background 0.2s;
+    border-radius: 0 0 4px 4px;
+  }
+  
+  .resize-handle:hover {
+    background: #d1d5db;
+  }
+  
