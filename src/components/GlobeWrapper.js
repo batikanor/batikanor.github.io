@@ -91,8 +91,18 @@ const GlobeWrapper = ({ onGlobeLoad, initialView, cloudOpacity = 0.25, ...props 
         };
         rotateClouds();
       });
+
+      // Cleanup function to remove clouds when component unmounts
+      return () => {
+        if (cloudsRef.current && globeRef.current) {
+          globeRef.current.scene().remove(cloudsRef.current);
+          cloudsRef.current.geometry.dispose();
+          cloudsRef.current.material.dispose();
+          cloudsRef.current = null;
+        }
+      };
     }
-  }, [isMounted, cloudOpacity]);
+  }, [isMounted]); // Only depend on isMounted
 
   // Update cloud opacity when it changes
   useEffect(() => {
