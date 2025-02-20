@@ -119,6 +119,7 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
   // State to ensure client-side rendering
   const [isClient, setIsClient] = useState(false);
   const [isGlobeReady, setIsGlobeReady] = useState(false);
+  const [mapMode, setMapMode] = useState('osm'); // 'osm' (default), 'day', 'night'
 
   // Refs
   const globeContainerRef = useRef(null);
@@ -244,6 +245,28 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
   const cloudControlPolygons = useMemo(() => {
     const baseCoords = { lat: 34, lng: 19 }; // Mediterranean position
     
+    // Map mode controls
+    const mapControls = ['osm', 'day', 'night'].map((mode, index) => ({
+      type: "Feature",
+      properties: { 
+        type: "mapControl",
+        mode: mode,
+        isActive: mapMode === mode,
+        label: `Map: ${mode.charAt(0).toUpperCase() + mode.slice(1)}`,
+        labelHeight: baseCoords.lat + 1.6
+      },
+      geometry: {
+        type: "Polygon",
+        coordinates: [[
+          [baseCoords.lng + (index * CONTROL_SPACING), baseCoords.lat + 1],
+          [baseCoords.lng + (index * CONTROL_SPACING) + 0.5, baseCoords.lat + 1.5],
+          [baseCoords.lng + (index * CONTROL_SPACING) + 1, baseCoords.lat + 1],
+          [baseCoords.lng + (index * CONTROL_SPACING) + 0.5, baseCoords.lat + 0.5],
+          [baseCoords.lng + (index * CONTROL_SPACING), baseCoords.lat + 1]
+        ]]
+      }
+    }));
+
     // Cloud controls
     const cloudControls = [0, 0.25, 0.5, 1].map((opacity, index) => ({
       type: "Feature",
@@ -316,9 +339,9 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
       }
     ];
 
-    // Remove game controls from here
-    return [...cloudControls, ...controls];
-  }, [cloudOpacity, showBorders, showChoropleth]); // Remove gameMode from dependencies
+    // Return all controls
+    return [...mapControls, ...cloudControls, ...controls];
+  }, [cloudOpacity, showBorders, showChoropleth, mapMode]);
 
   // Modify your existing polygonsData to include game controls
   const polygonsData = useMemo(() => {
@@ -1113,7 +1136,9 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
 
   // Add this to your polygon click handler
   const handlePolygonClick = (polygon) => {
-    if (polygon.properties.type === "cloudControl") {
+    if (polygon.properties.type === "mapControl") {
+      setMapMode(polygon.properties.mode);
+    } else if (polygon.properties.type === "cloudControl") {
       setCloudOpacity(polygon.properties.opacity);
     } else if (polygon.properties.type === "borderControl") {
       setShowBorders(prev => {
@@ -1275,17 +1300,22 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
                 setIsGlobeReady(true);
               }, 500);
             }}
+            key={mapMode} // Force complete remount when map mode changes
             initialView={initialLocation}
             width={isFullscreen ? window.innerWidth : dimensions.width}
             height={isFullscreen ? window.innerHeight : dimensions.height}
             enableZoom={true}
             enablePanning={!isNavigating}
             enableRotate={!isNavigating}
-            globeImageUrl={
-              resolvedTheme === "dark"
-                ? "//unpkg.com/three-globe/example/img/earth-night.jpg"
-                : "//unpkg.com/three-globe/example/img/earth-blue-marble.jpg"
-            }
+            globeImageUrl={mapMode === 'osm' ? null : mapMode === 'night' 
+              ? "//unpkg.com/three-globe/example/img/earth-night.jpg" 
+              : "//unpkg.com/three-globe/example/img/earth-blue-marble.jpg"}
+            globeTileEngineUrl={mapMode === 'osm' 
+              ? ((x, y, l) => `https://tile.openstreetmap.org/${l}/${x}/${y}.png`)
+              : null}
+            globeImageVisible={mapMode !== 'osm'}
+            bumpImageUrl={mapMode === 'osm' ? null : "//unpkg.com/three-globe/example/img/earth-topology.png"}
+            backgroundImageUrl={null}
             backgroundColor="rgba(0,0,0,0)"
             pointsData={markers}
             pointsMerge={false}
@@ -1299,20 +1329,29 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
               if (clickedMarker && clickedMarker.label === point.label) {
                 // Brighter when clicked
                 const color = point.color.match(/\d+/g);
-                return `rgba(${color[0]}, ${Math.min(parseInt(color[1]) + 50, 255)}, ${color[2]}, 1)`;
+                return mapMode === 'osm' 
+                  ? `rgba(${color[0]}, ${Math.min(parseInt(color[1]) + 50, 255)}, ${color[2]}, 0.6)`
+                  : `rgba(${color[0]}, ${Math.min(parseInt(color[1]) + 50, 255)}, ${color[2]}, 1)`
+              }
+              // Semi-transparent in OSM mode
+              if (mapMode === 'osm') {
+                const color = point.color.match(/\d+/g);
+                return `rgba(${color[0]}, ${color[1]}, ${color[2]}, 0.6)`;
               }
               return point.color;
             }}
             pointLabel={(point) => `${point.icon || ""} ${point.label}`}
             labelsData={[
               ...markers,
-              ...polygonsData.filter(d => d.properties?.type === "cloudControl" || 
+              ...polygonsData.filter(d => d.properties?.type === "mapControl" ||
+                                         d.properties?.type === "cloudControl" || 
                                          d.properties?.type === "borderControl" || 
                                          d.properties?.type === "choroplethControl" ||
                                          d.properties?.type === "gameControl")
             ]}
             labelLat={d => {
-              if (d.properties?.type === "cloudControl" || 
+              if (d.properties?.type === "mapControl" ||
+                  d.properties?.type === "cloudControl" || 
                   d.properties?.type === "borderControl" || 
                   d.properties?.type === "choroplethControl" ||
                   d.properties?.type === "gameControl") {
@@ -1321,7 +1360,8 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
               return d.labelLat;
             }}
             labelLng={d => {
-              if (d.properties?.type === "cloudControl" || 
+              if (d.properties?.type === "mapControl" ||
+                  d.properties?.type === "cloudControl" || 
                   d.properties?.type === "borderControl" || 
                   d.properties?.type === "choroplethControl" ||
                   d.properties?.type === "gameControl") {
@@ -1330,7 +1370,8 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
               return d.labelLng;
             }}
             labelText={d => {
-              if (d.properties?.type === "cloudControl" || 
+              if (d.properties?.type === "mapControl" ||
+                  d.properties?.type === "cloudControl" || 
                   d.properties?.type === "borderControl" || 
                   d.properties?.type === "choroplethControl" ||
                   d.properties?.type === "gameControl") {
@@ -1344,8 +1385,15 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
               return 0.3;
             }}
             labelColor={d => {
+              if (d.properties?.type === "mapControl") {
+                return d.properties.isActive ? "purple" : "white";
+              }
               if (d.properties?.type === "gameControl") {
                 return d.properties.isActive ? "purple" : "white";
+              }
+              // For city markers, make transparent in OSM mode, white otherwise
+              if (mapMode === 'osm') {
+                return 'rgba(0, 0, 0, 0)'; // Transparent in OSM mode
               }
               return d.labelColor || "white";
             }}
@@ -1404,6 +1452,9 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
               }
 
               // Handle control polygons
+              if (d.properties.type === "mapControl") {
+                return d.properties.isActive ? "purple" : "gray";
+              }
               if (d.properties.type === "cloudControl") {
                 return d.properties.isActive ? "orange" : "gray";
               }
