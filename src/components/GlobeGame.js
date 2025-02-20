@@ -118,6 +118,7 @@ const getDeterministicColor = (importance) => {
 export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
   // State to ensure client-side rendering
   const [isClient, setIsClient] = useState(false);
+  const [isGlobeReady, setIsGlobeReady] = useState(false);
 
   // Refs
   const globeContainerRef = useRef(null);
@@ -1179,6 +1180,13 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
 
   return (
     <div className="relative w-full">
+      {/* Loading overlay */}
+      {showMap && !isGlobeReady && (
+        <div className="absolute inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center" style={{ height: '700px' }}>
+          <div className="text-white text-xl">Loading Globe with Achievements...</div>
+        </div>
+      )}
+
       {/* Move toggle button for mobile to top */}
       {isMobile && (
         <>
@@ -1224,7 +1232,7 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
       {showMap && (
         <div
           ref={globeContainerRef}
-          className="relative w-full h-[700px] sm:h-[800px] md:h-[900px] globe-container"
+          className={`relative w-full h-[700px] sm:h-[800px] md:h-[900px] globe-container ${!isGlobeReady ? 'opacity-0' : 'opacity-100 transition-opacity duration-500'}`}
         >
           <div className={`text-white absolute ${isFullscreen ? 'top-4 right-16' : 'top-4 left-4'} bg-black bg-opacity-75 p-2 sm:p-4 rounded shadow-lg z-10 text-[10px] sm:text-sm md:text-base max-w-[200px] sm:max-w-none`}>
             <ul>
@@ -1261,6 +1269,11 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
                   window.history.replaceState({}, "", "/");
                 }, 100);
               }
+
+              // Set globe as ready after a short delay to ensure all components are loaded
+              setTimeout(() => {
+                setIsGlobeReady(true);
+              }, 500);
             }}
             initialView={initialLocation}
             width={isFullscreen ? window.innerWidth : dimensions.width}
