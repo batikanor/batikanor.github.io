@@ -1339,15 +1339,15 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
             labelDotRadius={0}
             labelAltitude={(point) => {
               if (clickedMarker && clickedMarker.label === point.label) {
-                return 0.012; // Increased from 0.008
+                return 0.012;
               }
-              return 0.005; // Increased from 0.003
+              return 0.005;
             }}
             pointAltitude={(point) => {
               if (clickedMarker && clickedMarker.label === point.label) {
-                return 0.012; // Increased from 0.008
+                return 0.012;
               }
-              return 0.005; // Increased from 0.003
+              return 0.005;
             }}
             pointResolution={8}
             pointTransitionDuration={300}
