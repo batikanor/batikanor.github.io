@@ -98,7 +98,7 @@ const ProjectDetailsPopup = ({ activity, onClose }) => {
       <div className="bg-white dark:bg-gray-900 rounded-lg shadow-xl border-2 border-gray-200 dark:border-gray-700 w-[95vw] sm:w-[90vw] max-w-[800px] max-h-[95vh] sm:max-h-[90vh] overflow-hidden">
         {/* Header with drag handle - only used on desktop */}
         <div 
-          className="sticky top-0 px-4 py-2 bg-gradient-to-r from-blue-500/10 to-green-500/10 dark:from-blue-500/20 dark:to-green-500/20 rounded-t-lg flex justify-between items-center z-10"
+          className="sticky top-0 px-4 py-2 bg-gradient-to-r from-blue-500/20 to-green-500/20 dark:from-blue-500/20 dark:to-green-500/20 rounded-t-lg flex justify-between items-center z-10"
           onPointerDown={(e) => !isMobile && dragControls.start(e)}
           style={{ cursor: isMobile ? 'default' : 'move' }}
         >
@@ -269,7 +269,7 @@ const MarkerInfo = ({ marker, onClose, navigateWithRefresh, isFullscreen = false
               {/* Drag handle bar - only shown/used on desktop */}
               {!isMobile && (
                 <div 
-                  className="absolute top-0 left-0 right-0 h-8 cursor-move bg-gradient-to-r from-blue-500/10 to-green-500/10 dark:from-blue-500/20 dark:to-green-500/20 rounded-t-lg"
+                  className="absolute top-0 left-0 right-0 h-8 cursor-move bg-gradient-to-r from-blue-500/20 to-green-500/20 dark:from-blue-500/20 dark:to-green-500/20 rounded-t-lg"
                   onPointerDown={(e) => dragControls.start(e)}
                 />
               )}
