@@ -101,8 +101,8 @@ function createPolygon(lat, lng, objType, index, size = 1, rotation = 0) {
 // Function to generate a deterministic color based on the importance
 const getDeterministicColor = (importance) => {
   // Define start and end colors (red to green)
-  const startColor = { r: 255, g: 0, b: 0 };    // Red
-  const endColor = { r: 0, g: 255, b: 0 };    // Green
+  const startColor = { r: 255, g: 100, b: 100 };    // Lighter red
+  const endColor = { r: 100, g: 255, b: 100 };    // Lighter green
 
   // Normalize importance to a 0-1 scale (assuming max importance is 10)
   const normalizedImportance = Math.min(importance / 10, 1);
@@ -112,7 +112,7 @@ const getDeterministicColor = (importance) => {
   const g = Math.round(startColor.g + (endColor.g - startColor.g) * normalizedImportance);
   const b = Math.round(startColor.b + (endColor.b - startColor.b) * normalizedImportance);
 
-  return `rgb(${r}, ${g}, ${b})`;
+  return `rgba(${r}, ${g}, ${b}, 1)`;
 };
 
 export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
@@ -130,7 +130,6 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
 
   // State for marker interactions
   const [clickedMarker, setClickedMarker] = useState(null);
-  const [hoveredMarker, setHoveredMarker] = useState(null);
 
   // Game mode state
   // Possible values: 'ticTacToe', 'planeCollectCoins', false
@@ -448,14 +447,14 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
       lng: location.coordinates.lng,
       label: location.city,
       labelText: location.city.replace(/ü/g, 'ue'),
-      size: location.maxImportance >= 5 ? 20 : 15,
+      size: location.maxImportance >= 5 ? 25 : 20,
       color: getDeterministicColor(location.maxImportance),
       icon: "",
-      animation: location.maxImportance >= 8 ? "pulsate" : "none",
+      animation: location.maxImportance >= 5 ? "pulsate" : "none",
       labelLat: location.coordinates.lat,
       labelLng: location.coordinates.lng,
-      labelSize: 0.7,
-      labelColor: getDeterministicColor(location.maxImportance),
+      labelSize: location.maxImportance >= 5 ? 1 : 0.8,
+      labelColor: location.maxImportance >= 5 ? 'rgba(255, 255, 255, 1)' : 'rgba(255, 255, 255, 0.9)',
       activities: location.activities.map(activity => ({
         venue: activity.venue,
         date: activity.date,
@@ -698,26 +697,16 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
     }
   }, [markers, PATHS_INSTEAD_OF_ARCS]);
 
-  // Debounced hover handler
-  const handlePointHover = useMemo(
-    () =>
-      debounce((point) => {
-        if (!isFullscreen && point) {
-          setHoveredMarker(point);
-        }
-      }, 100),
-    [isFullscreen]
-  );
-
   const handleCloseInfoWindow = () => {
-    setHoveredMarker(null);
+    setClickedMarker(null);
   };
 
-  useEffect(() => {
-    return () => {
-      handlePointHover.cancel();
-    };
-  }, [handlePointHover]);
+  // Simplified point click handler
+  const onPointClick = (point) => {
+    if (point) {
+      setClickedMarker(point);
+    }
+  };
 
   // Calculate the winner of Tic Tac Toe
   const calculateWinner = (board) => {
@@ -767,7 +756,6 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
     setCollectedCoins(0);
     setElapsedTime(0);
     setGameStartTime(null);
-    setHoveredMarker(null);
     setClickedMarker(null);
     setPolygonTransitionDuration(0);
   };
@@ -1060,11 +1048,6 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
       : { lat: 41.0082, lng: 28.9784, altitude: 0.5 };
   }, []);
 
-  // On point click - simplified to only handle city/location markers
-  const onPointClick = (point) => {
-    setClickedMarker(point);
-  };
-
   // Add this new function near your other handlers
   const handleGlobeTouch = (event) => {
     if (!gameMode === "planeCollectCoins" || !isFullscreen || !isMobile) return;
@@ -1292,14 +1275,21 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
             }
             backgroundColor="rgba(0,0,0,0)"
             pointsData={markers}
-            // Force a complete re-render of points each time
             pointsMerge={false}
-            pointSize={(point) =>
-              hoveredMarker && hoveredMarker.label === point.label
-                ? point.size + 5
-                : point.size
-            }
-            pointColor="color"
+            pointSize={(point) => {
+              if (clickedMarker && clickedMarker.label === point.label) {
+                return point.size * 1.3; // 30% larger when clicked
+              }
+              return point.size;
+            }}
+            pointColor={(point) => {
+              if (clickedMarker && clickedMarker.label === point.label) {
+                // Brighter when clicked
+                const color = point.color.match(/\d+/g);
+                return `rgba(${color[0]}, ${Math.min(parseInt(color[1]) + 50, 255)}, ${color[2]}, 1)`;
+              }
+              return point.color;
+            }}
             pointLabel={(point) => `${point.icon || ""} ${point.label}`}
             labelsData={[
               ...markers,
@@ -1347,11 +1337,21 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
               return d.labelColor || "white";
             }}
             labelDotRadius={0}
-            labelAltitude={0.01}
-            pointAltitude={0.01}
-            pointResolution={4}
+            labelAltitude={(point) => {
+              if (clickedMarker && clickedMarker.label === point.label) {
+                return 0.008; // Reduced from 0.012
+              }
+              return 0.003; // Reduced from 0.004
+            }}
+            pointAltitude={(point) => {
+              if (clickedMarker && clickedMarker.label === point.label) {
+                return 0.008; // Reduced from 0.012
+              }
+              return 0.003; // Reduced from 0.004
+            }}
+            pointResolution={8}
+            pointTransitionDuration={300}
             onPointClick={onPointClick}
-            onPointHover={handlePointHover}
             {...(PATHS_INSTEAD_OF_ARCS ? {
               pathsData: pathState.currentPath ? [pathState.currentPath] : [],
               pathColor: () => ['rgba(0,255,0,0.6)', 'rgba(255,0,0,0.6)'],
@@ -1511,18 +1511,14 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
             {isFullscreen ? "X" : "⛶"}
           </button>
 
-          {/* Marker Info - Show in both fullscreen and non-fullscreen modes */}
-          {(
-            (clickedMarker && isFullscreen) || 
-            (hoveredMarker && !isFullscreen) || 
-            gameMode === "planeCollectCoins"
-          ) && (
+          {/* Marker Info - Click only */}
+          {(clickedMarker || gameMode === "planeCollectCoins") && (
             <MarkerInfo
-              marker={clickedMarker || hoveredMarker || {
+              marker={clickedMarker || {
                 label: "Plane Game Status",
                 description: "Collect all coins to win!"
               }}
-              onClose={() => isFullscreen ? setClickedMarker(null) : handleCloseInfoWindow()}
+              onClose={handleCloseInfoWindow}
               navigateWithRefresh={navigateWithRefresh}
               isFullscreen={isFullscreen}
               isGameMode={gameMode !== false}
@@ -1610,7 +1606,7 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
                     : `Player ${winner} Wins!`}
                 </h2>
                 <button
-                  className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                  className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
                   onClick={resetGame}
                 >
                   End Game
