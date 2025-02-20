@@ -21,15 +21,13 @@ const Globe = dynamic(() => import("../components/GlobeWrapper"), { ssr: false }
 const PATHS_INSTEAD_OF_ARCS = true;
 
 const PATHS_CONFIG = {
-  numPaths: 100,              // Fixed number of paths to create
   pointsPerPath: 200,         // Points per path
   maxDeviation: 0.1,         // Maximum lateral deviation in degrees
   maxHeight: 0.905,          // Maximum height
   minHeight: 0.001,          // Minimum height for paths
   minDistance: 5,           // Minimum distance between markers to create a path
-  randomizeConnections: true, // If true, creates random connections instead of sequential
   pathColor: ['rgba(0,255,0,0.6)', 'rgba(255,0,0,0.6)'], // Start and end colors for path gradient
-  changeInterval: 4000,  // Interval in milliseconds to regenerate paths
+  changeInterval: 800,  // Reduced from 4000 to 2000 ms for faster updates
   fadeOutDuration: 0,    // Set to 0 to remove fade out animation
   pathOpacity: 1,       // Base opacity for paths
 };
@@ -795,89 +793,67 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
     setCoins(newCoins);
   };
 
-  // Add these new state variables after the existing state declarations
-  const [currentPaths, setCurrentPaths] = useState([]);
+  // Modify the state declarations
+  const [pathState, setPathState] = useState({
+    currentCityIndex: 0,
+    currentPath: null
+  });
 
-  // Add this function before the return statement
+  // Replace generateNewPaths function
   const generateNewPaths = useCallback(() => {
-    console.log('generateNewPaths called');
-    const pathsArray = [];
     const locations = citiesAndLocations;
     
-    if (PATHS_CONFIG.randomizeConnections) {
-      // Keep track of how many connections each city has
-      const connectionCounts = new Map();
-      locations.forEach(loc => connectionCounts.set(loc.city, 0));
-
-      // Create random connections
-      for (let i = 0; i < PATHS_CONFIG.numPaths; i++) {
-        const availableStartCities = locations.filter(loc => 
-          connectionCounts.get(loc.city) < 2
-        );
+    setPathState(prevState => {
+      // Get current start city
+      const startLocation = locations[prevState.currentCityIndex];
+      
+      // Get random end city (different from start)
+      let endIdx;
+      do {
+        endIdx = Math.floor(Math.random() * locations.length);
+      } while (endIdx === prevState.currentCityIndex);
+      
+      const endLocation = locations[endIdx];
+      
+      // Create path between current city and random next city
+      let currentLat = startLocation.coordinates.lat;
+      let currentLng = startLocation.coordinates.lng;
+      let currentAlt = PATHS_CONFIG.minHeight;
+      
+      const path = [];
+      path.push([currentLat, currentLng, currentAlt]);
+      
+      // Generate points between start and end
+      for (let j = 0; j < PATHS_CONFIG.pointsPerPath; j++) {
+        const progress = j / PATHS_CONFIG.pointsPerPath;
+        const latBias = (endLocation.coordinates.lat - currentLat) * progress;
+        const lngBias = (endLocation.coordinates.lng - currentLng) * progress;
         
-        if (availableStartCities.length === 0) break;
+        currentLat += latBias + (Math.random() * 2 - 1) * PATHS_CONFIG.maxDeviation;
+        currentLng += lngBias + (Math.random() * 2 - 1) * PATHS_CONFIG.maxDeviation;
+        currentAlt = PATHS_CONFIG.minHeight + Math.sin(progress * Math.PI) * PATHS_CONFIG.maxHeight;
         
-        const startIdx = Math.floor(Math.random() * availableStartCities.length);
-        const startLocation = availableStartCities[startIdx];
-        
-        // Find available end cities (excluding those with 2 connections and the start city)
-        const availableEndCities = locations.filter(loc => 
-          connectionCounts.get(loc.city) < 2 && loc.city !== startLocation.city
-        );
-        
-        if (availableEndCities.length === 0) continue;
-        
-        const endIdx = Math.floor(Math.random() * availableEndCities.length);
-        const endLocation = availableEndCities[endIdx];
-
-        // Increment connection counts
-        connectionCounts.set(startLocation.city, connectionCounts.get(startLocation.city) + 1);
-        connectionCounts.set(endLocation.city, connectionCounts.get(endLocation.city) + 1);
-
-        console.log(`Creating path from ${startLocation.city} to ${endLocation.city}`);
-
-        // Create path points
-        const path = [];
-        let currentLat = startLocation.coordinates.lat;
-        let currentLng = startLocation.coordinates.lng;
-        let currentAlt = PATHS_CONFIG.minHeight;
-
         path.push([currentLat, currentLng, currentAlt]);
-
-        // Generate intermediate points
-        for (let j = 0; j < PATHS_CONFIG.pointsPerPath; j++) {
-          const progress = j / PATHS_CONFIG.pointsPerPath;
-          const latBias = (endLocation.coordinates.lat - currentLat) * progress;
-          const lngBias = (endLocation.coordinates.lng - currentLng) * progress;
-
-          currentLat += latBias + (Math.random() * 2 - 1) * PATHS_CONFIG.maxDeviation;
-          currentLng += lngBias + (Math.random() * 2 - 1) * PATHS_CONFIG.maxDeviation;
-          currentAlt = PATHS_CONFIG.minHeight + Math.sin(progress * Math.PI) * PATHS_CONFIG.maxHeight;
-
-          path.push([currentLat, currentLng, currentAlt]);
-        }
-
-        path.push([endLocation.coordinates.lat, endLocation.coordinates.lng, PATHS_CONFIG.minHeight]);
-        pathsArray.push(path);
       }
-    }
-
-    console.log('Generated paths:', pathsArray);
-    setCurrentPaths(pathsArray);
+      
+      path.push([endLocation.coordinates.lat, endLocation.coordinates.lng, PATHS_CONFIG.minHeight]);
+      
+      return {
+        currentCityIndex: endIdx,
+        currentPath: path
+      };
+    });
   }, [citiesAndLocations]);
 
-  // Add this useEffect to trigger path generation
+  // Modify the useEffect for path generation
   useEffect(() => {
     if (!PATHS_INSTEAD_OF_ARCS || gameMode) return;
 
-    console.log('Starting path generation...');
+    // Initial path generation
     generateNewPaths();
 
     // Set up interval for path regeneration
-    const interval = setInterval(() => {
-      console.log('Regenerating paths...');
-      generateNewPaths();
-    }, PATHS_CONFIG.changeInterval);
+    const interval = setInterval(generateNewPaths, PATHS_CONFIG.changeInterval);
 
     return () => clearInterval(interval);
   }, [generateNewPaths, gameMode]);
@@ -1089,8 +1065,6 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
     setClickedMarker(point);
   };
 
-
-
   // Add this new function near your other handlers
   const handleGlobeTouch = (event) => {
     if (!gameMode === "planeCollectCoins" || !isFullscreen || !isMobile) return;
@@ -1198,7 +1172,6 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
       handleHexagonClick(polygon.properties.index);
     }
   };
-
 
   useEffect(() => {
     const loadData = async () => {
@@ -1380,13 +1353,13 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
             onPointClick={onPointClick}
             onPointHover={handlePointHover}
             {...(PATHS_INSTEAD_OF_ARCS ? {
-              pathsData: currentPaths,
+              pathsData: pathState.currentPath ? [pathState.currentPath] : [],
               pathColor: () => ['rgba(0,255,0,0.6)', 'rgba(255,0,0,0.6)'],
               pathDashLength: 0.1,
               pathDashGap: 0.004,
               pathDashAnimateTime: 100000,
               pathPointAlt: pnt => Math.min(pnt[2] * 0.3, 0.005),
-              pathTransitionDuration: 1000
+              pathTransitionDuration: 500  // Reduced from 1000 to 500 ms for faster transitions
             } : {
               arcsData: arcsAndPaths,
               arcStartLat: (d) => d.srcAirport.lat,
