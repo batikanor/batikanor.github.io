@@ -344,9 +344,48 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
     return [...mapControls, ...cloudControls, ...controls];
   }, [cloudOpacity, showBorders, showChoropleth, mapMode]);
 
-  // Modify your existing polygonsData to include game controls
+  // Add this new state declaration
+  const [citiesGeoJSON, setCitiesGeoJSON] = useState({ features: [] });
+
+  // Add this useEffect after your existing useEffects
+  useEffect(() => {
+    const loadCitiesData = async () => {
+      try {
+        const response = await fetch('/data/cities.geojson');
+        const data = await response.json();
+        setCitiesGeoJSON(data);
+      } catch (error) {
+        console.error('Error loading cities GeoJSON:', error);
+        setCitiesGeoJSON({ features: [] });
+      }
+    };
+    loadCitiesData();
+  }, []);
+
+  // Modify your existing polygonsData useMemo to include city polygons
   const polygonsData = useMemo(() => {
-    // Always include game controls, regardless of game mode
+    // Get cities with achievements, normalize names (convert ü to u)
+    const citiesWithAchievements = citiesAndLocations.map(loc => 
+      loc.city.toUpperCase().replace(/Ü/g, 'U')
+    );
+    
+    // Filter and transform city polygons
+    const cityPolygons = citiesGeoJSON.features
+      .filter(feature => citiesWithAchievements.includes(
+        feature.properties.NAME.replace(/Ü/g, 'U')
+      ))
+      .map(feature => ({
+        ...feature,
+        properties: {
+          ...feature.properties,
+          type: 'city',
+          importance: citiesAndLocations.find(loc => 
+            loc.city.toUpperCase().replace(/Ü/g, 'U') === feature.properties.NAME.replace(/Ü/g, 'U')
+          )?.maxImportance || 0
+        }
+      }));
+
+    // Always include game controls
     const gameControls = [
       {
         type: "Feature",
@@ -397,11 +436,11 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
     } else {
       const controls = cloudControlPolygons;
       if (showBorders || showChoropleth) {
-        return [...controls, ...gameControls, ...countryData.features];
+        return [...controls, ...gameControls, ...cityPolygons, ...countryData.features];
       }
-      return [...controls, ...gameControls];
+      return [...controls, ...gameControls, ...cityPolygons];
     }
-  }, [gameMode, sampleGeoJson.features, planeGameGeoJson.features, cloudControlPolygons, showBorders, showChoropleth, countryData]);
+  }, [gameMode, sampleGeoJson.features, planeGameGeoJson.features, cloudControlPolygons, showBorders, showChoropleth, countryData, citiesGeoJSON]);
 
   useEffect(() => {
     // Detect mobile devices
@@ -466,27 +505,29 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
 
   // Now markers can use the deterministic color
   const markers = useMemo(() => {
-    const baseMarkers = citiesAndLocations.map((location) => ({
-      id: `city-${location.city}`,
-      lat: location.coordinates.lat,
-      lng: location.coordinates.lng,
-      label: location.city,
-      labelText: location.city.replace(/ü/g, 'ue'),
-      size: location.maxImportance >= 5 ? 25 : 20,
-      color: getDeterministicColor(location.maxImportance),
-      icon: "",
-      animation: location.maxImportance >= 5 ? "pulsate" : "none",
-      labelLat: location.coordinates.lat,
-      labelLng: location.coordinates.lng,
-      labelSize: location.maxImportance >= 5 ? 1 : 0.8,
-      labelColor: location.maxImportance >= 5 ? 'rgba(255, 255, 255, 1)' : 'rgba(255, 255, 255, 0.9)',
-      activities: location.activities.map(activity => ({
-        venue: activity.venue,
-        date: activity.date,
-        title: activity.title,
-        slug: activity.slug,
-      })),
-    }));
+    // Show markers for ALL cities, not just those without polygons
+    const baseMarkers = citiesAndLocations
+      .map((location) => ({
+        id: `city-${location.city}`,
+        lat: location.coordinates.lat,
+        lng: location.coordinates.lng,
+        label: location.city,
+        labelText: location.city.replace(/ü/g, 'ue'),
+        size: location.maxImportance >= 5 ? 35 : 25,
+        color: getDeterministicColor(location.maxImportance),
+        icon: "",
+        animation: location.maxImportance >= 5 ? "pulsate" : "none",
+        labelLat: location.coordinates.lat,
+        labelLng: location.coordinates.lng,
+        labelSize: location.maxImportance >= 5 ? 1.2 : 1,
+        labelColor: location.maxImportance >= 5 ? 'rgba(255, 255, 255, 1)' : 'rgba(255, 255, 255, 0.95)',
+        activities: location.activities.map(activity => ({
+          venue: activity.venue,
+          date: activity.date,
+          title: activity.title,
+          slug: activity.slug,
+        })),
+      }));
 
     return baseMarkers;
   }, [citiesAndLocations]);
@@ -1137,15 +1178,30 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
 
   // Add this to your polygon click handler
   const handlePolygonClick = (polygon) => {
+    if (polygon.properties.type === "city") {
+      const cityData = citiesAndLocations.find(loc => 
+        loc.city.toUpperCase().replace(/Ü/g, 'U') === polygon.properties.NAME.replace(/Ü/g, 'U')
+      );
+      if (cityData) {
+        setClickedMarker({
+          ...cityData,
+          lat: polygon.geometry.coordinates[0][0][1], // Use first coordinate's latitude
+          lng: polygon.geometry.coordinates[0][0][0], // Use first coordinate's longitude
+          label: cityData.city,
+          activities: cityData.activities
+        });
+      }
+      return;
+    }
+
     if (polygon.properties.type === "mapControl") {
-      setIsMapModeChanging(true); // Set loading state when map mode changes
+      setIsMapModeChanging(true);
       setMapMode(polygon.properties.mode);
     } else if (polygon.properties.type === "cloudControl") {
       setCloudOpacity(polygon.properties.opacity);
     } else if (polygon.properties.type === "borderControl") {
       setShowBorders(prev => {
         const newValue = !prev;
-        // If turning on borders, turn off choropleth
         if (newValue) {
           setShowChoropleth(false);
           setPolygonTransitionDuration(0);
@@ -1155,7 +1211,6 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
     } else if (polygon.properties.type === "choroplethControl") {
       setShowChoropleth(prev => {
         const newValue = !prev;
-        // If turning on choropleth, turn off borders
         if (newValue) {
           setShowBorders(false);
           setPolygonTransitionDuration(1000);
@@ -1408,15 +1463,15 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
             labelDotRadius={0}
             labelAltitude={(point) => {
               if (clickedMarker && clickedMarker.label === point.label) {
-                return 0.012;
+                return 0.015;
               }
-              return 0.005;
+              return 0.008;
             }}
             pointAltitude={(point) => {
               if (clickedMarker && clickedMarker.label === point.label) {
-                return 0.012;
+                return 0.015;
               }
-              return 0.005;
+              return 0.008;
             }}
             pointResolution={8}
             pointTransitionDuration={300}
@@ -1457,6 +1512,18 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
               }
               if (d.properties.objType === "particle") {
                 return `rgba(255, 215, 0, ${d.properties.life})`;
+              }
+
+              // Handle city polygons
+              if (d.properties.type === "city") {
+                const importance = d.properties.importance;
+                const color = getDeterministicColor(importance);
+                // Make city polygons more opaque
+                const rgbaMatch = color.match(/rgba\((\d+),\s*(\d+),\s*(\d+),\s*[\d.]+\)/);
+                if (rgbaMatch) {
+                  return `rgba(${rgbaMatch[1]}, ${rgbaMatch[2]}, ${rgbaMatch[3]}, 0.8)`; // Increased opacity to 0.8
+                }
+                return color;
               }
 
               // Handle control polygons
@@ -1535,16 +1602,21 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
                 return 0.03;
               }
               
+              // Handle city polygons - keep them more visible
+              if (d.properties.type === "city") {
+                return hoveredPolygon === d ? 0.015 : 0.01;
+              }
+
               // Handle other polygon types
               if (gameMode === "ticTacToe" && d.properties.index !== undefined) {
                 return gameBoard[d.properties.index] ? 0.02 : 0.01;
               }
-              // Increase altitude for borders mode
+              // Restore original altitude for borders and choropleth
               if (showBorders && d.properties?.ISO_A2) {
-                return hoveredPolygon === d ? 0.01 : 0.002;
+                return hoveredPolygon === d ? 0.02 : 0.01;
               }
               if (showChoropleth && d.properties?.ISO_A2) {
-                return hoveredPolygon === d ? 0.02 : 0.009;
+                return hoveredPolygon === d ? 0.02 : 0.01;
               }
               return 0;
             }}
@@ -1556,6 +1628,19 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
             cloudOpacity={cloudOpacity}
             onPolygonHover={handlePolygonHover}
             polygonLabel={(d) => {
+              if (d.properties?.type === "city") {
+                const cityData = citiesAndLocations.find(loc => 
+                  loc.city.toUpperCase().replace(/Ü/g, 'U') === d.properties.NAME.replace(/Ü/g, 'U')
+                );
+                if (cityData) {
+                  return `
+                    <div class="bg-black bg-opacity-75 p-2 rounded">
+                      <b>${cityData.city}</b><br />
+                      ${cityData.activities.length} achievement${cityData.activities.length !== 1 ? 's' : ''}
+                    </div>
+                  `;
+                }
+              }
               if (d.properties?.type || gameMode) return null; // No labels for controls or during games
               if (!showChoropleth) return null;
               if (!d.properties?.ADMIN) return null;

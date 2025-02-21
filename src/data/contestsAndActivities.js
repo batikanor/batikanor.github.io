@@ -80,7 +80,7 @@ export const contestsAndActivities = [
     "title": "Finalist at LauzHack 2024: VR Classroom for Focus Improvement",
     "mapData": {
       "venue": "EPFL",
-      "city": "Lausanne",
+      "city": "Laussane",
       "country": "Switzerland",
       "coordinates": { "lat": 46.5191, "lng": 6.5668 }
     },
@@ -505,7 +505,9 @@ Our roadmap includes launching the platform in Zurich, gathering initial data, a
       title: "Bachelor’s Thesis: Cat identification using Noseprints",
       mapData: {
         venue: "Turkish-German University",
-        city: "Istanbul",
+        // city: "Istanbul",
+        city: "Beykoz",
+
         country: "Turkey",
         coordinates: { lat: 41.0082, lng: 28.9784 }
       },
@@ -525,7 +527,8 @@ Our roadmap includes launching the platform in Zurich, gathering initial data, a
       title: "First student ever to graduate from TGU with Perfect GPA",
       mapData: {
         venue: "Turkish-German University",
-        city: "Istanbul",
+        // city: "Istanbul",
+        city: "Beykoz",
         country: "Turkey",
         coordinates: { lat: 41.0082, lng: 28.9784 }
       },
