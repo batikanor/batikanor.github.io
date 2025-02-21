@@ -34,11 +34,11 @@ const GlobeWrapper = ({ onGlobeLoad, initialView, cloudOpacity = 0.25, ...props 
       initialViewSet.current = true;
     }
 
-    // Only pass the globe instance back after clouds are loaded
-    if (isMounted && globeRef.current && onGlobeLoad && cloudsLoaded) {
+    // Call onGlobeLoad as soon as the globe is ready
+    if (isMounted && globeRef.current && onGlobeLoad) {
       onGlobeLoad(globeRef.current);
     }
-  }, [onGlobeLoad, initialView, isMounted, cloudsLoaded]);
+  }, [onGlobeLoad, initialView, isMounted]);
 
   // Add clouds when the globe is mounted
   useEffect(() => {
@@ -47,53 +47,74 @@ const GlobeWrapper = ({ onGlobeLoad, initialView, cloudOpacity = 0.25, ...props 
       const CLOUDS_ALT = 0.004; 
       const CLOUDS_ROTATION_SPEED = -0.006;
 
-      // Preload clouds texture
-      new THREE.TextureLoader().load(CLOUDS_IMG_URL, cloudsTexture => {
-        const clouds = new THREE.Mesh(
-          new THREE.SphereGeometry(globeRef.current.getGlobeRadius() * (1 + CLOUDS_ALT), 75, 75),
-          new THREE.MeshPhongMaterial({ 
-            map: cloudsTexture, 
-            transparent: true,
-            opacity: 0 // Start with 0 opacity
-          })
-        );
-        
-        cloudsRef.current = clouds;
-        globeRef.current.scene().add(clouds);
+      // Clean up any existing clouds first
+      if (cloudsRef.current) {
+        globeRef.current.scene().remove(cloudsRef.current);
+        cloudsRef.current.geometry.dispose();
+        cloudsRef.current.material.dispose();
+        cloudsRef.current = null;
+      }
 
-        // Fade in clouds
-        const startTime = Date.now();
-        const duration = 500; // 500ms fade in
+      // Add clouds after a short delay to ensure globe is ready
+      const timeoutId = setTimeout(() => {
+        new THREE.TextureLoader().load(CLOUDS_IMG_URL, cloudsTexture => {
+          if (!globeRef.current) return; // Check if component is still mounted
 
-        const fadeInClouds = () => {
-          const elapsed = Date.now() - startTime;
-          const progress = Math.min(elapsed / duration, 1);
+          const clouds = new THREE.Mesh(
+            new THREE.SphereGeometry(globeRef.current.getGlobeRadius() * (1 + CLOUDS_ALT), 75, 75),
+            new THREE.MeshPhongMaterial({ 
+              map: cloudsTexture, 
+              transparent: true,
+              opacity: 0 // Start with 0 opacity
+            })
+          );
           
-          if (cloudsRef.current) {
-            cloudsRef.current.material.opacity = cloudOpacity * progress;
-          }
+          cloudsRef.current = clouds;
+          globeRef.current.scene().add(clouds);
 
-          if (progress < 1) {
-            requestAnimationFrame(fadeInClouds);
-          } else {
-            setCloudsLoaded(true);
-          }
-        };
+          // Fade in clouds
+          const startTime = Date.now();
+          const duration = 500; // 500ms fade in
 
-        fadeInClouds();
+          const fadeInClouds = () => {
+            const elapsed = Date.now() - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            
+            if (cloudsRef.current) {
+              cloudsRef.current.material.opacity = cloudOpacity * progress;
+            }
 
-        // Rotate clouds
-        const rotateClouds = () => {
-          if (cloudsRef.current) {
-            cloudsRef.current.rotation.y += CLOUDS_ROTATION_SPEED * Math.PI / 180;
-          }
-          requestAnimationFrame(rotateClouds);
-        };
-        rotateClouds();
-      });
+            if (progress < 1) {
+              requestAnimationFrame(fadeInClouds);
+            } else {
+              setCloudsLoaded(true);
+            }
+          };
 
-      // Cleanup function to remove clouds when component unmounts
+          fadeInClouds();
+
+          // Rotate clouds
+          let animationFrameId;
+          const rotateClouds = () => {
+            if (cloudsRef.current) {
+              cloudsRef.current.rotation.y += CLOUDS_ROTATION_SPEED * Math.PI / 180;
+              animationFrameId = requestAnimationFrame(rotateClouds);
+            }
+          };
+          rotateClouds();
+
+          // Cleanup function for rotation animation
+          return () => {
+            if (animationFrameId) {
+              cancelAnimationFrame(animationFrameId);
+            }
+          };
+        });
+      }, 1000); // Wait 1 second after globe mount
+
+      // Cleanup function
       return () => {
+        clearTimeout(timeoutId);
         if (cloudsRef.current && globeRef.current) {
           globeRef.current.scene().remove(cloudsRef.current);
           cloudsRef.current.geometry.dispose();
@@ -102,7 +123,7 @@ const GlobeWrapper = ({ onGlobeLoad, initialView, cloudOpacity = 0.25, ...props 
         }
       };
     }
-  }, [isMounted]); // Only depend on isMounted
+  }, [isMounted, cloudOpacity]);
 
   // Update cloud opacity when it changes
   useEffect(() => {

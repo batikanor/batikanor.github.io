@@ -119,6 +119,7 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
   // State to ensure client-side rendering
   const [isClient, setIsClient] = useState(false);
   const [isGlobeReady, setIsGlobeReady] = useState(false);
+  const [isMapModeChanging, setIsMapModeChanging] = useState(false);
   const [mapMode, setMapMode] = useState('osm'); // 'osm' (default), 'day', 'night'
 
   // Refs
@@ -1137,6 +1138,7 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
   // Add this to your polygon click handler
   const handlePolygonClick = (polygon) => {
     if (polygon.properties.type === "mapControl") {
+      setIsMapModeChanging(true); // Set loading state when map mode changes
       setMapMode(polygon.properties.mode);
     } else if (polygon.properties.type === "cloudControl") {
       setCloudOpacity(polygon.properties.opacity);
@@ -1206,9 +1208,9 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
   return (
     <div className="relative w-full">
       {/* Loading overlay */}
-      {showMap && !isGlobeReady && (
+      {showMap && (!isGlobeReady || isMapModeChanging) && (
         <div className="absolute inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center" style={{ height: '700px' }}>
-          <div className="text-white text-xl">Loading Globe with Achievements...</div>
+          <div className="text-white text-xl">Loading Globe...</div>
         </div>
       )}
 
@@ -1298,6 +1300,7 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
               // Set globe as ready after a short delay to ensure all components are loaded
               setTimeout(() => {
                 setIsGlobeReady(true);
+                setIsMapModeChanging(false); // Clear loading state when globe is ready
               }, 500);
             }}
             key={mapMode} // Force complete remount when map mode changes
@@ -1386,10 +1389,15 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
             }}
             labelColor={d => {
               if (d.properties?.type === "mapControl") {
-                return d.properties.isActive ? "purple" : "white";
+                return mapMode === 'osm' ? "black" : (d.properties.isActive ? "purple" : "white");
+              }
+              if (d.properties?.type === "cloudControl" || 
+                  d.properties?.type === "borderControl" || 
+                  d.properties?.type === "choroplethControl") {
+                return mapMode === 'osm' ? "black" : "white";
               }
               if (d.properties?.type === "gameControl") {
-                return d.properties.isActive ? "purple" : "white";
+                return mapMode === 'osm' ? "black" : (d.properties.isActive ? "purple" : "white");
               }
               // For city markers, make transparent in OSM mode, white otherwise
               if (mapMode === 'osm') {
