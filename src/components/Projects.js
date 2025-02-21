@@ -258,7 +258,7 @@ const Projects = () => {
               } transition-all duration-300`}
             >
               <div 
-                className={`tilt-card relative p-4 rounded-lg shadow-lg bg-white dark:bg-gray-900/40 border-[3px] border-gray-300 ${
+                className={`tilt-card relative p-4 rounded-lg shadow-lg bg-white dark:bg-gray-900/80 border-[3px] border-gray-300 ${
                   activity.highlighted ? "highlight" : ""
                 } ${!isExpanded ? `${getImportanceStyles(activity.importance).borderStyle} ${getImportanceStyles(activity.importance).borderColor}` : ""}`}
                 style={{ transformStyle: 'preserve-3d' }}

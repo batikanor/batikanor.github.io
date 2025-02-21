@@ -244,7 +244,7 @@ const MarkerInfo = ({ marker, onClose, navigateWithRefresh, isFullscreen = false
     ? "fixed top-40 right-16 z-[100]"
     : "fixed top-1/2 right-4 transform -translate-y-1/2 z-[100]";
 
-  const contentClasses = `relative p-4 rounded-lg shadow-lg bg-white dark:bg-gray-900/40 border-[3px] border-gray-300 ${
+  const contentClasses = `relative p-4 rounded-lg shadow-lg bg-white dark:bg-gray-900/80 border-[3px] border-gray-300 ${
     isFullscreen ? "max-w-md" : "max-w-[200px] sm:max-w-xs"
   }`;
 
