@@ -15,6 +15,78 @@ import { NAVBAR_HEIGHT, MAP_HEIGHT } from '../constants/layout';
 import MarkerInfo from './MarkerInfo';
 import { useTheme } from 'next-themes';
 
+// Performance settings
+const POLYGON_RESOLUTION = 6;         // Resolution for polygon rendering
+const POINT_RESOLUTION = 8;           // Resolution for point markers
+const TRANSITION_DURATION = 0;        // Duration for transitions (0 for instant)
+const GAME_UPDATE_INTERVAL = 32;      // ~30 FPS (1000ms / 30) - reduced from 60 FPS
+const ANIMATION_FRAME_RATE = 30;      // Reduced target frame rate
+const PARTICLE_UPDATE_INTERVAL = 32;  // Reduced particle update rate
+
+// Minimum and maximum altitude for flying objects (like planes and particles)
+const MIN_ALTITUDE = 0.01;  // Very close to globe surface
+const MAX_ALTITUDE = 0.5;   // Half a globe radius above surface
+
+// GDP Choropleth map specific altitudes
+const GDP_BASE_ALTITUDE = 0.015;     // Base height for GDP choropleth countries
+const GDP_HOVER_ALTITUDE = 0.025;    // Height when hovering over GDP choropleth countries
+const GDP_RICH_BONUS = 0.008;        // Additional height for high GDP countries
+
+// Regular map altitudes
+const COUNTRY_BASE_ALTITUDE = 0.02;  // Base height for regular country borders
+const COUNTRY_HOVER_ALTITUDE = 0.02; // Height when hovering over countries
+
+// Label heights for different types
+const CITY_LABEL_HEIGHT = 0.025;     // Height for city labels
+const CITY_LABEL_HOVER = 0.035;      // Height for hovered city labels
+const GDP_LABEL_HEIGHT = 0.045;      // Height for GDP choropleth labels
+const CONTROL_LABEL_HEIGHT = 0.03;   // Height for control buttons/labels
+const GAME_LABEL_HEIGHT = 0.035;     // Height for game-related labels
+
+// Point (marker) heights
+const CITY_POINT_HEIGHT = 0.015;     // Height for city points/markers
+const CITY_POINT_HOVER = 0.025;      // Height for hovered city points
+const CONTROL_POINT_HEIGHT = 0.02;   // Height for control points
+const GAME_POINT_HEIGHT = 0.04;     // Height for game-related points
+
+// Game-specific heights and speeds
+const PLANE_ALTITUDE = 0.03;         // Height for plane
+const COIN_ALTITUDE = 0.02;          // Height for coins
+const PLANE_COLLECTION_RADIUS = 1;   // Distance to collect coins
+const PLANE_CAMERA_OFFSET = 0.2;     // Camera distance
+const PLANE_SPEED = 24.0;            // Base movement speed - significantly increased for faster movement
+const PLANE_ROTATION_SPEED = 10;    // Rotation speed in degrees
+
+// Add these movement-specific constants
+const MOVEMENT_UPDATE_INTERVAL = 16;  // Update at 60fps
+const MOVEMENT_SPEED = 3.0;          // Movement speed multiplier - doubled for faster movement
+
+// Marker dimensions
+const MARKER_RADIUS = 4;             // Base radius for markers in pixels
+const MARKER_HEIGHT = 0.015;         // Height of marker extrusion relative to globe radius
+
+// Path and arc parameters
+const PATH_ALTITUDE = 0.1;           // Maximum height of paths/arcs relative to globe radius
+const PATH_SEGMENTS = 64;            // Number of segments in curved paths for smoothness
+
+// Animation and transition timings (in milliseconds)
+const CAMERA_TRANSITION_TIME = 1000;  // Time for camera movements
+const MARKER_TRANSITION_TIME = 800;   // Time for marker animations
+
+// Rotation limits and speeds
+const MAX_ROTATION_SPEED = 5;        // Maximum rotation speed in degrees per frame
+const AUTO_ROTATE_SPEED = 0.5;       // Speed of automatic globe rotation in degrees per frame
+
+// Add these game-specific constants at the top with other constants
+const CAMERA_UPDATE_INTERVAL = 100;    // Update camera every 100ms
+const CAMERA_SMOOTHING = 0.1;          // Camera smoothing factor
+const CAMERA_MIN_MOVE = 0.01;          // Minimum movement to trigger camera update
+
+// Add these constants at the top with other game constants
+const PLANE_BASE_SPEED = 0.3;            // Base movement speed
+const PLANE_ROTATION_SMOOTHING = 0.15;   // How smoothly the plane rotates
+const PLANE_MOVEMENT_SMOOTHING = 0.1;    // How smoothly the plane moves
+
 // Dynamically import the GlobeWrapper component without server-side rendering
 const Globe = dynamic(() => import("../components/GlobeWrapper"), { ssr: false });
 
@@ -240,7 +312,6 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
 
   // Add this to your state declarations
   const [cloudOpacity, setCloudOpacity] = useState(0.25);
-  const [planeVelocity, setPlaneVelocity] = useState({ x: 0, y: 0 });
   const [particles, setParticles] = useState([]);
   // Add this to your useMemo for polygons
   const cloudControlPolygons = useMemo(() => {
@@ -513,7 +584,7 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
         lng: location.coordinates.lng,
         label: location.city,
         labelText: location.city.replace(/ü/g, 'ue'),
-        size: location.maxImportance >= 5 ? 35 : 25,
+        size: location.maxImportance >= 5 ? MARKER_RADIUS * 7 : MARKER_RADIUS * 5,  // Using our global constant
         color: getDeterministicColor(location.maxImportance),
         icon: "",
         animation: location.maxImportance >= 5 ? "pulsate" : "none",
@@ -645,20 +716,20 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
         { 
           lat: planePosition.lat, 
           lng: planePosition.lng, 
-          // altitude: 2  // Set initial altitude but allow user to change it
+          altitude: MAX_ALTITUDE  // Using our global constant
         },
-        1000
+        CAMERA_TRANSITION_TIME  // Using our global constant
       );
     } else if (gameMode === "ticTacToe") {
       globeEl.current.pointOfView(
-        { lat: 26, lng: 30, altitude: 0.4 },
-        1000
+        { lat: 26, lng: 30, altitude: PATH_ALTITUDE },  // Using our global constant
+        CAMERA_TRANSITION_TIME
       );
     } else {
-      // Default
+      // Default view
       globeEl.current.pointOfView(
-        { lat: 41.0082, lng: 28.9784, altitude: 0.6 },
-        1000
+        { lat: 41.0082, lng: 28.9784, altitude: MAX_ALTITUDE },  // Using our global constant
+        CAMERA_TRANSITION_TIME
       );
     }
   }, [gameMode, planePosition]);
@@ -917,92 +988,114 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
   const DECELERATION = 0.98;
   const MAX_SPEED = 1;
 
-  // Replace the existing plane movement logic with this improved version
+  // Add these refs at the top with other refs
+  const keysRef = useRef({ w: false, a: false, s: false, d: false });
+  const planePositionRef = useRef({ lat: 55.7558, lng: 37.6173 });
+  const lastUpdateTime = useRef(performance.now());
+  const frameId = useRef(null);
+
+  // Replace the keyboard event handlers useEffect and plane movement useEffect with this new version
   useEffect(() => {
     if (gameMode !== "planeCollectCoins") return;
 
-    const updatePlanePosition = () => {
-      let newVelocity = { ...planeVelocity };
+    let keys = { w: false, a: false, s: false, d: false };
+    let frameId = null;
+    let lastTime = performance.now();
 
-      // Handle keyboard inputs
-      if (keysPressed.w) newVelocity.y += ACCELERATION;
-      if (keysPressed.s) newVelocity.y -= ACCELERATION;
-      if (keysPressed.a) newVelocity.x -= ACCELERATION;
-      if (keysPressed.d) newVelocity.x += ACCELERATION;
-
-      // Handle joystick input for mobile
-      if (isDragging && (joystickPosition.x !== 0 || joystickPosition.y !== 0)) {
-        // Convert joystick position to velocity
-        // Normalize by 40 (radius used in handleTouchMove)
-        newVelocity.x += (joystickPosition.x / 40) * ACCELERATION * 2;
-        newVelocity.y -= (joystickPosition.y / 40) * ACCELERATION * 2; // Inverted Y for correct direction
+    const handleKeyDown = (e) => {
+      const key = e.key.toLowerCase();
+      if (["w", "a", "s", "d"].includes(key)) {
+        e.preventDefault();
+        keys[key] = true;
       }
-
-      // Apply deceleration
-      newVelocity.x *= DECELERATION;
-      newVelocity.y *= DECELERATION;
-
-      // Limit maximum speed
-      const speed = Math.sqrt(newVelocity.x ** 2 + newVelocity.y ** 2);
-      if (speed > MAX_SPEED) {
-        newVelocity.x = (newVelocity.x / speed) * MAX_SPEED;
-        newVelocity.y = (newVelocity.y / speed) * MAX_SPEED;
-      }
-
-      // Calculate rotation based on movement direction
-      if (Math.abs(newVelocity.x) > 0.01 || Math.abs(newVelocity.y) > 0.01) {
-        const angle = Math.atan2(newVelocity.y, newVelocity.x);
-        setPlaneRotation((angle * (180 / Math.PI)) - 90);
-      }
-
-      // Update position
-      let newLat = planePosition.lat + newVelocity.y;
-      let newLng = planePosition.lng + newVelocity.x;
-
-      // Wrap around longitude
-      if (newLng > 180) newLng -= 360;
-      if (newLng < -180) newLng += 360;
-
-      // Clamp latitude
-      newLat = Math.max(-85, Math.min(85, newLat));
-
-      // Check coin collection and update camera in a single frame
-      setCoins(prevCoins => {
-        const remainingCoins = prevCoins.filter(coin => {
-          const dist = Math.sqrt((coin.lat - newLat) ** 2 + (coin.lng - newLng) ** 2);
-          if (dist < 2) {
-            createCoinCollectionEffect(coin.lat, coin.lng);
-            setCollectedCoins(prev => prev + 1);
-            return false; // remove coin
-          }
-          return true;
-        });
-        
-        // Update plane position and camera together
-        setPlanePosition({ lat: newLat, lng: newLng });
-        setPlaneVelocity(newVelocity);
-        
-        if (globeEl.current) {
-          // Get current altitude
-          // const currentPov = globeEl.current.pointOfView();
-          // Only update lat/lng, keep current altitude
-          globeEl.current.pointOfView(
-            { 
-              lat: newLat, 
-              lng: newLng, 
-              // altitude: currentPov.altitude 
-            },
-            0
-          );
-        }
-        
-        return remainingCoins;
-      });
     };
 
-    const frameId = requestAnimationFrame(updatePlanePosition);
-    return () => cancelAnimationFrame(frameId);
-  }, [keysPressed, planePosition, planeVelocity, gameMode, isDragging, joystickPosition]);
+    const handleKeyUp = (e) => {
+      const key = e.key.toLowerCase();
+      if (["w", "a", "s", "d"].includes(key)) {
+        e.preventDefault();
+        keys[key] = false;
+      }
+    };
+
+    const updatePlanePosition = () => {
+      const currentTime = performance.now();
+      const deltaTime = (currentTime - lastTime) / 1000;
+      lastTime = currentTime;
+
+      // Calculate movement direction
+      let moveX = 0;
+      let moveY = 0;
+
+      if (keys.w) moveY += 1;
+      if (keys.s) moveY -= 1;
+      if (keys.a) moveX -= 1;
+      if (keys.d) moveX += 1;
+
+      // Add joystick input for mobile
+      if (isDragging && (joystickPosition.x !== 0 || joystickPosition.y !== 0)) {
+        moveX += joystickPosition.x / 40;
+        moveY -= joystickPosition.y / 40;
+      }
+
+      // Only update if there's movement
+      if (moveX !== 0 || moveY !== 0) {
+        // Calculate angle and update rotation
+        const angle = Math.atan2(moveY, moveX);
+        const newRotation = (angle * (180 / Math.PI)) - 90;
+        setPlaneRotation(newRotation);
+
+        // Calculate new position with increased speed
+        const speed = PLANE_SPEED * deltaTime;
+        let newLat = planePosition.lat + moveY * speed;
+        let newLng = planePosition.lng + moveX * speed;
+
+        // Wrap around longitude
+        if (newLng > 180) newLng -= 360;
+        if (newLng < -180) newLng += 360;
+
+        // Clamp latitude
+        newLat = Math.max(-85, Math.min(85, newLat));
+
+        // Update position
+        setPlanePosition({ lat: newLat, lng: newLng });
+
+        // Check coin collection
+        setCoins(prevCoins => {
+          const remainingCoins = prevCoins.filter(coin => {
+            const dist = Math.sqrt(
+              Math.pow(coin.lat - newLat, 2) + 
+              Math.pow(coin.lng - newLng, 2)
+            );
+            if (dist < PLANE_COLLECTION_RADIUS) {
+              setCollectedCoins(prev => prev + 1);
+              return false;
+            }
+            return true;
+          });
+          return remainingCoins;
+        });
+      }
+
+      frameId = requestAnimationFrame(updatePlanePosition);
+    };
+
+    // Add event listeners
+    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keyup", handleKeyUp);
+
+    // Start animation loop
+    frameId = requestAnimationFrame(updatePlanePosition);
+
+    // Cleanup
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("keyup", handleKeyUp);
+      if (frameId) {
+        cancelAnimationFrame(frameId);
+      }
+    };
+  }, [gameMode, planePosition, isDragging, joystickPosition]);
 
   // Add this function to create particle effects
   const createCoinCollectionEffect = (lat, lng) => {
@@ -1038,31 +1131,6 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
     const particleInterval = setInterval(updateParticles, 16);
     return () => clearInterval(particleInterval);
   }, [particles]);
-
-  // Keyboard event handlers
-  useEffect(() => {
-    if (gameMode !== "planeCollectCoins") return;
-    const handleKeyDown = (e) => {
-      const key = e.key.toLowerCase();
-      if (["w", "a", "s", "d"].includes(key)) {
-        e.preventDefault();
-        setKeysPressed((prev) => ({ ...prev, [key]: true }));
-      }
-    };
-    const handleKeyUp = (e) => {
-      const key = e.key.toLowerCase();
-      if (["w", "a", "s", "d"].includes(key)) {
-        e.preventDefault();
-        setKeysPressed((prev) => ({ ...prev, [key]: false }));
-      }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    window.addEventListener("keyup", handleKeyUp);
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-      window.removeEventListener("keyup", handleKeyUp);
-    };
-  }, [gameMode]);
 
   // Timer
   useEffect(() => {
@@ -1462,19 +1530,52 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
             }}
             labelDotRadius={0}
             labelAltitude={(point) => {
-              if (clickedMarker && clickedMarker.label === point.label) {
-                return 0.015;
+              // For control labels (map mode, cloud controls, etc.)
+              if (point.properties?.type === "mapControl" ||
+                  point.properties?.type === "cloudControl" || 
+                  point.properties?.type === "borderControl" || 
+                  point.properties?.type === "choroplethControl") {
+                return CONTROL_LABEL_HEIGHT;
               }
-              return 0.008;
+
+              // For game controls
+              if (point.properties?.type === "gameControl") {
+                return GAME_LABEL_HEIGHT;
+              }
+
+              // For GDP choropleth labels
+              if (showChoropleth && point.properties?.GDP_MD_EST) {
+                return GDP_LABEL_HEIGHT;
+              }
+
+              // For city markers
+              if (clickedMarker && clickedMarker.label === point.label) {
+                return CITY_LABEL_HOVER;
+              }
+              return CITY_LABEL_HEIGHT;
             }}
             pointAltitude={(point) => {
-              if (clickedMarker && clickedMarker.label === point.label) {
-                return 0.015;
+              // For control points
+              if (point.properties?.type === "mapControl" ||
+                  point.properties?.type === "cloudControl" || 
+                  point.properties?.type === "borderControl" || 
+                  point.properties?.type === "choroplethControl") {
+                return CONTROL_POINT_HEIGHT;
               }
-              return 0.008;
+
+              // For game controls
+              if (point.properties?.type === "gameControl") {
+                return GAME_POINT_HEIGHT;
+              }
+
+              // For city markers
+              if (clickedMarker && clickedMarker.label === point.label) {
+                return CITY_POINT_HOVER;
+              }
+              return CITY_POINT_HEIGHT;
             }}
-            pointResolution={8}
-            pointTransitionDuration={300}
+            pointResolution={POINT_RESOLUTION}
+            pointTransitionDuration={TRANSITION_DURATION}
             onPointClick={onPointClick}
             {...(PATHS_INSTEAD_OF_ARCS ? {
               pathsData: pathState.currentPath ? [pathState.currentPath] : [],
@@ -1483,7 +1584,7 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
               pathDashGap: 0.004,
               pathDashAnimateTime: 100000,
               pathPointAlt: pnt => Math.min(pnt[2] * 0.3, 0.005),
-              pathTransitionDuration: 500  // Reduced from 1000 to 500 ms for faster transitions
+              pathTransitionDuration: TRANSITION_DURATION  // Reduced from 1000 to 500 ms for faster transitions
             } : {
               arcsData: arcsAndPaths,
               arcStartLat: (d) => d.srcAirport.lat,
@@ -1596,31 +1697,46 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
             polygonAltitude={(d) => {
               // Handle plane game altitude first
               if (d.properties.objType === "plane") {
-                return 0.05;
+                return PLANE_ALTITUDE;
               }
               if (d.properties.objType === "coin") {
-                return 0.03;
+                return COIN_ALTITUDE;
               }
               
               // Handle city polygons - keep them more visible
               if (d.properties.type === "city") {
-                return hoveredPolygon === d ? 0.015 : 0.01;
+                return hoveredPolygon === d ? CITY_POINT_HOVER : CITY_POINT_HEIGHT;
               }
 
               // Handle other polygon types
               if (gameMode === "ticTacToe" && d.properties.index !== undefined) {
-                return gameBoard[d.properties.index] ? 0.02 : 0.01;
+                return gameBoard[d.properties.index] ? TICTACTOE_MARKED_HEIGHT : TICTACTOE_BASE_HEIGHT;
               }
-              // Restore original altitude for borders and choropleth
+
+              // Handle choropleth mode with GDP-based heights
+              if (showChoropleth && d.properties?.GDP_MD_EST) {
+                const gdpValue = d.properties.GDP_MD_EST;
+                const popValue = d.properties.POP_EST || 1;
+                const gdpPerCapita = gdpValue * 1000000 / popValue;
+                
+                // Add extra height for richer countries
+                const gdpBonus = gdpPerCapita > 30000 ? GDP_RICH_BONUS : 0;
+                
+                return hoveredPolygon === d 
+                  ? GDP_HOVER_ALTITUDE + gdpBonus 
+                  : GDP_BASE_ALTITUDE + gdpBonus;
+              }
+
+              // Handle regular borders mode
               if (showBorders && d.properties?.ISO_A2) {
-                return hoveredPolygon === d ? 0.02 : 0.01;
+                return hoveredPolygon === d 
+                  ? COUNTRY_HOVER_ALTITUDE 
+                  : COUNTRY_BASE_ALTITUDE;
               }
-              if (showChoropleth && d.properties?.ISO_A2) {
-                return hoveredPolygon === d ? 0.02 : 0.01;
-              }
-              return 0;
+
+              return MIN_ALTITUDE;
             }}
-            polygonResolution={6}
+            polygonResolution={POLYGON_RESOLUTION}
             onPolygonClick={handlePolygonClick}
             onGlobeClick={handleGlobeTouch}
             onGlobeTouchStart={handleGlobeTouch}
