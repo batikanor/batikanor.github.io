@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import VanillaTilt from 'vanilla-tilt'; // You'll need to install this
+import { CV_CONFIG } from './config';
 
 export default function CV() {
   const [isMobile, setIsMobile] = useState(false);
@@ -58,7 +59,7 @@ export default function CV() {
           </p>
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
             <a
-              href="https://docs.google.com/document/d/1WJrlmn0cTgHiylnJaGbDYt_AX4li0fC8VFtORVIkh8w/export?format=pdf"
+              href={CV_CONFIG.pdfDownloadUrl}
               download
               className="inline-block bg-gradient-to-r from-green-500 to-green-600 text-white px-6 py-3 rounded-lg font-semibold shadow-md hover:shadow-lg transition-all duration-200"
             >
@@ -84,7 +85,7 @@ export default function CV() {
             <div className="absolute -inset-1 bg-gradient-to-tr from-green-500/20 to-blue-500/20 blur-sm" />
             
             <iframe
-              src="https://docs.google.com/document/d/e/2PACX-1vQneAZ5e8gxeySlhgZoHBj3GQ_XGqQ1Ykephk0ISrMx9vldhVLq8aL5S6bEt437PSfe8qJU8VPpnb74/pub?embedded=true"
+              src={CV_CONFIG.embeddedViewUrl}
               style={{
                 width: '100%',
                 height: '100%',
@@ -107,7 +108,7 @@ export default function CV() {
             <motion.a
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              href="https://docs.google.com/document/d/1WJrlmn0cTgHiylnJaGbDYt_AX4li0fC8VFtORVIkh8w/export?format=pdf"
+              href={CV_CONFIG.pdfDownloadUrl}
               download
               className="inline-block bg-gradient-to-r from-green-500 to-green-600 text-white px-6 py-3 rounded-lg font-semibold shadow-md hover:shadow-lg transition-all duration-200"
             >
