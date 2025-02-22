@@ -15,13 +15,18 @@ import { NAVBAR_HEIGHT, MAP_HEIGHT } from '../constants/layout';
 import MarkerInfo from './MarkerInfo';
 import { useTheme } from 'next-themes';
 
+// Dynamically import the GlobeWrapper component without server-side rendering
+const Globe = dynamic(() => import("../components/GlobeWrapper"), { ssr: false });
+
 // Performance settings
 const POLYGON_RESOLUTION = 6;         // Resolution for polygon rendering
 const POINT_RESOLUTION = 8;           // Resolution for point markers
 const TRANSITION_DURATION = 0;        // Duration for transitions (0 for instant)
-const GAME_UPDATE_INTERVAL = 32;      // ~30 FPS (1000ms / 30) - reduced from 60 FPS
-const ANIMATION_FRAME_RATE = 30;      // Reduced target frame rate
-const PARTICLE_UPDATE_INTERVAL = 32;  // Reduced particle update rate
+
+// Globe view distances
+const INITIAL_GLOBE_ALTITUDE = 2.5;   // Starting distance (far)
+const MAIN_GLOBE_ALTITUDE = 0.5;      // Final distance (closer)
+const INITIAL_ZOOM_DURATION = 2000;   // Duration of initial zoom in milliseconds
 
 // Minimum and maximum altitude for flying objects (like planes and particles)
 const MIN_ALTITUDE = 0.01;  // Very close to globe surface
@@ -47,48 +52,26 @@ const GAME_LABEL_HEIGHT = 0.035;     // Height for game-related labels
 const CITY_POINT_HEIGHT = 0.015;     // Height for city points/markers
 const CITY_POINT_HOVER = 0.025;      // Height for hovered city points
 const CONTROL_POINT_HEIGHT = 0.02;   // Height for control points
-const GAME_POINT_HEIGHT = 0.04;     // Height for game-related points
+const GAME_POINT_HEIGHT = 0.04;      // Height for game-related points
 
 // Game-specific heights and speeds
 const PLANE_ALTITUDE = 0.03;         // Height for plane
 const COIN_ALTITUDE = 0.02;          // Height for coins
 const PLANE_COLLECTION_RADIUS = 1;   // Distance to collect coins
-const PLANE_CAMERA_OFFSET = 0.2;     // Camera distance
-const PLANE_SPEED = 24.0;            // Base movement speed - significantly increased for faster movement
-const PLANE_ROTATION_SPEED = 10;    // Rotation speed in degrees
-
-// Add these movement-specific constants
-const MOVEMENT_UPDATE_INTERVAL = 16;  // Update at 60fps
-const MOVEMENT_SPEED = 3.0;          // Movement speed multiplier - doubled for faster movement
+const PLANE_SPEED = 24.0;            // Base movement speed
 
 // Marker dimensions
 const MARKER_RADIUS = 4;             // Base radius for markers in pixels
-const MARKER_HEIGHT = 0.015;         // Height of marker extrusion relative to globe radius
 
 // Path and arc parameters
 const PATH_ALTITUDE = 0.1;           // Maximum height of paths/arcs relative to globe radius
-const PATH_SEGMENTS = 64;            // Number of segments in curved paths for smoothness
 
 // Animation and transition timings (in milliseconds)
 const CAMERA_TRANSITION_TIME = 1000;  // Time for camera movements
-const MARKER_TRANSITION_TIME = 800;   // Time for marker animations
 
-// Rotation limits and speeds
-const MAX_ROTATION_SPEED = 5;        // Maximum rotation speed in degrees per frame
-const AUTO_ROTATE_SPEED = 0.5;       // Speed of automatic globe rotation in degrees per frame
-
-// Add these game-specific constants at the top with other constants
-const CAMERA_UPDATE_INTERVAL = 100;    // Update camera every 100ms
-const CAMERA_SMOOTHING = 0.1;          // Camera smoothing factor
-const CAMERA_MIN_MOVE = 0.01;          // Minimum movement to trigger camera update
-
-// Add these constants at the top with other game constants
-const PLANE_BASE_SPEED = 0.3;            // Base movement speed
-const PLANE_ROTATION_SMOOTHING = 0.15;   // How smoothly the plane rotates
-const PLANE_MOVEMENT_SMOOTHING = 0.1;    // How smoothly the plane moves
-
-// Dynamically import the GlobeWrapper component without server-side rendering
-const Globe = dynamic(() => import("../components/GlobeWrapper"), { ssr: false });
+// TicTacToe game heights
+const TICTACTOE_BASE_HEIGHT = 0.02;  // Base height for empty TicTacToe cells
+const TICTACTOE_MARKED_HEIGHT = 0.03; // Height for marked TicTacToe cells
 
 const PATHS_INSTEAD_OF_ARCS = true;
 
@@ -242,6 +225,7 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
   const [hoveredPolygon, setHoveredPolygon] = useState(null);
   const [planeRotation, setPlaneRotation] = useState(0);
   const [polygonTransitionDuration, setPolygonTransitionDuration] = useState(0);
+  const [isInitialZoom, setIsInitialZoom] = useState(true);
 
   // Sample GeoJSON data for the Tic-Tac-Toe polygons
   const sampleGeoJson = useMemo(
@@ -716,19 +700,19 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
         { 
           lat: planePosition.lat, 
           lng: planePosition.lng, 
-          altitude: MAX_ALTITUDE  // Using our global constant
+          altitude: MAIN_GLOBE_ALTITUDE
         },
-        CAMERA_TRANSITION_TIME  // Using our global constant
+        CAMERA_TRANSITION_TIME
       );
     } else if (gameMode === "ticTacToe") {
       globeEl.current.pointOfView(
-        { lat: 26, lng: 30, altitude: PATH_ALTITUDE },  // Using our global constant
+        { lat: 26, lng: 30, altitude: MAIN_GLOBE_ALTITUDE },
         CAMERA_TRANSITION_TIME
       );
     } else {
       // Default view
       globeEl.current.pointOfView(
-        { lat: 41.0082, lng: 28.9784, altitude: MAX_ALTITUDE },  // Using our global constant
+        { lat: 41.0082, lng: 28.9784, altitude: MAIN_GLOBE_ALTITUDE },
         CAMERA_TRANSITION_TIME
       );
     }
@@ -1173,14 +1157,14 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
       return {
         lat: highlighted.mapData.coordinates.lat,
         lng: highlighted.mapData.coordinates.lng,
-        altitude: 0.5
+        altitude: isInitialZoom ? INITIAL_GLOBE_ALTITUDE : MAIN_GLOBE_ALTITUDE
       };
     }
     // fallback
     return activities[0]
-      ? { lat: activities[0].coordinates.lat, lng: activities[0].coordinates.lng, altitude: 0.5 }
-      : { lat: 41.0082, lng: 28.9784, altitude: 0.5 };
-  }, []);
+      ? { lat: activities[0].coordinates.lat, lng: activities[0].coordinates.lng, altitude: isInitialZoom ? INITIAL_GLOBE_ALTITUDE : MAIN_GLOBE_ALTITUDE }
+      : { lat: 41.0082, lng: 28.9784, altitude: isInitialZoom ? INITIAL_GLOBE_ALTITUDE : MAIN_GLOBE_ALTITUDE };
+  }, [isInitialZoom]);
 
   // Add this new function near your other handlers
   const handleGlobeTouch = (event) => {
@@ -1415,15 +1399,27 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
 
               if (!isNaN(lat) && !isNaN(lng)) {
                 setTimeout(() => {
-                  globe.pointOfView({ lat, lng, altitude: 0.4 }, 1000);
+                  globe.pointOfView({ lat, lng, altitude: MAIN_GLOBE_ALTITUDE }, INITIAL_ZOOM_DURATION);
                   window.history.replaceState({}, "", "/");
+                }, 100);
+              } else if (isInitialZoom) {
+                // Start the initial zoom animation
+                setTimeout(() => {
+                  globe.pointOfView(
+                    { 
+                      ...initialLocation,
+                      altitude: MAIN_GLOBE_ALTITUDE 
+                    },
+                    INITIAL_ZOOM_DURATION
+                  );
+                  setIsInitialZoom(false);
                 }, 100);
               }
 
               // Set globe as ready after a short delay to ensure all components are loaded
               setTimeout(() => {
                 setIsGlobeReady(true);
-                setIsMapModeChanging(false); // Clear loading state when globe is ready
+                setIsMapModeChanging(false);
               }, 500);
             }}
             key={mapMode} // Force complete remount when map mode changes
