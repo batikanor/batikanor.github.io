@@ -210,12 +210,12 @@ const Projects = () => {
     if (!isMobile) {
       tiltElements.forEach(element => {
         VanillaTilt.init(element, {
-          max: 3, // Reduced tilt for cards
-          scale: 1.02, // Subtle scale
-          speed: 800,
+          max: 1.5, // Reduced from 3 to 1.5
+          scale: 1.01, // Reduced from 1.02 to 1.01
+          speed: 1000, // Increased from 800 to 1000 for smoother movement
           glare: true,
-          "max-glare": 0.1,
-          perspective: 1000,
+          "max-glare": 0.05, // Reduced from 0.1 to 0.05
+          perspective: 1500, // Increased from 1000 to 1500 for subtler effect
         });
       });
     }
@@ -301,13 +301,13 @@ const Projects = () => {
                   <p className="mb-4 dark:text-gray-300">{activity.date}</p>
                   
                   {/* Display Short Description */}
-                  {!isMinor && <p className="mb-4 dark:text-gray-200">{activity.shortDescription}</p>}
+                  <p className="mb-8 dark:text-gray-200">{activity.shortDescription}</p>
                   
                   {/* Display Long Description if Expanded */}
                   {isExpanded && (
                     <>
                       {activity.longDescription.split('\n').map((line, index) => (
-                        <p className="dark:text-white" key={index}>{line}</p>
+                        <p className="dark:text-white mb-6" key={index}>{line}</p>
                       ))}
                       <br/>
                       <button

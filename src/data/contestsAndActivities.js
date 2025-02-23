@@ -1,4 +1,34 @@
 export const contestsAndActivities = [
+
+  {"slug": "european-defense-tech-2025-munich",
+    "importance": 3,
+    "title": "Finalist at European Defense Tech Competition 2025 Munich",
+    "mapData": {
+      "venue": "Unternehmertum Garching",
+      "city": "Munich",
+      "country": "Germany",
+      "coordinates": { lat: 48.1351, lng: 11.5820 }
+    },
+    "date": "02/2025",
+    "shortDescription": "We built a solution to help detect and counter shaheed drones through a cheaper radar system during the biggest defense tech hackathon thus far.",
+    "longDescription": "\
+    \ The idea was to devise a software-hardware bundle radar system that doesn't cost hundreds of thousands of dollars, but can guide a kill of a shaheed drone through an interceptor drone. \n \
+    \ Out of the 40+ attending teams who went through the initial screening and managed to participate in this event, we were one of the few to make it to the final, and I made a very impressive pitch, after which I was contacted by multiple people from Ukrainian defense ministry and ukrainian / european defense companies. We were even given some implicit opportunities to test the system.\n\n  \
+    \ \n My teammate Emil had already built the radar system which costs far less than the more expensive systems, but still more than a thousand dollars. My contribution was to help make the system run in our demo setting, and provide AI implementation to enable the detection and classification of drones up to a satisfactory range. Due to the confidentiality nature of the sector, I cannot share any more details. \n\n \
+    \ \n Emil is more focused on the project on the long run, and he went directly to Kiev after the competition to continue the work. Contact him if you are interested in getting more information regarding the project. You can reach out to him through the linkedin post attached under 'links'.\
+    \ \n\n All for a safer europe! \ ",
+    "technologies": ["AI", "Python", "Radar Systems"],
+    "links": [
+      {label: "LinkedIn Post Regarding the Project", url: "https://www.linkedin.com/posts/emil-knutsson-8a4694237_this-is-why-european-defense-tech-edth-activity-7297240944100204544-oWMs?utm_source=share&utm_medium=member_desktop&rcm=ACoAACL8UREBa3FbjBW-yu7HCZmgCHJBrj-opz4"}
+    ],
+    "gdrive_embed": [ 
+      "https://drive.google.com/file/d/1AOgqKR_rebmcpswz4Q6TArD17jbAiV9f/view?usp=sharing",
+      "https://drive.google.com/file/d/1mSAf6-6gfYEm3FHCadufDTNS5vg_fst1/view?usp=sharing"
+    ],
+
+
+  },
+
   {
     "slug": "tech-berlin-ai-hackathon-2",
     "importance": 2,
