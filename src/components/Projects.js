@@ -301,7 +301,14 @@ const Projects = () => {
                   <p className="mb-4 dark:text-gray-300">{activity.date}</p>
                   
                   {/* Display Short Description */}
-                  <p className="mb-8 dark:text-gray-200">{activity.shortDescription}</p>
+                  <div className="mb-8 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg border-l-4 border-blue-400 dark:border-blue-500">
+                    <div className="flex items-center mb-2">
+                      <span className="text-xs uppercase tracking-wider text-blue-500 dark:text-blue-400 font-semibold">Summary</span>
+                    </div>
+                    <p className={`text-gray-700 dark:text-gray-200 italic ${!isExpanded ? "line-clamp-1" : ""}`}>
+                      {activity.shortDescription}
+                    </p>
+                  </div>
                   
                   {/* Display Long Description if Expanded */}
                   {isExpanded && (
