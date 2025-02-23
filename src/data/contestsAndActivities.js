@@ -2,7 +2,7 @@ export const contestsAndActivities = [
   {
     "slug": "tech-berlin-ai-hackathon-2",
     "importance": 2,
-    "title": "(to be updated) Winner of Balderton Capital Challenge at {Tech: Berlin} AI Hackathon",
+    "title": "Winner of Balderton Capital Challenge at {Tech: Berlin} AI Hackathon",
     "mapData": {
       "venue": "CODE Berlin",
       "city": "Berlin",
@@ -10,13 +10,24 @@ export const contestsAndActivities = [
       "coordinates": { lat: 52.520008, lng: 13.404954 }
     },
     "date": "01/2025",
-    "shortDescription": "To be updated",
-    "longDescription": "To be updated",
-    "technologies": ["AI"],
+    "shortDescription": "The won the balderton capital sponsored track, which was about making personal finance and investing more accessible to regular people.",
+    "longDescription": "\
+The vision of the SaaS platform -- integrated with common brokers like Scalable Capital -- was to provide real-time warnings or opportunities reports on whether certain political events like elections, law changes, etc., affect your portfolio and give you easily explained and interactive information on how this event will affect your stocks. Making complex political and economic causalities simply by leveraging a knowledge graph that captures complex relationships between different entities and using an LLM to use the causality to reason about the consequences. \
+\n\n \
+\n We were building an innovative GraphRAG solution that made use of Mistral AI, OpenAI and Neo4j in order to give indicators of how financial markets might be influenced through geo-political events happening at the present by comparing previous cases with similar characteristics, inducing the same outcomes and warning users whether their portfolio might be affected of it. We built a very cool solution with a Nuxt.js platform that allows you to interact with future scenarios by prompting how x might affect y, how would France leaving the EU affect the economy of France in the long run.",
+    "technologies": ["AI", "Neo4j", "Large Language Models (LLM)", "GraphRAG", "FastAPI", "Nuxt.js", "Python"],
     "links": [
       { label: "Hackathon Details", url: "https://trusted-grill-16a.notion.site/Tech-Berlin-AI-Hackathon-2-1746dbf0dcd78058ae8edd7b1cb6083f" },
-      {label: "Detailed LinkedIn Post Regarding the Project", url: "https://www.linkedin.com/posts/martin-mohammed_ai-graphrag-activity-7287020028309176320-BIIT?utm_source=share&utm_medium=member_desktop"}
+      {label: "Detailed LinkedIn Post Regarding the Project", url: "https://www.linkedin.com/posts/martin-mohammed_ai-graphrag-activity-7287020028309176320-BIIT?utm_source=share&utm_medium=member_desktop"},
+      {label: "Our demo video (Beware, not very polished)", url:"https://drive.google.com/file/d/1zWmfD1Hk3xMNP9MOZBmAb4jCP-K_MzhX/view?usp=sharing"}
     ],
+    "gdrive_embed": [
+      "https://drive.google.com/file/d/1d0BULESEArbLCNBlmC9ZhQSSnKLPb51E/view?usp=sharing",
+      "https://drive.google.com/file/d/1hJxgIWURaqP_1kbx7yP1E82HLgUNSgmg/view?usp=sharing",
+      "https://drive.google.com/file/d/1hBnF-VyPQ6tewqU7OyTX65uSBGX384gt/view?usp=sharing",
+      "https://docs.google.com/presentation/d/1YRglGHUGEQ-AieB2vgbJ6LyDepy822g6D1KgulMA1gA/edit?usp=sharing",
+
+    ]
   },
   {
     "slug": "huawei-agorize-2024",
