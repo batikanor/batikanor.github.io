@@ -91,10 +91,10 @@ const ResizableEmbed = ({ url, initialHeight = 300 }) => {
   }, [height]);
 
   return (
-    <div className="relative mb-4">
+    <div className="relative mb-4 w-full max-w-full overflow-hidden">
       <iframe 
         src={getGoogleDriveEmbedUrl(url)} 
-        className="w-full border-0"
+        className="w-full border-0 rounded-lg"
         style={{ height: `${height}px` }}
         allowFullScreen
       />
@@ -178,11 +178,11 @@ const Projects = () => {
     return (
       <div className="group relative inline-block">
         <p 
-          className="flex items-center gap-2 dark:text-gray-300 cursor-pointer hover:text-blue-400"
+          className="flex items-center gap-1 dark:text-gray-300 cursor-pointer hover:text-blue-400 text-xs sm:text-sm truncate"
           onClick={onClick}
         >
-          <FaGlobe className="text-blue-400" />
-          {activity.mapData.venue}, {activity.mapData.city}/{activity.mapData.country}
+          <FaGlobe className="text-blue-400 flex-shrink-0" />
+          <span className="truncate">{activity.mapData.venue}, {activity.mapData.city}/{activity.mapData.country}</span>
           
           {/* Tooltip */}
           <span className="invisible group-hover:visible absolute left-0 top-full mt-2 w-48 p-2 bg-gray-800 text-white text-sm rounded shadow-lg z-10">
@@ -237,7 +237,7 @@ const Projects = () => {
       </motion.h2>
 
       {/* Activities Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-7">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
         {contestsAndActivities.map((activity, index) => {
           const isExpanded = expandedActivity === activity;
           const isMicro = activity.importance < 2;
@@ -253,12 +253,12 @@ const Projects = () => {
               className={`${
                 isExpanded ? "col-span-1 sm:col-span-2 lg:col-span-4" : 
                 isMicro ? "col-span-1" : 
-                isMinor ? "col-span-1 sm:col-span-1 lg:col-span-1" : 
-                "col-span-1 sm:col-span-2 lg:col-span-2"
+                isMinor ? "col-span-1" : 
+                "col-span-1 lg:col-span-2"
               } transition-all duration-300`}
             >
               <div 
-                className={`tilt-card relative p-4 rounded-lg shadow-lg bg-white dark:bg-gray-900/80 border-[3px] border-gray-300 ${
+                className={`tilt-card relative p-3 sm:p-4 rounded-lg shadow-lg bg-white dark:bg-gray-900/80 border-[3px] border-gray-300 overflow-hidden ${
                   activity.highlighted ? "highlight" : ""
                 } ${!isExpanded ? `${getImportanceStyles(activity.importance).borderStyle} ${getImportanceStyles(activity.importance).borderColor}` : ""}`}
                 style={{ transformStyle: 'preserve-3d' }}
@@ -270,67 +270,70 @@ const Projects = () => {
                 
                 {/* Remove the old colored bar div and continue with existing content */}
                 <div className="relative z-20">
-                  <div className="flex justify-between items-start">
+                  <div className="flex justify-between items-start flex-wrap">
                     <h3 className={`${
-                      isMicro ? 'text-xs sm:text-base' :
-                      isMinor ? 'text-sm sm:text-lg' : 
-                      'text-lg sm:text-2xl'
-                    } font-semibold mb-2`}>
+                      isMicro ? 'text-xs sm:text-sm' :
+                      isMinor ? 'text-sm sm:text-base' : 
+                      'text-base sm:text-lg'
+                    } font-semibold mb-2 max-w-[70%]`}>
                       {activity.title}
                     </h3>
-                    <div className="flex flex-col items-end gap-2">
+                    <div className="flex flex-col items-end gap-2 ml-auto">
                       {!isExpanded && (isMicro || isMinor) && (
-                        <span className={`text-xs px-2 py-1 rounded-full ${
+                        <span className={`text-xs px-2 py-1 rounded-full whitespace-nowrap ${
                           isMicro ? 'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300' : 
                           'bg-purple-200 text-purple-700 dark:bg-purple-700 dark:text-purple-200'
                         }`}>
-                          {isMicro ? 'MICRO' : 'MINOR ACHIEVEMENT'}
+                          {isMicro ? 'MICRO' : 'MINOR'}
                         </span>
                       )}
                       <button
                         onClick={() => toggleExpandedView(activity)}
-                        className="px-3 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700"
+                        className="px-3 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 whitespace-nowrap"
                       >
                         {isExpanded ? "Collapse" : "See more"}
                       </button>
                     </div>
                   </div>
                   
-                  <LocationDisplay activity={activity} onClick={() => handleLocationClick(activity)} />
-                  
-                  <p className="mb-4 dark:text-gray-300">{activity.date}</p>
-                  
-                  {/* Display Short Description */}
-                  <div className="mb-8 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg border-l-4 border-blue-400 dark:border-blue-500">
-                    <div className="flex items-center mb-2">
-                      <span className="text-xs uppercase tracking-wider text-blue-500 dark:text-blue-400 font-semibold">Summary</span>
+                  <div className="overflow-hidden">
+                    <LocationDisplay activity={activity} onClick={() => handleLocationClick(activity)} />
+                    
+                    <p className="mb-4 dark:text-gray-300 truncate">{activity.date}</p>
+                    
+                    {/* Display Short Description */}
+                    <div className="mb-3 p-2 bg-gray-50 dark:bg-gray-800/50 rounded-lg border-l-4 border-blue-400 dark:border-blue-500">
+                      <div className="flex items-center mb-1">
+                        <span className="text-xs uppercase tracking-wider text-blue-500 dark:text-blue-400 font-semibold">Summary</span>
+                      </div>
+                      <p className={`text-xs sm:text-sm text-gray-700 dark:text-gray-200 italic ${!isExpanded ? "line-clamp-2 sm:line-clamp-1" : ""}`}>
+                        {activity.shortDescription}
+                      </p>
                     </div>
-                    <p className={`text-gray-700 dark:text-gray-200 italic ${!isExpanded ? "line-clamp-1" : ""}`}>
-                      {activity.shortDescription}
-                    </p>
                   </div>
                   
                   {/* Display Long Description if Expanded */}
                   {isExpanded && (
-                    <>
+                    <div className="mt-4 overflow-hidden">
                       {activity.longDescription.split('\n').map((line, index) => (
                         <p className="dark:text-white mb-6" key={index}>{line}</p>
                       ))}
-                      <br/>
-                      <button
-                        onClick={() => handleCopyLink(activity.slug)}
-                        className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-500 mb-4"
-                      >
-                        Copy Link to this Project
-                      </button>
+                      <div className="mt-4">
+                        <button
+                          onClick={() => handleCopyLink(activity.slug)}
+                          className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-500 mb-4"
+                        >
+                          Copy Link to this Project
+                        </button>
+                      </div>
                       
                       {/* Add Links */}
                       {activity.links && activity.links.length > 0 && (
-                        <div className="mb-4">
+                        <div className="mb-4 overflow-hidden">
                           <h4 className="font-semibold">Links:</h4>
-                          <ul>
+                          <ul className="space-y-1">
                             {activity.links.map((link, index) => (
-                              <li key={index}>
+                              <li key={index} className="truncate">
                                 <a href={link.url} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">
                                   {link.label}
                                 </a>
@@ -358,9 +361,11 @@ const Projects = () => {
                       {activity.images && activity.images.length > 0 && (
                         <div className="mb-4">
                           <h4 className="font-semibold">Images:</h4>
-                          {activity.images.map((image, index) => (
-                            <img key={index} src={getGoogleDriveImageEmbedUrl(image)} alt={`Project image ${index + 1}`} className="mb-2" />
-                          ))}
+                          <div className="space-y-4">
+                            {activity.images.map((image, index) => (
+                              <img key={index} src={getGoogleDriveImageEmbedUrl(image)} alt={`Project image ${index + 1}`} className="w-full rounded-lg shadow-md" />
+                            ))}
+                          </div>
                         </div>
                       )}
 
@@ -371,7 +376,7 @@ const Projects = () => {
                           ))}
                         </div>
                       )}
-                    </>
+                    </div>
                   )}
                 </div>
               </div>
