@@ -51,58 +51,82 @@ const getImportanceStyles = (importance) => {
   }
 };
 
-// Update the iframe component to be resizable
+// Update the iframe component with preset size options and better controls
 const ResizableEmbed = ({ url, initialHeight = 300 }) => {
   const [height, setHeight] = useState(initialHeight);
-  const resizeRef = useRef(null);
+  const [isExpanded, setIsExpanded] = useState(false);
   
-  useEffect(() => {
-    if (!resizeRef.current) return;
-    
-    let startY;
-    let startHeight;
-    
-    const onMouseDown = (e) => {
-      startY = e.clientY;
-      startHeight = height;
-      document.addEventListener('mousemove', onMouseMove);
-      document.addEventListener('mouseup', onMouseUp);
-    };
-    
-    const onMouseMove = (e) => {
-      const delta = e.clientY - startY;
-      setHeight(Math.max(200, startHeight + delta)); // Minimum height of 200px
-    };
-    
-    const onMouseUp = () => {
-      document.removeEventListener('mousemove', onMouseMove);
-      document.removeEventListener('mouseup', onMouseUp);
-    };
-    
-    resizeRef.current.addEventListener('mousedown', onMouseDown);
-    
-    return () => {
-      if (resizeRef.current) {
-        resizeRef.current.removeEventListener('mousedown', onMouseDown);
-      }
-      document.removeEventListener('mousemove', onMouseMove);
-      document.removeEventListener('mouseup', onMouseUp);
-    };
-  }, [height]);
+  const presetSizes = {
+    small: 250,
+    medium: 450,
+    large: 650,
+    full: 850
+  };
+
+  const handleSizeChange = (size) => {
+    setHeight(presetSizes[size]);
+    setIsExpanded(size === 'full');
+  };
+
+  const toggleExpand = () => {
+    if (isExpanded) {
+      setHeight(presetSizes.medium);
+      setIsExpanded(false);
+    } else {
+      setHeight(presetSizes.full);
+      setIsExpanded(true);
+    }
+  };
 
   return (
-    <div className="relative mb-4 w-full max-w-full overflow-hidden">
+    <div className="relative mb-4 w-full max-w-full overflow-hidden embed-container">
       <iframe 
         src={getGoogleDriveEmbedUrl(url)} 
-        className="w-full border-0 rounded-lg"
+        className="w-full border-0 rounded-lg transition-height duration-300 ease-in-out"
         style={{ height: `${height}px` }}
         allowFullScreen
       />
-      <div 
-        ref={resizeRef}
-        className="absolute bottom-0 left-0 right-0 h-2 bg-gray-200 hover:bg-gray-300 cursor-ns-resize"
-        title="Drag to resize"
-      />
+      <div className="embed-controls">
+        <div className="size-controls bg-white dark:bg-gray-800 px-2 py-1 rounded-lg shadow-md flex items-center justify-between">
+          <div className="flex space-x-2">
+            <button 
+              onClick={() => handleSizeChange('small')} 
+              className={`size-btn ${height === presetSizes.small ? 'active' : ''}`}
+              title="Small size"
+            >
+              S
+            </button>
+            <button 
+              onClick={() => handleSizeChange('medium')} 
+              className={`size-btn ${height === presetSizes.medium ? 'active' : ''}`}
+              title="Medium size"
+            >
+              M
+            </button>
+            <button 
+              onClick={() => handleSizeChange('large')} 
+              className={`size-btn ${height === presetSizes.large ? 'active' : ''}`}
+              title="Large size"
+            >
+              L
+            </button>
+            <button 
+              onClick={() => handleSizeChange('full')} 
+              className={`size-btn ${height === presetSizes.full ? 'active' : ''}`}
+              title="Full size"
+            >
+              XL
+            </button>
+          </div>
+          <button 
+            onClick={toggleExpand} 
+            className="expand-btn ml-2"
+            title={isExpanded ? "Collapse" : "Expand"}
+          >
+            {isExpanded ? "↓" : "↑"}
+          </button>
+        </div>
+      </div>
     </div>
   );
 };
