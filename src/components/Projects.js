@@ -1,24 +1,28 @@
-import React, { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
-import VanillaTilt from 'vanilla-tilt';
-import "./Projects.css";
+import { useEffect, useState } from "react";
+import { FaGlobe } from "react-icons/fa";
+import VanillaTilt from "vanilla-tilt";
 import { contestsAndActivities } from "../data/contestsAndActivities";
-import { NAVBAR_HEIGHT } from '../constants/layout';
-import { FaGlobe } from 'react-icons/fa';
+import "./Projects.css";
 
 // import ResizePanel from "react-resize-panel";
-const ResizePanel = typeof window !== "undefined" ? require("react-resize-panel").default : null;
+const ResizePanel =
+  typeof window !== "undefined" ? require("react-resize-panel").default : null;
 
 // Function to convert Google Drive link to embeddable format for videos and documents
 const getGoogleDriveEmbedUrl = (url) => {
   const fileIdMatch = url.match(/[-\w]{25,}/);
-  return fileIdMatch ? `https://drive.google.com/file/d/${fileIdMatch[0]}/preview` : url;
+  return fileIdMatch
+    ? `https://drive.google.com/file/d/${fileIdMatch[0]}/preview`
+    : url;
 };
 
 // Function to convert Google Drive link to embeddable image format
 const getGoogleDriveImageEmbedUrl = (url) => {
   const fileIdMatch = url.match(/[-\w]{25,}/);
-  return fileIdMatch ? `https://drive.google.com/uc?export=view&id=${fileIdMatch[0]}` : url;
+  return fileIdMatch
+    ? `https://drive.google.com/uc?export=view&id=${fileIdMatch[0]}`
+    : url;
 };
 
 // Replace getDeterministicColor with getImportanceStyles
@@ -26,27 +30,27 @@ const getImportanceStyles = (importance) => {
   // Define different style configurations based on importance ranges
   if (importance >= 8) {
     return {
-      borderStyle: 'border-l-4 border-t-4',
-      borderColor: 'border-yellow-400',
-      bgGradient: 'bg-gradient-to-r from-yellow-100/10 to-transparent'
+      borderStyle: "border-l-4 border-t-4",
+      borderColor: "border-accent-hover",
+      bgGradient: "bg-gradient-to-r from-accent-hover/10 to-transparent",
     };
   } else if (importance >= 5) {
     return {
-      borderStyle: 'border-l-4',
-      borderColor: 'border-blue-400',
-      bgGradient: 'bg-gradient-to-r from-blue-100/10 to-transparent'
+      borderStyle: "border-l-4",
+      borderColor: "border-accent",
+      bgGradient: "bg-gradient-to-r from-accent/10 to-transparent",
     };
   } else if (importance >= 2) {
     return {
-      borderStyle: 'border-l-2',
-      borderColor: 'border-purple-400',
-      bgGradient: 'bg-gradient-to-r from-purple-100/10 to-transparent'
+      borderStyle: "border-l-2",
+      borderColor: "border-accent",
+      bgGradient: "bg-gradient-to-r from-accent/5 to-transparent",
     };
   } else {
     return {
-      borderStyle: 'border-l',
-      borderColor: 'border-gray-400',
-      bgGradient: 'bg-gradient-to-r from-gray-100/10 to-transparent'
+      borderStyle: "border-l",
+      borderColor: "border-light-border dark:border-dark-border",
+      bgGradient: "bg-gradient-to-r from-light-border/10 to-transparent",
     };
   }
 };
@@ -55,17 +59,17 @@ const getImportanceStyles = (importance) => {
 const ResizableEmbed = ({ url, initialHeight = 300 }) => {
   const [height, setHeight] = useState(initialHeight);
   const [isExpanded, setIsExpanded] = useState(false);
-  
+
   const presetSizes = {
     small: 250,
     medium: 450,
     large: 650,
-    full: 850
+    full: 850,
   };
 
   const handleSizeChange = (size) => {
     setHeight(presetSizes[size]);
-    setIsExpanded(size === 'full');
+    setIsExpanded(size === "full");
   };
 
   const toggleExpand = () => {
@@ -80,46 +84,54 @@ const ResizableEmbed = ({ url, initialHeight = 300 }) => {
 
   return (
     <div className="relative mb-4 w-full max-w-full overflow-hidden embed-container">
-      <iframe 
-        src={getGoogleDriveEmbedUrl(url)} 
+      <iframe
+        src={getGoogleDriveEmbedUrl(url)}
         className="w-full border-0 rounded-lg transition-height duration-300 ease-in-out"
         style={{ height: `${height}px` }}
         allowFullScreen
       />
       <div className="embed-controls">
-        <div className="size-controls bg-white dark:bg-gray-800 px-2 py-1 rounded-lg shadow-md flex items-center justify-between">
+        <div className="size-controls bg-light-background-secondary dark:bg-dark-background-secondary px-2 py-1 rounded-lg shadow-md flex items-center justify-between">
           <div className="flex space-x-2">
-            <button 
-              onClick={() => handleSizeChange('small')} 
-              className={`size-btn ${height === presetSizes.small ? 'active' : ''}`}
+            <button
+              onClick={() => handleSizeChange("small")}
+              className={`size-btn ${
+                height === presetSizes.small ? "active" : ""
+              }`}
               title="Small size"
             >
               S
             </button>
-            <button 
-              onClick={() => handleSizeChange('medium')} 
-              className={`size-btn ${height === presetSizes.medium ? 'active' : ''}`}
+            <button
+              onClick={() => handleSizeChange("medium")}
+              className={`size-btn ${
+                height === presetSizes.medium ? "active" : ""
+              }`}
               title="Medium size"
             >
               M
             </button>
-            <button 
-              onClick={() => handleSizeChange('large')} 
-              className={`size-btn ${height === presetSizes.large ? 'active' : ''}`}
+            <button
+              onClick={() => handleSizeChange("large")}
+              className={`size-btn ${
+                height === presetSizes.large ? "active" : ""
+              }`}
               title="Large size"
             >
               L
             </button>
-            <button 
-              onClick={() => handleSizeChange('full')} 
-              className={`size-btn ${height === presetSizes.full ? 'active' : ''}`}
+            <button
+              onClick={() => handleSizeChange("full")}
+              className={`size-btn ${
+                height === presetSizes.full ? "active" : ""
+              }`}
               title="Full size"
             >
               XL
             </button>
           </div>
-          <button 
-            onClick={toggleExpand} 
+          <button
+            onClick={toggleExpand}
             className="expand-btn ml-2"
             title={isExpanded ? "Collapse" : "Expand"}
           >
@@ -137,7 +149,9 @@ const Projects = () => {
 
   // Function to handle scrolling to a project
   const scrollToProject = (slug) => {
-    const foundActivity = contestsAndActivities.find((activity) => activity.slug === slug);
+    const foundActivity = contestsAndActivities.find(
+      (activity) => activity.slug === slug
+    );
     if (foundActivity) {
       setExpandedActivity(foundActivity);
 
@@ -146,10 +160,10 @@ const Projects = () => {
         requestAnimationFrame(() => {
           const element = document.getElementById(foundActivity.slug);
           if (element) {
-            const offset = element.offsetTop - NAVBAR_HEIGHT - 20; // Added 20px padding
+            const offset = element.offsetTop - 20; // No navbar height needed anymore
             window.scrollTo({
               top: offset,
-              behavior: "smooth"
+              behavior: "smooth",
             });
           }
         });
@@ -170,7 +184,7 @@ const Projects = () => {
   const toggleExpandedView = (activity) => {
     const newExpandedActivity = activity === expandedActivity ? null : activity;
     setExpandedActivity(newExpandedActivity);
-    
+
     if (newExpandedActivity) {
       scrollToProject(activity.slug);
     }
@@ -179,37 +193,45 @@ const Projects = () => {
   const handleCopyLink = (slug) => {
     const url = `${window.location.origin}/projects#${slug}`;
     // const url = `${window.location.origin}${window.location.pathname}#${slug}`;
-    
+
     try {
-      navigator.clipboard.writeText(url).then(() => {
-        alert("Link copied to clipboard!");
-      }).catch(err => {
-        console.error("Failed to copy the link:", err);
-        alert("Unable to copy link. Please try again.");
-      });
+      navigator.clipboard
+        .writeText(url)
+        .then(() => {
+          alert("Link copied to clipboard!");
+        })
+        .catch((err) => {
+          console.error("Failed to copy the link:", err);
+          alert("Unable to copy link. Please try again.");
+        });
     } catch (err) {
       console.error("Clipboard API error:", err);
-      alert("Clipboard operation failed. Please make sure the document is focused.");
+      alert(
+        "Clipboard operation failed. Please make sure the document is focused."
+      );
     }
   };
-  
+
   const handleLocationClick = (activity) => {
     const url = `${window.location.origin}/?lat=${activity.mapData.coordinates.lat}&lng=${activity.mapData.coordinates.lng}`;
     window.location.href = url;
   };
-  
+
   const LocationDisplay = ({ activity, onClick }) => {
     return (
       <div className="group relative inline-block">
-        <p 
-          className="flex items-center gap-1 dark:text-gray-300 cursor-pointer hover:text-blue-400 text-xs sm:text-sm truncate"
+        <p
+          className="flex items-center gap-1 text-light-foreground-secondary dark:text-dark-foreground-secondary cursor-pointer hover:text-accent-hover text-xs sm:text-sm truncate"
           onClick={onClick}
         >
-          <FaGlobe className="text-blue-400 flex-shrink-0" />
-          <span className="truncate">{activity.mapData.venue}, {activity.mapData.city}/{activity.mapData.country}</span>
-          
+          <FaGlobe className="text-accent flex-shrink-0" />
+          <span className="truncate">
+            {activity.mapData.venue}, {activity.mapData.city}/
+            {activity.mapData.country}
+          </span>
+
           {/* Tooltip */}
-          <span className="invisible group-hover:visible absolute left-0 top-full mt-2 w-48 p-2 bg-gray-800 text-white text-sm rounded shadow-lg z-10">
+          <span className="invisible group-hover:visible absolute left-0 top-full mt-2 w-48 p-2 bg-dark-background text-dark-foreground text-sm rounded shadow-lg z-10">
             Click to view location on the map
           </span>
         </p>
@@ -223,8 +245,8 @@ const Projects = () => {
       setIsMobile(window.innerWidth <= 768);
     };
     handleResize();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   // Add this useEffect for tilt effect
@@ -232,7 +254,7 @@ const Projects = () => {
     // Initialize tilt effect on all project cards
     const tiltElements = document.querySelectorAll(".tilt-card");
     if (!isMobile) {
-      tiltElements.forEach(element => {
+      tiltElements.forEach((element) => {
         VanillaTilt.init(element, {
           max: 1.5, // Reduced from 3 to 1.5
           scale: 1.01, // Reduced from 1.02 to 1.01
@@ -245,23 +267,72 @@ const Projects = () => {
     }
   }, [isMobile, expandedActivity]); // Re-run when cards expand/collapse
 
+  // Function to parse and render content with inline images/embeds
+  const renderContentWithInlineMedia = (content, activity) => {
+    if (!content) return null;
+
+    // Split content by inline media placeholders
+    const parts = content.split(
+      /(\{\{(?:image|embed|gdrive_embed)\[\d+\]\}\})/g
+    );
+
+    return parts.map((part, index) => {
+      // Check if this part is an inline media placeholder
+      const imageMatch = part.match(/\{\{image\[(\d+)\]\}\}/);
+      const embedMatch = part.match(/\{\{(?:embed|gdrive_embed)\[(\d+)\]\}\}/);
+
+      if (imageMatch) {
+        const imageIndex = parseInt(imageMatch[1]);
+        if (activity.images && activity.images[imageIndex]) {
+          return (
+            <div key={index} className="my-6 flex justify-center">
+              <img
+                src={getGoogleDriveImageEmbedUrl(activity.images[imageIndex])}
+                alt={`Inline image ${imageIndex + 1}`}
+                className="max-w-full rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300"
+                style={{ maxHeight: "500px", objectFit: "contain" }}
+              />
+            </div>
+          );
+        }
+      } else if (embedMatch) {
+        const embedIndex = parseInt(embedMatch[1]);
+        if (activity.gdrive_embed && activity.gdrive_embed[embedIndex]) {
+          return (
+            <div key={index} className="my-6">
+              <ResizableEmbed url={activity.gdrive_embed[embedIndex]} />
+            </div>
+          );
+        }
+      } else {
+        // Regular text content - split by newlines and render paragraphs
+        return part.split("\n").map((line, lineIndex) => {
+          if (line.trim()) {
+            return (
+              <p
+                key={`${index}-${lineIndex}`}
+                className="text-light-foreground dark:text-dark-foreground mb-4"
+              >
+                {line}
+              </p>
+            );
+          }
+          return null;
+        });
+      }
+      return null;
+    });
+  };
+
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
-      className="max-w-6xl mx-auto py-8 px-4 sm:px-6 lg:px-8"
+      className="w-full py-8"
     >
-      <motion.h2 
-        initial={{ y: -20 }}
-        animate={{ y: 0 }}
-        className="text-3xl font-bold tracking-tight text-center mb-12"
-      >
-        Past Project Samples
-      </motion.h2>
-
-      {/* Activities Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
+      {/* Activities Grid - Using more width */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
         {contestsAndActivities.map((activity, index) => {
           const isExpanded = expandedActivity === activity;
           const isMicro = activity.importance < 2;
@@ -275,90 +346,131 @@ const Projects = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, delay: index * 0.1 }}
               className={`${
-                isExpanded ? "col-span-1 sm:col-span-2 lg:col-span-4" : 
-                isMicro ? "col-span-1" : 
-                isMinor ? "col-span-1" : 
-                "col-span-1 lg:col-span-2"
+                isExpanded
+                  ? "col-span-1 sm:col-span-2 lg:col-span-3 xl:col-span-4"
+                  : isMicro
+                  ? "col-span-1"
+                  : isMinor
+                  ? "col-span-1"
+                  : "col-span-1 sm:col-span-2 lg:col-span-2"
               } transition-all duration-300`}
             >
-              <div 
-                className={`tilt-card relative p-3 sm:p-4 rounded-lg shadow-lg bg-white dark:bg-gray-900/80 border-[3px] border-gray-300 overflow-hidden ${
-                  activity.highlighted ? "highlight" : ""
-                } ${!isExpanded ? `${getImportanceStyles(activity.importance).borderStyle} ${getImportanceStyles(activity.importance).borderColor}` : ""}`}
-                style={{ transformStyle: 'preserve-3d' }}
+              <div
+                className={`tilt-card relative p-4 sm:p-6 rounded-2xl shadow-xl backdrop-blur-lg overflow-hidden hover:shadow-2xl transition-all duration-300 ${
+                  activity.highlighted ? "highlight ring-2 ring-accent" : ""
+                } ${
+                  !isExpanded
+                    ? `${
+                        getImportanceStyles(activity.importance).borderStyle
+                      } ${getImportanceStyles(activity.importance).borderColor}`
+                    : ""
+                }`}
+                style={{ transformStyle: "preserve-3d" }}
               >
                 {/* Replace the colored bar with a subtle gradient background */}
                 {!isExpanded && (
-                  <div className={`absolute inset-0 ${getImportanceStyles(activity.importance).bgGradient} pointer-events-none rounded-lg`} />
+                  <div
+                    className={`absolute inset-0 ${
+                      getImportanceStyles(activity.importance).bgGradient
+                    } pointer-events-none rounded-lg`}
+                  />
                 )}
-                
+
                 {/* Remove the old colored bar div and continue with existing content */}
                 <div className="relative z-20">
                   <div className="flex justify-between items-start flex-wrap">
-                    <h3 className={`${
-                      isMicro ? 'text-xs sm:text-sm' :
-                      isMinor ? 'text-sm sm:text-base' : 
-                      'text-base sm:text-lg'
-                    } font-semibold mb-2 max-w-[70%]`}>
+                    <h3
+                      className={`${
+                        isMicro
+                          ? "text-xs sm:text-sm"
+                          : isMinor
+                          ? "text-sm sm:text-base"
+                          : "text-base sm:text-lg"
+                      } font-semibold mb-2 max-w-[70%]`}
+                    >
                       {activity.title}
                     </h3>
                     <div className="flex flex-col items-end gap-2 ml-auto">
                       {!isExpanded && (isMicro || isMinor) && (
-                        <span className={`text-xs px-2 py-1 rounded-full whitespace-nowrap ${
-                          isMicro ? 'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300' : 
-                          'bg-purple-200 text-purple-700 dark:bg-purple-700 dark:text-purple-200'
-                        }`}>
-                          {isMicro ? 'MICRO' : 'MINOR'}
+                        <span
+                          className={`text-xs px-2 py-1 rounded-full whitespace-nowrap ${
+                            isMicro
+                              ? "bg-light-background-secondary text-light-foreground-secondary dark:bg-dark-background-secondary dark:text-dark-foreground-secondary"
+                              : "bg-accent/20 text-accent dark:bg-accent/30 dark:text-accent-hover"
+                          }`}
+                        >
+                          {isMicro ? "MICRO" : "MINOR"}
                         </span>
                       )}
                       <button
                         onClick={() => toggleExpandedView(activity)}
-                        className="px-3 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 whitespace-nowrap"
+                        className="px-3 py-1 rounded hover:bg-light-background-secondary dark:hover:bg-dark-background-secondary whitespace-nowrap"
                       >
                         {isExpanded ? "Collapse" : "See more"}
                       </button>
                     </div>
                   </div>
-                  
+
                   <div className="overflow-hidden">
-                    <LocationDisplay activity={activity} onClick={() => handleLocationClick(activity)} />
-                    
-                    <p className="mb-4 dark:text-gray-300 truncate">{activity.date}</p>
-                    
+                    <LocationDisplay
+                      activity={activity}
+                      onClick={() => handleLocationClick(activity)}
+                    />
+
+                    <p className="mb-4 text-light-foreground-secondary dark:text-dark-foreground-secondary truncate">
+                      {activity.date}
+                    </p>
+
                     {/* Display Short Description */}
-                    <div className="mb-3 p-2 bg-gray-50 dark:bg-gray-800/50 rounded-lg border-l-4 border-blue-400 dark:border-blue-500">
+                    <div className="mb-3 p-2 bg-light-background-secondary/50 dark:bg-dark-background-secondary/50 rounded-lg border-l-4 border-accent dark:border-accent">
                       <div className="flex items-center mb-1">
-                        <span className="text-xs uppercase tracking-wider text-blue-500 dark:text-blue-400 font-semibold">Summary</span>
+                        <span className="text-xs uppercase tracking-wider text-accent dark:text-accent font-semibold">
+                          Summary
+                        </span>
                       </div>
-                      <p className={`text-xs sm:text-sm text-gray-700 dark:text-gray-200 italic ${!isExpanded ? "line-clamp-2 sm:line-clamp-1" : ""}`}>
+                      <p
+                        className={`text-xs sm:text-sm text-light-foreground-secondary dark:text-dark-foreground-secondary italic ${
+                          !isExpanded ? "line-clamp-2 sm:line-clamp-1" : ""
+                        }`}
+                      >
                         {activity.shortDescription}
                       </p>
                     </div>
                   </div>
-                  
+
                   {/* Display Long Description if Expanded */}
                   {isExpanded && (
                     <div className="mt-4 overflow-hidden">
-                      {activity.longDescription.split('\n').map((line, index) => (
-                        <p className="dark:text-white mb-6" key={index}>{line}</p>
-                      ))}
+                      {/* Render content with inline media */}
+                      <div className="prose prose-lg dark:prose-invert max-w-none">
+                        {renderContentWithInlineMedia(
+                          activity.longDescription,
+                          activity
+                        )}
+                      </div>
+
                       <div className="mt-4">
                         <button
                           onClick={() => handleCopyLink(activity.slug)}
-                          className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-500 mb-4"
+                          className="bg-gradient-to-r from-accent to-accent-hover text-text-on-accent px-3 py-1 rounded hover:from-accent-hover hover:to-accent mb-4 transition-all duration-200"
                         >
                           Copy Link to this Project
                         </button>
                       </div>
-                      
+
                       {/* Add Links */}
                       {activity.links && activity.links.length > 0 && (
                         <div className="mb-4 overflow-hidden">
-                          <h4 className="font-semibold">Links:</h4>
+                          <h4 className="font-semibold text-lg mb-2">Links:</h4>
                           <ul className="space-y-1">
                             {activity.links.map((link, index) => (
                               <li key={index} className="truncate">
-                                <a href={link.url} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">
+                                <a
+                                  href={link.url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-accent hover:text-accent-hover hover:underline transition-colors"
+                                >
                                   {link.label}
                                 </a>
                               </li>
@@ -368,38 +480,67 @@ const Projects = () => {
                       )}
 
                       {/* Add Technologies */}
-                      {activity.technologies && activity.technologies.length > 0 && (
-                        <div className="mt-4 mb-4 flex flex-wrap gap-2">
-                          {activity.technologies.map((tech, i) => (
-                            <span
-                              key={i}
-                              className="text-sm bg-gray-700 text-white px-3 py-1 rounded-full"
-                            >
-                              {tech}
-                            </span>
-                          ))}
-                        </div>
-                      )}
-
-                      {/* Add Images or Embedded Content */}
-                      {activity.images && activity.images.length > 0 && (
-                        <div className="mb-4">
-                          <h4 className="font-semibold">Images:</h4>
-                          <div className="space-y-4">
-                            {activity.images.map((image, index) => (
-                              <img key={index} src={getGoogleDriveImageEmbedUrl(image)} alt={`Project image ${index + 1}`} className="w-full rounded-lg shadow-md" />
+                      {activity.technologies &&
+                        activity.technologies.length > 0 && (
+                          <div className="mt-4 mb-4 flex flex-wrap gap-2">
+                            {activity.technologies.map((tech, i) => (
+                              <span
+                                key={i}
+                                className="tech-tag text-sm bg-gradient-to-r from-accent to-accent-hover text-text-on-accent px-3 py-1 rounded-full shadow-md hover:shadow-lg transition-all duration-200"
+                              >
+                                {tech}
+                              </span>
                             ))}
                           </div>
+                        )}
+
+                      {/* Add remaining Images that weren't used inline */}
+                      {activity.images && activity.images.length > 0 && (
+                        <div className="mb-4">
+                          {activity.images.map((image, index) => {
+                            // Check if this image was already used inline
+                            const wasUsedInline =
+                              activity.longDescription.includes(
+                                `{{image[${index}]}}`
+                              );
+                            if (!wasUsedInline) {
+                              return (
+                                <div key={index} className="mb-4">
+                                  <img
+                                    src={getGoogleDriveImageEmbedUrl(image)}
+                                    alt={`Project image ${index + 1}`}
+                                    className="w-full rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300"
+                                  />
+                                </div>
+                              );
+                            }
+                            return null;
+                          })}
                         </div>
                       )}
 
-                      {activity.gdrive_embed && activity.gdrive_embed.length > 0 && (
-                        <div className="mb-4">
-                          {activity.gdrive_embed.map((embedUrl, index) => (
-                            <ResizableEmbed key={index} url={embedUrl} />
-                          ))}
-                        </div>
-                      )}
+                      {/* Add remaining embeds that weren't used inline */}
+                      {activity.gdrive_embed &&
+                        activity.gdrive_embed.length > 0 && (
+                          <div className="mb-4">
+                            {activity.gdrive_embed.map((embedUrl, index) => {
+                              // Check if this embed was already used inline
+                              const wasUsedInline =
+                                activity.longDescription.includes(
+                                  `{{embed[${index}]}}`
+                                ) ||
+                                activity.longDescription.includes(
+                                  `{{gdrive_embed[${index}]}}`
+                                );
+                              if (!wasUsedInline) {
+                                return (
+                                  <ResizableEmbed key={index} url={embedUrl} />
+                                );
+                              }
+                              return null;
+                            })}
+                          </div>
+                        )}
                     </div>
                   )}
                 </div>

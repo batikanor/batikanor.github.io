@@ -3,99 +3,393 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Custom Root Variables */
-:root {
-  /* Light Mode Colors */
-  --navbar-background-light: #ffffff; /* Crisp white for the navbar */
-  --sidepanel-background-light: #f8f9fa; /* Soft neutral for the side panel */
-  --mainpanel-background-light: #f5f5f5; /* Subtle gray for the main panel */
-  --footer-background-light: #e9ecef; /* Light gray for the footer */
-
-  --foreground-light: #212529; /* Deep neutral text color */
-  --border-light: #dee2e6; /* Gentle gray for borders */
+@layer base {
+  body {
+    @apply bg-light-background text-light-foreground dark:bg-dark-background dark:text-dark-foreground;
+  }
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply text-light-foreground dark:text-dark-foreground;
+  }
+  a {
+    /* Color is applied contextually */
+    @apply hover:text-accent;
+  }
 }
 
-.dark {
-  /* Dark Mode Colors */
-  --navbar-background-dark: #1f1b17; /* Dark charcoal for the navbar */
-  --sidepanel-background-dark: #cbcbcb; /* Slightly lighter charcoal for the side panel */
-  --mainpanel-background-dark: #201b17; /* Deep gray for the main panel */
-  --footer-background-dark: #1f1f1f; /* A rich dark tone for the footer */
-
-  --foreground-dark: #e9ecef; /* Soft light text color */
-  --border-dark: #495057; /* Muted gray for borders */
-}
-
-/* Global Styles */
-body {
-  @apply antialiased flex flex-col min-h-screen;
-  background-color: var(--mainpanel-background-light);
-  color: var(--foreground-light);
-  margin: 0;
-  padding: 0;
+/* Modern Global Styles */
+* {
   box-sizing: border-box;
 }
 
-.dark body {
-  background-color: var(--mainpanel-background-dark);
-  color: var(--foreground-dark);
+html {
+  scroll-behavior: smooth;
 }
 
-/* Input and Textarea Styling */
+body {
+  @apply antialiased flex flex-col min-h-screen;
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Modern Background Pattern */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: radial-gradient(
+      circle at 20% 80%,
+      theme("colors.accent-hover / 5%") 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      circle at 80% 20%,
+      theme("colors.accent / 5%") 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      circle at 40% 40%,
+      theme("colors.accent-hover / 3%") 0%,
+      transparent 50%
+    );
+  pointer-events: none;
+  z-index: -1;
+}
+
+.dark body::before {
+  background-image: radial-gradient(
+      circle at 20% 80%,
+      theme("colors.accent-hover / 8%") 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      circle at 80% 20%,
+      theme("colors.accent / 8%") 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      circle at 40% 40%,
+      theme("colors.accent-hover / 4%") 0%,
+      transparent 50%
+    );
+}
+
+/* Slightly darker background for child elements */
+.darker-background {
+  background-color: rgba(0, 0, 0, 0.01);
+}
+
+.dark .darker-background {
+  background-color: rgba(255, 255, 255, 0.01);
+}
+
+/* Modern Typography */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: 700;
+  line-height: 1.2;
+  margin-top: 0;
+}
+
+h1 {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  @apply text-transparent bg-clip-text bg-gradient-to-r from-accent-hover to-accent;
+}
+
+h2 {
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
+}
+
+h3 {
+  font-size: clamp(1.25rem, 3vw, 2rem);
+}
+
+/* Modern Links */
+a {
+  text-decoration: none;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+/* Modern Cards */
+.card {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  @apply border border-light-border;
+  transition: all 0.3s ease;
+}
+
+.dark .card {
+  background: rgba(255, 255, 255, 0.05);
+  @apply border border-dark-border;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+}
+
+.dark .card:hover {
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+}
+
+/* Modern Buttons */
+.btn {
+  @apply inline-flex items-center gap-2 px-6 py-3 rounded-full font-medium transition-all duration-300 transform hover:scale-105;
+  @apply bg-gradient-to-r from-accent-dark to-accent-darker text-text-on-accent hover:from-accent-darker hover:to-accent-dark;
+  @apply shadow-lg hover:shadow-xl;
+}
+
+.btn-secondary {
+  @apply inline-flex items-center gap-2 px-6 py-3 rounded-full font-medium transition-all duration-300 transform hover:scale-105;
+  @apply bg-light-background-secondary dark:bg-dark-background-secondary text-light-foreground dark:text-dark-foreground border-2 border-light-border dark:border-dark-border;
+  @apply hover:border-accent dark:hover:border-accent;
+}
+
+/* Modern Input Styles */
 input,
 textarea {
-  background-color: var(--mainpanel-background-light);
-  color: var(--foreground-light);
-  border: 1px solid var(--border-light);
-  padding: 0.5rem;
-  border-radius: 0.25rem;
+  @apply bg-light-input text-light-foreground border-2 border-light-border;
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  font-size: 1rem;
 }
 
 .dark input,
 .dark textarea {
-  background-color: var(--mainpanel-background-dark);
-  color: var(--foreground-dark);
-  border: 1px solid var(--border-dark);
-}
-/* Slightly darker background for child elements */
-.darker-background {
-  background-color: rgba(0, 0, 0, 0.01); /* Slightly darker overlay for light mode */
+  @apply bg-dark-input text-dark-foreground border-2 border-dark-border;
 }
 
-.dark .darker-background {
-  background-color: rgba(255, 255, 255, 0.01); /* Slightly lighter overlay for dark mode */
+input:focus,
+textarea:focus {
+  outline: none;
+  @apply border-accent;
+  box-shadow: 0 0 0 3px theme("colors.accent / 15%");
 }
 
-/* Placeholder Text Color */
-::placeholder {
-  color: var(--foreground-light);
-  opacity: 0.6;
+/* Modern Scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
 }
 
-.dark ::placeholder {
-  color: var(--foreground-dark);
+::-webkit-scrollbar-track {
+  @apply bg-light-background;
 }
 
-/* Headings */
-h1 {
-  @apply text-3xl font-bold text-gray-900 dark:text-gray-100;
+.dark ::-webkit-scrollbar-track {
+  @apply bg-dark-background;
 }
 
-h2 {
-  @apply text-2xl font-semibold text-gray-800 dark:text-gray-200;
+::-webkit-scrollbar-thumb {
+  @apply bg-gradient-to-r from-accent-hover to-accent rounded-[5px];
 }
 
-h3 {
-  @apply text-xl font-medium text-gray-700 dark:text-gray-300;
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-accent;
 }
 
-/* Layout Utility Classes */
-.container {
-  @apply mx-auto max-w-7xl;
-}
-
-@media (max-width: 640px) {
-  .container {
-    @apply px-4;
+/* Modern Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes blob {
+  0% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  33% {
+    transform: translate(30px, -50px) scale(1.1);
+  }
+  66% {
+    transform: translate(-20px, 20px) scale(0.9);
+  }
+  100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+}
+
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Utility Classes */
+.animate-fadeIn {
+  animation: fadeIn 0.6s ease-out;
+}
+
+.animate-slideIn {
+  animation: slideIn 0.6s ease-out;
+}
+
+.animate-scaleIn {
+  animation: scaleIn 0.6s ease-out;
+}
+
+.animate-blob {
+  animation: blob 7s infinite;
+}
+
+.animate-spin-slow {
+  animation: spin-slow 3s linear infinite;
+}
+
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+
+.animation-delay-4000 {
+  animation-delay: 4s;
+}
+
+/* Modern Container */
+.container {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+/* Glassmorphism Effect */
+.glass {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+}
+
+.dark .glass {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Modern Shadows */
+.shadow-modern {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.shadow-modern-lg {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+/* Gradient Text */
+.gradient-text {
+  @apply text-transparent bg-clip-text bg-gradient-to-r from-accent-hover to-accent;
+}
+
+/* Modern Hover Effects */
+.hover-lift {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+/* Responsive Utilities */
+@media (max-width: 768px) {
+  body {
+    font-size: 16px;
+  }
+
+  .container {
+    padding: 0 1rem;
+  }
+}
+
+/* Blob Animation */
+.animate-blob {
+  animation: blob 7s infinite;
+}
+
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+
+.animation-delay-4000 {
+  animation-delay: 4s;
+}
+
+/* Updated project-card (tilt-card) colours */
+.tilt-card {
+  background: rgba(255, 255, 255, 0.85) !important;
+  @apply border border-light-border !important;
+  backdrop-filter: blur(12px) !important;
+}
+
+.dark .tilt-card {
+  background: theme("colors.dark-background-secondary / 85%") !important;
+  @apply border border-dark-border !important;
+}
+
+.tilt-card:hover {
+  background: rgba(255, 255, 255, 0.9) !important;
+  @apply border-accent !important;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1) !important;
+  transform: translateY(-2px) !important;
+}
+
+.dark .tilt-card:hover {
+  background: theme("colors.dark-background-secondary / 92%") !important;
+  @apply border-accent !important;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Removed hard-coded blue overrides to respect Tailwind's default colour utilities */

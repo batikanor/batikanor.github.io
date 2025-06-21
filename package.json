@@ -39,6 +39,7 @@
     "react-joystick-component": "^6.2.1",
     "react-leaflet": "^4.2.1",
     "react-resize-panel": "^0.3.5",
+    "styled-jsx": "^5.1.7",
     "tailwindcss-animate": "^1.0.7",
     "three": "^0.169.0",
     "vanilla-tilt": "^1.8.1"
