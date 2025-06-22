@@ -38,6 +38,14 @@ body {
     "Helvetica Neue", Arial, sans-serif;
   position: relative;
   overflow-x: hidden;
+  /* Prevent mobile zoom */
+  touch-action: manipulation;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
 /* Modern Background Pattern */
@@ -341,6 +349,35 @@ textarea:focus {
 .hover-lift:hover {
   transform: translateY(-4px);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+/* Mobile Zoom Prevention */
+.map-container,
+.globe-container,
+.achievement-map,
+canvas {
+  touch-action: manipulation;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Prevent double-tap zoom on buttons and interactive elements */
+button,
+.btn,
+a {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Allow text selection in content areas but prevent zoom */
+p,
+.text-content {
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
+  touch-action: manipulation;
 }
 
 /* Responsive Utilities */

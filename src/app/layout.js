@@ -20,6 +20,12 @@ export const metadata = {
   title: "BatikanoR | Portfolio of Batıkan Bora Ormancı",
   description:
     "Portfolio showcasing the projects and work of Batıkan Bora Ormancı.",
+  viewport: {
+    width: "device-width",
+    initialScale: 1,
+    maximumScale: 1,
+    userScalable: false,
+  },
 };
 
 export default function RootLayout({ children }) {
