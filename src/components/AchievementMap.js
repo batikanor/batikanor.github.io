@@ -185,7 +185,7 @@ export default function AchievementMap({ navigateWithRefresh, onToggle3D }) {
       const map = mapInstanceRef.current;
 
       if (isExpanded) {
-        map.setZoom(3);
+        // Keep zoom unchanged - no zoom changes on hover
         map.scrollWheelZoom.enable();
         map.doubleClickZoom.enable();
         map.dragging.enable();
@@ -196,7 +196,7 @@ export default function AchievementMap({ navigateWithRefresh, onToggle3D }) {
           map.zoomControl.addTo(map);
         }
       } else {
-        map.setZoom(2);
+        // Keep zoom unchanged - no zoom changes on hover
         map.scrollWheelZoom.disable();
         map.doubleClickZoom.disable();
         map.dragging.disable();
@@ -235,8 +235,7 @@ export default function AchievementMap({ navigateWithRefresh, onToggle3D }) {
   };
 
   const getMapHeight = () => {
-    if (isExpanded) return "800px";
-    return "600px"; // Increased from 400px
+    return "600px"; // Keep consistent height - no expansion on hover
   };
 
   return (
@@ -303,7 +302,11 @@ export default function AchievementMap({ navigateWithRefresh, onToggle3D }) {
       <div
         className={`
           relative overflow-hidden rounded-3xl transition-all duration-700
-          ${isExpanded ? "ring-2 ring-accent/50" : "ring-1 ring-dark-border/50"}
+          ${
+            isExpanded
+              ? "ring-2 ring-orange-500/80"
+              : "ring-1 ring-dark-border/50"
+          }
         `}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
@@ -319,7 +322,7 @@ export default function AchievementMap({ navigateWithRefresh, onToggle3D }) {
         />
 
         {/* Control Buttons Container */}
-        <div className="absolute top-6 left-4 sm:left-16 right-6 z-[1000] flex justify-between items-start">
+        <div className="absolute top-6 right-10 z-[1000] flex justify-between items-start gap-10">
           {/* Left side buttons */}
           <div className="flex flex-col gap-3">
             {/* 3D Globe Toggle Button */}

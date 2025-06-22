@@ -224,6 +224,7 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
   const [elapsedTime, setElapsedTime] = useState(0);
 
   const [isMobile, setIsMobile] = useState(false);
+  const [showMobileWarning, setShowMobileWarning] = useState(false);
   const [showMap, setShowMap] = useState(true); // Initially, show map for non-mobile
   const { resolvedTheme } = useTheme();
   const [isNavigating, setIsNavigating] = useState(false);
@@ -592,7 +593,10 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
     // Detect mobile devices
     const mobileQuery = window.matchMedia("(max-width: 768px)");
     const handleDeviceChange = (event) => {
-      setIsMobile(event.matches);
+      const isMobileDevice = event.matches;
+      setIsMobile(isMobileDevice);
+      setShowMobileWarning(isMobileDevice);
+
       // Always show map, but will show warning on mobile
       setShowMap(true);
     };
@@ -602,6 +606,16 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
       mobileQuery.removeEventListener("change", handleDeviceChange);
     };
   }, []);
+
+  // Auto-hide mobile warning after 2 seconds
+  useEffect(() => {
+    if (showMobileWarning) {
+      const timer = setTimeout(() => {
+        setShowMobileWarning(false);
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [showMobileWarning]);
 
   // **Fullscreen Toggle Function**
   const toggleFullscreen = () => {
@@ -1578,7 +1592,7 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
           }`}
         >
           {/* Mobile warning message */}
-          {isMobile && (
+          {showMobileWarning && (
             <div className="absolute top-4 left-4 right-4 z-20 bg-red-600/90 backdrop-blur-sm rounded-lg p-3 text-white text-center">
               <p className="text-sm font-semibold">
                 ⚠️ 3D Globe Not Optimized for Mobile

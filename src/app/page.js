@@ -59,7 +59,7 @@ export default function Home() {
               Hi, I'm <span className="gradient-text">Batıkan</span>
             </h1>
             <p className="text-xl md:text-3xl text-gray-600 dark:text-gray-400">
-              Geography Enthusiast • Developer • Explorer
+              Hacker • Developer • Entrepreneur
             </p>
           </div>
 
