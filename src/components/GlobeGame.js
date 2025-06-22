@@ -4,6 +4,7 @@
 import { useTheme } from "next-themes";
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import * as THREE from "three";
 import {
   contestsAndActivities,
   getCitiesAndLocations,
@@ -45,11 +46,16 @@ const GDP_LABEL_HEIGHT = 0.045; // Height for GDP choropleth labels
 const CONTROL_LABEL_HEIGHT = 0.03; // Height for control buttons/labels
 const GAME_LABEL_HEIGHT = 0.035; // Height for game-related labels
 
-// Point (marker) heights
-const CITY_POINT_HEIGHT = 0.015; // Height for city points/markers
-const CITY_POINT_HOVER = 0.025; // Height for hovered city points
+// Point (marker) heights - Reduced to eliminate "laser" effect
+const CITY_POINT_HEIGHT = 0.0; // No height for city points - no more lasers!
+const CITY_POINT_HOVER = 0.0; // No height for hovered city points
 const CONTROL_POINT_HEIGHT = 0.02; // Height for control points
 const GAME_POINT_HEIGHT = 0.04; // Height for game-related points
+
+// New ripple ring settings for beautiful animations
+const RING_MAX_RADIUS = 2; // Maximum radius for ripple rings
+const RING_PROPAGATION_SPEED = 0.2; // EXTREMELY slow ring expansion
+const RING_REPEAT_PERIOD = 8000; // Even longer time between ring emissions (8 seconds)
 
 // Game-specific heights and speeds
 const PLANE_ALTITUDE = 0.03; // Height for plane
@@ -73,15 +79,12 @@ const TICTACTOE_MARKED_HEIGHT = 0.03; // Height for marked TicTacToe cells
 const PATHS_INSTEAD_OF_ARCS = true;
 
 const PATHS_CONFIG = {
-  pointsPerPath: 200, // Points per path
-  maxDeviation: 0.1, // Maximum lateral deviation in degrees
-  maxHeight: 0.905, // Maximum height
-  minHeight: 0.001, // Minimum height for paths
-  minDistance: 5, // Minimum distance between markers to create a path
-  pathColor: ["rgba(0,255,0,0.6)", "rgba(255,0,0,0.6)"], // Start and end colors for path gradient
-  changeInterval: 800, // Reduced from 4000 to 2000 ms for faster updates
-  fadeOutDuration: 0, // Set to 0 to remove fade out animation
-  pathOpacity: 1, // Base opacity for paths
+  pointsPerPath: 100, // Points per path - reduced for performance
+  maxDeviation: 0.05, // Reduced deviation for cleaner paths
+  maxHeight: 0.15, // Moderate height for visibility
+  minHeight: 0.01, // Minimum height for paths
+  pathColor: ["rgba(60,120,180,0.7)", "rgba(140,60,80,0.6)"], // Darker, more elegant gradient colors
+  pathOpacity: 0.7, // Slightly reduced opacity for subtlety
 };
 
 const CONTROL_SPACING = 2; // Spacing between controls
@@ -154,9 +157,9 @@ function createPolygon(lat, lng, objType, index, size = 1, rotation = 0) {
 
 // Function to generate a deterministic color based on the importance
 const getDeterministicColor = (importance) => {
-  // Define start and end colors (red to green)
-  const startColor = { r: 255, g: 100, b: 100 }; // Lighter red
-  const endColor = { r: 100, g: 255, b: 100 }; // Lighter green
+  // Define start and end colors (darker red to darker green)
+  const startColor = { r: 140, g: 60, b: 60 }; // Much darker red
+  const endColor = { r: 60, g: 140, b: 60 }; // Much darker green
 
   // Normalize importance to a 0-1 scale (assuming max importance is 10)
   const normalizedImportance = Math.min(importance / 10, 1);
@@ -172,7 +175,7 @@ const getDeterministicColor = (importance) => {
     startColor.b + (endColor.b - startColor.b) * normalizedImportance
   );
 
-  return `rgba(${r}, ${g}, ${b}, 1)`;
+  return `rgba(${r}, ${g}, ${b}, 0.8)`; // Reduced opacity too
 };
 
 export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
@@ -307,9 +310,54 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const citiesAndLocations = useMemo(() => getCitiesAndLocations(), []);
 
+  // Create ripple rings for high-importance cities
+  const rippleRingsData = useMemo(() => {
+    return citiesAndLocations
+      .filter((city) => city.maxImportance >= 6) // Only show rings for important achievements
+      .map((city) => ({
+        lat: city.coordinates.lat,
+        lng: city.coordinates.lng,
+        maxR: RING_MAX_RADIUS,
+        propagationSpeed: RING_PROPAGATION_SPEED,
+        repeatPeriod: RING_REPEAT_PERIOD,
+        importance: city.maxImportance,
+        city: city.city,
+      }));
+  }, [citiesAndLocations]);
+
+  // Create floating particles for the most premium achievements
+  const premiumParticlesData = useMemo(() => {
+    const particles = [];
+    citiesAndLocations
+      .filter((city) => city.maxImportance >= 8) // Only for the most premium achievements
+      .forEach((city) => {
+        // Create multiple particles around each premium location
+        for (let i = 0; i < 6; i++) {
+          const angle = (i / 6) * Math.PI * 2;
+          const radius = 0.5 + Math.random() * 0.3;
+          particles.push({
+            lat: city.coordinates.lat + Math.cos(angle) * radius,
+            lng: city.coordinates.lng + Math.sin(angle) * radius,
+            alt: 0.01 + Math.random() * 0.02,
+            city: city.city,
+            importance: city.maxImportance,
+            phase: Math.random() * Math.PI * 2, // Random starting phase for animation
+          });
+        }
+      });
+    return particles;
+  }, [citiesAndLocations]);
+
   // Add this to your state declarations
   const [cloudOpacity, setCloudOpacity] = useState(0.25);
   const [particles, setParticles] = useState([]);
+
+  // New state for ripple rings animation
+  const [ringsData, setRingsData] = useState([]);
+  const [ringAnimation, setRingAnimation] = useState(0);
+
+  // Particle effects for premium locations
+  const [premiumParticles, setPremiumParticles] = useState([]);
   // Add this to your useMemo for polygons
   const cloudControlPolygons = useMemo(() => {
     const baseCoords = { lat: 34, lng: 19 }; // Mediterranean position
@@ -863,111 +911,7 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
     }
   }, [gameMode, planePosition]);
 
-  // Arcs (just a demo)
-  const arcsAndPaths = useMemo(() => {
-    if (!PATHS_INSTEAD_OF_ARCS) {
-      // Original arcs logic
-      const arcsArray = [];
-      for (let i = 0; i < markers.length - 2; i++) {
-        arcsArray.push({
-          airline: `Route ${i + 1}`,
-          srcIata: markers[i].label,
-          dstIata: markers[i + 1].label,
-          srcAirport: { lat: markers[i].lat, lng: markers[i].lng },
-          dstAirport: { lat: markers[i + 1].lat, lng: markers[i + 1].lng },
-          arcColor: [`rgba(0, 255, 0, 0.3)`, `rgba(255, 0, 0, 0.3)`],
-        });
-      }
-      return arcsArray;
-    } else {
-      const pathsArray = [];
-
-      if (PATHS_CONFIG.randomizeConnections) {
-        // Create random connections
-        for (let i = 0; i < PATHS_CONFIG.numPaths; i++) {
-          const startIdx = Math.floor(Math.random() * markers.length);
-          let endIdx;
-          do {
-            endIdx = Math.floor(Math.random() * markers.length);
-          } while (startIdx === endIdx);
-
-          const startMarker = markers[startIdx];
-          const endMarker = markers[endIdx];
-
-          // Calculate distance between markers
-          const distance = Math.sqrt(
-            Math.pow(startMarker.lat - endMarker.lat, 2) +
-              Math.pow(startMarker.lng - endMarker.lng, 2)
-          );
-
-          // Only create path if markers are far enough apart
-          if (distance >= PATHS_CONFIG.minDistance) {
-            let currentLat = startMarker.lat;
-            let currentLng = startMarker.lng;
-            let currentAlt = 0;
-
-            const path = [[currentLat, currentLng, currentAlt]];
-
-            for (let j = 0; j < PATHS_CONFIG.pointsPerPath; j++) {
-              const progress = j / PATHS_CONFIG.pointsPerPath;
-              const latBias = (endMarker.lat - currentLat) * progress;
-              const lngBias = (endMarker.lng - currentLng) * progress;
-
-              currentLat +=
-                latBias + (Math.random() * 2 - 1) * PATHS_CONFIG.maxDeviation;
-              currentLng +=
-                lngBias + (Math.random() * 2 - 1) * PATHS_CONFIG.maxDeviation;
-              currentAlt += (Math.random() * 2 - 1) * PATHS_CONFIG.maxHeight;
-              currentAlt = Math.max(0, currentAlt);
-
-              path.push([currentLat, currentLng, currentAlt]);
-            }
-
-            path.push([endMarker.lat, endMarker.lng, 0]);
-            pathsArray.push(path);
-          }
-        }
-      } else {
-        // Original sequential logic...
-        for (let i = 0; i < markers.length - 2; i++) {
-          const startLat = markers[i].lat;
-          const startLng = markers[i].lng;
-          const endLat = markers[i + 1].lat;
-          const endLng = markers[i + 1].lng;
-
-          let currentLat = startLat;
-          let currentLng = startLng;
-          let currentAlt = 0;
-
-          const path = [];
-          path.push([currentLat, currentLng, currentAlt]);
-
-          // Generate random points between start and end
-          for (let j = 0; j < PATHS_CONFIG.pointsPerPath; j++) {
-            // Bias the random movement towards the destination
-            const latBias =
-              (endLat - currentLat) / (PATHS_CONFIG.pointsPerPath - j);
-            const lngBias =
-              (endLng - currentLng) / (PATHS_CONFIG.pointsPerPath - j);
-
-            currentLat +=
-              latBias + (Math.random() * 2 - 1) * PATHS_CONFIG.maxDeviation;
-            currentLng +=
-              lngBias + (Math.random() * 2 - 1) * PATHS_CONFIG.maxDeviation;
-            currentAlt += (Math.random() * 2 - 1) * PATHS_CONFIG.maxHeight;
-            currentAlt = Math.max(0, currentAlt);
-
-            path.push([currentLat, currentLng, currentAlt]);
-          }
-
-          // Ensure the path ends at the destination
-          path.push([endLat, endLng, 0]);
-          pathsArray.push(path);
-        }
-      }
-      return pathsArray;
-    }
-  }, [markers, PATHS_INSTEAD_OF_ARCS]);
+  // This will be defined later after all dependencies are ready
 
   const handleCloseInfoWindow = () => {
     setClickedMarker(null);
@@ -1053,78 +997,133 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
     setCoins(newCoins);
   };
 
-  // Modify the state declarations
-  const [pathState, setPathState] = useState({
-    currentCityIndex: 0,
-    currentPath: null,
-  });
+  // Helper function to create a path segment between two points
+  const createPathSegment = useCallback((start, end) => {
+    const segment = [];
 
-  // Replace generateNewPaths function
-  const generateNewPaths = useCallback(() => {
-    const locations = citiesAndLocations;
+    for (let i = 0; i <= PATHS_CONFIG.pointsPerPath; i++) {
+      const progress = i / PATHS_CONFIG.pointsPerPath;
 
-    setPathState((prevState) => {
-      // Get current start city
-      const startLocation = locations[prevState.currentCityIndex];
+      // Linear interpolation between start and end
+      const lat = start.lat + (end.lat - start.lat) * progress;
+      const lng = start.lng + (end.lng - start.lng) * progress;
 
-      // Get random end city (different from start)
-      let endIdx;
-      do {
-        endIdx = Math.floor(Math.random() * locations.length);
-      } while (endIdx === prevState.currentCityIndex);
+      // Add some height variation - arc over the globe
+      const height =
+        PATHS_CONFIG.minHeight +
+        Math.sin(progress * Math.PI) * PATHS_CONFIG.maxHeight;
 
-      const endLocation = locations[endIdx];
+      // Add slight deviation for more natural curves
+      const deviation =
+        Math.sin(progress * Math.PI * 2) * PATHS_CONFIG.maxDeviation;
 
-      // Create path between current city and random next city
-      let currentLat = startLocation.coordinates.lat;
-      let currentLng = startLocation.coordinates.lng;
-      let currentAlt = PATHS_CONFIG.minHeight;
+      segment.push([
+        lat + deviation * Math.cos(progress * Math.PI),
+        lng + deviation * Math.sin(progress * Math.PI),
+        height,
+      ]);
+    }
 
-      const path = [];
-      path.push([currentLat, currentLng, currentAlt]);
+    return segment;
+  }, []);
 
-      // Generate points between start and end
-      for (let j = 0; j < PATHS_CONFIG.pointsPerPath; j++) {
-        const progress = j / PATHS_CONFIG.pointsPerPath;
-        const latBias = (endLocation.coordinates.lat - currentLat) * progress;
-        const lngBias = (endLocation.coordinates.lng - currentLng) * progress;
+  // Calculate distance between two points on Earth
+  const calculateDistance = useCallback((lat1, lng1, lat2, lng2) => {
+    const R = 6371; // Earth's radius in kilometers
+    const dLat = ((lat2 - lat1) * Math.PI) / 180;
+    const dLng = ((lng2 - lng1) * Math.PI) / 180;
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos((lat1 * Math.PI) / 180) *
+        Math.cos((lat2 * Math.PI) / 180) *
+        Math.sin(dLng / 2) *
+        Math.sin(dLng / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
+  }, []);
 
-        currentLat +=
-          latBias + (Math.random() * 2 - 1) * PATHS_CONFIG.maxDeviation;
-        currentLng +=
-          lngBias + (Math.random() * 2 - 1) * PATHS_CONFIG.maxDeviation;
-        currentAlt =
-          PATHS_CONFIG.minHeight +
-          Math.sin(progress * Math.PI) * PATHS_CONFIG.maxHeight;
+  // Create a stable loop connecting all achievement locations
+  const achievementLoop = useMemo(() => {
+    if (citiesAndLocations.length < 2) return [];
 
-        path.push([currentLat, currentLng, currentAlt]);
+    // Simple nearest neighbor approach to create a loop
+    const locations = [...citiesAndLocations];
+    const visited = new Set();
+    const path = [];
+
+    // Start with the first location
+    let currentLocation = locations[0];
+    visited.add(0);
+
+    // Build the path by always going to the nearest unvisited location
+    while (visited.size < locations.length) {
+      let nearestIdx = -1;
+      let nearestDistance = Infinity;
+
+      for (let i = 0; i < locations.length; i++) {
+        if (!visited.has(i)) {
+          const distance = calculateDistance(
+            currentLocation.coordinates.lat,
+            currentLocation.coordinates.lng,
+            locations[i].coordinates.lat,
+            locations[i].coordinates.lng
+          );
+          if (distance < nearestDistance) {
+            nearestDistance = distance;
+            nearestIdx = i;
+          }
+        }
       }
 
-      path.push([
-        endLocation.coordinates.lat,
-        endLocation.coordinates.lng,
-        PATHS_CONFIG.minHeight,
-      ]);
+      if (nearestIdx !== -1) {
+        visited.add(nearestIdx);
 
-      return {
-        currentCityIndex: endIdx,
-        currentPath: path,
-      };
-    });
-  }, [citiesAndLocations]);
+        // Create path segment from current to nearest
+        const pathSegment = createPathSegment(
+          currentLocation.coordinates,
+          locations[nearestIdx].coordinates
+        );
+        path.push(...pathSegment);
 
-  // Modify the useEffect for path generation
-  useEffect(() => {
-    if (!PATHS_INSTEAD_OF_ARCS || gameMode) return;
+        currentLocation = locations[nearestIdx];
+      }
+    }
 
-    // Initial path generation
-    generateNewPaths();
+    // Close the loop by connecting back to the first location
+    if (locations.length > 2) {
+      const closingSegment = createPathSegment(
+        currentLocation.coordinates,
+        locations[0].coordinates
+      );
+      path.push(...closingSegment);
+    }
 
-    // Set up interval for path regeneration
-    const interval = setInterval(generateNewPaths, PATHS_CONFIG.changeInterval);
+    return path;
+  }, [citiesAndLocations, calculateDistance, createPathSegment]);
 
-    return () => clearInterval(interval);
-  }, [generateNewPaths, gameMode]);
+  // Now define arcsAndPaths after achievementLoop is ready
+  const arcsAndPaths = useMemo(() => {
+    if (!PATHS_INSTEAD_OF_ARCS) {
+      // Original arcs logic (if needed)
+      const arcsArray = [];
+      for (let i = 0; i < markers.length - 2; i++) {
+        arcsArray.push({
+          airline: `Route ${i + 1}`,
+          srcIata: markers[i].label,
+          dstIata: markers[i + 1].label,
+          srcAirport: { lat: markers[i].lat, lng: markers[i].lng },
+          dstAirport: { lat: markers[i + 1].lat, lng: markers[i + 1].lng },
+          arcColor: [`rgba(0, 255, 0, 0.3)`, `rgba(255, 0, 0, 0.3)`],
+        });
+      }
+      return arcsArray;
+    } else {
+      // Return the stable achievement loop
+      return achievementLoop.length > 0 ? [achievementLoop] : [];
+    }
+  }, [markers, PATHS_INSTEAD_OF_ARCS, achievementLoop]);
+
+  // No more interval-based path generation - paths are now stable!
 
   // Add these constants at the top of your component
   const ACCELERATION = 0.02;
@@ -1278,6 +1277,17 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
     const particleInterval = setInterval(updateParticles, 16);
     return () => clearInterval(particleInterval);
   }, [particles]);
+
+  // Animation loop for pulsing effects and particles
+  useEffect(() => {
+    if (!gameMode) {
+      const animationInterval = setInterval(() => {
+        setRingAnimation((prev) => prev + 1); // Trigger re-renders for animations
+      }, 333); // 3 FPS for extremely gentle, zen-like animations
+
+      return () => clearInterval(animationInterval);
+    }
+  }, [gameMode]);
 
   // Timer
   useEffect(() => {
@@ -1709,10 +1719,11 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
             pointsData={markers}
             pointsMerge={false}
             pointSize={(point) => {
+              // Make points much smaller or invisible to focus on regions
               if (clickedMarker && clickedMarker.label === point.label) {
-                return point.size * 1.3; // 30% larger when clicked
+                return 0.5; // Very small even when clicked
               }
-              return point.size;
+              return 0.1; // Almost invisible points - focus on polygons instead
             }}
             pointColor={(point) => {
               if (clickedMarker && clickedMarker.label === point.label) {
@@ -1871,15 +1882,21 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
             onPointClick={onPointClick}
             {...(PATHS_INSTEAD_OF_ARCS
               ? {
-                  pathsData: pathState.currentPath
-                    ? [pathState.currentPath]
-                    : [],
-                  pathColor: () => ["rgba(0,255,0,0.6)", "rgba(255,0,0,0.6)"],
-                  pathDashLength: 0.1,
-                  pathDashGap: 0.004,
-                  pathDashAnimateTime: 100000,
-                  pathPointAlt: (pnt) => Math.min(pnt[2] * 0.3, 0.005),
-                  pathTransitionDuration: TRANSITION_DURATION, // Reduced from 1000 to 500 ms for faster transitions
+                  pathsData: arcsAndPaths, // Now contains the stable achievement loop
+                  pathColor: () => {
+                    // Static elegant lines with very subtle breathing opacity
+                    const breathe = 0.7 + Math.sin(Date.now() / 8000) * 0.1; // 8-second gentle breathing
+                    return [
+                      `rgba(60,120,180,${breathe})`,
+                      `rgba(140,60,80,${breathe * 0.8})`,
+                    ];
+                  }, // Elegant solid lines with gentle breathing
+                  pathDashLength: 0, // No dashes - solid lines like everyone else does
+                  pathDashGap: 0, // No gaps - completely solid
+                  pathDashAnimateTime: 0, // No animation - static elegant lines
+                  pathPointAlt: (pnt) => pnt[2], // Use full altitude for visibility
+                  pathTransitionDuration: 0, // No transitions - stable paths
+                  pathStroke: 3, // Slightly thicker lines for better visibility
                 }
               : {
                   arcsData: arcsAndPaths,
@@ -1917,16 +1934,29 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
                 return `rgba(255, 215, 0, ${d.properties.life})`;
               }
 
-              // Handle city polygons
+              // Handle city polygons with enhanced styling
               if (d.properties.type === "city") {
                 const importance = d.properties.importance;
                 const color = getDeterministicColor(importance);
-                // Make city polygons more opaque
+
+                // Enhanced pulsing effect for high importance cities
+                const pulseIntensity =
+                  importance >= 7
+                    ? 0.3 + Math.sin(Date.now() / 4000) * 0.15 // MUCH slower pulsing - 4 second cycles
+                    : 0.12;
+
+                // Make city polygons more vibrant with pulsing
                 const rgbaMatch = color.match(
                   /rgba\((\d+),\s*(\d+),\s*(\d+),\s*[\d.]+\)/
                 );
                 if (rgbaMatch) {
-                  return `rgba(${rgbaMatch[1]}, ${rgbaMatch[2]}, ${rgbaMatch[3]}, 0.8)`; // Increased opacity to 0.8
+                  const [, r, g, b] = rgbaMatch;
+                  const isHovered = hoveredPolygon === d;
+                  const finalOpacity = isHovered ? 0.95 : 0.6 + pulseIntensity;
+                  return `rgba(${r}, ${Math.min(
+                    parseInt(g) + (isHovered ? 30 : 0),
+                    255
+                  )}, ${b}, ${finalOpacity})`;
                 }
                 return color;
               }
@@ -1999,8 +2029,38 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
               // Default transparent for other cases
               return "rgba(0, 0, 0, 0.1)";
             }}
-            polygonSideColor={() => "rgba(0, 0, 0, 0.1)"}
-            polygonStrokeColor={() => "#000"}
+            polygonSideColor={(d) => {
+              // Enhanced side coloring for city polygons
+              if (d.properties.type === "city") {
+                const importance = d.properties.importance;
+                const color = getDeterministicColor(importance);
+                const rgbaMatch = color.match(
+                  /rgba\((\d+),\s*(\d+),\s*(\d+),\s*[\d.]+\)/
+                );
+                if (rgbaMatch) {
+                  const [, r, g, b] = rgbaMatch;
+                  return `rgba(${Math.min(parseInt(r) + 20, 255)}, ${Math.min(
+                    parseInt(g) + 20,
+                    255
+                  )}, ${Math.min(parseInt(b) + 20, 255)}, 0.4)`;
+                }
+                return color;
+              }
+              return "rgba(0, 0, 0, 0.1)";
+            }}
+            polygonStrokeColor={(d) => {
+              // Beautiful stroke colors for city polygons
+              if (d.properties.type === "city") {
+                const importance = d.properties.importance;
+                if (importance >= 7) {
+                  return `rgba(255, 255, 255, ${
+                    0.6 + Math.sin(Date.now() / 3000) * 0.2 // Super slow stroke pulsing - 3 second cycles
+                  })`;
+                }
+                return "rgba(255, 255, 255, 0.4)";
+              }
+              return "rgba(255, 255, 255, 0.2)";
+            }}
             polygonAltitude={(d) => {
               // Handle plane game altitude first
               if (d.properties.objType === "plane") {
@@ -2010,11 +2070,14 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
                 return COIN_ALTITUDE;
               }
 
-              // Handle city polygons - keep them more visible
+              // Handle city polygons - enhanced visibility with importance-based heights
               if (d.properties.type === "city") {
-                return hoveredPolygon === d
-                  ? CITY_POINT_HOVER
-                  : CITY_POINT_HEIGHT;
+                const importance = d.properties.importance;
+                const baseHeight = Math.min(importance * 0.003, 0.025); // Scale with importance
+                const hoverBonus = hoveredPolygon === d ? 0.01 : 0;
+                const pulseEffect =
+                  importance >= 7 ? 0.001 * Math.sin(Date.now() / 6000) : 0; // EXTREMELY subtle, 6-second height pulsing
+                return baseHeight + hoverBonus + pulseEffect;
               }
 
               // Handle other polygon types
@@ -2057,6 +2120,64 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
             onGlobeTouchMove={handleGlobeTouch}
             cloudOpacity={cloudOpacity}
             onPolygonHover={handlePolygonHover}
+            // Beautiful ripple rings for important locations
+            ringsData={rippleRingsData}
+            ringColor={() => ["rgba(120,120,120,0.3)", "rgba(60,100,140,0.1)"]} // Much darker ring colors
+            ringMaxRadius="maxR"
+            ringPropagationSpeed="propagationSpeed"
+            ringRepeatPeriod="repeatPeriod"
+            // Floating particles for premium achievements
+            customLayerData={premiumParticlesData}
+            customThreeObject={(data) => {
+              // Create a glowing particle
+              const sprite = new THREE.Sprite(
+                new THREE.SpriteMaterial({
+                  map: new THREE.CanvasTexture(
+                    (() => {
+                      const canvas = document.createElement("canvas");
+                      canvas.width = canvas.height = 64;
+                      const ctx = canvas.getContext("2d");
+                      const gradient = ctx.createRadialGradient(
+                        32,
+                        32,
+                        0,
+                        32,
+                        32,
+                        32
+                      );
+                      gradient.addColorStop(0, "rgba(255, 255, 255, 0.8)");
+                      gradient.addColorStop(0.5, "rgba(100, 200, 255, 0.4)");
+                      gradient.addColorStop(1, "rgba(0, 0, 0, 0)");
+                      ctx.fillStyle = gradient;
+                      ctx.fillRect(0, 0, 64, 64);
+                      return canvas;
+                    })()
+                  ),
+                  transparent: true,
+                  opacity: 0.7,
+                })
+              );
+              sprite.scale.set(0.3, 0.3, 0.3);
+              return sprite;
+            }}
+            customThreeObjectUpdate={(obj, data) => {
+              // Animate particles with floating motion
+              const time = Date.now() * 0.0003; // MUCH slower overall animation
+              const floatOffset = Math.sin(time * 1 + data.phase) * 0.002; // Super gentle floating
+              obj.position.setFromSpherical(
+                new THREE.Spherical(
+                  globeEl.current
+                    ? globeEl.current.getGlobeRadius() *
+                      (1 + data.alt + floatOffset)
+                    : 1,
+                  ((90 - data.lat) * Math.PI) / 180,
+                  (data.lng * Math.PI) / 180
+                )
+              );
+              // Gentle opacity pulsing
+              obj.material.opacity =
+                0.4 + Math.sin(time * 1.5 + data.phase) * 0.15; // Much slower, subtler opacity changes
+            }}
             polygonLabel={(d) => {
               if (d.properties?.type === "city") {
                 const cityData = citiesAndLocations.find(
