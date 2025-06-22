@@ -58,18 +58,18 @@ export default function Home() {
             <h1 className="text-6xl md:text-8xl font-bold mb-4">
               Hi, I'm <span className="gradient-text">Batıkan</span>
             </h1>
-            <p className="text-2xl md:text-3xl text-gray-600 dark:text-gray-400">
+            <p className="text-xl md:text-3xl text-gray-600 dark:text-gray-400">
               Geography Enthusiast • Developer • Explorer
             </p>
           </div>
 
           {/* Map/Globe Container - Much Larger and More Prominent */}
-          <div className="mt-16">
+          <div className="mt-16 w-full px-0 sm:px-4">
             {show3D ? (
               <div className="relative">
-                <div className="glass rounded-3xl p-4 sm:p-6 shadow-2xl border border-gray-200 dark:border-gray-800 backdrop-blur-xl">
+                <div className="glass rounded-3xl p-2 sm:p-6 shadow-2xl border border-gray-200 dark:border-gray-800 backdrop-blur-xl">
                   <div
-                    className="w-full py-8 sm:py-12 globe-container"
+                    className="w-full py-4 sm:py-12 globe-container"
                     style={{ minHeight: "800px" }}
                   >
                     <GlobeGame navigateWithRefresh={navigateWithRefresh} />
@@ -80,9 +80,9 @@ export default function Home() {
                 <div className="absolute top-6 left-6 z-10">
                   <button
                     onClick={toggle3D}
-                    className="bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white px-6 py-3 rounded-full font-medium transition-all transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center gap-2"
+                    className="bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white px-3 sm:px-6 py-2 sm:py-3 rounded-full font-medium transition-all transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center gap-2"
                   >
-                    <span className="text-base font-semibold">
+                    <span className="text-sm sm:text-base font-semibold">
                       ← Back to 2D Map
                     </span>
                   </button>

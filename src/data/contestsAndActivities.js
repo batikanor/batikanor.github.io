@@ -11,11 +11,11 @@ export const contestsAndActivities = [
       country: "Japan",
       coordinates: { lat: 34.6937, lng: 135.5023 },
     },
-    date: "04/2025",
+    date: "06/2025",
     shortDescription:
       "Built 'Slai' - an innovative VR-pen based music equalizer system using Logitech MX Ink, allowing musicians to control frequency bands through spatial movements. Won Open Source distinction and participated in World Expo 2025.",
     longDescription:
-      "We were given the opportunity to have a free trip to Osaka, Japan where the World Expo 2025 was taking place. We first worked on music and AI challenges in a Buddhist temple called 'Gyokuzoin Temple' on a mountain between Osaka and Nara, and built a solution using the VR-pen of Logitech, MX Ink.\n\n\
+      "--TO_BE_UPDATED--We were given the opportunity to have a free trip to Osaka, Japan where the World Expo 2025 was taking place. We first worked on music and AI challenges in a Buddhist temple called 'Gyokuzoin Temple' on a mountain between Osaka and Nara, and built a solution using the VR-pen of Logitech, MX Ink.\n\n\
 We made it so that the pen can be used like an equalizer. You map the frequency bands to one of the x, y or z axes and then just move the pen around to see the music change. We called our project 'Slight Adjustments with AI', or 'Slai'. We brought our prototype to a working state and let the fellow participants also play with the system on a desk we set up.\n\n\
 In our demo video, we actually mapped the x-dimension to a drumbeat, and mapped x and y dimensions to some frequency bands for a Mozart piece. Note that I am not a musician, so please try to judge the solution independently from your judgement of my music control skills :D I also tried the extremes to make the functionality over-the-top-noticeable for the audience.\n\n\
 The VR-pen has many infrared emitters, which enables it to be 3D-tracked very precisely using a device such as the Meta Quest 3. We couldn't have just used anything with a GPS for this project, or just relied on computer vision tracking a stick, for these methods wouldn't be precise enough to satisfy e.g. an orchestra chef or a DJ.\n\n\

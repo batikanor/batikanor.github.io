@@ -593,7 +593,8 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
     const mobileQuery = window.matchMedia("(max-width: 768px)");
     const handleDeviceChange = (event) => {
       setIsMobile(event.matches);
-      setShowMap(!event.matches);
+      // Always show map, but will show warning on mobile
+      setShowMap(true);
     };
     handleDeviceChange(mobileQuery);
     mobileQuery.addEventListener("change", handleDeviceChange);
@@ -1576,28 +1577,53 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
               : "opacity-100 transition-opacity duration-500"
           }`}
         >
+          {/* Mobile warning message */}
+          {isMobile && (
+            <div className="absolute top-4 left-4 right-4 z-20 bg-red-600/90 backdrop-blur-sm rounded-lg p-3 text-white text-center">
+              <p className="text-sm font-semibold">
+                ⚠️ 3D Globe Not Optimized for Mobile
+              </p>
+              <p className="text-xs mt-1">
+                For the best experience, please use a desktop or tablet device
+              </p>
+            </div>
+          )}
+
           <div
             className={`text-white absolute ${
               isFullscreen ? "top-4 right-16" : "top-4 left-4"
+            } ${
+              isMobile ? "hidden" : "block"
             } bg-black bg-opacity-75 p-2 sm:p-4 rounded shadow-lg z-10 text-[10px] sm:text-sm md:text-base max-w-[200px] sm:max-w-none`}
           >
-            <ul>
+            <div className="mb-2">
+              <span className="text-white font-semibold">
+                Achievement Importance
+              </span>
+            </div>
+            <ul className="text-xs space-y-1">
               <li>
-                <span className="text-red-500">Red Markers:</span> Cities with
-                minor achievements
+                <span style={{ color: getDeterministicColor(9) }}>●</span> High
+                Impact (9-10)
               </li>
               <li>
-                <span className="text-green-500">Green Markers:</span> Cities
-                with major achievements
+                <span style={{ color: getDeterministicColor(6) }}>●</span>{" "}
+                Medium Impact (5-8)
+              </li>
+              <li>
+                <span style={{ color: getDeterministicColor(3) }}>●</span> Lower
+                Impact (1-4)
               </li>
               {showChoropleth && (
-                <li>
-                  <span className="text-red-500">Red Intensity:</span> GDP per
+                <li className="pt-1 border-t border-gray-500">
+                  <span className="text-red-400">Red Intensity:</span> GDP per
                   capita
                 </li>
               )}
             </ul>
-            <p>ToDo: Fill the map with achievements</p>
+            <div className="text-center text-xs text-gray-400 mt-2 pt-2 border-t border-gray-500">
+              Colors: Red → Yellow → Green
+            </div>
           </div>
 
           <Globe

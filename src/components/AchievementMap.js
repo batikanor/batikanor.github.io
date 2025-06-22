@@ -7,6 +7,29 @@ import { FaGlobe } from "react-icons/fa";
 import { contestsAndActivities } from "../data/contestsAndActivities";
 import MarkerInfo from "./MarkerInfo";
 
+// Function to generate a deterministic color based on the importance
+const getDeterministicColor = (importance) => {
+  // Define start and end colors (red to green)
+  const startColor = { r: 255, g: 100, b: 100 }; // Lighter red
+  const endColor = { r: 100, g: 255, b: 100 }; // Lighter green
+
+  // Normalize importance to a 0-1 scale (assuming max importance is 10)
+  const normalizedImportance = Math.min(importance / 10, 1);
+
+  // Interpolate between colors
+  const r = Math.round(
+    startColor.r + (endColor.r - startColor.r) * normalizedImportance
+  );
+  const g = Math.round(
+    startColor.g + (endColor.g - startColor.g) * normalizedImportance
+  );
+  const b = Math.round(
+    startColor.b + (endColor.b - startColor.b) * normalizedImportance
+  );
+
+  return `rgb(${r}, ${g}, ${b})`;
+};
+
 // Fix for default markers in Next.js
 if (typeof window !== "undefined") {
   delete L.Icon.Default.prototype._getIconUrl;
@@ -70,6 +93,7 @@ const processAchievements = () => {
         ? "medium"
         : "minor",
     averageImportance: city.totalImportance / city.count,
+    maxImportance: Math.max(...city.achievements.map((a) => a.importance)),
     label: `${city.city}, ${city.country}`,
   }));
 };
@@ -116,8 +140,9 @@ export default function AchievementMap({ navigateWithRefresh, onToggle3D }) {
     ).addTo(map);
 
     // Custom icon for major achievements
-    const createCustomIcon = (count, type) => {
-      const iconHtml = `<div class="custom-marker ${type}"><span class="marker-count">${count}</span></div>`;
+    const createCustomIcon = (count, type, maxImportance) => {
+      const color = getDeterministicColor(maxImportance);
+      const iconHtml = `<div class="custom-marker ${type}" style="background: ${color}; border-color: ${color};"><span class="marker-count">${count}</span></div>`;
       const size = type === "major" ? 50 : type === "medium" ? 40 : 30;
       return L.divIcon({
         html: iconHtml,
@@ -128,7 +153,11 @@ export default function AchievementMap({ navigateWithRefresh, onToggle3D }) {
 
     // Add markers
     achievements.forEach((location) => {
-      const icon = createCustomIcon(location.count, location.type);
+      const icon = createCustomIcon(
+        location.count,
+        location.type,
+        location.maxImportance
+      );
       const marker = L.marker(location.coords, { icon }).addTo(map);
 
       // Simple click handler like 3D map - no popup, direct navigation
@@ -220,49 +249,33 @@ export default function AchievementMap({ navigateWithRefresh, onToggle3D }) {
           border-radius: 50%;
           animation: pulse 2s infinite;
           font-weight: bold;
-        }
-
-        .custom-marker.major {
-          background: theme("colors.accent-hover / 95%");
-          border: 4px solid theme("colors.accent-hover");
-          box-shadow: 0 0 25px theme("colors.accent-hover / 80%");
-        }
-
-        .custom-marker.medium {
-          background: theme("colors.accent / 95%");
-          border: 3px solid theme("colors.accent");
-          box-shadow: 0 0 20px theme("colors.accent / 70%");
-        }
-
-        .custom-marker.minor {
-          background: theme("colors.accent / 90%");
-          border: 2px solid theme("colors.accent");
-          box-shadow: 0 0 15px theme("colors.accent / 60%");
+          border: 3px solid;
+          box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
         }
 
         .marker-count {
-          font-size: 18px;
+          font-size: 14px;
           color: white;
           text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
         }
 
         .custom-marker.medium .marker-count {
-          font-size: 16px;
+          font-size: 12px;
         }
 
         .custom-marker.minor .marker-count {
-          font-size: 14px;
+          font-size: 10px;
         }
 
         @keyframes pulse {
           0% {
-            box-shadow: 0 0 0 0 theme("colors.accent-hover / 70%");
+            box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7);
           }
           70% {
-            box-shadow: 0 0 0 10px theme("colors.accent-hover / 0%");
+            box-shadow: 0 0 0 10px rgba(255, 255, 255, 0);
           }
           100% {
-            box-shadow: 0 0 0 0 theme("colors.accent-hover / 0%");
+            box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
           }
         }
 
@@ -306,46 +319,65 @@ export default function AchievementMap({ navigateWithRefresh, onToggle3D }) {
         />
 
         {/* Control Buttons Container */}
-        <div className="absolute top-6 left-16 right-6 z-[1000] flex justify-between items-start">
+        <div className="absolute top-6 left-4 sm:left-16 right-6 z-[1000] flex justify-between items-start">
           {/* Left side buttons */}
           <div className="flex flex-col gap-3">
             {/* 3D Globe Toggle Button */}
             <button
               onClick={onToggle3D}
-              className="group relative bg-gradient-to-r from-accent-dark to-accent-darker hover:from-accent-darker hover:to-accent-dark text-text-on-accent px-4 py-2 rounded-full font-medium transition-all transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center gap-2"
+              className="group relative bg-gradient-to-r from-accent-dark to-accent-darker hover:from-accent-darker hover:to-accent-dark text-text-on-accent px-3 sm:px-4 py-2 rounded-full font-medium transition-all transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center gap-2"
             >
-              <FaGlobe className="text-lg animate-spin-slow" />
-              <span className="text-sm font-semibold">Switch to 3D Globe</span>
+              <FaGlobe className="text-base sm:text-lg animate-spin-slow" />
+              <span className="text-xs sm:text-sm font-semibold">
+                Switch to 3D Globe
+              </span>
               <div className="absolute -top-1 -right-1 w-3 h-3 bg-accent-hover rounded-full animate-ping"></div>
               <div className="absolute -top-1 -right-1 w-3 h-3 bg-accent rounded-full"></div>
             </button>
           </div>
 
-          {/* Right side - Legend */}
-          <div className="bg-black/80 backdrop-blur-sm rounded-lg p-3 text-sm">
-            <div className="flex items-center gap-2 mb-2">
-              <div className="w-4 h-4 bg-accent-darker rounded-full flex items-center justify-center text-text-on-accent text-xs font-bold">
-                5+
+          {/* Right side - Legend - Hidden on mobile */}
+          <div className="hidden sm:block bg-black/80 backdrop-blur-sm rounded-lg p-3 text-sm">
+            <div className="mb-2 text-center">
+              <span className="text-white font-semibold text-xs">
+                Achievement Importance
+              </span>
+            </div>
+            <div className="flex items-center gap-2 mb-1.5">
+              <div
+                className="w-4 h-4 rounded-full flex items-center justify-center text-white text-xs font-bold"
+                style={{ backgroundColor: getDeterministicColor(9) }}
+              >
+                9+
               </div>
-              <span className="text-dark-foreground-secondary">
-                Major achievements
+              <span className="text-dark-foreground-secondary text-xs">
+                High Impact
+              </span>
+            </div>
+            <div className="flex items-center gap-2 mb-1.5">
+              <div
+                className="w-3.5 h-3.5 rounded-full flex items-center justify-center text-white text-xs font-bold"
+                style={{ backgroundColor: getDeterministicColor(6) }}
+              >
+                6
+              </div>
+              <span className="text-dark-foreground-secondary text-xs">
+                Medium Impact
               </span>
             </div>
             <div className="flex items-center gap-2 mb-2">
-              <div className="w-3 h-3 bg-accent-dark rounded-full flex items-center justify-center text-text-on-accent text-xs font-bold">
-                3+
+              <div
+                className="w-3 h-3 rounded-full flex items-center justify-center text-white text-xs font-bold"
+                style={{ backgroundColor: getDeterministicColor(3) }}
+              >
+                3
               </div>
-              <span className="text-dark-foreground-secondary">
-                Medium achievements
+              <span className="text-dark-foreground-secondary text-xs">
+                Lower Impact
               </span>
             </div>
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-accent rounded-full flex items-center justify-center text-text-on-accent text-xs font-bold">
-                1+
-              </div>
-              <span className="text-dark-foreground-secondary">
-                Minor achievements
-              </span>
+            <div className="text-center text-xs text-gray-400 border-t border-gray-600 pt-2">
+              Red → Yellow → Green
             </div>
           </div>
         </div>
