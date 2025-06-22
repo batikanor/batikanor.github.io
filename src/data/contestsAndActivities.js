@@ -4,18 +4,18 @@ export const contestsAndActivities = [
     importance: 7,
     highlighted: true,
     title:
-      "Winner with distinction 'Open Source' in Music & AI Hackathon in Osaka, Japan. Participation in World Expo as VIP of Austria",
+      "Winner with distinction 'Open Source' in Music & AI Hackathon in Japan. Participation in World Expo as VIP of Austria",
     mapData: {
-      venue: "Gyokuzoin Temple",
-      city: "Osaka",
+      venue: "Gyokuzoin Temple, Mount Shigi",
+      city: "Nara",
       country: "Japan",
-      coordinates: { lat: 34.6937, lng: 135.5023 },
+      coordinates: { lat: 34.6128, lng: 135.6682 }, // Mount Shigi, Nara - actual location of Gyokuzoin Temple
     },
     date: "06/2025",
     shortDescription:
       "Built 'Slai' - an innovative VR-pen based music equalizer system using Logitech MX Ink, allowing musicians to control frequency bands through spatial movements. Won Open Source distinction and participated in World Expo 2025.",
     longDescription:
-      "--TO_BE_UPDATED--We were given the opportunity to have a free trip to Osaka, Japan where the World Expo 2025 was taking place. We first worked on music and AI challenges in a Buddhist temple called 'Gyokuzoin Temple' on a mountain between Osaka and Nara, and built a solution using the VR-pen of Logitech, MX Ink.\n\n\
+      "--TO_BE_UPDATED--We were given the opportunity to have a free trip to Japan where the World Expo 2025 was taking place. We first worked on music and AI challenges in a Buddhist temple called 'Gyokuzoin Temple' on Mount Shigi in Nara Prefecture, and built a solution using the VR-pen of Logitech, MX Ink.\n\n\
 We made it so that the pen can be used like an equalizer. You map the frequency bands to one of the x, y or z axes and then just move the pen around to see the music change. We called our project 'Slight Adjustments with AI', or 'Slai'. We brought our prototype to a working state and let the fellow participants also play with the system on a desk we set up.\n\n\
 In our demo video, we actually mapped the x-dimension to a drumbeat, and mapped x and y dimensions to some frequency bands for a Mozart piece. Note that I am not a musician, so please try to judge the solution independently from your judgement of my music control skills :D I also tried the extremes to make the functionality over-the-top-noticeable for the audience.\n\n\
 The VR-pen has many infrared emitters, which enables it to be 3D-tracked very precisely using a device such as the Meta Quest 3. We couldn't have just used anything with a GPS for this project, or just relied on computer vision tracking a stick, for these methods wouldn't be precise enough to satisfy e.g. an orchestra chef or a DJ.\n\n\
@@ -61,7 +61,7 @@ We had two 'backends' and one 'frontend', if these terms mean anything today... 
       venue: "Unternehmertum Garching",
       city: "Munich",
       country: "Germany",
-      coordinates: { lat: 48.1351, lng: 11.582 },
+      coordinates: { lat: 48.2625, lng: 11.6671 }, // Garching bei München
     },
     date: "02/2025",
     shortDescription:
@@ -146,7 +146,7 @@ The vision of the SaaS platform -- integrated with common brokers like Scalable 
       venue: "Huawei Research Center",
       city: "Munich",
       country: "Germany",
-      coordinates: { lat: 48.1351, lng: 11.582 },
+      coordinates: { lat: 48.1786, lng: 11.5353 }, // Huawei Munich Research Center - Riesstraße
     },
     date: "12/2024 - 01/2025",
     shortDescription: "Estimating HRTFs from multi-view pinna images.",
@@ -183,7 +183,7 @@ The vision of the SaaS platform -- integrated with common brokers like Scalable 
       venue: "Siemens AG",
       city: "Munich",
       country: "Germany",
-      coordinates: { lat: 48.1351, lng: 11.582 },
+      coordinates: { lat: 48.1453, lng: 11.5758 }, // Siemens AG Munich Headquarters - Wittelsbacherplatz
     },
     date: "12/2024",
     shortDescription: "(Grade: 1.0) (Accepted at ESANN 2025)",
@@ -311,7 +311,7 @@ The vision of the SaaS platform -- integrated with common brokers like Scalable 
       venue: "Kraftwerk",
       city: "Zurich",
       country: "Switzerland",
-      coordinates: { lat: 47.3769, lng: 8.5417 },
+      coordinates: { lat: 47.3882, lng: 8.5153 }, // Kraftwerk Zurich
     },
     date: "11/2024",
     shortDescription: `Awarded funding for co-designing an AI-based employee surveying platform to enable sustainability and climate-related discussions between employees and employers. Pilot project currently planned in Zurich.`,
@@ -340,7 +340,7 @@ Our roadmap includes launching the platform in Zurich, gathering initial data, a
       venue: "Google Office",
       city: "Munich",
       country: "Germany",
-      coordinates: { lat: 48.1351, lng: 11.582 },
+      coordinates: { lat: 48.1392, lng: 11.5802 }, // Google Office Munich
     },
     date: "10/2024",
     shortDescription: `We helped test the up-and-coming AI innovation platform built by Bayer based on Google Cloud Platform. We found valuable bugs and managed to solve a set of computer vision and bioinformatics related tasks.`,
@@ -413,7 +413,7 @@ Our roadmap includes launching the platform in Zurich, gathering initial data, a
       venue: "Makerspace",
       city: "Munich",
       country: "Germany",
-      coordinates: { lat: 48.1351, lng: 11.582 },
+      coordinates: { lat: 48.148, lng: 11.568 }, // Munich Makerspace
     },
     date: "10/2024",
     shortDescription: `We built a complete prototype for circular value creation out of old home appliances using AI/RL.`,
@@ -434,7 +434,7 @@ Our roadmap includes launching the platform in Zurich, gathering initial data, a
       venue: "Thüga Solutions",
       city: "Munich",
       country: "Germany",
-      coordinates: { lat: 48.1351, lng: 11.582 },
+      coordinates: { lat: 48.1445, lng: 11.5892 }, // Thüga Solutions Munich Office
     },
     date: "09/2024",
     shortDescription: `Cost minimization for tenants and landlords through energy management using AI (multivariate forecasters, neural networks, …), and Mathematical Optimization (interior-point methods)  (Role: FullStack, Cloud, RL).`,
@@ -470,7 +470,7 @@ Our roadmap includes launching the platform in Zurich, gathering initial data, a
       venue: "TUM Blockchain Conference",
       city: "Munich",
       country: "Germany",
-      coordinates: { lat: 48.1351, lng: 11.582 },
+      coordinates: { lat: 48.1497, lng: 11.5677 }, // TUM Main Campus
     },
     date: "09/2024",
     shortDescription: `Designed a solana microbetting solution.`,
@@ -500,7 +500,7 @@ Our roadmap includes launching the platform in Zurich, gathering initial data, a
       venue: "SIX Swiss Exchange",
       city: "Zurich",
       country: "Switzerland",
-      coordinates: { lat: 47.3769, lng: 8.5417 },
+      coordinates: { lat: 47.3667, lng: 8.55 }, // SIX Swiss Exchange Zurich
     },
     date: "06/2024",
     shortDescription: `Developed “BizzWizz”, an AI-driven sustainability reporting assistance platform. Also presented in front of VC & on PointZero forum. Talks ongoing with Swiss Exchange business developers regarding turning this idea into a company.`,
@@ -562,7 +562,7 @@ Our roadmap includes launching the platform in Zurich, gathering initial data, a
       venue: "TUM AI Makeathon",
       city: "Munich",
       country: "Germany",
-      coordinates: { lat: 48.1351, lng: 11.582 },
+      coordinates: { lat: 48.1497, lng: 11.5677 }, // TUM Main Campus
     },
     date: "04/2024",
     shortDescription: `Wind Turbine Preventive Maintenance Through Reinforcement Learning  (Role: RL Developer, Presenter)`,
@@ -598,7 +598,7 @@ Our roadmap includes launching the platform in Zurich, gathering initial data, a
       venue: "TUM MDSI",
       city: "Munich",
       country: "Germany",
-      coordinates: { lat: 48.1351, lng: 11.582 },
+      coordinates: { lat: 48.1497, lng: 11.5677 }, // TUM Main Campus
     },
     date: "01/2024",
     shortDescription: `3D Visualization of football players as spheres during a live match, clustering them into lines and detecting line breaks, predictive analysis, providing an intuitive UI for configuration (Role: FullStack Developer).`,
@@ -725,7 +725,7 @@ Our roadmap includes launching the platform in Zurich, gathering initial data, a
       city: "Beykoz",
 
       country: "Turkey",
-      coordinates: { lat: 41.0082, lng: 28.9784 },
+      coordinates: { lat: 41.1428, lng: 29.1001 }, // Turkish-German University - Beykoz, Istanbul
     },
     date: "06/2022",
     shortDescription: `Cat identification using noseprints and siamese networks.`,
@@ -745,7 +745,7 @@ Our roadmap includes launching the platform in Zurich, gathering initial data, a
       // city: "Istanbul",
       city: "Beykoz",
       country: "Turkey",
-      coordinates: { lat: 41.0082, lng: 28.9784 },
+      coordinates: { lat: 41.1428, lng: 29.1001 }, // Turkish-German University - Beykoz, Istanbul
     },
     date: "06/2022",
     shortDescription: `I was the first student ever to graduate from any faculty of the Turkish-German University with a perfect GPA.`,

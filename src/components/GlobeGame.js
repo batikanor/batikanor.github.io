@@ -857,7 +857,7 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
     } else {
       // Default view
       globeEl.current.pointOfView(
-        { lat: 41.0082, lng: 28.9784, altitude: MAIN_GLOBE_ALTITUDE },
+        { lat: 41.1428, lng: 29.1001, altitude: MAIN_GLOBE_ALTITUDE }, // Turkish-German University - Beykoz, Istanbul
         CAMERA_TRANSITION_TIME
       );
     }

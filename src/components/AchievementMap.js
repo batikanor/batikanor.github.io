@@ -48,12 +48,13 @@ if (typeof window !== "undefined") {
 
 // Process the real data from contestsAndActivities
 const processAchievements = () => {
-  const cityMap = new Map();
+  const venueMap = new Map();
 
   contestsAndActivities.forEach((activity) => {
-    const key = `${activity.mapData.city}-${activity.mapData.country}`;
-    if (!cityMap.has(key)) {
-      cityMap.set(key, {
+    // Group by venue + city + country to ensure each venue gets its own marker
+    const key = `${activity.mapData.venue}-${activity.mapData.city}-${activity.mapData.country}`;
+    if (!venueMap.has(key)) {
+      venueMap.set(key, {
         city: activity.mapData.city,
         country: activity.mapData.country,
         coords: [
@@ -68,36 +69,36 @@ const processAchievements = () => {
       });
     }
 
-    const cityData = cityMap.get(key);
-    cityData.achievements.push({
+    const venueData = venueMap.get(key);
+    venueData.achievements.push({
       title: activity.title,
       date: activity.date,
       importance: activity.importance,
       shortDescription: activity.shortDescription,
     });
 
-    cityData.activities.push({
+    venueData.activities.push({
       title: activity.title,
       venue: activity.mapData.venue,
       date: activity.date,
       slug: activity.slug,
     });
 
-    cityData.totalImportance += activity.importance;
-    cityData.count += 1;
+    venueData.totalImportance += activity.importance;
+    venueData.count += 1;
   });
 
-  return Array.from(cityMap.values()).map((city) => ({
-    ...city,
+  return Array.from(venueMap.values()).map((venue) => ({
+    ...venue,
     type:
-      city.totalImportance >= 15
+      venue.totalImportance >= 15
         ? "major"
-        : city.totalImportance >= 8
+        : venue.totalImportance >= 8
         ? "medium"
         : "minor",
-    averageImportance: city.totalImportance / city.count,
-    maxImportance: Math.max(...city.achievements.map((a) => a.importance)),
-    label: `${city.city}, ${city.country}`,
+    averageImportance: venue.totalImportance / venue.count,
+    maxImportance: Math.max(...venue.achievements.map((a) => a.importance)),
+    label: `${venue.venue}, ${venue.city}`, // Changed to show venue + city instead of just city
   }));
 };
 
@@ -122,7 +123,7 @@ export default function AchievementMap({ navigateWithRefresh, onToggle3D }) {
       center: [35, 20],
       zoom: 2,
       minZoom: 1,
-      maxZoom: 8,
+      maxZoom: 18, // Increased from 8 to 18 for much deeper zoom
       scrollWheelZoom: false,
       doubleClickZoom: false,
       dragging: false,
@@ -156,11 +157,11 @@ export default function AchievementMap({ navigateWithRefresh, onToggle3D }) {
 
     // Create marker cluster group
     const markerClusterGroup = L.markerClusterGroup({
-      maxClusterRadius: 80, // How close markers need to be to cluster
+      maxClusterRadius: 50, // Reduced from 80 to 50 - markers need to be closer to cluster
       spiderfyOnMaxZoom: true,
       showCoverageOnHover: false,
       zoomToBoundsOnClick: true,
-      disableClusteringAtZoom: 6, // Disable clustering at higher zoom levels
+      disableClusteringAtZoom: 8, // Reduced from 10 to 8 - disable clustering earlier when zooming in
       iconCreateFunction: function (cluster) {
         const childCount = cluster.getChildCount();
         const markers = cluster.getAllChildMarkers();
