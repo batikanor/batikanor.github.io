@@ -1,6 +1,9 @@
 "use client";
 
 import L from "leaflet";
+import "leaflet.markercluster";
+import "leaflet.markercluster/dist/MarkerCluster.css";
+import "leaflet.markercluster/dist/MarkerCluster.Default.css";
 import "leaflet/dist/leaflet.css";
 import { useEffect, useRef, useState } from "react";
 import { FaGlobe } from "react-icons/fa";
@@ -151,20 +154,78 @@ export default function AchievementMap({ navigateWithRefresh, onToggle3D }) {
       });
     };
 
-    // Add markers
+    // Create marker cluster group
+    const markerClusterGroup = L.markerClusterGroup({
+      maxClusterRadius: 80, // How close markers need to be to cluster
+      spiderfyOnMaxZoom: true,
+      showCoverageOnHover: false,
+      zoomToBoundsOnClick: true,
+      disableClusteringAtZoom: 6, // Disable clustering at higher zoom levels
+      iconCreateFunction: function (cluster) {
+        const childCount = cluster.getChildCount();
+        const markers = cluster.getAllChildMarkers();
+
+        // Calculate total counts and importance from all markers in cluster
+        let totalCount = 0;
+        let totalImportance = 0;
+        let maxImportance = 0;
+        markers.forEach((marker) => {
+          if (marker.locationData) {
+            totalCount += marker.locationData.count; // Sum of all achievement counts
+            totalImportance += marker.locationData.totalImportance;
+            maxImportance = Math.max(
+              maxImportance,
+              marker.locationData.maxImportance
+            );
+          }
+        });
+
+        const color = getDeterministicColor(maxImportance);
+
+        // Determine cluster size based on total achievement count (not marker count)
+        let size = 40;
+        let className = "marker-cluster-small";
+        if (totalCount > 10) {
+          size = 50;
+          className = "marker-cluster-medium";
+        }
+        if (totalCount > 20) {
+          size = 60;
+          className = "marker-cluster-large";
+        }
+
+        return L.divIcon({
+          html: `<div class="marker-cluster ${className}" style="background: ${color}; border-color: ${color};">
+                   <span>${totalCount}</span>
+                 </div>`,
+          className: "custom-cluster-icon",
+          iconSize: [size, size],
+        });
+      },
+    });
+
+    // Add markers to cluster group
     achievements.forEach((location) => {
       const icon = createCustomIcon(
         location.count,
         location.type,
         location.maxImportance
       );
-      const marker = L.marker(location.coords, { icon }).addTo(map);
+      const marker = L.marker(location.coords, { icon });
+
+      // Store location data on marker for cluster calculations
+      marker.locationData = location;
 
       // Simple click handler like 3D map - no popup, direct navigation
       marker.on("click", () => {
         setSelectedMarker(location);
       });
+
+      markerClusterGroup.addLayer(marker);
     });
+
+    // Add cluster group to map
+    map.addLayer(markerClusterGroup);
 
     // Remove global function - not needed anymore
     mapInstanceRef.current = map;
@@ -264,6 +325,53 @@ export default function AchievementMap({ navigateWithRefresh, onToggle3D }) {
 
         .custom-marker.minor .marker-count {
           font-size: 10px;
+        }
+
+        /* Marker cluster styles */
+        .marker-cluster {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border-radius: 50%;
+          font-weight: bold;
+          border: 3px solid;
+          color: white;
+          font-size: 14px;
+          text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+          animation: pulse 2s infinite;
+          cursor: pointer;
+          transition: all 0.3s ease;
+        }
+
+        .marker-cluster:hover {
+          transform: scale(1.1);
+        }
+
+        .marker-cluster-small {
+          width: 40px;
+          height: 40px;
+        }
+
+        .marker-cluster-medium {
+          width: 50px;
+          height: 50px;
+          font-size: 16px;
+        }
+
+        .marker-cluster-large {
+          width: 60px;
+          height: 60px;
+          font-size: 18px;
+        }
+
+        /* Override default cluster styles */
+        .leaflet-cluster-anim .leaflet-marker-icon,
+        .leaflet-cluster-anim .leaflet-marker-shadow {
+          transition: all 0.3s ease-out;
+        }
+
+        .leaflet-markercluster-group {
+          animation: none !important;
         }
 
         @keyframes pulse {
