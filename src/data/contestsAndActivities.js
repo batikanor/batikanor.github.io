@@ -79,6 +79,10 @@ Final note: Osaka is extremely humid. You aren't prepared. You cannot prepare. J
         label: "photos from expo",
         url: "https://drive.google.com/drive/folders/1CwdbxeL0oYo-E4K6hZuFjzQWp9o89xeT?usp=sharing",
       },
+      {
+        label: "photos from temple",
+        url: "https://drive.google.com/drive/folders/1p098CuFdbnfJpOm91hqeTE5TLEez6Fuw?usp=sharing",
+      },
     ],
     gdrive_embed: [
       "https://drive.google.com/file/d/1h3e3bf_HZbINjviMf1zYXoFuCryrj0Pq/view?usp=sharing",
