@@ -1,7 +1,7 @@
 export const contestsAndActivities = [
   {
     slug: "music-ai-osaka-2025",
-    importance: 7,
+    importance: 6,
     highlighted: true,
     title:
       "Winner with distinction 'Open Source' in Music & AI Hackathon in Japan. Participation in World Expo as VIP of Austria",
@@ -15,13 +15,31 @@ export const contestsAndActivities = [
     shortDescription:
       "Built 'Slai' - an innovative VR-pen based music equalizer system using Logitech MX Ink, allowing musicians to control frequency bands through spatial movements. Won Open Source distinction and participated in World Expo 2025.",
     longDescription:
-      "--TO_BE_UPDATED--We were given the opportunity to have a free trip to Japan where the World Expo 2025 was taking place. We first worked on music and AI challenges in a Buddhist temple called 'Gyokuzoin Temple' on Mount Shigi in Nara Prefecture, and built a solution using the VR-pen of Logitech, MX Ink.\n\n\
-We made it so that the pen can be used like an equalizer. You map the frequency bands to one of the x, y or z axes and then just move the pen around to see the music change. We called our project 'Slight Adjustments with AI', or 'Slai'. We brought our prototype to a working state and let the fellow participants also play with the system on a desk we set up.\n\n\
-In our demo video, we actually mapped the x-dimension to a drumbeat, and mapped x and y dimensions to some frequency bands for a Mozart piece. Note that I am not a musician, so please try to judge the solution independently from your judgement of my music control skills :D I also tried the extremes to make the functionality over-the-top-noticeable for the audience.\n\n\
-The VR-pen has many infrared emitters, which enables it to be 3D-tracked very precisely using a device such as the Meta Quest 3. We couldn't have just used anything with a GPS for this project, or just relied on computer vision tracking a stick, for these methods wouldn't be precise enough to satisfy e.g. an orchestra chef or a DJ.\n\n\
-However, the pen's tracking did rely on it remaining in the field of vision of the Quest headset, which, for a proof of concept solution, we believe was fine.\n\n\
-Our project is open source and we invite people to also get inspired by it, and maybe try the limits of the pen through other means.\n\n\
-We had two 'backends' and one 'frontend', if these terms mean anything today... we basically made sure the location data were flowing correctly to the source app where the music implications can be set up.",
+      "We were given the incredible opportunity to have a free trip to Japan where the World Expo 2025 was taking place. We first worked on music and AI challenges in a Buddhist temple called 'Gyokuzoin Temple' on Mount Shigi in Nara Prefecture, and built a solution using Logitech's VR-pen, the MX Ink.\n\n\
+Group Photo - All Hackers at the Temple:\n\n\
+{{gdrive_embed[5]}}\n\n\
+We designed the pen to function as an equalizer. You map frequency bands to one of the x, y, or z axes and then simply move the pen around to hear the music change in real-time. We called our project 'Slight Adjustments with AI', or 'Slai'. We brought our prototype to a working state and let fellow participants interact with the system at a demo station we set up.\n\n\
+Here's a photo of me holding the winner card with open source distinction, my teammate Davide holding his prize for travel reimbursement to another competition in Austria, and the famous yodeler with his own cinematic universe, [Takeo Ischi](https://youtu.be/Ppm5_AGtbTo?si=qdbxNxp4Y4bI5u74):\n\n\
+{{gdrive_embed[0]}}\n\n\
+The VR-pen features multiple infrared emitters, enabling precise 3D tracking through devices like the Meta Quest 3. We couldn't rely on GPS or simple computer vision tracking for this project, as these methods lack the precision required for applications like orchestral conducting or professional DJing.\n\n\
+However, the pen's tracking depends on remaining within the Quest headset's field of vision, which we considered acceptable for our proof of concept.\n\n\
+Interface Overview - Trajectory Plot and Equalizer:\n\n\
+{{gdrive_embed[1]}}\n\n\
+On the left side of our interface, we displayed a real-time plot showing the pen's trajectory in 3D space for a user-defined time period (e.g., last 2 seconds). On the right side, you see the equalizer with frequency bands that can be mapped to the x, y, or z axes. The rightmost section features a 'click me' button for selecting specific tracks (such as a drumbeat, or perhaps [Chicken Attack by Takeo Ischi](https://www.youtube.com/watch?v=miomuSGoPzI)), allowing users to control mid-tones with the y-dimension and piano with the z-dimension while adjusting drumbeat volume through the equalizer (where values <0 disable the drumbeat).\n\n\
+Demo Video - Proof of Concept:\n\n\
+{{gdrive_embed[2]}}\n\n\
+In our demo video, we mapped the x-dimension to a drumbeat and the z and y dimensions to some frequency bands for a Mozart piece. Note that I'm not a musician, so please judge the solution independently of my musical control skills! I intentionally used extreme settings to make the functionality clearly visible to the audience.\n\n\
+This video demonstrates the working system, though I was sleep-deprived during recording. I held the pen too high, making some movements less visible on the left plot (trust me, it normally displays beautifully), and as someone without musical training, I focused on demonstrating extreme volume variations across frequency bands rather than subtle adjustments. I also forgot to scroll down to show the complete mapping interface. Ideally, I'd re-record this demo with better preparation, but given the hackathon's nature (<24 hours of working time with limited internet access in a temple in Japan, where we also wanted to explore and travel), what did you expect—a perfect pitch?\n\n\
+We experimented with using pen velocity (direct, 10ms, 100ms averages) and even acceleration (direct, 10ms, 100ms averages) instead of position, but concluded this felt unnatural for conductors. When a conductor raises their baton and holds it there, they expect the orchestra to maintain that dynamic level. Position matters: pen up, orchestra up. Of course, this creates the challenge of establishing the reference point (0,0,0), which we address through VR pen synchronization. However, we didn't advance our PoC enough to enable seamless reference point recalibration, which limited our live demo's effectiveness. We had ambitious plans—imagine playing Mozart, then suddenly stepping right and switching to [Chicken Attack](https://www.youtube.com/watch?v=miomuSGoPzI) to surprise the audience! It would've been magnificent.\n\n\
+Contributors and Testers:\n\n\
+{{gdrive_embed[3]}}\n\n\
+The name 'Slight Adjustments with AI' reflects our vision: pen movements should create subtle musical changes, which we still believe represents the ideal final product. However, for our demo, we showcased extreme variations instead of subtle adjustments because, as non-musicians, it would've been difficult to convince the audience the system was working otherwise.\n\n\
+Our project is open source (check out our [GitHub repository](https://github.com/batikanor/slai)) and we invite others to draw inspiration and explore the pen's capabilities through different approaches. We implemented two 'backends' and one 'frontend'—if these terms still mean anything today—essentially ensuring location data flowed correctly to the source application where musical parameters could be configured.\n\n\
+Meeting Maywa Denki, Founder of Otamatone:\n\n\
+{{gdrive_embed[4]}}\n\n\
+We had the honor of meeting and listening to [Maywa Denki](https://youtu.be/g_1WvxYBGTk), founder of the Otamatone, who, like us, was invited as a VIP of Austria to the expo. What a talented musician!\n\n\
+Thank you to everyone for this incredible event! Special thanks to [Florian Bauer](https://www.linkedin.com/in/florian-bauer-a230b333/) and [Nobuko Okazaki](https://www.linkedin.com/in/nobuko-okazaki-79253233/) for the outstanding organization!\n\n\
+Final note: Osaka is extremely humid. You aren't prepared. You cannot prepare. Just embrace it.",
     technologies: [
       "VR",
       "Logitech MX Ink",
@@ -45,12 +63,30 @@ We had two 'backends' and one 'frontend', if these terms mean anything today... 
         label: "Logitech MX Ink Details",
         url: "https://www.logitech.com/products/vr/mx-ink.html",
       },
+      {
+        label: "never used presentation",
+        url: "https://docs.google.com/presentation/d/1HFY7wZPyJjT9E2tAPsd4GxOrRcCKMziv/edit?usp=sharing&ouid=108923877595249603456&rtpof=true&sd=true",
+      },
+      {
+        label: "selfies I regret",
+        url: "https://drive.google.com/drive/folders/1-f7Llr77rG3O6AU5drdlbcy0mcwgmrQQ?usp=sharing",
+      },
+      {
+        label: "few amateur osaka photos",
+        url: "https://drive.google.com/drive/folders/1KJqUwQBaQbEWQOFtZe35UZKJXEuOIPuM?usp=sharing",
+      },
+      {
+        label: "photos from expo",
+        url: "https://drive.google.com/drive/folders/1CwdbxeL0oYo-E4K6hZuFjzQWp9o89xeT?usp=sharing",
+      },
     ],
     gdrive_embed: [
-      "https://drive.google.com/file/d/MOCK_slai_demo_video/view?usp=sharing",
-      "https://drive.google.com/file/d/MOCK_world_expo_images/view?usp=sharing",
-      "https://drive.google.com/file/d/MOCK_winner_card_takeo_ischi/view?usp=sharing",
-      "https://drive.google.com/file/d/MOCK_austria_vip_otamatone/view?usp=sharing",
+      "https://drive.google.com/file/d/1h3e3bf_HZbINjviMf1zYXoFuCryrj0Pq/view?usp=sharing",
+      "https://drive.google.com/file/d/1wAupvoHsFx5lHhgui2nYA4IwjSydyv6D/view?usp=sharing",
+      "https://drive.google.com/file/d/1vW2hecPnWMbgtJvzqUqiBtLglIzygIHK/view?usp=sharing",
+      "https://drive.google.com/file/d/1_i827KJ103iCVst7TNusUL57RZ52KAZQ/view?usp=sharing",
+      "https://drive.google.com/file/d/1ZxqUGjovsyOCWkb4cts40uamX3HV-YRL/view?usp=sharing",
+      "https://drive.google.com/file/d/1-45SiclILZpFmZaCC08grF3tZ9zdIIgf/view?usp=sharing",
     ],
   },
   {

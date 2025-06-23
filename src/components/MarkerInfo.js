@@ -18,16 +18,122 @@ const getGoogleDriveImageEmbedUrl = (url) => {
     : url;
 };
 
-const ResizableEmbed = ({ url, initialHeight = 300 }) => {
-  const [height, setHeight] = useState(initialHeight);
-  const [isExpanded, setIsExpanded] = useState(false);
+// Function to render text with inline markdown links
+const renderTextWithLinks = (text) => {
+  // Find all markdown links and replace them
+  const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
+  const parts = [];
+  let lastIndex = 0;
+  let match;
 
+  while ((match = linkRegex.exec(text)) !== null) {
+    // Add text before the link
+    if (match.index > lastIndex) {
+      parts.push(text.slice(lastIndex, match.index));
+    }
+
+    // Add the link component
+    parts.push(
+      <a
+        key={`link-${match.index}`}
+        href={match[2]}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-accent hover:text-accent-hover hover:underline transition-colors"
+      >
+        {match[1]}
+      </a>
+    );
+
+    lastIndex = match.index + match[0].length;
+  }
+
+  // Add remaining text after the last link
+  if (lastIndex < text.length) {
+    parts.push(text.slice(lastIndex));
+  }
+
+  // If no links found, return the original text
+  return parts.length > 0 ? parts : text;
+};
+
+// Function to render content with inline media
+const renderContentWithInlineMedia = (content, activity) => {
+  if (!content) return null;
+
+  // Split content by inline media placeholders
+  const parts = content.split(/(\{\{(?:image|embed|gdrive_embed)\[\d+\]\}\})/g);
+
+  return parts.map((part, index) => {
+    // Check if this part is an inline media placeholder
+    const imageMatch = part.match(/\{\{image\[(\d+)\]\}\}/);
+    const embedMatch = part.match(/\{\{(?:embed|gdrive_embed)\[(\d+)\]\}\}/);
+
+    if (imageMatch) {
+      const imageIndex = parseInt(imageMatch[1]);
+      if (activity.images && activity.images[imageIndex]) {
+        return (
+          <div key={index} className="my-4 sm:my-6 flex justify-center">
+            <img
+              src={getGoogleDriveImageEmbedUrl(activity.images[imageIndex])}
+              alt={`Inline image ${imageIndex + 1}`}
+              className="max-w-full rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300"
+              style={{ maxHeight: "400px", objectFit: "contain" }}
+            />
+          </div>
+        );
+      }
+    } else if (embedMatch) {
+      const embedIndex = parseInt(embedMatch[1]);
+      if (activity.gdrive_embed && activity.gdrive_embed[embedIndex]) {
+        // Set demo video (index 2) to XL by default
+        const isLargeEmbed = embedIndex === 2;
+        return (
+          <div key={index} className="my-4 sm:my-6">
+            <ResizableEmbed
+              url={activity.gdrive_embed[embedIndex]}
+              initialSize={isLargeEmbed ? "full" : "medium"}
+              initialHeight={isLargeEmbed ? 850 : 250}
+            />
+          </div>
+        );
+      }
+    } else {
+      // Regular text content - split by newlines and render paragraphs
+      return part.split("\n").map((line, lineIndex) => {
+        if (line.trim()) {
+          return (
+            <p
+              key={`${index}-${lineIndex}`}
+              className="text-sm sm:text-base text-light-foreground-secondary dark:text-dark-foreground-secondary mb-3 sm:mb-4"
+            >
+              {renderTextWithLinks(line)}
+            </p>
+          );
+        }
+        return null;
+      });
+    }
+    return null;
+  });
+};
+
+const ResizableEmbed = ({
+  url,
+  initialHeight = 300,
+  initialSize = "medium",
+}) => {
   const presetSizes = {
     small: 250,
     medium: 450,
     large: 650,
     full: 850,
   };
+
+  const [height, setHeight] = useState(
+    initialHeight || presetSizes[initialSize]
+  );
+  const [isExpanded, setIsExpanded] = useState(initialSize === "full");
 
   const handleSizeChange = (size) => {
     setHeight(presetSizes[size]);
@@ -192,14 +298,12 @@ const ProjectDetailsPopup = ({ activity, onClose }) => {
                 <h4 className="text-base sm:text-lg font-semibold text-light-foreground dark:text-dark-foreground">
                   Details
                 </h4>
-                {activity.longDescription.split("\n").map((line, i) => (
-                  <p
-                    key={i}
-                    className="text-sm sm:text-base text-light-foreground-secondary dark:text-dark-foreground-secondary"
-                  >
-                    {line}
-                  </p>
-                ))}
+                <div className="prose prose-sm sm:prose-base dark:prose-invert max-w-none">
+                  {renderContentWithInlineMedia(
+                    activity.longDescription,
+                    activity
+                  )}
+                </div>
               </div>
             )}
 

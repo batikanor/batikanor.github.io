@@ -56,16 +56,22 @@ const getImportanceStyles = (importance) => {
 };
 
 // Update the iframe component with preset size options and better controls
-const ResizableEmbed = ({ url, initialHeight = 300 }) => {
-  const [height, setHeight] = useState(initialHeight);
-  const [isExpanded, setIsExpanded] = useState(false);
-
+const ResizableEmbed = ({
+  url,
+  initialHeight = 300,
+  initialSize = "medium",
+}) => {
   const presetSizes = {
     small: 250,
     medium: 450,
     large: 650,
     full: 850,
   };
+
+  const [height, setHeight] = useState(
+    initialHeight || presetSizes[initialSize]
+  );
+  const [isExpanded, setIsExpanded] = useState(initialSize === "full");
 
   const handleSizeChange = (size) => {
     setHeight(presetSizes[size]);
@@ -267,6 +273,45 @@ const Projects = () => {
     }
   }, [isMobile, expandedActivity]); // Re-run when cards expand/collapse
 
+  // Function to render text with inline markdown links
+  const renderTextWithLinks = (text) => {
+    // Find all markdown links and replace them
+    const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
+    const parts = [];
+    let lastIndex = 0;
+    let match;
+
+    while ((match = linkRegex.exec(text)) !== null) {
+      // Add text before the link
+      if (match.index > lastIndex) {
+        parts.push(text.slice(lastIndex, match.index));
+      }
+
+      // Add the link component
+      parts.push(
+        <a
+          key={`link-${match.index}`}
+          href={match[2]}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-accent hover:text-accent-hover hover:underline transition-colors"
+        >
+          {match[1]}
+        </a>
+      );
+
+      lastIndex = match.index + match[0].length;
+    }
+
+    // Add remaining text after the last link
+    if (lastIndex < text.length) {
+      parts.push(text.slice(lastIndex));
+    }
+
+    // If no links found, return the original text
+    return parts.length > 0 ? parts : text;
+  };
+
   // Function to parse and render content with inline images/embeds
   const renderContentWithInlineMedia = (content, activity) => {
     if (!content) return null;
@@ -298,9 +343,15 @@ const Projects = () => {
       } else if (embedMatch) {
         const embedIndex = parseInt(embedMatch[1]);
         if (activity.gdrive_embed && activity.gdrive_embed[embedIndex]) {
+          // Set demo video (index 2) to XL by default
+          const isLargeEmbed = embedIndex === 2;
           return (
             <div key={index} className="my-6">
-              <ResizableEmbed url={activity.gdrive_embed[embedIndex]} />
+              <ResizableEmbed
+                url={activity.gdrive_embed[embedIndex]}
+                initialSize={isLargeEmbed ? "full" : "medium"}
+                initialHeight={isLargeEmbed ? 850 : 300}
+              />
             </div>
           );
         }
@@ -313,7 +364,7 @@ const Projects = () => {
                 key={`${index}-${lineIndex}`}
                 className="text-light-foreground dark:text-dark-foreground mb-4"
               >
-                {line}
+                {renderTextWithLinks(line)}
               </p>
             );
           }
