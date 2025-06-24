@@ -5,8 +5,8 @@
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import { FaCode, FaRocket, FaTrophy } from "react-icons/fa";
+import CVContent from "../components/CVContent";
 import Projects from "../components/Projects";
-import CV from "./cv/page";
 
 // Dynamically import both components without server-side rendering
 const AchievementMap = dynamic(() => import("../components/AchievementMap"), {
@@ -55,11 +55,12 @@ export default function Home() {
       <section className="relative min-h-screen flex items-center justify-center py-8">
         <div className="text-center space-y-12 max-w-7xl mx-auto px-4 w-full">
           <div className="space-y-6">
-            <h1 className="text-6xl md:text-8xl font-bold mb-4">
+            <h1 className="text-4xl md:text-6xl font-bold mb-4">
               Hi, I'm <span className="gradient-text">Batıkan</span>
             </h1>
             <p className="text-xl md:text-3xl text-gray-600 dark:text-gray-400">
-              Hacker • Developer • Entrepreneur
+              Hacker • Developer • Entrepreneur •{" "}
+              <span className="gradient-text">Friend</span>
             </p>
           </div>
 
@@ -146,8 +147,10 @@ export default function Home() {
             My <span className="gradient-text">Projects</span>
           </h2>
           <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-            A collection of my work ranging from hackathon wins to personal
-            projects, spanning various technologies and geographic locations
+            Here I share some of my competition wins, personal projects, and
+            other achievements I find noteworthy. Life is short, so I want to
+            adventure further. If you find another adventure for me, let me
+            know!
           </p>
         </div>
         <Projects />
@@ -163,7 +166,7 @@ export default function Home() {
             Professional journey and academic achievements
           </p>
         </div>
-        <CV />
+        <CVContent />
       </section>
 
       {/* Legacy Link */}

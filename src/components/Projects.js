@@ -1,4 +1,3 @@
-import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { FaGlobe } from "react-icons/fa";
 import VanillaTilt from "vanilla-tilt";
@@ -376,12 +375,7 @@ const Projects = () => {
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.5 }}
-      className="w-full py-8"
-    >
+    <div className="w-full">
       {/* Activities Grid - Using more width */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
         {contestsAndActivities.map((activity, index) => {
@@ -390,12 +384,9 @@ const Projects = () => {
           const isMinor = activity.importance >= 2 && activity.importance < 5;
 
           return (
-            <motion.div
+            <div
               id={activity.slug}
               key={activity.slug}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: index * 0.1 }}
               className={`${
                 isExpanded
                   ? "col-span-1 sm:col-span-2 lg:col-span-3 xl:col-span-4"
@@ -596,11 +587,11 @@ const Projects = () => {
                   )}
                 </div>
               </div>
-            </motion.div>
+            </div>
           );
         })}
       </div>
-    </motion.div>
+    </div>
   );
 };
 
