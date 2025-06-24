@@ -102,10 +102,7 @@ export default function Home() {
             <a href="#projects" className="btn text-lg px-8 py-4">
               Explore My Projects
             </a>
-            <a
-              href="/cv"
-              className="btn bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-2 border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 text-lg px-8 py-4"
-            >
+            <a href="/cv" className="btn-secondary text-lg px-8 py-4">
               View CV
             </a>
           </div>

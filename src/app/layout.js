@@ -2,6 +2,7 @@
 import { ThemeProvider } from "next-themes";
 import localFont from "next/font/local";
 import Footer from "../components/Footer";
+import ThemeToggle from "../components/ThemeToggle";
 import "./globals.css";
 
 const geistSans = localFont({
@@ -40,6 +41,9 @@ export default function RootLayout({ children }) {
         suppressHydrationWarning
       >
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          {/* Theme Toggle */}
+          <ThemeToggle />
+
           {/* Main Content Area - Full width, no navbar offset needed */}
           <main className="flex-1 relative">
             <div className="w-full max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 py-4 sm:py-8 lg:py-12">
