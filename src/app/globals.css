@@ -454,3 +454,33 @@ p,
   background-clip: text;
   text-fill-color: transparent;
 }
+
+/* Force remove all borders when expanded - highest specificity */
+.tilt-card.expanded,
+.tilt-card.expanded.highlight,
+.tilt-card.expanded:hover,
+.tilt-card.expanded.highlight:hover,
+.expanded.highlight,
+.expanded.highlight:hover {
+  border: none !important;
+  border-left: none !important;
+  border-top: none !important;
+  border-right: none !important;
+  border-bottom: none !important;
+  outline: none !important;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1) !important;
+  transform: none !important;
+  background-image: none !important;
+}
+
+/* Animation for professional header */
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

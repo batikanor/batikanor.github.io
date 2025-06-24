@@ -235,8 +235,8 @@ const Projects = () => {
             {activity.mapData.country}
           </span>
 
-          {/* Tooltip */}
-          <span className="invisible group-hover:visible absolute left-0 top-full mt-2 w-48 p-2 bg-dark-background text-dark-foreground text-sm rounded shadow-lg z-10">
+          {/* Tooltip - Made wider and more responsive */}
+          <span className="invisible group-hover:visible absolute left-0 top-full mt-2 w-56 sm:w-64 p-3 bg-dark-background text-dark-foreground text-sm rounded-lg shadow-lg z-10 whitespace-normal leading-relaxed">
             Click to view location on the map
           </span>
         </p>
@@ -399,17 +399,32 @@ const Projects = () => {
             >
               <div
                 className={`tilt-card relative p-4 sm:p-6 rounded-2xl shadow-xl backdrop-blur-lg overflow-hidden hover:shadow-2xl transition-all duration-300 ${
-                  activity.highlighted ? "highlight ring-2 ring-accent" : ""
+                  activity.highlighted && !isExpanded ? "highlight" : ""
+                } ${isExpanded ? "expanded" : ""} ${
+                  activity.highlighted && !isExpanded
+                    ? "ring-2 ring-accent"
+                    : ""
                 } ${
                   !isExpanded
                     ? `${
                         getImportanceStyles(activity.importance).borderStyle
                       } ${getImportanceStyles(activity.importance).borderColor}`
-                    : ""
+                    : "border-0"
                 }`}
-                style={{ transformStyle: "preserve-3d" }}
+                style={{
+                  transformStyle: "preserve-3d",
+                  ...(isExpanded && {
+                    border: "none !important",
+                    borderLeft: "none !important",
+                    borderTop: "none !important",
+                    borderRight: "none !important",
+                    borderBottom: "none !important",
+                    boxShadow:
+                      "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)",
+                  }),
+                }}
               >
-                {/* Replace the colored bar with a subtle gradient background */}
+                {/* Replace the colored bar with a subtle gradient background - only when not expanded */}
                 {!isExpanded && (
                   <div
                     className={`absolute inset-0 ${
@@ -464,7 +479,13 @@ const Projects = () => {
                     </p>
 
                     {/* Display Short Description */}
-                    <div className="mb-3 p-2 bg-light-background-secondary/50 dark:bg-dark-background-secondary/50 rounded-lg border-l-4 border-accent dark:border-accent">
+                    <div
+                      className={`mb-3 p-2 bg-light-background-secondary/50 dark:bg-dark-background-secondary/50 rounded-lg ${
+                        !isExpanded
+                          ? "border-l-4 border-accent dark:border-accent"
+                          : ""
+                      }`}
+                    >
                       <div className="flex items-center mb-1">
                         <span className="text-xs uppercase tracking-wider text-accent dark:text-accent font-semibold">
                           Summary

@@ -118,10 +118,25 @@ export default function AchievementMap({ navigateWithRefresh, onToggle3D }) {
     )
       return;
 
+    // Parse URL parameters for lat/lng
+    const urlParams = new URLSearchParams(window.location.search);
+    const lat = parseFloat(urlParams.get("lat"));
+    const lng = parseFloat(urlParams.get("lng"));
+
+    // Default map center and zoom
+    let initialCenter = [35, 20];
+    let initialZoom = 2;
+
+    // If valid lat/lng found in URL, use those coordinates
+    if (!isNaN(lat) && !isNaN(lng)) {
+      initialCenter = [lat, lng];
+      initialZoom = 12; // Zoom in much closer when focusing on a specific location
+    }
+
     // Initialize map
     const map = L.map(mapRef.current, {
-      center: [35, 20],
-      zoom: 2,
+      center: initialCenter,
+      zoom: initialZoom,
       minZoom: 1,
       maxZoom: 18, // Increased from 8 to 18 for much deeper zoom
       scrollWheelZoom: false,
@@ -142,6 +157,20 @@ export default function AchievementMap({ navigateWithRefresh, onToggle3D }) {
         maxZoom: 20,
       }
     ).addTo(map);
+
+    // If we're focusing on a specific location, add a highlight marker
+    if (!isNaN(lat) && !isNaN(lng)) {
+      const highlightIcon = L.divIcon({
+        html: `<div class="highlight-marker">
+                 <div class="highlight-pulse"></div>
+                 <div class="highlight-center"></div>
+               </div>`,
+        iconSize: [40, 40],
+        className: "highlight-div-icon",
+      });
+
+      L.marker([lat, lng], { icon: highlightIcon }).addTo(map);
+    }
 
     // Custom icon for major achievements
     const createCustomIcon = (count, type, maxImportance) => {
@@ -326,6 +355,51 @@ export default function AchievementMap({ navigateWithRefresh, onToggle3D }) {
 
         .custom-marker.minor .marker-count {
           font-size: 10px;
+        }
+
+        /* Highlight marker styles for focused location */
+        .highlight-marker {
+          position: relative;
+          width: 40px;
+          height: 40px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .highlight-pulse {
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          border-radius: 50%;
+          background: rgba(255, 165, 0, 0.3);
+          animation: highlightPulse 2s ease-in-out infinite;
+        }
+
+        .highlight-center {
+          position: relative;
+          width: 20px;
+          height: 20px;
+          border-radius: 50%;
+          background: linear-gradient(135deg, #ff6b35, #f7931e);
+          border: 3px solid white;
+          box-shadow: 0 0 15px rgba(255, 107, 53, 0.8);
+          z-index: 2;
+        }
+
+        @keyframes highlightPulse {
+          0% {
+            transform: scale(0.8);
+            opacity: 1;
+          }
+          50% {
+            transform: scale(1.4);
+            opacity: 0.3;
+          }
+          100% {
+            transform: scale(0.8);
+            opacity: 1;
+          }
         }
 
         /* Marker cluster styles */

@@ -10,10 +10,14 @@
 
 .highlight {
   position: relative;
+  transition: all 0.3s ease-in-out;
+}
+
+/* Only apply highlight border when not expanded */
+.highlight:not(.expanded) {
   border: 2px solid #ffd700; /* Gold border */
   box-shadow: 0 4px 10px rgba(255, 215, 0, 0.3); /* Golden shadow */
   transform: scale(1.02); /* Slight zoom effect */
-  transition: all 0.3s ease-in-out;
 }
 
 .highlight::before {
@@ -659,4 +663,18 @@
 
 :global(.dark) .inline-embed {
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* Force remove all borders when expanded - highest specificity */
+.tilt-card.expanded,
+.tilt-card.expanded.highlight,
+.tilt-card.expanded:hover,
+.tilt-card.expanded.highlight:hover {
+  border: none !important;
+  border-left: none !important;
+  border-top: none !important;
+  border-right: none !important;
+  border-bottom: none !important;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1) !important;
+  transform: none !important;
 }
