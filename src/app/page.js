@@ -122,17 +122,19 @@ export default function Home() {
           <div className="card text-center hover-lift">
             <FaTrophy className="text-4xl text-yellow-600 mx-auto mb-4" />
             <h3 className="text-2xl font-bold mb-2">10+</h3>
-            <p className="text-gray-600 dark:text-gray-400">Hackathon Wins</p>
+            <p className="text-gray-600 dark:text-gray-400">Competition sins</p>
           </div>
           <div className="card text-center hover-lift">
             <FaCode className="text-4xl text-amber-600 mx-auto mb-4" />
-            <h3 className="text-2xl font-bold mb-2">50+</h3>
-            <p className="text-gray-600 dark:text-gray-400">Projects Built</p>
+            <h3 className="text-2xl font-bold mb-2">Many</h3>
+            <p className="text-gray-600 dark:text-gray-400">Projects built</p>
           </div>
           <div className="card text-center hover-lift">
             <FaRocket className="text-4xl text-orange-600 mx-auto mb-4" />
-            <h3 className="text-2xl font-bold mb-2">100K+</h3>
-            <p className="text-gray-600 dark:text-gray-400">Lines of Code</p>
+            <h3 className="text-2xl font-bold mb-2">100+</h3>
+            <p className="text-gray-600 dark:text-gray-400">
+              Teammates befriended for life.
+            </p>
           </div>
         </div>
       </section>
