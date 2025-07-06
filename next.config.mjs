@@ -50,9 +50,6 @@ const nextConfig = {
   compiler: {
     styledComponents: true,
   },
-  experimental: {
-    styledJsx: true,
-  },
 };
 
 export default nextConfig;

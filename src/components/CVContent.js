@@ -40,8 +40,8 @@ export default function CVContent() {
             <h3 className="text-2xl font-bold gradient-text">My CV</h3>
           </div>
           <p>
-            Please access this page through a computer if you'd like to download
-            a pdf version.
+            Please access this page through a computer if you&apos;d like to
+            download a pdf version.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <motion.a
