@@ -24,15 +24,23 @@ Welcome to my portfolio website's repository! I'm Batıkan, a software engineer 
 
 1. Install dependencies:
 
-    pnpm install
+   pnpm install
 
 2. Run the development server:
 
-    pnpm dev
+   pnpm dev
 
 For mobile testing:
 
     pnpm dev --hostname 0.0.0.0
+
+or
+
+    pnpm dev --hostname 0.0.0.0 --port 3001
+
+and
+
+    ngrok http 3001
 
 Other useful commands:
 
