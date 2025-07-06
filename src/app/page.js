@@ -122,7 +122,7 @@ export default function Home() {
           <div className="card text-center hover-lift">
             <FaTrophy className="text-4xl text-yellow-600 mx-auto mb-4" />
             <h3 className="text-2xl font-bold mb-2">10+</h3>
-            <p className="text-gray-600 dark:text-gray-400">Competition sins</p>
+            <p className="text-gray-600 dark:text-gray-400">Competition wins</p>
           </div>
           <div className="card text-center hover-lift">
             <FaCode className="text-4xl text-amber-600 mx-auto mb-4" />

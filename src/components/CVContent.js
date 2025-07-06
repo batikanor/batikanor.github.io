@@ -1,11 +1,12 @@
 "use client";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
-import VanillaTilt from "vanilla-tilt"; // You'll need to install this
+import { FaDownload, FaFileAlt } from "react-icons/fa";
 import { CV_CONFIG } from "../app/cv/config";
 
 export default function CVContent() {
   const [isMobile, setIsMobile] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const handleResize = () => {
@@ -16,103 +17,135 @@ export default function CVContent() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  useEffect(() => {
-    // Initialize tilt effect on the CV container
-    const tiltElement = document.querySelector(".tilt-element");
-    if (tiltElement && !isMobile) {
-      VanillaTilt.init(tiltElement, {
-        max: 5, // maximum tilt rotation (degrees)
-        scale: 1.05, // scaling on hover
-        speed: 1000, // Speed of the enter/exit transition
-        glare: true, // Enable glare effect
-        "max-glare": 0.2, // maximum glare opacity
-        perspective: 1000, // Transform perspective, the lower the more extreme the tilt gets
-      });
-    }
-  }, [isMobile]);
+  const handleIframeLoad = () => {
+    setIsLoading(false);
+  };
 
   return (
-    <motion.main
+    <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      transition={{ duration: 0.5 }}
-      className="flex flex-col items-center justify-center"
+      transition={{ duration: 0.6 }}
+      className="w-full max-w-6xl mx-auto px-4"
     >
-      <motion.h1
-        initial={{ y: -50 }}
-        animate={{ y: 0 }}
-        className="text-5xl font-bold mb-8 text-gray-800 tracking-tight"
-      ></motion.h1>
-
       {isMobile ? (
         <motion.div
-          initial={{ scale: 0.9, opacity: 0 }}
+          initial={{ scale: 0.95, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          className="text-center space-y-4 p-6 bg-white rounded-lg shadow-lg"
+          transition={{ delay: 0.2 }}
+          className="card text-center space-y-6"
         >
-          <p className="text-lg text-gray-700">
-            For the best viewing experience, please download the CV below.
+          <div className="space-y-4">
+            <FaFileAlt className="text-5xl text-accent mx-auto" />
+            <h3 className="text-2xl font-bold gradient-text">My CV</h3>
+          </div>
+          <p>
+            Please access this page through a computer if you'd like to download
+            a pdf version.
           </p>
-          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-            <a
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <motion.a
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               href={CV_CONFIG.pdfDownloadUrl}
               download
-              className="inline-block bg-gradient-to-r from-green-500 to-green-600 text-white px-6 py-3 rounded-lg font-semibold shadow-md hover:shadow-lg transition-all duration-200"
+              className="btn flex items-center gap-2"
             >
-              Download CV as PDF
-            </a>
-          </motion.div>
+              <FaDownload className="text-sm" />
+              View in Google Docs
+            </motion.a>
+          </div>
         </motion.div>
       ) : (
         <div className="space-y-8">
+          {/* CV Viewer */}
           <motion.div
-            initial={{ y: 50, opacity: 0 }}
+            initial={{ y: 30, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.2 }}
-            className="tilt-element relative bg-white rounded-xl shadow-2xl overflow-hidden"
-            style={{
-              width: "850px",
-              height: "1100px",
-              transformStyle: "preserve-3d",
-            }}
+            transition={{ delay: 0.3, duration: 0.8 }}
+            className="flex justify-center"
           >
-            {/* Decorative elements */}
-            <div className="absolute inset-0 bg-gradient-to-tr from-white/10 to-white/30 pointer-events-none z-10" />
-            <div className="absolute -inset-1 bg-gradient-to-tr from-green-500/20 to-blue-500/20 blur-sm" />
+            {/* Main CV Container - Clean and Modern */}
+            <div
+              className="relative card overflow-hidden hover-lift"
+              style={{ width: "1350px" }}
+            >
+              {/* CV Content Container */}
+              <div className="relative bg-white dark:bg-gray-900 rounded-xl overflow-hidden">
+                {/* Loading Overlay */}
+                {isLoading && (
+                  <div className="absolute inset-0 bg-white dark:bg-gray-900 flex items-center justify-center z-10 rounded-xl">
+                    <div className="text-center space-y-4">
+                      <div className="animate-spin w-12 h-12 border-4 border-accent border-t-transparent rounded-full mx-auto"></div>
+                      <p className="text-gray-600 dark:text-gray-400">
+                        Loading CV...
+                      </p>
+                    </div>
+                  </div>
+                )}
 
-            <iframe
-              src={CV_CONFIG.embeddedViewUrl}
-              style={{
-                width: "100%",
-                height: "100%",
-                border: "none",
-                transform: "translateZ(50px)", // 3D effect
-                position: "relative",
-                zIndex: 1,
-              }}
-              title="My CV"
-              className="bg-white"
-            />
+                {/* Google Docs Iframe */}
+                <div
+                  style={{
+                    width: "100%",
+                    height: "1747px",
+                    overflow: "hidden",
+                  }}
+                >
+                  <iframe
+                    src={CV_CONFIG.embeddedViewUrl}
+                    onLoad={handleIframeLoad}
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      border: "none",
+                      opacity: isLoading ? 0 : 1,
+                      zoom: "1.3",
+                    }}
+                    title="Batıkan's CV"
+                    className="transition-opacity duration-500 bg-white"
+                  />
+                </div>
+              </div>
+            </div>
           </motion.div>
 
+          {/* Action Buttons */}
           <motion.div
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.4 }}
-            className="text-center"
+            transition={{ delay: 0.6 }}
+            className="flex flex-wrap gap-4 justify-center"
           >
             <motion.a
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               href={CV_CONFIG.pdfDownloadUrl}
               download
-              className="inline-block bg-gradient-to-r from-green-500 to-green-600 text-white px-6 py-3 rounded-lg font-semibold shadow-md hover:shadow-lg transition-all duration-200"
+              className="btn flex items-center gap-3"
             >
-              Download CV as PDF
+              <FaDownload className="text-sm" />
+              Download PDF
             </motion.a>
+          </motion.div>
+
+          {/* Info Card */}
+          <motion.div
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.8 }}
+            className="text-center"
+          >
+            <div className="card max-w-2xl mx-auto">
+              <p className="text-gray-600 dark:text-gray-400">
+                If you expected my experience(s) to be listed through a
+                different format, please send me an email and I will do my best
+                to present myself better.
+              </p>
+            </div>
           </motion.div>
         </div>
       )}
-    </motion.main>
+    </motion.div>
   );
 }
