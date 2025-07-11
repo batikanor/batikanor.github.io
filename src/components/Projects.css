@@ -381,6 +381,44 @@
   transition: all 0.3s ease;
 }
 
+/* Embed alignment and floating styles */
+.prose::after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+@media (min-width: 768px) {
+  .md\:float-left {
+    float: left !important;
+  }
+
+  .md\:float-right {
+    float: right !important;
+  }
+
+  .md\:clear-left {
+    clear: left !important;
+  }
+
+  .md\:clear-right {
+    clear: right !important;
+  }
+
+  .md\:w-96 {
+    width: 24rem !important;
+  }
+
+  /* Ensure text flows around floated embeds */
+  .md\:float-left + p,
+  .md\:float-left ~ p,
+  .md\:float-right + p,
+  .md\:float-right ~ p {
+    text-align: justify;
+    line-height: 1.6;
+  }
+}
+
 /* Mobile optimizations */
 @media (max-width: 768px) {
   .tilt-card {
@@ -400,6 +438,14 @@
   .size-btn {
     padding: 0.2rem 0.4rem;
     font-size: 0.7rem;
+  }
+
+  /* Override floating on mobile */
+  .md\:float-left,
+  .md\:float-right {
+    float: none !important;
+    clear: none !important;
+    margin: 0 !important;
   }
 }
 

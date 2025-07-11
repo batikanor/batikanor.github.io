@@ -59,6 +59,7 @@ const ResizableEmbed = ({
   url,
   initialHeight = 300,
   initialSize = "medium",
+  desktopEmbedAlign = "center",
 }) => {
   const [height, setHeight] = useState(initialHeight);
   const [isExpanded, setIsExpanded] = useState(false);
@@ -365,6 +366,9 @@ const Projects = () => {
             const credit = isNewFormat ? embedData.credit : null;
             const desktopSize = isNewFormat ? embedData.desktopSize : "M";
             const mobileSize = isNewFormat ? embedData.mobileSize : "M";
+            const desktopEmbedAlign = isNewFormat
+              ? embedData.desktopEmbedAlign
+              : "center";
 
             let initialSize, initialHeight;
 
@@ -389,20 +393,44 @@ const Projects = () => {
                 initialHeight = 300;
             }
 
+            // Determine container classes based on alignment (only affects desktop)
+            const isMobile = window.innerWidth <= 768;
+            let containerClasses = "my-4";
+            let embedWrapperClasses = "";
+
+            if (isMobile || desktopEmbedAlign === "center") {
+              // Mobile or center alignment: full width, centered
+              containerClasses += " text-center";
+              embedWrapperClasses = "w-full";
+            } else if (desktopEmbedAlign === "left") {
+              // Desktop left alignment: float left, text wraps around
+              containerClasses +=
+                " md:float-left md:mr-6 md:mb-4 md:clear-left";
+              embedWrapperClasses = "w-full md:w-96"; // Full width on mobile, fixed width on desktop
+            } else if (desktopEmbedAlign === "right") {
+              // Desktop right alignment: float right, text wraps around
+              containerClasses +=
+                " md:float-right md:ml-6 md:mb-4 md:clear-right";
+              embedWrapperClasses = "w-full md:w-96"; // Full width on mobile, fixed width on desktop
+            }
+
             return (
-              <div key={index} className="my-4 text-center">
+              <div key={index} className={containerClasses}>
                 {abovePhotoCaption && (
-                  <p className="mb-2 text-base text-light-foreground dark:text-dark-foreground">
+                  <p className="mb-2 text-base text-light-foreground dark:text-dark-foreground text-center">
                     {abovePhotoCaption}
                   </p>
                 )}
-                <ResizableEmbed
-                  url={url}
-                  initialSize={initialSize}
-                  initialHeight={initialHeight}
-                />
+                <div className={embedWrapperClasses}>
+                  <ResizableEmbed
+                    url={url}
+                    initialSize={initialSize}
+                    initialHeight={initialHeight}
+                    desktopEmbedAlign={desktopEmbedAlign}
+                  />
+                </div>
                 {credit && (
-                  <p className="mt-1 text-xs text-light-foreground-secondary dark:text-dark-foreground-secondary">
+                  <p className="mt-1 text-xs text-light-foreground-secondary dark:text-dark-foreground-secondary text-center">
                     {credit}
                   </p>
                 )}
@@ -665,17 +693,82 @@ const Projects = () => {
                                 const credit = isNewFormat
                                   ? embedData.credit
                                   : null;
+                                const desktopSize = isNewFormat
+                                  ? embedData.desktopSize
+                                  : "M";
+                                const mobileSize = isNewFormat
+                                  ? embedData.mobileSize
+                                  : "M";
+                                const desktopEmbedAlign = isNewFormat
+                                  ? embedData.desktopEmbedAlign
+                                  : "center";
+
+                                // Determine container classes based on alignment (only affects desktop)
+                                const isMobile = window.innerWidth <= 768;
+                                let containerClasses = "my-4";
+                                let embedWrapperClasses = "";
+
+                                if (
+                                  isMobile ||
+                                  desktopEmbedAlign === "center"
+                                ) {
+                                  // Mobile or center alignment: full width, centered
+                                  containerClasses += " text-center";
+                                  embedWrapperClasses = "w-full";
+                                } else if (desktopEmbedAlign === "left") {
+                                  // Desktop left alignment: float left, text wraps around
+                                  containerClasses +=
+                                    " md:float-left md:mr-6 md:mb-4 md:clear-left";
+                                  embedWrapperClasses = "w-full md:w-96";
+                                } else if (desktopEmbedAlign === "right") {
+                                  // Desktop right alignment: float right, text wraps around
+                                  containerClasses +=
+                                    " md:float-right md:ml-6 md:mb-4 md:clear-right";
+                                  embedWrapperClasses = "w-full md:w-96";
+                                }
+
+                                let initialSize, initialHeight;
+                                const size =
+                                  window.innerWidth <= 768
+                                    ? mobileSize
+                                    : desktopSize;
+
+                                switch (size) {
+                                  case "S":
+                                    initialSize = "small";
+                                    initialHeight = 200;
+                                    break;
+                                  case "L":
+                                    initialSize = "large";
+                                    initialHeight = 500;
+                                    break;
+                                  case "XL":
+                                    initialSize = "full";
+                                    initialHeight = 850;
+                                    break;
+                                  case "M":
+                                  default:
+                                    initialSize = "medium";
+                                    initialHeight = 300;
+                                }
 
                                 return (
-                                  <div key={index} className="my-4 text-center">
+                                  <div key={index} className={containerClasses}>
                                     {abovePhotoCaption && (
-                                      <p className="mb-2 text-base text-light-foreground dark:text-dark-foreground">
+                                      <p className="mb-2 text-base text-light-foreground dark:text-dark-foreground text-center">
                                         {abovePhotoCaption}
                                       </p>
                                     )}
-                                    <ResizableEmbed url={url} />
+                                    <div className={embedWrapperClasses}>
+                                      <ResizableEmbed
+                                        url={url}
+                                        initialSize={initialSize}
+                                        initialHeight={initialHeight}
+                                        desktopEmbedAlign={desktopEmbedAlign}
+                                      />
+                                    </div>
                                     {credit && (
-                                      <p className="mt-1 text-xs text-light-foreground-secondary dark:text-dark-foreground-secondary">
+                                      <p className="mt-1 text-xs text-light-foreground-secondary dark:text-dark-foreground-secondary text-center">
                                         {credit}
                                       </p>
                                     )}
