@@ -38,6 +38,10 @@ Thank you to zweihelden gmbh for making this possible. A special thank you to Ne
     ],
     links: [
       {
+        label: "Decarbon Days Climathon Website",
+        url: "https://www.decarbon-days.eu/climathon/",
+      },
+      {
         label: "Photo Collection",
         url: "https://drive.google.com/drive/folders/1mBm_30zRDLMo7YAs0JyJ2PW3steiMrdB?usp=sharing",
       },
