@@ -5,7 +5,7 @@ export const contestsAndActivities = [
     highlighted: true,
     title: "Lead Jury & Mentor at Decarbon Days Climathon",
     mapData: {
-      venue: "Burger Chaussee 1",
+      venue: "Decarbon Days",
       city: "Cottbus",
       country: "Germany",
       coordinates: { lat: 51.7734, lng: 14.3315 },
