@@ -235,19 +235,19 @@ Final note: Osaka is extremely humid. You aren't prepared. You cannot prepare. J
     date: "02/2025",
     shortDescription:
       "We built a solution to help detect and counter shaheed drones through a cheaper radar system during the biggest defense tech hackathon thus far.",
-    longDescription: `     The idea was to devise a software-hardware bundle radar system that doesn't cost hundreds of thousands of dollars, but can guide a kill of a shaheed drone through an interceptor drone. 
-      Out of the 40+ attending teams who went through the initial screening and managed to participate in this event, we were one of the few to make it to the final, and I made a very impressive pitch, after which I was contacted by multiple people from Ukrainian defense ministry and ukrainian / european defense companies. We were even given some implicit opportunities to test the system.
+    longDescription: `The idea was to devise a software-hardware bundle radar system that doesn't cost hundreds of thousands of dollars but can guide the neutralization of a Shaheed drone using an interceptor drone.
 
-     {{gdrive_embed[0]}} 
- 
- My teammate Emil had already built the radar system which costs far less than the more expensive systems, but still more than a thousand dollars. My contribution was to help make the system run in our demo setting, and provide AI implementation to enable the detection and classification of drones up to a satisfactory range. Due to the confidentiality nature of the sector, I cannot share any more details. 
+Out of the 40+ attending teams who went through the initial screening, we were one of the few to make it to the final. I made a very impressive pitch, after which I was contacted by multiple people from the Ukrainian Ministry of Defense and Ukrainian/European defense companies. We were even given some implicit opportunities to test the system.
 
-     {{gdrive_embed[1]}} 
- 
- Emil is more focused on the project on the long run, and he went directly to Kiev after the competition to continue the work. Contact him if you are interested in getting more information regarding the project. You can reach out to him through the linkedin post attached under 'links'.
-     
+{{gdrive_embed[0]}}
 
- All for a safer europe!  `,
+My teammate Emil had already built the radar system, which costs far less than the more expensive systems, though still more than a thousand dollars. My contribution was to help get the system running in our demo setting and provide the AI implementation to enable the detection and classification of drones up to a satisfactory range. Due to the confidential nature of the sector, I cannot share any more details.
+
+{{gdrive_embed[1]}}
+
+Emil is more focused on the project in the long run, and he went directly to Kyiv after the competition to continue the work. Contact him if you are interested in getting more information regarding the project. You can reach out to him through the LinkedIn post attached under 'links'.
+
+All for a safer Europe!`,
     technologies: ["AI", "Python", "Radar Systems"],
     links: [
       {
@@ -258,11 +258,13 @@ Final note: Osaka is extremely humid. You aren't prepared. You cannot prepare. J
     gdrive_embed: [
       {
         url: "https://drive.google.com/file/d/1AOgqKR_rebmcpswz4Q6TArD17jbAiV9f/view?usp=sharing",
+        abovePhotoCaption: "The radar system we assembled and worked on.",
         desktopSize: "XL",
         mobileSize: "S",
       },
       {
         url: "https://drive.google.com/file/d/1mSAf6-6gfYEm3FHCadufDTNS5vg_fst1/view?usp=sharing",
+        abovePhotoCaption: "Our brief pitch deck.",
         desktopSize: "XL",
         mobileSize: "S",
       },
@@ -282,12 +284,15 @@ Final note: Osaka is extremely humid. You aren't prepared. You cannot prepare. J
     },
     date: "01/2025",
     shortDescription:
-      "The won the balderton capital sponsored track, which was about making personal finance and investing more accessible to regular people.",
-    longDescription:
-      "\
-The vision of the SaaS platform -- integrated with common brokers like Scalable Capital -- was to provide real-time warnings or opportunities reports on whether certain political events like elections, law changes, etc., affect your portfolio and give you easily explained and interactive information on how this event will affect your stocks. Making complex political and economic causalities simply by leveraging a knowledge graph that captures complex relationships between different entities and using an LLM to use the causality to reason about the consequences. \
-\n\n \
-\n We were building an innovative GraphRAG solution that made use of Mistral AI, OpenAI and Neo4j in order to give indicators of how financial markets might be influenced through geo-political events happening at the present by comparing previous cases with similar characteristics, inducing the same outcomes and warning users whether their portfolio might be affected of it. We built a very cool solution with a Nuxt.js platform that allows you to interact with future scenarios by prompting how x might affect y, how would France leaving the EU affect the economy of France in the long run.",
+      "We won the Balderton Capital sponsored track, which was about making personal finance and investing more accessible to regular people.",
+    longDescription: `The vision of the SaaS platform, integrated with common brokers like Scalable Capital, was to provide real-time warnings or opportunity reports on how political events like elections or law changes might affect your portfolio. It provides easily explained and interactive information on how these events will affect your stocks, simplifying complex political and economic causalities by leveraging a knowledge graph and an LLM to reason about the consequences.
+
+We built an innovative GraphRAG solution using Mistral AI, OpenAI, and Neo4j to indicate how financial markets might be influenced by current geopolitical events. By comparing them to previous cases with similar characteristics, it could project similar outcomes and warn users if their portfolio might be affected. We developed a cool solution with a Nuxt.js platform that allows you to interact with future scenarios by prompting how 'x' might affect 'y'—for example, how France leaving the EU would affect its economy in the long run.
+
+{{gdrive_embed[0]}}
+{{gdrive_embed[1]}}
+{{gdrive_embed[2]}}
+{{gdrive_embed[3]}}`,
     technologies: [
       "AI",
       "Neo4j",
@@ -314,21 +319,25 @@ The vision of the SaaS platform -- integrated with common brokers like Scalable 
     gdrive_embed: [
       {
         url: "https://drive.google.com/file/d/1d0BULESEArbLCNBlmC9ZhQSSnKLPb51E/view?usp=sharing",
-        desktopSize: "XL",
+        abovePhotoCaption: "Our proposed architecture.",
+        desktopSize: "L",
         mobileSize: "S",
       },
       {
         url: "https://drive.google.com/file/d/1hJxgIWURaqP_1kbx7yP1E82HLgUNSgmg/view?usp=sharing",
+        abovePhotoCaption: "Us pitching.",
         desktopSize: "XL",
         mobileSize: "S",
       },
       {
         url: "https://drive.google.com/file/d/1hBnF-VyPQ6tewqU7OyTX65uSBGX384gt/view?usp=sharing",
+        abovePhotoCaption: "App demo",
         desktopSize: "XL",
         mobileSize: "S",
       },
       {
         url: "https://docs.google.com/presentation/d/1YRglGHUGEQ-AieB2vgbJ6LyDepy822g6D1KgulMA1gA/edit?usp=sharing",
+        abovePhotoCaption: "Our presentation slides.",
         desktopSize: "XL",
         mobileSize: "S",
       },
