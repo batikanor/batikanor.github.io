@@ -64,58 +64,99 @@ const renderContentWithInlineMedia = (content, activity) => {
   // Split content by inline media placeholders
   const parts = content.split(/(\{\{(?:image|embed|gdrive_embed)\[\d+\]\}\})/g);
 
-  return parts.map((part, index) => {
-    // Check if this part is an inline media placeholder
-    const imageMatch = part.match(/\{\{image\[(\d+)\]\}\}/);
-    const embedMatch = part.match(/\{\{(?:embed|gdrive_embed)\[(\d+)\]\}\}/);
+  return parts
+    .filter((part) => part)
+    .map((part, index) => {
+      // Check if this part is an inline media placeholder
+      const imageMatch = part.match(/\{\{image\[(\d+)\]\}\}/);
+      const embedMatch = part.match(/\{\{(?:embed|gdrive_embed)\[(\d+)\]\}\}/);
 
-    if (imageMatch) {
-      const imageIndex = parseInt(imageMatch[1]);
-      if (activity.images && activity.images[imageIndex]) {
-        return (
-          <div key={index} className="my-4 sm:my-6 flex justify-center">
-            <img
-              src={getGoogleDriveImageEmbedUrl(activity.images[imageIndex])}
-              alt={`Inline image ${imageIndex + 1}`}
-              className="max-w-full rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300"
-              style={{ maxHeight: "400px", objectFit: "contain" }}
-            />
-          </div>
-        );
-      }
-    } else if (embedMatch) {
-      const embedIndex = parseInt(embedMatch[1]);
-      if (activity.gdrive_embed && activity.gdrive_embed[embedIndex]) {
-        // Set demo video (index 2) to XL by default
-        const isLargeEmbed = embedIndex === 2;
-        return (
-          <div key={index} className="my-4 sm:my-6">
-            <ResizableEmbed
-              url={activity.gdrive_embed[embedIndex]}
-              initialSize={isLargeEmbed ? "full" : "medium"}
-              initialHeight={isLargeEmbed ? 850 : 250}
-            />
-          </div>
-        );
-      }
-    } else {
-      // Regular text content - split by newlines and render paragraphs
-      return part.split("\n").map((line, lineIndex) => {
-        if (line.trim()) {
+      if (imageMatch) {
+        const imageIndex = parseInt(imageMatch[1], 10);
+        if (activity.images && activity.images[imageIndex]) {
           return (
-            <p
-              key={`${index}-${lineIndex}`}
-              className="text-sm sm:text-base text-light-foreground-secondary dark:text-dark-foreground-secondary mb-3 sm:mb-4"
-            >
-              {renderTextWithLinks(line)}
-            </p>
+            <div key={index} className="my-4 flex justify-center">
+              <img
+                src={getGoogleDriveImageEmbedUrl(activity.images[imageIndex])}
+                alt={`Inline image ${imageIndex + 1}`}
+                className="max-w-full rounded-lg shadow-md"
+                style={{ maxHeight: "300px", objectFit: "contain" }}
+              />
+            </div>
           );
         }
-        return null;
-      });
-    }
-    return null;
-  });
+      } else if (embedMatch) {
+        const embedIndex = parseInt(embedMatch[1], 10);
+        const embedData = activity.gdrive_embed?.[embedIndex];
+
+        if (embedData) {
+          const isNewFormat =
+            typeof embedData === "object" && embedData !== null;
+          const url = isNewFormat ? embedData.url : embedData;
+          const abovePhotoCaption = isNewFormat
+            ? embedData.abovePhotoCaption
+            : null;
+          const credit = isNewFormat ? embedData.credit : null;
+          const desktopSize = isNewFormat ? embedData.desktopSize : "M";
+          const mobileSize = isNewFormat ? embedData.mobileSize : "M";
+
+          let initialSize, initialHeight;
+          const size = window.innerWidth <= 768 ? mobileSize : desktopSize;
+
+          switch (size) {
+            case "S":
+              initialSize = "small";
+              initialHeight = 200;
+              break;
+            case "L":
+              initialSize = "large";
+              initialHeight = 500;
+              break;
+            case "XL":
+              initialSize = "full";
+              initialHeight = 850;
+              break;
+            case "M":
+            default:
+              initialSize = "medium";
+              initialHeight = 300;
+          }
+
+          return (
+            <div key={index} className="my-4 text-center">
+              {abovePhotoCaption && (
+                <p className="mb-2 text-sm text-light-foreground dark:text-dark-foreground">
+                  {abovePhotoCaption}
+                </p>
+              )}
+              <ResizableEmbed
+                url={url}
+                initialSize={initialSize}
+                initialHeight={initialHeight}
+              />
+              {credit && (
+                <p className="mt-1 text-xs text-light-foreground-secondary dark:text-dark-foreground-secondary">
+                  {credit}
+                </p>
+              )}
+            </div>
+          );
+        }
+      } else {
+        // Regular text content
+        return part.split("\n").map((line, lineIndex) => {
+          if (line.trim()) {
+            return (
+              <p key={`${index}-${lineIndex}`} className="mb-2">
+                {renderTextWithLinks(line)}
+              </p>
+            );
+          }
+          return null;
+        });
+      }
+      return null;
+    });
 };
 
 const ResizableEmbed = ({

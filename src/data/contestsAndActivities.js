@@ -1,5 +1,91 @@
 export const contestsAndActivities = [
   {
+    slug: "decarbon-days-climathon-2024",
+    importance: 9,
+    highlighted: true,
+    title: "Lead Jury & Mentor at Decarbon Days Climathon",
+    mapData: {
+      venue: "Burger Chaussee 1",
+      city: "Cottbus",
+      country: "Germany",
+      coordinates: { lat: 51.7734, lng: 14.3315 },
+    },
+    date: "06/2025",
+    shortDescription:
+      "Lead jury & mentor at a climate hackathon by Decarbon Days, BTU Cottbus, and Zielona Gora University.",
+    longDescription: `I was the lead jury and mentor at the climate hack competition organized by Decarbon Days together with BTU Cottbus University (Germany) and Zielona Gora University (Poland).
+
+I was joined by professors from both universities and industry partners as the other jury. After we thoroughly considered all pitches, I handed the prizes to the winning team, which presented a Reinforcement Learning-based solution to optimize energy usage and balance loads across multiple machines in factories. What mainly led them to win was their openness to improve themselves throughout the competition, and also the more realistic and feasible first steps they shared for what they can do after the climathon. There were a few other potential candidates for the win, but we believe this team deserved it.
+
+It was a great experience meeting with partners and politicians who are knowledgeable and interested in climate and energy, and I'm thankful to the organizers for considering me for this important role.
+
+Thank you to zweihelden gmbh for making this possible. A special thank you to Neela-Medea Löder for her efforts in realizing the climathon.
+
+{{gdrive_embed[1]}}
+
+{{gdrive_embed[0]}}
+
+{{gdrive_embed[2]}}
+
+{{gdrive_embed[3]}}
+
+{{gdrive_embed[4]}}`,
+    technologies: [
+      "Climate Tech",
+      "Energy Optimization",
+      "AI",
+      "Reinforcement Learning",
+    ],
+    links: [
+      {
+        label: "Photo Collection",
+        url: "https://drive.google.com/drive/folders/1mBm_30zRDLMo7YAs0JyJ2PW3steiMrdB?usp=sharing",
+      },
+      {
+        label: "LinkedIn Post by winner team",
+        url: "https://www.linkedin.com/posts/yamrsalem_decarbon-days-2025-climathon-winners-activity-7345019705130151937-Z9_h?utm_source=share&utm_medium=member_desktop&rcm=ACoAACL8UREBa3FbjBW-yu7HCZmgCHJBrj-opz4",
+      },
+    ],
+    gdrive_embed: [
+      {
+        url: "https://drive.google.com/file/d/1gMI4FLfMgvcPVnFQwAA0tuAxZ4lfyfK2/view?usp=sharing",
+        abovePhotoCaption: "Handing the award to the winner team.",
+        desktopSize: "XL",
+        mobileSize: "S",
+        credit: "Decarbon Days, copyright @ Foto: Andreas Franke",
+      },
+      {
+        url: "https://drive.google.com/file/d/1COQczx-HbV8HGpzpc-wXzSVrC-sumBO7/view?usp=sharing",
+        abovePhotoCaption:
+          "Group photo with the organization team and participants.",
+        desktopSize: "XL",
+        mobileSize: "S",
+        credit: "Decarbon Days, copyright @ Foto: Andreas Franke",
+      },
+      {
+        url: "https://drive.google.com/file/d/1cCtCFg5UfVHfEF6Qt8nivf1AlnO4uYAj/view?usp=drive_link",
+        abovePhotoCaption: "Asking a question to a presenting team.",
+        desktopSize: "XL",
+        mobileSize: "S",
+        credit: "Decarbon Days, copyright @ Foto: Andreas Franke",
+      },
+      {
+        url: "https://drive.google.com/file/d/1RrWhaHr9GKMSeehINngEAFtsHaEyGz_-/view?usp=sharing",
+        abovePhotoCaption: "A view of the jury table and the stage.",
+        desktopSize: "XL",
+        mobileSize: "S",
+        credit: "Decarbon Days, copyright @ Foto: Andreas Franke",
+      },
+      {
+        url: "https://drive.google.com/file/d/1-8WncwMQXEi5t1p5MajXXGN2U0epaMon/view?usp=sharing",
+        abovePhotoCaption: "Holding flags",
+        desktopSize: "XL",
+        mobileSize: "S",
+        credit: "Decarbon Days, copyright @ Foto: Andreas Franke",
+      },
+    ],
+  },
+  {
     slug: "music-ai-osaka-2025",
     importance: 6,
     highlighted: true,
@@ -14,32 +100,43 @@ export const contestsAndActivities = [
     date: "06/2025",
     shortDescription:
       "Built 'Slai' - an innovative VR-pen based music equalizer system using Logitech MX Ink, allowing musicians to control frequency bands through spatial movements. Won Open Source distinction and participated in World Expo 2025.",
-    longDescription:
-      "We were given the incredible opportunity to have a free trip to Japan where the World Expo 2025 was taking place. We first worked on music and AI challenges in a Buddhist temple called 'Gyokuzoin Temple' on Mount Shigi in Nara Prefecture, and built a solution using Logitech's VR-pen, the MX Ink.\n\n\
-Group Photo - All Hackers at the Temple:\n\n\
-{{gdrive_embed[5]}}\n\n\
-We designed the pen to function as an equalizer. You map frequency bands to one of the x, y, or z axes and then simply move the pen around to hear the music change in real-time. We called our project 'Slight Adjustments with AI', or 'Slai'. We brought our prototype to a working state and let fellow participants interact with the system at a demo station we set up.\n\n\
-Here's a photo of me holding the winner card with open source distinction, my teammate Davide holding his prize for travel reimbursement to another competition in Austria, and the famous yodeler with his own cinematic universe, [Takeo Ischi](https://youtu.be/Ppm5_AGtbTo?si=qdbxNxp4Y4bI5u74):\n\n\
-{{gdrive_embed[0]}}\n\n\
-The VR-pen features multiple infrared emitters, enabling precise 3D tracking through devices like the Meta Quest 3. We couldn't rely on GPS or simple computer vision tracking for this project, as these methods lack the precision required for applications like orchestral conducting or professional DJing.\n\n\
-However, the pen's tracking depends on remaining within the Quest headset's field of vision, which we considered acceptable for our proof of concept.\n\n\
-Interface Overview - Trajectory Plot and Equalizer:\n\n\
-{{gdrive_embed[1]}}\n\n\
-On the left side of our interface, we displayed a real-time plot showing the pen's trajectory in 3D space for a user-defined time period (e.g., last 2 seconds). On the right side, you see the equalizer with frequency bands that can be mapped to the x, y, or z axes. The rightmost section features a 'click me' button for selecting specific tracks (such as a drumbeat, or perhaps [Chicken Attack by Takeo Ischi](https://www.youtube.com/watch?v=miomuSGoPzI)), allowing users to control mid-tones with the y-dimension and piano with the z-dimension while adjusting drumbeat volume through the equalizer (where values <0 disable the drumbeat).\n\n\
-Demo Video - Proof of Concept:\n\n\
-{{gdrive_embed[2]}}\n\n\
-In our demo video, we mapped the x-dimension to a drumbeat and the z and y dimensions to some frequency bands for a Mozart piece. Note that I'm not a musician, so please judge the solution independently of my musical control skills! I intentionally used extreme settings to make the functionality clearly visible to the audience.\n\n\
-This video demonstrates the working system, though I was sleep-deprived during recording. I held the pen too high, making some movements less visible on the left plot (trust me, it normally displays beautifully), and as someone without musical training, I focused on demonstrating extreme volume variations across frequency bands rather than subtle adjustments. I also forgot to scroll down to show the complete mapping interface. Ideally, I'd re-record this demo with better preparation, but given the hackathon's nature (<24 hours of working time with limited internet access in a temple in Japan, where we also wanted to explore and travel), what did you expect—a perfect pitch?\n\n\
-We experimented with using pen velocity (direct, 10ms, 100ms averages) and even acceleration (direct, 10ms, 100ms averages) instead of position, but concluded this felt unnatural for conductors. When a conductor raises their baton and holds it there, they expect the orchestra to maintain that dynamic level. Position matters: pen up, orchestra up. Of course, this creates the challenge of establishing the reference point (0,0,0), which we address through VR pen synchronization. However, we didn't advance our PoC enough to enable seamless reference point recalibration, which limited our live demo's effectiveness. We had ambitious plans—imagine playing Mozart, then suddenly stepping right and switching to [Chicken Attack](https://www.youtube.com/watch?v=miomuSGoPzI) to surprise the audience! It would've been magnificent.\n\n\
-Contributors and Testers:\n\n\
-{{gdrive_embed[3]}}\n\n\
-The name 'Slight Adjustments with AI' reflects our vision: pen movements should create subtle musical changes, which we still believe represents the ideal final product. However, for our demo, we showcased extreme variations instead of subtle adjustments because, as non-musicians, it would've been difficult to convince the audience the system was working otherwise.\n\n\
-Our project is open source (check out our [GitHub repository](https://github.com/batikanor/slai)) and we invite others to draw inspiration and explore the pen's capabilities through different approaches. We implemented two 'backends' and one 'frontend'—if these terms still mean anything today—essentially ensuring location data flowed correctly to the source application where musical parameters could be configured.\n\n\
-Meeting Maywa Denki, Founder of Otamatone:\n\n\
-{{gdrive_embed[4]}}\n\n\
-We had the honor of meeting and listening to [Maywa Denki](https://youtu.be/g_1WvxYBGTk), founder of the Otamatone, who, like us, was invited as a VIP of Austria to the expo. What a talented musician!\n\n\
-Thank you to everyone for this incredible event! Special thanks to [Florian Bauer](https://www.linkedin.com/in/florian-bauer-a230b333/) and [Nobuko Okazaki](https://www.linkedin.com/in/nobuko-okazaki-79253233/) for the outstanding organization!\n\n\
-Final note: Osaka is extremely humid. You aren't prepared. You cannot prepare. Just embrace it.",
+    longDescription: `We were given the incredible opportunity to have a free trip to Japan where the World Expo 2025 was taking place. We first worked on music and AI challenges in a Buddhist temple called 'Gyokuzoin Temple' on Mount Shigi in Nara Prefecture, and built a solution using Logitech's VR-pen, the MX Ink.
+
+{{gdrive_embed[5]}}
+
+We designed the pen to function as an equalizer. You map frequency bands to one of the x, y, or z axes and then simply move the pen around to hear the music change in real-time. We called our project 'Slight Adjustments with AI', or 'Slai'. We brought our prototype to a working state and let fellow participants interact with the system at a demo station we set up.
+
+{{gdrive_embed[0]}}
+
+The VR-pen features multiple infrared emitters, enabling precise 3D tracking through devices like the Meta Quest 3. We couldn't rely on GPS or simple computer vision tracking for this project, as these methods lack the precision required for applications like orchestral conducting or professional DJing.
+
+However, the pen's tracking depends on remaining within the Quest headset's field of vision, which we considered acceptable for our proof of concept.
+
+{{gdrive_embed[1]}}
+
+On the left side of our interface, we displayed a real-time plot showing the pen's trajectory in 3D space for a user-defined time period (e.g., last 2 seconds). On the right side, you see the equalizer with frequency bands that can be mapped to the x, y, or z axes. The rightmost section features a 'click me' button for selecting specific tracks (such as a drumbeat, or perhaps [Chicken Attack by Takeo Ischi](https://www.youtube.com/watch?v=miomuSGoPzI)), allowing users to control mid-tones with the y-dimension and piano with the z-dimension while adjusting drumbeat volume through the equalizer (where values <0 disable the drumbeat).
+
+{{gdrive_embed[2]}}
+
+In our demo video, we mapped the x-dimension to a drumbeat and the z and y dimensions to some frequency bands for a Mozart piece. Note that I'm not a musician, so please judge the solution independently of my musical control skills! I intentionally used extreme settings to make the functionality clearly visible to the audience.
+
+This video demonstrates the working system, though I was sleep-deprived during recording. I held the pen too high, making some movements less visible on the left plot (trust me, it normally displays beautifully), and as someone without musical training, I focused on demonstrating extreme volume variations across frequency bands rather than subtle adjustments. I also forgot to scroll down to show the complete mapping interface. Ideally, I'd re-record this demo with better preparation, but given the hackathon's nature (<24 hours of working time with limited internet access in a temple in Japan, where we also wanted to explore and travel), what did you expect—a perfect pitch?
+
+We experimented with using pen velocity (direct, 10ms, 100ms averages) and even acceleration (direct, 10ms, 100ms averages) instead of position, but concluded this felt unnatural for conductors. When a conductor raises their baton and holds it there, they expect the orchestra to maintain that dynamic level. Position matters: pen up, orchestra up. Of course, this creates the challenge of establishing the reference point (0,0,0), which we address through VR pen synchronization. However, we didn't advance our PoC enough to enable seamless reference point recalibration, which limited our live demo's effectiveness. We had ambitious plans—imagine playing Mozart, then suddenly stepping right and switching to [Chicken Attack](https://www.youtube.com/watch?v=miomuSGoPzI) to surprise the audience! It would've been magnificent.
+
+{{gdrive_embed[3]}}
+
+The name 'Slight Adjustments with AI' reflects our vision: pen movements should create subtle musical changes, which we still believe represents the ideal final product. However, for our demo, we showcased extreme variations instead of subtle adjustments because, as non-musicians, it would've been difficult to convince the audience the system was working otherwise.
+
+Our project is open source (check out our [GitHub repository](https://github.com/batikanor/slai)) and we invite others to draw inspiration and explore the pen's capabilities through different approaches. We implemented two 'backends' and one 'frontend'—if these terms still mean anything today—essentially ensuring location data flowed correctly to the source application where musical parameters could be configured.
+
+{{gdrive_embed[4]}}
+
+We had the honor of meeting and listening to [Maywa Denki](https://youtu.be/g_1WvxYBGTk), founder of the Otamatone, who, like us, was invited as a VIP of Austria to the expo. What a talented musician!
+
+Thank you to everyone for this incredible event! Special thanks to [Florian Bauer](https://www.linkedin.com/in/florian-bauer-a230b333/) and [Nobuko Okazaki](https://www.linkedin.com/in/nobuko-okazaki-79253233/) for the outstanding organization!
+
+Final note: Osaka is extremely humid. You aren't prepared. You cannot prepare. Just embrace it.`,
     technologies: [
       "VR",
       "Logitech MX Ink",
@@ -85,12 +182,44 @@ Final note: Osaka is extremely humid. You aren't prepared. You cannot prepare. J
       },
     ],
     gdrive_embed: [
-      "https://drive.google.com/file/d/1h3e3bf_HZbINjviMf1zYXoFuCryrj0Pq/view?usp=sharing",
-      "https://drive.google.com/file/d/1wAupvoHsFx5lHhgui2nYA4IwjSydyv6D/view?usp=sharing",
-      "https://drive.google.com/file/d/1vW2hecPnWMbgtJvzqUqiBtLglIzygIHK/view?usp=sharing",
-      "https://drive.google.com/file/d/1_i827KJ103iCVst7TNusUL57RZ52KAZQ/view?usp=sharing",
-      "https://drive.google.com/file/d/1ZxqUGjovsyOCWkb4cts40uamX3HV-YRL/view?usp=sharing",
-      "https://drive.google.com/file/d/1-45SiclILZpFmZaCC08grF3tZ9zdIIgf/view?usp=sharing",
+      {
+        url: "https://drive.google.com/file/d/1h3e3bf_HZbINjviMf1zYXoFuCryrj0Pq/view?usp=sharing",
+        abovePhotoCaption:
+          "Here's a photo of me holding the winner card with open source distinction, my teammate Davide holding his prize for travel reimbursement to another competition in Austria, and the famous yodeler with his own cinematic universe, [Takeo Ischi](https://youtu.be/Ppm5_AGtbTo?si=qdbxNxp4Y4bI5u74):",
+        desktopSize: "XL",
+        mobileSize: "S",
+      },
+      {
+        url: "https://drive.google.com/file/d/1wAupvoHsFx5lHhgui2nYA4IwjSydyv6D/view?usp=sharing",
+        abovePhotoCaption:
+          "Interface Overview - Trajectory Plot and Equalizer:",
+        desktopSize: "XL",
+        mobileSize: "S",
+      },
+      {
+        url: "https://drive.google.com/file/d/1vW2hecPnWMbgtJvzqUqiBtLglIzygIHK/view?usp=sharing",
+        abovePhotoCaption: "Demo Video - Proof of Concept:",
+        desktopSize: "XL",
+        mobileSize: "S",
+      },
+      {
+        url: "https://drive.google.com/file/d/1_i827KJ103iCVst7TNusUL57RZ52KAZQ/view?usp=sharing",
+        abovePhotoCaption: "Contributors and Testers:",
+        desktopSize: "XL",
+        mobileSize: "S",
+      },
+      {
+        url: "https://drive.google.com/file/d/1ZxqUGjovsyOCWkb4cts40uamX3HV-YRL/view?usp=sharing",
+        abovePhotoCaption: "Meeting Maywa Denki, Founder of Otamatone:",
+        desktopSize: "XL",
+        mobileSize: "S",
+      },
+      {
+        url: "https://drive.google.com/file/d/1-45SiclILZpFmZaCC08grF3tZ9zdIIgf/view?usp=sharing",
+        abovePhotoCaption: "Group Photo - All Hackers at the Temple:",
+        desktopSize: "XL",
+        mobileSize: "S",
+      },
     ],
   },
   {
@@ -106,15 +235,19 @@ Final note: Osaka is extremely humid. You aren't prepared. You cannot prepare. J
     date: "02/2025",
     shortDescription:
       "We built a solution to help detect and counter shaheed drones through a cheaper radar system during the biggest defense tech hackathon thus far.",
-    longDescription:
-      "\
-     The idea was to devise a software-hardware bundle radar system that doesn't cost hundreds of thousands of dollars, but can guide a kill of a shaheed drone through an interceptor drone. \n \
-     Out of the 40+ attending teams who went through the initial screening and managed to participate in this event, we were one of the few to make it to the final, and I made a very impressive pitch, after which I was contacted by multiple people from Ukrainian defense ministry and ukrainian / european defense companies. We were even given some implicit opportunities to test the system.\n\n  \
-     {{gdrive_embed[0]}} \
-     \n My teammate Emil had already built the radar system which costs far less than the more expensive systems, but still more than a thousand dollars. My contribution was to help make the system run in our demo setting, and provide AI implementation to enable the detection and classification of drones up to a satisfactory range. Due to the confidentiality nature of the sector, I cannot share any more details. \n\n \
-     {{gdrive_embed[1]}} \
-     \n Emil is more focused on the project on the long run, and he went directly to Kiev after the competition to continue the work. Contact him if you are interested in getting more information regarding the project. You can reach out to him through the linkedin post attached under 'links'.\
-     \n\n All for a safer europe!  ",
+    longDescription: `     The idea was to devise a software-hardware bundle radar system that doesn't cost hundreds of thousands of dollars, but can guide a kill of a shaheed drone through an interceptor drone. 
+      Out of the 40+ attending teams who went through the initial screening and managed to participate in this event, we were one of the few to make it to the final, and I made a very impressive pitch, after which I was contacted by multiple people from Ukrainian defense ministry and ukrainian / european defense companies. We were even given some implicit opportunities to test the system.
+
+     {{gdrive_embed[0]}} 
+ 
+ My teammate Emil had already built the radar system which costs far less than the more expensive systems, but still more than a thousand dollars. My contribution was to help make the system run in our demo setting, and provide AI implementation to enable the detection and classification of drones up to a satisfactory range. Due to the confidentiality nature of the sector, I cannot share any more details. 
+
+     {{gdrive_embed[1]}} 
+ 
+ Emil is more focused on the project on the long run, and he went directly to Kiev after the competition to continue the work. Contact him if you are interested in getting more information regarding the project. You can reach out to him through the linkedin post attached under 'links'.
+     
+
+ All for a safer europe!  `,
     technologies: ["AI", "Python", "Radar Systems"],
     links: [
       {
@@ -123,8 +256,16 @@ Final note: Osaka is extremely humid. You aren't prepared. You cannot prepare. J
       },
     ],
     gdrive_embed: [
-      "https://drive.google.com/file/d/1AOgqKR_rebmcpswz4Q6TArD17jbAiV9f/view?usp=sharing",
-      "https://drive.google.com/file/d/1mSAf6-6gfYEm3FHCadufDTNS5vg_fst1/view?usp=sharing",
+      {
+        url: "https://drive.google.com/file/d/1AOgqKR_rebmcpswz4Q6TArD17jbAiV9f/view?usp=sharing",
+        desktopSize: "XL",
+        mobileSize: "S",
+      },
+      {
+        url: "https://drive.google.com/file/d/1mSAf6-6gfYEm3FHCadufDTNS5vg_fst1/view?usp=sharing",
+        desktopSize: "XL",
+        mobileSize: "S",
+      },
     ],
   },
 
@@ -171,10 +312,26 @@ The vision of the SaaS platform -- integrated with common brokers like Scalable 
       },
     ],
     gdrive_embed: [
-      "https://drive.google.com/file/d/1d0BULESEArbLCNBlmC9ZhQSSnKLPb51E/view?usp=sharing",
-      "https://drive.google.com/file/d/1hJxgIWURaqP_1kbx7yP1E82HLgUNSgmg/view?usp=sharing",
-      "https://drive.google.com/file/d/1hBnF-VyPQ6tewqU7OyTX65uSBGX384gt/view?usp=sharing",
-      "https://docs.google.com/presentation/d/1YRglGHUGEQ-AieB2vgbJ6LyDepy822g6D1KgulMA1gA/edit?usp=sharing",
+      {
+        url: "https://drive.google.com/file/d/1d0BULESEArbLCNBlmC9ZhQSSnKLPb51E/view?usp=sharing",
+        desktopSize: "XL",
+        mobileSize: "S",
+      },
+      {
+        url: "https://drive.google.com/file/d/1hJxgIWURaqP_1kbx7yP1E82HLgUNSgmg/view?usp=sharing",
+        desktopSize: "XL",
+        mobileSize: "S",
+      },
+      {
+        url: "https://drive.google.com/file/d/1hBnF-VyPQ6tewqU7OyTX65uSBGX384gt/view?usp=sharing",
+        desktopSize: "XL",
+        mobileSize: "S",
+      },
+      {
+        url: "https://docs.google.com/presentation/d/1YRglGHUGEQ-AieB2vgbJ6LyDepy822g6D1KgulMA1gA/edit?usp=sharing",
+        desktopSize: "XL",
+        mobileSize: "S",
+      },
     ],
   },
   {
@@ -191,8 +348,7 @@ The vision of the SaaS platform -- integrated with common brokers like Scalable 
     date: "12/2024 - 01/2025",
     shortDescription: "Estimating HRTFs from multi-view pinna images.",
     longDescription:
-      "Out of the 100+ teams that attended from 88 universities across Europe, our team (Fırat Fuat Olcay, Serdar Pehlivan & me) was one of the winners of the Huawei 2024 Munich Tech Arena competition! Our team represented Turkey & Germany (Since we all did our bachelor's at the Turkish-German University in Istanbul), and we were the only team representing Turkey. \n\n The competition, held from September 2024 to January 2025, was related to generating precise individual HRTFs (head related transfer functions) associated with the listener's anthropometric data based on multi-view pinna images. Winner teams were determined through a leaderboard of accuracy scores (which is nice. Can be more objective than jury decisions, but not always better). \
-     \n\n\n\n In case you are interested in our method, feel free to check out the slides attached below. \n\n",
+      "Out of the 100+ teams that attended from 88 universities across Europe, our team (Fırat Fuat Olcay, Serdar Pehlivan & me) was one of the winners of the Huawei 2024 Munich Tech Arena competition! Our team represented Turkey & Germany (Since we all did our bachelor's at the Turkish-German University in Istanbul), and we were the only team representing Turkey. \n\n The competition, held from September 2024 to January 2025, was related to generating precise individual HRTFs (head related transfer functions) associated with the listener's anthropometric data based on multi-view pinna images. Winner teams were determined through a leaderboard of accuracy scores (which is nice. Can be more objective than jury decisions, but not always better).      \n\n\n\n In case you are interested in our method, feel free to check out the slides attached below. \n\n",
     links: [
       // { "label": "Hackathon Link", "url": "https://lauzhack.com/" },
       // { "label": "GitHub Repository", "url": "https://github.com/batikanor/MX-Focus" }
@@ -207,11 +363,26 @@ The vision of the SaaS platform -- integrated with common brokers like Scalable 
     ],
     technologies: ["Machine Learning", "AI", "HRTFs"],
     gdrive_embed: [
-      // "https://drive.google.com/file/d/1vL77AmjuWV4hls8Mt75x_lOqaBaohr1D/preview"
-      "https://docs.google.com/presentation/d/1gwv_dG_OYWu-U_rlkEqX3nc8eBm9KfqD/edit#slide=id.g323a7e8b31b_0_337",
-      "https://drive.google.com/file/d/1ozUoDpXIXS0QCASqIzK6KmjtUvafX-Iu/view?usp=sharing",
-      "https://drive.google.com/file/d/1Z2OEXOpJ10GXUou8XJJ7oGTG2heXV7wI/view?usp=sharing",
-      "https://drive.google.com/file/d/1HR7vYuOflNDRaODlDte0WaVCv-v35Vcn/view?usp=sharing",
+      {
+        url: "https://docs.google.com/presentation/d/1gwv_dG_OYWu-U_rlkEqX3nc8eBm9KfqD/edit#slide=id.g323a7e8b31b_0_337",
+        desktopSize: "XL",
+        mobileSize: "S",
+      },
+      {
+        url: "https://drive.google.com/file/d/1ozUoDpXIXS0QCASqIzK6KmjtUvafX-Iu/view?usp=sharing",
+        desktopSize: "XL",
+        mobileSize: "S",
+      },
+      {
+        url: "https://drive.google.com/file/d/1Z2OEXOpJ10GXUou8XJJ7oGTG2heXV7wI/view?usp=sharing",
+        desktopSize: "XL",
+        mobileSize: "S",
+      },
+      {
+        url: "https://drive.google.com/file/d/1HR7vYuOflNDRaODlDte0WaVCv-v35Vcn/view?usp=sharing",
+        desktopSize: "XL",
+        mobileSize: "S",
+      },
     ],
   },
   {
@@ -279,8 +450,11 @@ The vision of the SaaS platform -- integrated with common brokers like Scalable 
       // "https://drive.google.com/uc?id=1aBcDeFgHiJkLmNoPqRSuvWxyz"
     ],
     gdrive_embed: [
-      "https://www.youtube.com/embed/HIuHFqtGaEs",
-      // "https://drive.google.com/file/d/1vL77AmjuWV4hls8Mt75x_lOqaBaohr1D/preview"
+      {
+        url: "https://www.youtube.com/embed/HIuHFqtGaEs",
+        desktopSize: "XL",
+        mobileSize: "S",
+      },
     ],
   },
 
@@ -338,8 +512,16 @@ The vision of the SaaS platform -- integrated with common brokers like Scalable 
     I wanted to share the code here, but we private'd the repository due to the wishes of some of our team members.
     `,
     gdrive_embed: [
-      "https://drive.google.com/file/d/1_chrnl3jKyyBcyZjBpodhtyYO0jwaGHE/view?usp=sharing",
-      "https://drive.google.com/file/d/1U4GgVCr_zNKcQcSS6prPBdPJGg0g3C6U/view?usp=sharing",
+      {
+        url: "https://drive.google.com/file/d/1_chrnl3jKyyBcyZjBpodhtyYO0jwaGHE/view?usp=sharing",
+        desktopSize: "XL",
+        mobileSize: "S",
+      },
+      {
+        url: "https://drive.google.com/file/d/1U4GgVCr_zNKcQcSS6prPBdPJGg0g3C6U/view?usp=sharing",
+        desktopSize: "XL",
+        mobileSize: "S",
+      },
     ],
   },
   {
@@ -363,11 +545,27 @@ The platform supports sustainable decision-making and aligns with global Sustain
 
 Our roadmap includes launching the platform in Zurich, gathering initial data, and progressively expanding features and geographic reach as data volume and revenue grow. GreenDoor aims not only to inform potential employees but also to encourage proactive change, providing companies with critical insights into employee expectations around sustainability. By fostering a community-driven approach to sustainable corporate transparency, GreenDoor breaks down barriers between employees and employers, opening the door to a greener, more accountable future for businesses.`,
     gdrive_embed: [
-      "https://drive.google.com/file/d/12jv9_k9AbwCAeG_mMYdgFvX7LkR-xNOC/view?usp=sharing",
-      "https://drive.google.com/file/d/1phR3MaPwiy9zZi_yqyfafVVeJRBylhBL/view?usp=sharing",
+      {
+        url: "https://drive.google.com/file/d/12jv9_k9AbwCAeG_mMYdgFvX7LkR-xNOC/view?usp=sharing",
+        desktopSize: "XL",
+        mobileSize: "S",
+      },
+      {
+        url: "https://drive.google.com/file/d/1phR3MaPwiy9zZi_yqyfafVVeJRBylhBL/view?usp=sharing",
+        desktopSize: "XL",
+        mobileSize: "S",
+      },
       // "https://drive.google.com/file/d/1XBhq5-55hGyOsYrkRKRZV-V5P1qPKPc1/view?usp=sharing",
-      "https://docs.google.com/presentation/d/13NjatYi07DAcC8oKYnAJxaIXW_GopTxigWBoWbUfwQo/edit#slide=id.p",
-      "https://docs.google.com/document/d/1Zp4I7-1y4VoNY0kydPNKfeSKhuO_41lfdlDqhQF_39I/edit?usp=sharing",
+      {
+        url: "https://docs.google.com/presentation/d/13NjatYi07DAcC8oKYnAJxaIXW_GopTxigWBoWbUfwQo/edit#slide=id.p",
+        desktopSize: "XL",
+        mobileSize: "S",
+      },
+      {
+        url: "https://docs.google.com/document/d/1Zp4I7-1y4VoNY0kydPNKfeSKhuO_41lfdlDqhQF_39I/edit?usp=sharing",
+        desktopSize: "XL",
+        mobileSize: "S",
+      },
     ],
   },
 
@@ -403,9 +601,11 @@ Our roadmap includes launching the platform in Zurich, gathering initial data, a
     // "https://drive.google.com/file/d/1aBcDeFgHiJkLmNoPqRSuvWxyz/view?usp=sharing", // Google Drive image
     // ],
     gdrive_embed: [
-      "https://drive.google.com/file/d/1r9y5cFobyG1CgPJQxxEHHyM29hyrfL19/view?usp=sharing",
-      // "https://docs.google.com/presentation/d/1FSCjiBlLvDn6dzIAjPaf_RC2LvJBzk5q/edit?usp=sharing&ouid=108923877595249603456&rtpof=true&sd=true", // Google Drive video
-      // "https://drive.google.com/file/d/1vL77AmjuWV4hls8Mt75x_lOqaBaohr1D/view?usp=sharing",
+      {
+        url: "https://drive.google.com/file/d/1r9y5cFobyG1CgPJQxxEHHyM29hyrfL19/view?usp=sharing",
+        desktopSize: "XL",
+        mobileSize: "S",
+      },
     ],
   },
   {
@@ -440,8 +640,16 @@ Our roadmap includes launching the platform in Zurich, gathering initial data, a
     // "https://drive.google.com/file/d/1aBcDeFgHiJkLmNoPqRSuvWxyz/view?usp=sharing", // Google Drive image
     // ],
     gdrive_embed: [
-      "https://docs.google.com/presentation/d/1FSCjiBlLvDn6dzIAjPaf_RC2LvJBzk5q/edit?usp=sharing&ouid=108923877595249603456&rtpof=true&sd=true", // Google Drive video
-      "https://drive.google.com/file/d/1vL77AmjuWV4hls8Mt75x_lOqaBaohr1D/view?usp=sharing",
+      {
+        url: "https://docs.google.com/presentation/d/1FSCjiBlLvDn6dzIAjPaf_RC2LvJBzk5q/edit?usp=sharing&ouid=108923877595249603456&rtpof=true&sd=true", // Google Drive video
+        desktopSize: "XL",
+        mobileSize: "S",
+      },
+      {
+        url: "https://drive.google.com/file/d/1vL77AmjuWV4hls8Mt75x_lOqaBaohr1D/view?usp=sharing",
+        desktopSize: "XL",
+        mobileSize: "S",
+      },
     ],
   },
   {
@@ -460,10 +668,26 @@ Our roadmap includes launching the platform in Zurich, gathering initial data, a
     longDescription: `We created a holistic solution for improving the e-waste management process in B/S/H and other businesses. Our solution included: Scanning containers full of old home appliances using X-Ray, automatically unloading the containers, identifying appliances using sensors and computer vision, and making decisions in order to create best-possible value out of respective old appliances using reinforcement learning. We created two functional physical prototypes and displayed them to the audience. We devised a realistic roadmap and business plan that convinced the jury. See the slide deck for more details.`,
     technologies: ["Python", "Reinforcement Learning", "YoLo"],
     gdrive_embed: [
-      "https://docs.google.com/presentation/d/1347zgwVf8qzQxtcdbyJGKT3fXpcduz0BDLUoEVQXw4I/edit#slide=id.g2d42802e251_0_139",
-      "https://drive.google.com/file/d/16NxZ9npePverTrbb4Rjhe1JPD05ctZvY/view?usp=sharing",
-      "https://drive.google.com/file/d/1TFr1kNcWFcCKKt3jBzamDmvOqQuI-b5I/view?usp=drive_link",
-      "https://drive.google.com/file/d/1Z7WmvqB6oa1zPSIBh_oCnWJgEkYNXj4r/view?usp=sharing",
+      {
+        url: "https://docs.google.com/presentation/d/1347zgwVf8qzQxtcdbyJGKT3fXpcduz0BDLUoEVQXw4I/edit#slide=id.g2d42802e251_0_139",
+        desktopSize: "XL",
+        mobileSize: "S",
+      },
+      {
+        url: "https://drive.google.com/file/d/16NxZ9npePverTrbb4Rjhe1JPD05ctZvY/view?usp=sharing",
+        desktopSize: "XL",
+        mobileSize: "S",
+      },
+      {
+        url: "https://drive.google.com/file/d/1TFr1kNcWFcCKKt3jBzamDmvOqQuI-b5I/view?usp=drive_link",
+        desktopSize: "XL",
+        mobileSize: "S",
+      },
+      {
+        url: "https://drive.google.com/file/d/1Z7WmvqB6oa1zPSIBh_oCnWJgEkYNXj4r/view?usp=sharing",
+        desktopSize: "XL",
+        mobileSize: "S",
+      },
     ],
   },
   {
@@ -497,9 +721,21 @@ Our roadmap includes launching the platform in Zurich, gathering initial data, a
       "AWS",
     ],
     gdrive_embed: [
-      "https://docs.google.com/presentation/d/11HvG41xdg7wGdrsyRskOe90hIqc2Fany/edit?usp=sharing&ouid=108923877595249603456&rtpof=true&sd=true", // Google Drive video
-      "https://www.youtube.com/embed/ccDWxExAJ_o",
-      "https://www.youtube.com/embed/58lh7E9Msuw",
+      {
+        url: "https://docs.google.com/presentation/d/11HvG41xdg7wGdrsyRskOe90hIqc2Fany/edit?usp=sharing&ouid=108923877595249603456&rtpof=true&sd=true", // Google Drive video
+        desktopSize: "XL",
+        mobileSize: "S",
+      },
+      {
+        url: "https://www.youtube.com/embed/ccDWxExAJ_o",
+        desktopSize: "XL",
+        mobileSize: "S",
+      },
+      {
+        url: "https://www.youtube.com/embed/58lh7E9Msuw",
+        desktopSize: "XL",
+        mobileSize: "S",
+      },
     ],
   },
   {
@@ -527,7 +763,11 @@ Our roadmap includes launching the platform in Zurich, gathering initial data, a
     ],
     technologies: ["Solana"],
     gdrive_embed: [
-      "https://docs.google.com/presentation/d/1XrH3zm4eHonEyMC3OfbAyHICnfGUiwrm2BXZWveHXvU/edit?usp=sharing",
+      {
+        url: "https://docs.google.com/presentation/d/1XrH3zm4eHonEyMC3OfbAyHICnfGUiwrm2BXZWveHXvU/edit?usp=sharing",
+        desktopSize: "XL",
+        mobileSize: "S",
+      },
     ],
   },
   {
@@ -553,8 +793,16 @@ Our roadmap includes launching the platform in Zurich, gathering initial data, a
     ],
     technologies: ["Python Flask", "ReactJS"],
     gdrive_embed: [
-      "https://drive.google.com/file/d/1jh99Y2fF8UDNwlvrsVV0FJulm9o8W9_C/view?usp=sharing",
-      "https://docs.google.com/presentation/d/1T3AmHdyHZ3zETXZK4PgeMD8TVZD0r38f/edit?usp=sharing&ouid=108923877595249603456&rtpof=true&sd=true",
+      {
+        url: "https://drive.google.com/file/d/1jh99Y2fF8UDNwlvrsVV0FJulm9o8W9_C/view?usp=sharing",
+        desktopSize: "XL",
+        mobileSize: "S",
+      },
+      {
+        url: "https://docs.google.com/presentation/d/1T3AmHdyHZ3zETXZK4PgeMD8TVZD0r38f/edit?usp=sharing&ouid=108923877595249603456&rtpof=true&sd=true",
+        desktopSize: "XL",
+        mobileSize: "S",
+      },
     ],
   },
   {
@@ -587,46 +835,21 @@ Our roadmap includes launching the platform in Zurich, gathering initial data, a
     ],
     technologies: ["Python Flask", "ReactJS"],
     gdrive_embed: [
-      "https://drive.google.com/file/d/1sJlVjqHJDO9zx6p30pDoUyVUXdAlnNFV/view?usp=sharing",
-      "https://www.youtube.com/embed/cjVDi2AY8yc",
-      "https://docs.google.com/presentation/d/1eCo7cuh-HS7SYnlTHYASAdwcHIfLiFE7/edit?usp=sharing&ouid=108923877595249603456&rtpof=true&sd=true",
-    ],
-  },
-  {
-    slug: "makeathon-reply-2024", // Unique slug for each project
-    importance: 5, // If less than 5, pink text
-
-    title:
-      "2nd Place (team) & 1st Place (individual) at TUM AI Makeathon Main Challenge (Sponsor: Reply S.p.A.)",
-    mapData: {
-      venue: "TUM AI Makeathon",
-      city: "Munich",
-      country: "Germany",
-      coordinates: { lat: 48.1497, lng: 11.5677 }, // TUM Main Campus
-    },
-    date: "04/2024",
-    shortDescription: `Wind Turbine Preventive Maintenance Through Reinforcement Learning  (Role: RL Developer, Presenter)`,
-    longDescription: `The challenge given on the hackathon was called “Predictive Maintenance on Wind Turbine Data”.
-  We started with cleaning and preprocessing the dataset provided by Reply S.p.A, available at govdata.de. We realised that it didn’t have any potential for turbine fault / maintenance prediction, and just like many other teams, we looked at alternative approaches.
-  We first used standard q-learning on a very basic setting of a wind turbine maintenance problem, where we had 2 states (working, broken) and 2 actions (maintain, leave it be). I created a fullstack app (flask+react) to better visualise this during the pitch. Our first system showed an agent learning the ideal maintenance schedule for making sure turbines are productive and profitable. We then created a more sophisticated setting where the state had more detailed information such as rotor speed and orientation, observation space had wind speed and direction, power output, noise output, and current energy demand; and action space involved rotor orientation (cont.), alongside maintenance/start/stop actions. We implemented the second setting in an interactive environment and didn’t have the time to build a full-stack app to better display it. Also, most of the data we used were just stochastic (yet interdependent and somewhat realistic). For our second setting we used Proximal Policy Optimization (PPO) through stable_baselines_3, for we didn’t have enough time to consider other options (our team had a total working time of 24 hrs and it was just me and another teammate who worked on RL aspects). Despite that, we could successfully present positive outcomes.
-  We also did web-scraping with Selenium to get more data regarding each turbine given in the original dataset, and argued that the data from there could be integrated into the complete system later on.
-  We got second place as a team in the main track, and I personally got 1st place in the individual sidetrack of the same company, where the task was mainly pre-processing. They thought I deserved the reward due to the nice visualisations I provided and the novel way of decreasing ‘unique value’ count of some features through creating embedding similarity matrices and providing most-similar pairs to LLM’s to eventually retrieve pre-processing code for these columns.
-  As a team, we think our solution was the best amongst all submissions, but we prepared the pitch very late and even though it was said that our pitch was great, we couldn’t focus a lot on the business aspects of the project, which we will pay more attention to in our future projects.
-  We got invited to the company’s Munich office to further discuss our findings.
-  `,
-    links: [
       {
-        label: "Github repo",
-        url: "https://github.com/batikanor/predictive-maintenaince-wind-power",
+        url: "https://drive.google.com/file/d/1sJlVjqHJDO9zx6p30pDoUyVUXdAlnNFV/view?usp=sharing",
+        desktopSize: "XL",
+        mobileSize: "S",
       },
       {
-        label: "Proof of participation",
-        url: "https://drive.google.com/file/d/1mm8m518Vt0QAB05JSVW61tzl9Pwt9bb0/view?usp=sharing",
+        url: "https://www.youtube.com/embed/cjVDi2AY8yc",
+        desktopSize: "XL",
+        mobileSize: "S",
       },
-    ],
-    technologies: ["Python Flask", "ReactJS"],
-    gdrive_embed: [
-      "https://docs.google.com/presentation/d/1S3xRlTyYaJTQ3EfpPzmKcZr36jvNNIkaytn5SEXGUqo/edit#slide=id.p",
+      {
+        url: "https://docs.google.com/presentation/d/1eCo7cuh-HS7SYnlTHYASAdwcHIfLiFE7/edit?usp=sharing&ouid=108923877595249603456&rtpof=true&sd=true",
+        desktopSize: "XL",
+        mobileSize: "S",
+      },
     ],
   },
   {
@@ -646,8 +869,16 @@ Our roadmap includes launching the platform in Zurich, gathering initial data, a
     links: [],
     technologies: ["Python Flask", "ReactJS", "ThreeJS"],
     gdrive_embed: [
-      "https://docs.google.com/presentation/d/1TjLC77f7rv1GVfNdqpKKlxQOdSntDlcw/edit?usp=sharing&ouid=108923877595249603456&rtpof=true&sd=true",
-      "https://drive.google.com/file/d/1IPYrb_iPpduONEgdEusn32_OH1wx-8ze/view?usp=sharing",
+      {
+        url: "https://docs.google.com/presentation/d/1TjLC77f7rv1GVfNdqpKKlxQOdSntDlcw/edit?usp=sharing&ouid=108923877595249603456&rtpof=true&sd=true",
+        desktopSize: "XL",
+        mobileSize: "S",
+      },
+      {
+        url: "https://drive.google.com/file/d/1IPYrb_iPpduONEgdEusn32_OH1wx-8ze/view?usp=sharing",
+        desktopSize: "XL",
+        mobileSize: "S",
+      },
     ],
   },
   {
@@ -681,7 +912,11 @@ Our roadmap includes launching the platform in Zurich, gathering initial data, a
     ],
     technologies: ["LSTMs", "XGBoost"],
     gdrive_embed: [
-      "https://drive.google.com/file/d/14iqBE66SjUpp2y6eFLHI8hOeCDtHZ8sh/view?usp=sharing",
+      {
+        url: "https://drive.google.com/file/d/14iqBE66SjUpp2y6eFLHI8hOeCDtHZ8sh/view?usp=sharing",
+        desktopSize: "XL",
+        mobileSize: "S",
+      },
     ],
   },
   {
@@ -717,7 +952,11 @@ Our roadmap includes launching the platform in Zurich, gathering initial data, a
     ],
     technologies: ["Gateway FM RPC", "Python"],
     gdrive_embed: [
-      "https://drive.google.com/file/d/1-3hcEi9acIWug8ZNo0yoYe5UMrjzdTOE/view?usp=sharing",
+      {
+        url: "https://drive.google.com/file/d/1-3hcEi9acIWug8ZNo0yoYe5UMrjzdTOE/view?usp=sharing",
+        desktopSize: "XL",
+        mobileSize: "S",
+      },
     ],
   },
   {
@@ -750,8 +989,16 @@ Our roadmap includes launching the platform in Zurich, gathering initial data, a
     ],
     technologies: ["Python Flask", "ReactJS"],
     gdrive_embed: [
-      "https://drive.google.com/file/d/1JrOiAxGTxlG9GfMk4jL9CslwcYOHvcwr/view?usp=sharing",
-      "https://drive.google.com/file/d/1xrktqeqkMM-8CWpFcZVLXR-ccGVcJvHR/view?usp=sharing",
+      {
+        url: "https://drive.google.com/file/d/1JrOiAxGTxlG9GfMk4jL9CslwcYOHvcwr/view?usp=sharing",
+        desktopSize: "XL",
+        mobileSize: "S",
+      },
+      {
+        url: "https://drive.google.com/file/d/1xrktqeqkMM-8CWpFcZVLXR-ccGVcJvHR/view?usp=sharing",
+        desktopSize: "XL",
+        mobileSize: "S",
+      },
     ],
   },
   {
@@ -772,7 +1019,11 @@ Our roadmap includes launching the platform in Zurich, gathering initial data, a
     longDescription: `For the task of identification of pets and stray animals;  many methods, the ethicalness of which are questionable, are put to use. With this project, 16 different test cats (for each of which there were 4 to 20 examples) could be identified by the machine learning system using their nose images, face images or whole images with very high (99%, 100%, …) rank-1 to rank-5 accuracies without the model having been shown any example of their identity/class to the system in the training phase. Later on, the aim is to make the system more scalable and use it in end-user applications. For the project has an entrepreneurial side to it, the implementation will be kept confidential for at least a couple more years.`,
     technologies: ["Siamese Networks", "Pytorch"],
     gdrive_embed: [
-      "https://drive.google.com/file/d/1vkXClWm80q1e-R4MItsKIthmG21vG_4R/view?usp=sharing",
+      {
+        url: "https://drive.google.com/file/d/1vkXClWm80q1e-R4MItsKIthmG21vG_4R/view?usp=sharing",
+        desktopSize: "XL",
+        mobileSize: "S",
+      },
     ],
   },
   {
@@ -806,7 +1057,11 @@ Our roadmap includes launching the platform in Zurich, gathering initial data, a
       "Turkish-German University.",
     ],
     gdrive_embed: [
-      "https://drive.google.com/file/d/1M7Ca6-_t-u1_ERRk2I9YwkS_GdTbXUXz/view?usp=drive_link",
+      {
+        url: "https://drive.google.com/file/d/1M7Ca6-_t-u1_ERRk2I9YwkS_GdTbXUXz/view?usp=drive_link",
+        desktopSize: "XL",
+        mobileSize: "S",
+      },
     ],
   },
 ];
