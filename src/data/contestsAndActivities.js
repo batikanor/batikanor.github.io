@@ -1,6 +1,6 @@
 export const contestsAndActivities = [
   {
-    slug: "decarbon-days-climathon-2024",
+    slug: "decarbon-days-climathon-2025",
     importance: 9,
     highlighted: true,
     title: "Lead Jury & Mentor at Decarbon Days Climathon",
