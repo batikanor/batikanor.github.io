@@ -4,12 +4,7 @@ Welcome to my portfolio website's repository! I'm Batıkan, a software engineer 
 
 ## Features
 
-- 🌍 Interactive 3D Globe with project locations
-- 🎮 Mini-games integrated into the globe interface
-- 🌓 Dark/Light theme support
-- 📱 Responsive design for all devices
-- 📄 Dynamic CV display and download options
-- 🏆 Comprehensive project showcase with location mapping
+- Good stuff
 
 ## Tech Stack
 
