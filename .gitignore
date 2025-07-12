@@ -34,3 +34,16 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Sui Move build artefacts
+# These are generated when running `sui move build` / `sui move test` and should not be committed
+**/bytecode_modules/
+**/debug_info/
+**/build/
+**/test_coverage/
+
+# Move compiler outputs (per-file)
+*.mv
+*.mvd
+*.mv.d
+*.bcs
