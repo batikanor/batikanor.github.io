@@ -1022,7 +1022,8 @@ export default function SuiGraphPage() {
       <ul className="list-disc pl-6 text-gray-700 dark:text-gray-300">
         <li>
           Implement semantic node placement where direction depends on relation
-          logic (e.g., 'bigger' to the right, 'smaller' to the left).
+          logic (e.g., &apos;bigger&apos; to the right, &apos;smaller&apos; to
+          the left).
         </li>
         <li>
           Group semantically similar nodes closer together using embeddings.
