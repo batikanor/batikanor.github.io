@@ -26,9 +26,7 @@ export default function SuiPageContent() {
         <h1 className="text-4xl md:text-5xl font-bold mb-2 text-black dark:text-white">
           Utisui
         </h1>
-        <p className="text-lg text-gray-600 dark:text-gray-400">
-          Connect your wallet to view your on-chain assets.
-        </p>
+        <p className="text-lg text-gray-600 dark:text-gray-400">Own a word.</p>
       </header>
 
       {account ? (

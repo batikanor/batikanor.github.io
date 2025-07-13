@@ -22,12 +22,13 @@ import {
   SRGBColorSpace,
   TextureLoader,
 } from "three";
-import SuiMap from "../../components/SuiMap";
 
 // 3D graph library & text sprites
 const ForceGraph3D = dynamic(() => import("react-force-graph-3d"), {
   ssr: false,
 });
+
+const SuiMap = dynamic(() => import("../../components/SuiMap"), { ssr: false });
 
 const Globe = dynamic(() => import("../../components/GlobeWrapper"), {
   ssr: false,
