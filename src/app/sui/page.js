@@ -28,11 +28,6 @@ import SuiMap from "../../components/SuiMap";
 const ForceGraph3D = dynamic(() => import("react-force-graph-3d"), {
   ssr: false,
 });
-let SpriteText = null;
-if (typeof window !== "undefined") {
-  const mod = require("three-spritetext");
-  SpriteText = mod.default ? mod.default : mod;
-}
 
 const Globe = dynamic(() => import("../../components/GlobeWrapper"), {
   ssr: false,
@@ -175,6 +170,7 @@ export default function SuiGraphPage() {
   const { mutateAsync: signTransaction } = useSignTransaction();
   const [aiMode, setAiMode] = useState("local");
   const [localAiModel, setLocalAiModel] = useState(localModels[0]);
+  const [SpriteText, setSpriteText] = useState(null);
   const [mintedNames, setMintedNames] = useState(new Set());
   const [pendingMint, setPendingMint] = useState(null);
   const [nftDesc, setNftDesc] = useState("");
@@ -518,6 +514,12 @@ export default function SuiGraphPage() {
   useEffect(() => {
     fetchAllNfts();
   }, [fetchAllNfts]);
+
+  useEffect(() => {
+    import("three-spritetext").then((mod) => {
+      setSpriteText(() => (mod.default ? mod.default : mod));
+    });
+  }, []);
 
   // ------------------------ Callbacks -------------------------------------
   const handleNodeClick = useCallback((node) => {
