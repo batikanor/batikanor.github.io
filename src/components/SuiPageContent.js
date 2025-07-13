@@ -24,7 +24,7 @@ export default function SuiPageContent() {
     <div className="container mx-auto p-4 md:p-8">
       <header className="text-center mb-12">
         <h1 className="text-4xl md:text-5xl font-bold mb-2 text-black dark:text-white">
-          Sui Devnet Explorer
+          Utisui
         </h1>
         <p className="text-lg text-gray-600 dark:text-gray-400">
           Connect your wallet to view your on-chain assets.

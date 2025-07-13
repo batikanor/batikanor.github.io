@@ -128,6 +128,9 @@ importers:
       three:
         specifier: ^0.169.0
         version: 0.169.0
+      three-spritetext:
+        specifier: ^1.10.0
+        version: 1.10.0(three@0.169.0)
       vanilla-tilt:
         specifier: ^1.8.1
         version: 1.8.1
@@ -6852,6 +6855,12 @@ packages:
     engines: {node: '>=12'}
     peerDependencies:
       three: '>=0.154'
+
+  three-spritetext@1.10.0:
+    resolution: {integrity: sha512-t08iP1FCU1lQh8T5MmCpdijKgas8GDHJE0LqMGBuVu3xqMMpFnEZhTlih7FlxLPQizHIGoumUSpfOlY1GO/Tgg==}
+    engines: {node: '>=12'}
+    peerDependencies:
+      three: '>=0.86.0'
 
   three-stdlib@2.35.13:
     resolution: {integrity: sha512-AbXVObkM0OFCKX0r4VmHguGTdebiUQA+Yl+4VNta1wC158gwY86tCkjp2LFfmABtjYJhdK6aP13wlLtxZyLMAA==}
@@ -15990,6 +15999,10 @@ snapshots:
       d3-geo: 3.1.1
       d3-octree: 1.1.0
       d3-scale: 4.0.2
+      three: 0.169.0
+
+  three-spritetext@1.10.0(three@0.169.0):
+    dependencies:
       three: 0.169.0
 
   three-stdlib@2.35.13(three@0.169.0):

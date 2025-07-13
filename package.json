@@ -48,6 +48,7 @@
     "styled-jsx": "^5.1.7",
     "tailwindcss-animate": "^1.0.7",
     "three": "^0.169.0",
+    "three-spritetext": "^1.10.0",
     "vanilla-tilt": "^1.8.1"
   },
   "devDependencies": {

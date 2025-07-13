@@ -6,6 +6,7 @@ import {
   useSuiClient,
 } from "@mysten/dapp-kit";
 import { Transaction } from "@mysten/sui/transactions";
+import { useTheme } from "next-themes";
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
@@ -64,13 +65,13 @@ const SuiPageContent = dynamic(
 
 // --- Helper functions ------------------------------------------------------
 
-async function getLocalAI(source, relation) {
+async function getLocalAI(source, relation, model) {
   try {
     const response = await fetch("http://127.0.0.1:11434/api/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "gemma3:27b",
+        model: model,
         messages: [
           {
             role: "system",
@@ -105,10 +106,10 @@ async function getOpenRouterAI(source, relation) {
   return data.target;
 }
 
-async function resolveRelation(source, relation, mode) {
+async function resolveRelation(source, relation, mode, localModel) {
   try {
     if (mode === "local") {
-      return await getLocalAI(source, relation);
+      return await getLocalAI(source, relation, localModel);
     } else {
       return await getOpenRouterAI(source, relation);
     }
@@ -118,14 +119,67 @@ async function resolveRelation(source, relation, mode) {
   }
 }
 
+const vibrantColors = [
+  "#FF5733",
+  "#33FF57",
+  "#3357FF",
+  "#FF33A1",
+  "#A133FF",
+  "#33FFA1",
+  "#FFC300",
+  "#DAF7A6",
+  "#C70039",
+  "#900C3F",
+];
+
+const localModels = [
+  "gemma3:27b",
+  "gemma3:12b-it-qat",
+  "eramax/gemma-3-27b-it-qat:q4_0",
+  "mistral-small:24b",
+  "llava:13b",
+  "deepseek-r1:14b",
+  "nomic-embed-text:latest",
+  "qwq:32b",
+  "phi4:14b",
+  "qwen2.5:0.5b",
+];
+
+const relationToColor = (relation) => {
+  let hash = 0;
+  for (let i = 0; i < (relation || "").length; i++) {
+    hash = relation.charCodeAt(i) + ((hash << 5) - hash);
+    hash = hash & hash;
+  }
+  const index = Math.abs(hash) % vibrantColors.length;
+  return vibrantColors[index];
+};
+
+const stringToLightColor = (str, theme) => {
+  let hash = 0;
+  for (let i = 0; i < (str || "").length; i++) {
+    hash = str.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  const hue = hash % 360;
+  if (theme === "light") {
+    return `hsl(${hue}, 70%, 20%)`;
+  } else {
+    return `hsl(${hue}, 80%, 85%)`;
+  }
+};
+
 export default function SuiGraphPage() {
+  const { resolvedTheme } = useTheme();
   const client = useSuiClient();
   const currentAccount = useCurrentAccount();
   const { mutateAsync: signTransaction } = useSignTransaction();
   const [aiMode, setAiMode] = useState("local");
+  const [localAiModel, setLocalAiModel] = useState(localModels[0]);
   const [mintedNames, setMintedNames] = useState(new Set());
   const [pendingMint, setPendingMint] = useState(null);
   const [nftDesc, setNftDesc] = useState("");
+  const [autoNftDesc, setAutoNftDesc] = useState("");
+  const [isMinting, setIsMinting] = useState(false);
   const [nftUrl, setNftUrl] = useState("https://picsum.photos/400");
   // ------------------------ State -----------------------------------------
   const [graphData, setGraphData] = useState(() => {
@@ -162,12 +216,160 @@ export default function SuiGraphPage() {
   const [horizSpeed, setHorizSpeed] = useState(0);
   const [vertSpeed, setVertSpeed] = useState(0);
   const [mintedNftMap, setMintedNftMap] = useState({});
+  const [mintInfo, setMintInfo] = useState({});
   const [fullscreenView, setFullscreenView] = useState("3d");
   const [mapState, setMapState] = useState({
     zoom: 6,
     center: { lat: 52, lng: 19 },
   });
   const [isAddingRelation, setIsAddingRelation] = useState(false);
+
+  const handleGenerateMockData = () => {
+    const wordList = [
+      "athena",
+      "zeus",
+      "apollo",
+      "artemis",
+      "poseidon",
+      "hermes",
+      "aphrodite",
+      "ares",
+      "hades",
+      "demeter",
+      "blockchain",
+      "crypto",
+      "decentralized",
+      "ledger",
+      "smart-contract",
+      "token",
+      "wallet",
+      "node",
+      "hash",
+      "mining",
+      "forest",
+      "river",
+      "mountain",
+      "ocean",
+      "desert",
+      "canyon",
+      "valley",
+      "glacier",
+      "island",
+      "volcano",
+      "galaxy",
+      "nebula",
+      "supernova",
+      "quasar",
+      "pulsar",
+      "cosmos",
+      "orbit",
+      "gravity",
+      "singularity",
+      "planet",
+      "symphony",
+      "sonata",
+      "concerto",
+      "opera",
+      "fugue",
+      "rhapsody",
+      "nocturne",
+      "prelude",
+      "serenade",
+      "melody",
+      "impressionism",
+      "cubism",
+      "surrealism",
+      "baroque",
+      "renaissance",
+      "expressionism",
+      "realism",
+      "abstract",
+      "gothic",
+      "rococo",
+      "algorithm",
+      "database",
+      "frontend",
+      "backend",
+      "cloud",
+      "serverless",
+      "microservice",
+      "api",
+      "devops",
+      "agile",
+      "philosophy",
+      "metaphysics",
+      "epistemology",
+      "ethics",
+      "logic",
+      "aesthetics",
+      "ontology",
+      "phenomenology",
+      "existentialism",
+      "stoicism",
+      "quantum",
+      "relativity",
+      "thermodynamics",
+      "electromagnetism",
+      "kinematics",
+      "optics",
+      "acoustics",
+      "plasma",
+      "particle",
+      "string-theory",
+      "neuron",
+      "synapse",
+      "cortex",
+      "cerebellum",
+      "amygdala",
+      "hippocampus",
+      "axon",
+      "dendrite",
+      "glia",
+      "neurotransmitter",
+    ];
+
+    const numNodes = 300;
+    const numClusters = 7;
+    const nodesPerCluster = Math.floor(numNodes / numClusters);
+
+    let newNodes = [];
+    let newLinks = [];
+    const existingNodeIds = new Set(graphData.nodes.map((n) => n.id));
+
+    for (let i = 0; i < numClusters; i++) {
+      const clusterNodes = [];
+      for (let j = 0; j < nodesPerCluster; j++) {
+        const wordIndex = (i * nodesPerCluster + j) % wordList.length;
+        let nodeId = wordList[wordIndex];
+        if (existingNodeIds.has(nodeId)) {
+          nodeId = `${nodeId}_${i}_${j}`;
+        }
+        if (!existingNodeIds.has(nodeId)) {
+          newNodes.push({ id: nodeId });
+          clusterNodes.push(nodeId);
+          existingNodeIds.add(nodeId);
+        }
+      }
+
+      // Connect nodes within the cluster
+      for (let k = 0; k < clusterNodes.length; k++) {
+        const source = clusterNodes[k];
+        const numConnections = Math.floor(Math.random() * 3) + 1;
+        for (let l = 0; l < numConnections; l++) {
+          const target =
+            clusterNodes[Math.floor(Math.random() * clusterNodes.length)];
+          if (source !== target) {
+            newLinks.push({ source, target, label: "related_to" });
+          }
+        }
+      }
+    }
+
+    setGraphData((prev) => ({
+      nodes: [...prev.nodes, ...newNodes],
+      links: [...prev.links, ...newLinks],
+    }));
+  };
 
   const fetchAllNfts = useCallback(async () => {
     console.log("Fetching all mint transactions via RPC...");
@@ -218,6 +420,7 @@ export default function SuiGraphPage() {
                   allCreated.push({
                     objectId: created.reference.objectId,
                     version: created.reference.version.toString(),
+                    digest: tx.digest,
                   });
                 } else {
                   console.log(
@@ -252,6 +455,7 @@ export default function SuiGraphPage() {
     console.log("Found potential historical NFTs:", allCreated);
 
     const nftMap = {};
+    const newMintInfo = {};
     if (allCreated.length > 0) {
       try {
         const objResponse = await fetch(rpcUrl, {
@@ -277,6 +481,10 @@ export default function SuiGraphPage() {
                   `Minted NFT ${index + 1}: Name = ${name}, URL = ${url}`
                 );
                 nftMap[name] = url;
+                newMintInfo[name] = {
+                  objectId: allCreated[index].objectId,
+                  digest: allCreated[index].digest,
+                };
               } else {
                 console.log(
                   `Object ${index + 1} (ID: ${
@@ -303,6 +511,7 @@ export default function SuiGraphPage() {
     console.log("NFTs found:", nftMap);
     console.log("All NFT names found:", Object.keys(nftMap));
     setMintedNftMap(nftMap);
+    setMintInfo(newMintInfo);
     setMintedNames(new Set(Object.keys(nftMap)));
   }, []);
 
@@ -326,7 +535,13 @@ export default function SuiGraphPage() {
 
       setIsAddingRelation(true);
 
-      const target = await resolveRelation(selected, relation, aiMode);
+      const aiTarget = await resolveRelation(
+        selected,
+        relation,
+        aiMode,
+        localAiModel
+      );
+      const target = aiTarget.toLowerCase();
 
       setGraphData((prev) => {
         const exists = prev.nodes.some((n) => n.id === target);
@@ -360,7 +575,10 @@ export default function SuiGraphPage() {
           ...prev.links,
           { source: selected, target, label: relation },
         ];
-        if (newNode) setPendingMint(target);
+        if (newNode) {
+          setPendingMint(target);
+          setAutoNftDesc(`${selected} -> ${relation}`);
+        }
         return { nodes, links };
       });
 
@@ -368,7 +586,7 @@ export default function SuiGraphPage() {
       inputRef.current.value = "";
       setSelected(null);
     },
-    [selected, aiMode]
+    [selected, aiMode, localAiModel]
   );
 
   useEffect(() => {
@@ -415,13 +633,16 @@ export default function SuiGraphPage() {
   // ------------------------ Rendering -------------------------------------
   const handleMint = async () => {
     if (!currentAccount || !pendingMint) return;
+
+    setIsMinting(true);
+
     try {
       const tx = new Transaction();
       tx.moveCall({
         target: `${NFT_PACKAGE_ID}::my_nft::mint`,
         arguments: [
           tx.pure.string(pendingMint),
-          tx.pure.string(nftDesc || `NFT for concept: ${pendingMint}`),
+          tx.pure.string(autoNftDesc),
           tx.pure.string(nftUrl),
         ],
       });
@@ -438,13 +659,24 @@ export default function SuiGraphPage() {
       if (executeResult.rawEffects && signResult.reportTransactionEffects) {
         signResult.reportTransactionEffects(executeResult.rawEffects);
       }
-      // Refetch NFTs after mint
-      fetchAllNfts();
+
+      // Refetch NFTs after mint to ensure the graph is up-to-date
+      await fetchAllNfts();
+
+      // Force graph to re-render the node with the new data
+      setGraphData((prevData) => {
+        const newNodes = prevData.nodes.map((node) =>
+          node.id === pendingMint ? { ...node, _updated: Date.now() } : node
+        );
+        return { ...prevData, nodes: newNodes };
+      });
+
       alert(`NFT minted! Digest: ${executeResult.digest}`);
     } catch (error) {
       console.error("Mint error:", error);
       alert("Mint failed: " + error.message);
     } finally {
+      setIsMinting(false);
       setPendingMint(null);
     }
   };
@@ -454,16 +686,30 @@ export default function SuiGraphPage() {
       {/* original Sui page content */}
       <SuiPageContent />
 
-      <h2 className="text-2xl font-semibold mt-12">Concept Graph Demo</h2>
+      {/* <h2 className="text-2xl font-semibold mt-12">Concept Graph Demo</h2> */}
 
       {/* Graph canvas */}
       <div
         ref={containerRef}
-        className={`w-full border rounded-md shadow-sm overflow-hidden relative ${
+        className={`w-full overflow-hidden relative ${
           isFullscreen ? "fixed inset-0 z-50 h-screen" : "h-[70vh]"
         }`}
       >
         <div className="absolute top-4 right-4 flex gap-2 z-20">
+          <button
+            onClick={handleGenerateMockData}
+            className="bg-purple-600 text-white px-3 py-1 rounded-md"
+            title="Generate Mock Data"
+          >
+            Generate Mock Data
+          </button>
+          <button
+            onClick={fetchAllNfts}
+            className="bg-gray-500 text-white px-3 py-1 rounded-md"
+            title="Refresh NFT data"
+          >
+            Refresh
+          </button>
           {isFullscreen && fullscreenView === "3d" && (
             <button
               onClick={() => setFullscreenView("2d")}
@@ -579,6 +825,8 @@ export default function SuiGraphPage() {
             }
             nodeThreeObjectExtend={false}
             cooldownTicks={fullscreenView === "2d" ? 0 : undefined}
+            linkColor={(link) => relationToColor(link.label)}
+            linkWidth={2}
             rendererConfig={{ alpha: true, antialias: true }}
             backgroundColor="rgba(0,0,0,0)"
             className="absolute inset-0"
@@ -597,7 +845,7 @@ export default function SuiGraphPage() {
               }
               if (!SpriteText) return new Group();
               const textSprite = new SpriteText(node.id);
-              textSprite.color = "#fff";
+              textSprite.color = stringToLightColor(node.id, resolvedTheme);
               textSprite.textHeight = 20;
               return textSprite;
             }}
@@ -605,7 +853,7 @@ export default function SuiGraphPage() {
             linkThreeObject={(link) => {
               if (!link.label || !SpriteText) return undefined;
               const sprite = new SpriteText(link.label);
-              sprite.color = "#ffeb3b";
+              sprite.color = stringToLightColor(link.label, resolvedTheme);
               sprite.textHeight = 10;
               return sprite;
             }}
@@ -659,7 +907,31 @@ export default function SuiGraphPage() {
           {mintedNames.has(pendingMint) ? (
             <div>
               <h3>The name &quot;{pendingMint}&quot; is already minted.</h3>
-              <p>Would you like to place a bid instead?</p>
+              {mintInfo[pendingMint] && (
+                <div className="text-sm mt-2">
+                  <p>
+                    <a
+                      href={`https://suiscan.xyz/devnet/object/${mintInfo[pendingMint].objectId}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-500 hover:underline"
+                    >
+                      View NFT on Suiscan
+                    </a>
+                  </p>
+                  <p>
+                    <a
+                      href={`https://suiscan.xyz/devnet/tx/${mintInfo[pendingMint].digest}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-500 hover:underline"
+                    >
+                      View Mint Transaction
+                    </a>
+                  </p>
+                </div>
+              )}
+              <p className="mt-4">Would you like to place a bid instead?</p>
               <button
                 onClick={() => {
                   alert("Bidding is a work-in-progress feature.");
@@ -679,13 +951,12 @@ export default function SuiGraphPage() {
           ) : (
             <>
               <h3>Mint new concept &quot;{pendingMint}&quot; as NFT?</h3>
-              <input
-                type="text"
-                placeholder="Description"
-                value={nftDesc}
-                onChange={(e) => setNftDesc(e.target.value)}
-                className="border px-2 py-1 rounded-md text-sm"
-              />
+              <p className="text-sm text-gray-500 my-2">
+                Description:{" "}
+                <span className="font-mono bg-gray-100 dark:bg-gray-700 p-1 rounded">
+                  {autoNftDesc}
+                </span>
+              </p>
               <input
                 type="text"
                 placeholder="Image URL"
@@ -695,13 +966,15 @@ export default function SuiGraphPage() {
               />
               <button
                 onClick={handleMint}
-                className="bg-green-600 text-white px-3 py-1 rounded-md text-sm ml-2"
+                disabled={isMinting}
+                className="bg-green-600 text-white px-3 py-1 rounded-md text-sm ml-2 disabled:bg-gray-400"
               >
-                Mint
+                {isMinting ? "Minting..." : "Mint"}
               </button>
               <button
                 onClick={() => setPendingMint(null)}
-                className="bg-red-600 text-white px-3 py-1 rounded-md text-sm ml-2"
+                disabled={isMinting}
+                className="bg-red-600 text-white px-3 py-1 rounded-md text-sm ml-2 disabled:bg-gray-400"
               >
                 Cancel
               </button>
@@ -710,7 +983,7 @@ export default function SuiGraphPage() {
         </div>
       )}
       {/* Debug Menu */}
-      <div className="flex gap-2 mt-4">
+      <div className="flex gap-2 mt-4 items-center">
         <button
           onClick={() => setAiMode("local")}
           className={`px-3 py-1 rounded ${
@@ -731,6 +1004,19 @@ export default function SuiGraphPage() {
         >
           OpenRouter AI
         </button>
+        {aiMode === "local" && (
+          <select
+            value={localAiModel}
+            onChange={(e) => setLocalAiModel(e.target.value)}
+            className="border px-2 py-1 rounded-md text-sm focus:outline-none text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-700"
+          >
+            {localModels.map((model) => (
+              <option key={model} value={model}>
+                {model}
+              </option>
+            ))}
+          </select>
+        )}
       </div>
       <h3 className="text-xl font-semibold mt-8">Future Steps</h3>
       <ul className="list-disc pl-6 text-gray-700 dark:text-gray-300">
@@ -749,6 +1035,7 @@ export default function SuiGraphPage() {
           Constrain names to be unique through the Move smart contract rather
           than through web2.
         </li>
+        <li>Use IPFS for storing images instead of URLs.</li>
       </ul>
     </div>
   );
