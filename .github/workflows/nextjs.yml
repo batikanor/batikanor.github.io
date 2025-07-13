@@ -74,7 +74,7 @@ jobs:
 
       - name: Build with Next.js
         env:
-          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          NEXT_PUBLIC_OPENROUTER_API_KEY: ${{ secrets.NEXT_PUBLIC_OPENROUTER_API_KEY }}
         run: ${{ steps.detect-package-manager.outputs.runner }} build
 
       - name: Upload artifact

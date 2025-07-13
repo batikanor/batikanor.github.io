@@ -93,7 +93,7 @@ async function getLocalAI(source, relation, model) {
 
 async function getOpenRouterAI(source, relation, model) {
   // TODO: THIS NORMALLY SHOULDNT BE ON THE CLIENT SIDE, BUT SINCE THE KEY I USE IS ONLY FOR FREE MODEL USAGE AND HAS 0 LIMIT AND I WANT TO KEEP HOSTING THIS FREELY ON GITHUB, THIS IS HERE TEMPORARILY FOR THE HACKATHON!
-  const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
+  const OPENROUTER_API_KEY = process.env.NEXT_PUBLIC_OPENROUTER_API_KEY;
   if (!OPENROUTER_API_KEY) {
     throw new Error("OpenRouter API key not configured");
   }
@@ -1080,7 +1080,7 @@ export default function SuiGraphPage() {
             ))}
           </select>
         )}
-        {!isStaticExport && aiMode === "openrouter" && (
+        {aiMode === "openrouter" && (
           <select
             value={openRouterModel}
             onChange={(e) => setOpenRouterModel(e.target.value)}
