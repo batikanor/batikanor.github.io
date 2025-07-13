@@ -92,14 +92,46 @@ async function getLocalAI(source, relation, model) {
 }
 
 async function getOpenRouterAI(source, relation, model) {
-  const response = await fetch("/api/ai", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ source, relation, model }),
-  });
-  const data = await response.json();
-  if (data.error) throw new Error(data.error);
-  return data.target;
+  // TODO: THIS NORMALLY SHOULDNT BE ON THE CLIENT SIDE, BUT SINCE THE KEY I USE IS ONLY FOR FREE MODEL USAGE AND HAS 0 LIMIT AND I WANT TO KEEP HOSTING THIS FREELY ON GITHUB, THIS IS HERE TEMPORARILY FOR THE HACKATHON!
+  const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
+  if (!OPENROUTER_API_KEY) {
+    throw new Error("OpenRouter API key not configured");
+  }
+  try {
+    const response = await fetch(
+      "https://openrouter.ai/api/v1/chat/completions",
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${OPENROUTER_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: model || "meta-llama/llama-3.1-8b-instruct:free",
+          messages: [
+            {
+              role: "system",
+              content:
+                "You are a helpful assistant that suggests a single word related to the source via the given relation. Respond only with the word.",
+            },
+            {
+              role: "user",
+              content: `Source: ${source}, Relation: ${relation}`,
+            },
+          ],
+        }),
+      }
+    );
+    if (!response.ok) {
+      throw new Error(`OpenRouter API error: ${response.status}`);
+    }
+    const data = await response.json();
+    const target = data.choices[0].message.content.trim();
+    return target;
+  } catch (error) {
+    console.error("OpenRouter AI error:", error);
+    throw error;
+  }
 }
 
 async function resolveRelation(
@@ -189,6 +221,7 @@ export default function SuiGraphPage() {
   const [aiMode, setAiMode] = useState("local");
   const [localAiModel, setLocalAiModel] = useState(localModels[0]);
   const [openRouterModel, setOpenRouterModel] = useState(openRouterModels[0]);
+  const [isStaticExport, setIsStaticExport] = useState(false);
   const [SpriteText, setSpriteText] = useState(null);
   const [mintedNames, setMintedNames] = useState(new Set());
   const [pendingMint, setPendingMint] = useState(null);
@@ -538,6 +571,14 @@ export default function SuiGraphPage() {
     import("three-spritetext").then((mod) => {
       setSpriteText(() => (mod.default ? mod.default : mod));
     });
+  }, []);
+
+  useEffect(() => {
+    // Detect if we're in a static export (no server, like GitHub Pages)
+    setIsStaticExport(
+      typeof window !== "undefined" &&
+        !window.navigator.userAgent.includes("Node")
+    );
   }, []);
 
   // ------------------------ Callbacks -------------------------------------
@@ -1039,7 +1080,7 @@ export default function SuiGraphPage() {
             ))}
           </select>
         )}
-        {aiMode === "openrouter" && (
+        {!isStaticExport && aiMode === "openrouter" && (
           <select
             value={openRouterModel}
             onChange={(e) => setOpenRouterModel(e.target.value)}
