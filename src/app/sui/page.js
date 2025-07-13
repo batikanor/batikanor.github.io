@@ -91,23 +91,29 @@ async function getLocalAI(source, relation, model) {
   }
 }
 
-async function getOpenRouterAI(source, relation) {
+async function getOpenRouterAI(source, relation, model) {
   const response = await fetch("/api/ai", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ source, relation }),
+    body: JSON.stringify({ source, relation, model }),
   });
   const data = await response.json();
   if (data.error) throw new Error(data.error);
   return data.target;
 }
 
-async function resolveRelation(source, relation, mode, localModel) {
+async function resolveRelation(
+  source,
+  relation,
+  mode,
+  localModel,
+  openRouterModel
+) {
   try {
     if (mode === "local") {
       return await getLocalAI(source, relation, localModel);
     } else {
-      return await getOpenRouterAI(source, relation);
+      return await getOpenRouterAI(source, relation, openRouterModel);
     }
   } catch (error) {
     console.error("AI error:", error);
@@ -141,6 +147,17 @@ const localModels = [
   "qwen2.5:0.5b",
 ];
 
+const openRouterModels = [
+  "deepseek/deepseek-chat-v3-0324:free",
+  "deepseek/deepseek-r1-0528:free",
+  "deepseek/deepseek-chat:free",
+  "openrouter/cypher-alpha:free",
+  "google/gemini-2.0-flash-exp:free",
+  "mistralai/mistral-nemo:free",
+  "microsoft/mai-ds-r1:free",
+  "meta-llama/llama-4-maverick:free",
+];
+
 const relationToColor = (relation) => {
   let hash = 0;
   for (let i = 0; i < (relation || "").length; i++) {
@@ -171,6 +188,7 @@ export default function SuiGraphPage() {
   const { mutateAsync: signTransaction } = useSignTransaction();
   const [aiMode, setAiMode] = useState("local");
   const [localAiModel, setLocalAiModel] = useState(localModels[0]);
+  const [openRouterModel, setOpenRouterModel] = useState(openRouterModels[0]);
   const [SpriteText, setSpriteText] = useState(null);
   const [mintedNames, setMintedNames] = useState(new Set());
   const [pendingMint, setPendingMint] = useState(null);
@@ -542,7 +560,8 @@ export default function SuiGraphPage() {
         selected,
         relation,
         aiMode,
-        localAiModel
+        localAiModel,
+        openRouterModel
       );
       const target = aiTarget.toLowerCase();
 
@@ -589,7 +608,7 @@ export default function SuiGraphPage() {
       inputRef.current.value = "";
       setSelected(null);
     },
-    [selected, aiMode, localAiModel]
+    [selected, aiMode, localAiModel, openRouterModel]
   );
 
   useEffect(() => {
@@ -1014,6 +1033,19 @@ export default function SuiGraphPage() {
             className="border px-2 py-1 rounded-md text-sm focus:outline-none text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-700"
           >
             {localModels.map((model) => (
+              <option key={model} value={model}>
+                {model}
+              </option>
+            ))}
+          </select>
+        )}
+        {aiMode === "openrouter" && (
+          <select
+            value={openRouterModel}
+            onChange={(e) => setOpenRouterModel(e.target.value)}
+            className="border px-2 py-1 rounded-md text-sm focus:outline-none text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-700"
+          >
+            {openRouterModels.map((model) => (
               <option key={model} value={model}>
                 {model}
               </option>

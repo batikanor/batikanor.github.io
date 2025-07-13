@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
 
 export async function POST(request) {
-  const { source, relation } = await request.json();
+  const { source, relation, model } = await request.json();
 
   if (!OPENROUTER_API_KEY) {
     return NextResponse.json(
@@ -22,7 +22,7 @@ export async function POST(request) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "meta-llama/llama-3.1-8b-instruct:free",
+          model: model || "meta-llama/llama-3.1-8b-instruct:free",
           messages: [
             {
               role: "system",
