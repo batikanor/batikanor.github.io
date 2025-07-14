@@ -1,5 +1,83 @@
 export const contestsAndActivities = [
   {
+    slug: "sui-hackathon-poland-2025",
+    importance: 5,
+    title: "3rd Place at the First Sui Hackathon in Poland",
+    mapData: {
+      venue: "triQube - Inkubator Przedsiębiorczości",
+      city: "Wroclaw",
+      country: "Poland",
+      coordinates: { lat: 51.107883, lng: 17.038538 },
+    },
+    date: "07/2025",
+    shortDescription:
+      "Won 3rd place and $500 at the first offline Sui hackathon in Poland after joining late, hacking solo, and with no prior Sui or Move experience.",
+    longDescription: `This was a spontaneous adventure. On a Friday evening, with no weekend plans, I found out about the first-ever offline Sui hackathon in Poland happening in Wroclaw. The catch? It had already started that morning, I hadn't applied, and I knew nothing about Sui or the Move language.
+
+Still, I took a leap of faith. I applied, jumped into their Telegram group, and asked if I could join late on Saturday. To my surprise, the organizers were incredibly welcoming, so I bought my tickets right away.
+
+I took the "Kulturbahn" to Wroclaw, where, in a surprising turn of events, I was handed a massive pair of scissors for a traditional "Scherenschnitte" paper-cutting session on the train.
+
+{{gdrive_embed[0]}}
+
+The hospitality continued at the venue, where they even let me sleep on-site. I was the only one camping out and got a friendly 6 AM wake-up call in Polish. While I didn't understand a word, I figured it was time to start coding, not to go back to sleep. It's all part of the hackathon lore!
+
+{{gdrive_embed[1]}}
+
+The Sui team was fantastic. They treated us to a great dinner and were endlessly patient with my beginner questions, which was a huge help.
+
+{{gdrive_embed[2]}}
+
+I hacked solo, wrote my first Move smart contract, and built a word-joining dApp where users could mint the words they composed. You can check it out live on devnet at [batikanor.com/sui](https://batikanor.com/sui). Against all odds, I won 3rd place and $500!
+
+If you'd like to try the app, note that you should have a slush wallet, and use the openrouter endpoints. Start playing by clicking on a word, and then you'll figure the rest out. You need some devnet faucet tokens, and then you can mint the words you compose and put whatever image you want on them. Note that I didn't bother with IPFS, since this was just a demo.
+
+A huge thank you to Oleksandr (1st place winner), Alex and Andrii from Sui, Adam Welc from Mysten Labs, and the entire community for making it an unforgettable experience.
+
+They said they'll even ship me a My 3rd place trophy all the way to Cottbus. Looking forward to it!`,
+    technologies: ["Sui", "Move", "ReactJS", "dApp"],
+    links: [
+      {
+        label: "Live App (Devnet)",
+        url: "https://batikanor.com/sui",
+      },
+      {
+        label: "Venue: triQube Incubator",
+        url: "https://triqube.dawg.pl/",
+      },
+      {
+        label: "More Photos",
+        url: "https://drive.google.com/drive/folders/1VUl8AwJfEyglp_eY8JhpSyIrmFtMeEvE?usp=drive_link",
+      },
+      {
+        label: "Unpolished Slide Deck",
+        url: "https://docs.google.com/presentation/d/12gXpKlvYj6zY7VJdbaYFoX52t04ZLpdJM7PgHFBHY1k/edit?usp=drive_link",
+      },
+    ],
+    gdrive_embed: [
+      {
+        url: "https://drive.google.com/file/d/1UCFcjNlHQrfCjZl1Q15QTa3poQNWadHw/view?usp=sharing",
+        abovePhotoCaption:
+          "Unexpectedly large scissors for Scherenschnitte on the train to Wroclaw.",
+        desktopSize: "XL",
+        mobileSize: "S",
+      },
+      {
+        url: "https://drive.google.com/file/d/1UF1WQhjwu-b6f7QqevLAL2BP1Uvt7hEU/view?usp=sharing",
+        abovePhotoCaption:
+          "My luxurious sleeping quarters at the hackathon venue.",
+        desktopSize: "XL",
+        mobileSize: "S",
+      },
+      {
+        url: "https://drive.google.com/file/d/1Trloz4z104Cj2DCMvNUF6psydyyAqICQ/view?usp=drive_link",
+        abovePhotoCaption: "With the helpful Sui people.",
+        desktopSize: "XL",
+        mobileSize: "S",
+      },
+    ],
+  },
+  {
     slug: "decarbon-days-climathon-2025",
     importance: 9,
     highlighted: true,
