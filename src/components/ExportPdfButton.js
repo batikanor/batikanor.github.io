@@ -415,7 +415,20 @@ export default function ExportPdfButton({
       pdf.setTextColor(255, 255, 255);
       pdf.text("Summary Report of Batikan's Achievements", margin, 10);
 
-      const headerHeight = 15;
+      // Download date + latest version note
+      pdf.setFontSize(9);
+      pdf.setFont("helvetica", "normal");
+      pdf.setTextColor(255, 255, 255);
+      const downloadDate = new Date().toLocaleDateString();
+      const notice1 = `Downloaded on ${downloadDate}.`;
+      const notice2 = `For the latest version visit batikanor.com/projects/en`;
+      pdf.text(notice1, margin, 16);
+      const notice1W = pdf.getTextWidth(notice1 + " ");
+      pdf.textWithLink(notice2, margin + notice1W, 16, {
+        url: "https://batikanor.com/projects/en",
+      });
+
+      const headerHeight = 20;
       currentY = headerHeight;
 
       await addReferenceBox(
@@ -587,6 +600,13 @@ export default function ExportPdfButton({
               pageNumber: entry.page + pagesInserted,
               top: entry.y,
             });
+            // page number right-aligned
+            const pLabel = (entry.page + pagesInserted).toString();
+            pdf.text(
+              pLabel,
+              pageWidth - margin - pdf.getTextWidth(pLabel),
+              tocY
+            );
           } else {
             pdf.text(line, margin + 12, tocY);
           }
@@ -630,7 +650,21 @@ export default function ExportPdfButton({
       });
 
       pdf.setTextColor(0, 0, 0);
-      pdf.setPage(pdf.getNumberOfPages());
+      const totalPages = pdf.getNumberOfPages();
+      for (let p = 1; p <= totalPages; p++) {
+        pdf.setPage(p);
+        pdf.setFontSize(8);
+        pdf.setFont("helvetica", "normal");
+        pdf.setTextColor(107, 114, 128);
+        const label = `Page ${p} / ${totalPages}`;
+        pdf.text(
+          label,
+          pageWidth - margin - pdf.getTextWidth(label),
+          pageHeight - 8
+        );
+      }
+
+      pdf.setPage(totalPages);
       /* ------------------------------------------------------------------ */
 
       pdf.save("batikan-achievements-summary.pdf");
