@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FaDownload } from "react-icons/fa";
 import { contestsAndActivities as achievements } from "../data/contestsAndActivities";
 
@@ -8,7 +8,11 @@ import { contestsAndActivities as achievements } from "../data/contestsAndActivi
 // • Clean text (no weird characters)
 // • All links & QR codes in dedicated reference boxes
 // • Modern, professional styling that never overlaps
-export default function ExportPdfButton({ className = "" }) {
+export default function ExportPdfButton({
+  className = "",
+  autoStart = false,
+  hideWhenAuto = true,
+}) {
   const [loading, setLoading] = useState(false);
 
   const generatePDF = async () => {
@@ -638,11 +642,21 @@ export default function ExportPdfButton({ className = "" }) {
     }
   };
 
+  // Auto-trigger PDF generation on mount if desired
+  useEffect(() => {
+    if (autoStart) {
+      generatePDF();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <button
       onClick={generatePDF}
       disabled={loading}
-      className={`btn flex items-center gap-3 ${className}`}
+      className={`btn flex items-center gap-3 ${className} ${
+        autoStart && hideWhenAuto ? "hidden" : ""
+      }`}
     >
       <FaDownload className="text-sm" />
       {loading
