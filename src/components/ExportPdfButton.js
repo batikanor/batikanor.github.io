@@ -159,6 +159,7 @@ export default function ExportPdfButton({ className = "" }) {
 
       // Render a paragraph preserving newlines
       const renderParagraph = (paragraph, fontSize = 9) => {
+        pdf.setFontSize(fontSize);
         const lines = pdf.splitTextToSize(paragraph, pageWidth - 2 * margin);
         renderLines(lines, fontSize);
         currentY += 4; // extra space between paragraphs
@@ -206,6 +207,7 @@ export default function ExportPdfButton({ className = "" }) {
 
       // Helper to render lines with automatic page break
       const renderLines = (lines, fontSize) => {
+        pdf.setFontSize(fontSize);
         const lineHeight = fontSize <= 9 ? 4 : 5;
         lines.forEach((line) => {
           if (currentY > pageHeight - margin) {
