@@ -1,2 +1,3 @@
 - Remember that we use `pnpm`. Also always take `README.md` into account.
 - make sure to run commands from correct directory
+- whenveer you create an update, make sure both the pdf export, the map, and the projects page render will look right!

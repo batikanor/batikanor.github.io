@@ -165,45 +165,133 @@ export default function ExportPdfButton({ className = "" }) {
         currentY += 4; // extra space between paragraphs
       };
 
-      // Process description with placeholders inline
+      // Helper to render an inline clickable link styled like normal text
+      const renderInlineLink = (label, url, fontSize = 9) => {
+        pdf.setFontSize(fontSize);
+        const lineHeight = fontSize <= 9 ? 4 : 5;
+        const maxWidth = pageWidth - 2 * margin;
+        // Split the label in case it is long
+        const lines = pdf.splitTextToSize(label, maxWidth);
+
+        // Use blue for the clickable link text
+        pdf.setTextColor(59, 130, 246);
+        lines.forEach((line, idx) => {
+          if (currentY > pageHeight - margin) {
+            pdf.addPage();
+            currentY = margin;
+          }
+          if (idx === 0) {
+            pdf.textWithLink(line, margin, currentY, { url });
+          } else {
+            pdf.text(line, margin, currentY);
+          }
+          currentY += lineHeight;
+        });
+
+        // Reset text color back to black
+        pdf.setTextColor(0, 0, 0);
+      };
+
+      // --- Rich description processor without random newlines ------------------
       const processDescription = async (desc, embeds, usedSet) => {
-        const regex =
-          /\{\{gdrive_embed\[(\d+)\]\}\}|\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g;
-        let lastIndex = 0;
-        let match;
-        while ((match = regex.exec(desc))) {
-          const textBefore = desc.slice(lastIndex, match.index);
-          if (textBefore) {
-            textBefore.split(/\n+/).forEach((p) => {
-              const clean = sanitizeText(p);
-              if (clean) renderParagraph(clean);
+        // Tokenize text into plain, link, embed, and newline tokens
+        const tokRegex =
+          /\{\{gdrive_embed\[(\d+)\]\}\}|\[([^\]]+)\]\((https?:\/\/[^)]+)\)|\n+/g;
+        let last = 0;
+        const tokens = [];
+        let m;
+        while ((m = tokRegex.exec(desc))) {
+          if (m.index > last) {
+            tokens.push({ type: "text", text: desc.slice(last, m.index) });
+          }
+          if (m[1] !== undefined) {
+            tokens.push({ type: "embed", idx: parseInt(m[1]) });
+          } else if (m[2] !== undefined) {
+            tokens.push({ type: "link", label: m[2], url: m[3] });
+          } else {
+            tokens.push({ type: "newline" });
+          }
+          last = m.index + m[0].length;
+        }
+        if (last < desc.length) {
+          tokens.push({ type: "text", text: desc.slice(last) });
+        }
+
+        // Helper to flush buffered inline tokens into lines
+        const flushInlineBuffer = (buffer) => {
+          if (!buffer.length) return;
+          // We will render word by word to respect max width
+          pdf.setFontSize(9);
+          const lineHeight = 4;
+          let x = margin;
+          const maxX = pageWidth - margin;
+          const spaceW = pdf.getTextWidth(" ");
+          const advanceY = () => {
+            currentY += lineHeight;
+            if (currentY > pageHeight - margin) {
+              pdf.addPage();
+              currentY = margin;
+            }
+            x = margin;
+          };
+
+          for (let segIdx = 0; segIdx < buffer.length; segIdx++) {
+            const seg = buffer[segIdx];
+            // Ensure a space between segments (if not first on line)
+            if (segIdx > 0) {
+              const spaceW2 = pdf.getTextWidth(" ");
+              if (x + spaceW2 > maxX) {
+                advanceY();
+              }
+              pdf.setTextColor(0, 0, 0);
+              pdf.text(" ", x, currentY);
+              x += spaceW2;
+            }
+            const color = seg.type === "link" ? [59, 130, 246] : [0, 0, 0];
+            const words = seg.text.split(/\s+/);
+            words.forEach((w, idx) => {
+              const word = idx < words.length - 1 ? w + " " : w; // keep spacing
+              const wWidth = pdf.getTextWidth(word);
+              if (x + wWidth > maxX) {
+                advanceY();
+              }
+              pdf.setTextColor(...color);
+              if (seg.type === "link" && idx === 0) {
+                pdf.textWithLink(word, x, currentY, { url: seg.url });
+              } else {
+                pdf.text(word, x, currentY);
+              }
+              x += wWidth;
             });
           }
-          if (match[1] !== undefined) {
-            // embed placeholder
-            const idx = parseInt(match[1]);
-            const embed = embeds?.[idx];
+          // reset color and move to next line after finishing paragraph
+          pdf.setTextColor(0, 0, 0);
+          currentY += lineHeight + 1;
+        };
+
+        let inlineBuf = [];
+        for (const t of tokens) {
+          if (t.type === "newline") {
+            flushInlineBuffer(inlineBuf);
+            inlineBuf = [];
+          } else if (t.type === "embed") {
+            flushInlineBuffer(inlineBuf);
+            inlineBuf = [];
+            const embed = embeds?.[t.idx];
             if (embed) {
               const cap = sanitizeText(embed.abovePhotoCaption || "Media file");
               await addReferenceBox(embed.url || embed, cap);
-              usedSet.add(idx);
+              usedSet.add(t.idx);
             }
-          } else if (match[2] !== undefined && match[3] !== undefined) {
-            // markdown link [label](url)
-            const label = sanitizeText(match[2]);
-            const url = match[3];
-            await addReferenceBox(url, label);
+          } else if (t.type === "link") {
+            inlineBuf.push({ ...t, text: sanitizeText(t.label) });
+          } else {
+            inlineBuf.push({ type: "text", text: sanitizeText(t.text) });
           }
-          lastIndex = match.index + match[0].length;
         }
-        const remaining = desc.slice(lastIndex);
-        if (remaining) {
-          remaining.split(/\n+/).forEach((p) => {
-            const clean = sanitizeText(p);
-            if (clean) renderParagraph(clean);
-          });
-        }
+        flushInlineBuffer(inlineBuf);
       };
+      // ---------------------------------------------------------------------------
 
       // Helper to render lines with automatic page break
       const renderLines = (lines, fontSize) => {
@@ -431,6 +519,11 @@ export default function ExportPdfButton({ className = "" }) {
         });
 
         if (refs.length) {
+          // Ensure "References:" heading is not placed too close to bottom
+          if (currentY > pageHeight - margin - 25) {
+            pdf.addPage();
+            currentY = margin;
+          }
           pdf.setFontSize(11);
           pdf.setFont("helvetica", "bold");
           pdf.setTextColor(0, 0, 0);

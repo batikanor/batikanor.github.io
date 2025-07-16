@@ -267,7 +267,7 @@ Final note: Osaka is extremely humid. You aren't prepared. You cannot prepare. J
       {
         url: "https://drive.google.com/file/d/1h3e3bf_HZbINjviMf1zYXoFuCryrj0Pq/view?usp=sharing",
         abovePhotoCaption:
-          "Here's a photo of me holding the winner card with open source distinction, my teammate Davide holding his prize for travel reimbursement to another competition in Austria, and the famous yodeler with his own cinematic universe, [Takeo Ischi](https://youtu.be/Ppm5_AGtbTo?si=qdbxNxp4Y4bI5u74):",
+          "Here's a photo of me holding the winner card with open source distinction, my teammate Davide holding his prize for travel reimbursement to another competition in Austria, and the famous yodeler with his own cinematic universe, Takeo Ischi.",
         desktopSize: "XL",
         mobileSize: "S",
       },
