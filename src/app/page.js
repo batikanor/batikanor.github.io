@@ -6,7 +6,6 @@ import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import { FaCode, FaRocket, FaTrophy } from "react-icons/fa";
 import CVContent from "../components/CVContent";
-import ExportPdfButton from "../components/ExportPdfButton";
 import Projects from "../components/Projects";
 
 // Dynamically import both components without server-side rendering
@@ -169,10 +168,7 @@ export default function Home() {
         <CVContent />
       </section>
 
-      {/* Export PDF Button Section */}
-      <section className="py-12 text-center">
-        <ExportPdfButton />
-      </section>
+      {/* Export PDF Button removed: now available in Projects section */}
 
       {/* Legacy Link */}
       <section className="text-center py-12">
