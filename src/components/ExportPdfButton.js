@@ -20,6 +20,7 @@ export default function ExportPdfButton({ className = "" }) {
       const QRCode = (await import("qrcode")).default;
 
       const pdf = new jsPDF();
+      const toc = [];
       const pageWidth = pdf.internal.pageSize.width;
       const pageHeight = pdf.internal.pageSize.height;
       const margin = 20;
@@ -141,8 +142,9 @@ export default function ExportPdfButton({ className = "" }) {
       };
 
       // Process description with placeholders inline
-      const processDescription = async (desc, embeds) => {
-        const regex = /\{\{gdrive_embed\[(\d+)\]\}\}/g;
+      const processDescription = async (desc, embeds, usedSet) => {
+        const regex =
+          /\{\{gdrive_embed\[(\d+)\]\}\}|\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g;
         let lastIndex = 0;
         let match;
         while ((match = regex.exec(desc))) {
@@ -153,11 +155,20 @@ export default function ExportPdfButton({ className = "" }) {
               if (clean) renderParagraph(clean);
             });
           }
-          const idx = parseInt(match[1]);
-          const embed = embeds?.[idx];
-          if (embed) {
-            const cap = sanitizeText(embed.abovePhotoCaption || "Media file");
-            await addReferenceBox(embed.url || embed, cap);
+          if (match[1] !== undefined) {
+            // embed placeholder
+            const idx = parseInt(match[1]);
+            const embed = embeds?.[idx];
+            if (embed) {
+              const cap = sanitizeText(embed.abovePhotoCaption || "Media file");
+              await addReferenceBox(embed.url || embed, cap);
+              usedSet.add(idx);
+            }
+          } else if (match[2] !== undefined && match[3] !== undefined) {
+            // markdown link [label](url)
+            const label = sanitizeText(match[2]);
+            const url = match[3];
+            await addReferenceBox(url, label);
           }
           lastIndex = match.index + match[0].length;
         }
@@ -185,7 +196,7 @@ export default function ExportPdfButton({ className = "" }) {
       /**********************************************************/
 
       /**********************  HEADER  **************************/
-      pdf.setFillColor(37, 99, 235); // Brand blue
+      pdf.setFillColor(245, 158, 11); // Accent amber
       pdf.rect(0, 0, pageWidth, 50, "F");
 
       pdf.setFontSize(18);
@@ -204,7 +215,7 @@ export default function ExportPdfButton({ className = "" }) {
       currentY = 60;
       await addReferenceBox(
         "https://batikanor.com",
-        "This is a PDF summary of my achievements listed on my homepage. Reach out to be through batikanor@gmail.com if you'd like to know more about any of them."
+        "This is a PDF summary of my achievements listed on my homepage. Reach out to me through batikanor@gmail.com if you'd like to know more about any of them."
       );
       /**********************************************************/
 
@@ -212,6 +223,18 @@ export default function ExportPdfButton({ className = "" }) {
       const valid = achievements.filter((a) => a && a.title);
 
       for (const achievement of valid) {
+        // record toc entry
+        const locationStr = achievement.mapData
+          ? `${achievement.mapData.city}, ${achievement.mapData.country}`
+          : "";
+        toc.push({
+          title: achievement.title,
+          page: pdf.internal.getCurrentPageInfo().pageNumber,
+          y: currentY,
+          date: achievement.date,
+          location: locationStr,
+        });
+
         // Title
         pdf.setFontSize(14);
         pdf.setFont("helvetica", "bold");
@@ -241,12 +264,12 @@ export default function ExportPdfButton({ className = "" }) {
         }
 
         // Long description (cleaned)
+        const usedEmbedIdx = new Set();
         if (achievement.longDescription) {
-          pdf.setFontSize(9);
-          pdf.setTextColor(0, 0, 0);
           await processDescription(
             achievement.longDescription,
-            achievement.gdrive_embed
+            achievement.gdrive_embed,
+            usedEmbedIdx
           );
           currentY += 4;
         }
@@ -266,15 +289,11 @@ export default function ExportPdfButton({ className = "" }) {
         // Gather all links for references
         const refs = [];
 
-        const urlRegex = /https?:\/\/(?:[^\s]|\n)+/g;
-        const rawDesc = achievement.longDescription || "";
-        const foundUrls = rawDesc.match(urlRegex) || [];
-        foundUrls.forEach((u) => {
-          refs.push({ url: u, label: "Link from description" });
-        });
+        // no generic 'link from description' refs; markdown links handled inline
 
         // Embedded media links with captions
-        achievement.gdrive_embed?.forEach((embed) => {
+        achievement.gdrive_embed?.forEach((embed, idx) => {
+          if (usedEmbedIdx.has(idx)) return; // already placed inline
           if (!embed) return;
           const url = typeof embed === "string" ? embed : embed.url;
           if (!url) return;
@@ -316,6 +335,52 @@ export default function ExportPdfButton({ className = "" }) {
         }
       }
       /**********************************************************/
+
+      /* Insert Table of Contents page at the beginning */
+      pdf.insertPage(1);
+      pdf.setPage(1);
+      pdf.setFillColor(245, 158, 11);
+      pdf.rect(0, 0, pageWidth, 40, "F");
+      pdf.setFontSize(18);
+      pdf.setFont("helvetica", "bold");
+      pdf.setTextColor(255, 255, 255);
+      pdf.text("Table of Contents", margin, 20);
+
+      pdf.setFontSize(11);
+      pdf.setFont("helvetica", "normal");
+      pdf.setTextColor(0, 0, 0);
+      let tocY = 50;
+      toc.forEach((entry, idx) => {
+        const numText = `${idx + 1}.`;
+        pdf.setTextColor(0, 0, 0);
+        pdf.text(numText, margin, tocY);
+        pdf.textWithLink(entry.title, margin + 12, tocY, {
+          pageNumber: entry.page + 1,
+          top: entry.y,
+        });
+        // second line for location & date
+        const secondLineY = tocY + 4;
+        if (entry.location) {
+          pdf.setTextColor(245, 158, 11); // orange for location
+          pdf.text(entry.location, margin + 20, secondLineY);
+        }
+        if (entry.date) {
+          const locWidth = entry.location
+            ? pdf.getTextWidth(entry.location) + 4
+            : 0;
+          pdf.setTextColor(59, 130, 246); // blue for date
+          pdf.text(entry.date, margin + 20 + locWidth, secondLineY);
+        }
+        tocY += 10;
+        // page break check
+        if (tocY > pageHeight - margin) {
+          pdf.addPage();
+          tocY = margin;
+        }
+      });
+      pdf.setTextColor(0, 0, 0);
+
+      pdf.setPage(pdf.getNumberOfPages());
 
       pdf.save("batikan-achievements-summary.pdf");
     } catch (e) {

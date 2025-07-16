@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { FaGlobe } from "react-icons/fa";
 import VanillaTilt from "vanilla-tilt";
 import { contestsAndActivities } from "../data/contestsAndActivities";
+import ExportPdfButton from "./ExportPdfButton";
 import "./Projects.css";
 
 // import ResizePanel from "react-resize-panel";
@@ -459,6 +460,10 @@ const Projects = () => {
 
   return (
     <div className="w-full">
+      {/* PDF Download Button */}
+      <div className="my-8 flex justify-center">
+        <ExportPdfButton achievements={contestsAndActivities} />
+      </div>
       {/* Activities Grid - Using more width */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
         {contestsAndActivities.map((activity, index) => {
