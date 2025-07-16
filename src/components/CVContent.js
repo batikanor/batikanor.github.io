@@ -125,7 +125,7 @@ export default function CVContent() {
               className="btn flex items-center gap-3"
             >
               <FaDownload className="text-sm" />
-              Download PDF
+              Download CV as PDF
             </motion.a>
           </motion.div>
 

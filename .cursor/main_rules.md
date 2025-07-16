@@ -1,0 +1,2 @@
+- Remember that we use `pnpm`. Also always take `README.md` into account.
+- make sure to run commands from correct directory
