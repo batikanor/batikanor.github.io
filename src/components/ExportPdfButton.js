@@ -26,6 +26,29 @@ export default function ExportPdfButton({ className = "" }) {
       const margin = 20;
       let currentY = margin;
 
+      // ---------------------------------------------------------------------------
+      // Gradient color helper: pick a color between purple and orange based on a
+      // deterministic hash of the location string so each city/country pair always
+      // gets the same hue.
+      const locationColorCache = {};
+      const startColor = [139, 92, 246]; // purple (tailwind violet-500)
+      const endColor = [245, 158, 11]; // orange (tailwind amber-400)
+      const getLocationColor = (loc = "") => {
+        if (locationColorCache[loc]) return locationColorCache[loc];
+        // Simple deterministic hash → 0…1
+        let hash = 0;
+        for (let i = 0; i < loc.length; i++) {
+          hash = (hash * 31 + loc.charCodeAt(i)) & 0xffffffff;
+        }
+        const t = (hash >>> 0) / 0xffffffff;
+        const color = startColor.map((s, idx) =>
+          Math.round(s + (endColor[idx] - s) * t)
+        );
+        locationColorCache[loc] = color;
+        return color; // [r, g, b]
+      };
+      // ---------------------------------------------------------------------------
+
       /**********************  HELPERS  *************************/
       // Draw a full-width reference box with QR & link
       const addReferenceBox = async (url, label = "Reference") => {
@@ -193,30 +216,125 @@ export default function ExportPdfButton({ className = "" }) {
           currentY += lineHeight;
         });
       };
+
+      // ---------------------------------------------------------------------------
+      // Helper to render an achievement header with orange title + small QR code
+      const renderAchievementHeader = async (ach) => {
+        const qrSize = 18; // small QR
+        const paddingX = 5;
+        const paddingY = 4;
+        const maxTextWidth = pageWidth - 2 * margin - qrSize - paddingX * 3;
+        pdf.setFontSize(14);
+        pdf.setFont("helvetica", "bold");
+        const titleLines = pdf.splitTextToSize(ach.title, maxTextWidth);
+        const lineHeight = 8;
+        const contentHeight = titleLines.length * lineHeight;
+        const boxHeight = Math.max(
+          contentHeight + paddingY * 2,
+          qrSize + paddingY * 2
+        );
+
+        // Page break if needed
+        if (currentY + boxHeight > pageHeight - margin) {
+          pdf.addPage();
+          currentY = margin;
+        }
+
+        // Box border for nice styling
+        pdf.setFillColor(255, 255, 255);
+        pdf.setDrawColor(226, 232, 240);
+        pdf.setLineWidth(0.4);
+        pdf.rect(margin, currentY, pageWidth - 2 * margin, boxHeight, "S");
+
+        // Title text in orange theme color
+        pdf.setTextColor(245, 158, 11);
+        let textY = currentY + paddingY + lineHeight - 2; // slight vertical align tweak
+        titleLines.forEach((line) => {
+          pdf.text(line, margin + paddingX, textY);
+          textY += lineHeight;
+        });
+
+        // Coordinates for QR placement
+        const qrX = pageWidth - margin - qrSize - paddingX;
+        const qrY = currentY + (boxHeight - qrSize) / 2;
+
+        // Small label below QR with clickable blue domain
+        const prefixTxt = "view on ";
+        const domainTxt = "batikanor.com";
+        pdf.setFontSize(7);
+        const prefixW = pdf.getTextWidth(prefixTxt);
+        const domainW = pdf.getTextWidth(domainTxt);
+        const totalW = prefixW + domainW;
+        const baseX = qrX + (qrSize - totalW) / 2;
+        const baseY = qrY + qrSize + 3;
+
+        // draw prefix in black
+        pdf.setTextColor(0, 0, 0);
+        pdf.text(prefixTxt, baseX, baseY);
+
+        // draw domain in blue with link
+        if (ach.slug) {
+          const url = `https://batikanor.com/#${ach.slug}`;
+          pdf.setTextColor(59, 130, 246);
+          pdf.textWithLink(domainTxt, baseX + prefixW, baseY, { url });
+        } else {
+          pdf.setTextColor(59, 130, 246);
+          pdf.text(domainTxt, baseX + prefixW, baseY);
+        }
+
+        // reset color
+        pdf.setTextColor(0, 0, 0);
+
+        // QR code on the right (link to homepage achievement section)
+        if (ach.slug) {
+          try {
+            const url = `https://batikanor.com/#${ach.slug}`;
+            const qrData = await QRCode.toDataURL(url, {
+              width: 160,
+              margin: 1,
+              errorCorrectionLevel: "M",
+            });
+            pdf.addImage(
+              "PNG" === "PNG" ? qrData : qrData,
+              "PNG",
+              qrX,
+              qrY,
+              qrSize,
+              qrSize
+            );
+          } catch (err) {
+            console.error("QR generation error", err);
+          }
+        }
+
+        currentY += boxHeight + 6; // space after header
+      };
+      // ---------------------------------------------------------------------------
       /**********************************************************/
 
       /**********************  HEADER  **************************/
       pdf.setFillColor(245, 158, 11); // Accent amber
-      pdf.rect(0, 0, pageWidth, 50, "F");
+      pdf.rect(0, 0, pageWidth, 20, "F");
 
-      pdf.setFontSize(18);
+      pdf.setFontSize(15);
       pdf.setFont("helvetica", "bold");
       pdf.setTextColor(255, 255, 255);
-      pdf.text("Summary Report of Batikan's Achievements", margin, 20);
+      pdf.text("Summary Report of Batikan's Achievements", margin, 10);
 
-      pdf.setFontSize(12);
-      pdf.setFont("helvetica", "normal");
-      pdf.text(
-        "Professional portfolio with interactive references",
-        margin,
-        35
-      );
+      const headerHeight = 15;
+      currentY = headerHeight;
 
-      currentY = 60;
       await addReferenceBox(
         "https://batikanor.com",
-        "This is a PDF summary of my achievements listed on my homepage. Reach out to me through batikanor@gmail.com if you'd like to know more about any of them."
+        "This is a PDF summary of my achievements listed on my homepage. For a more interactive experience, visit my homepage using a web browser."
       );
+
+      // store Y where TOC should start later
+      const tocStartY = currentY;
+
+      // Start achievements on a new page for clean layout
+      pdf.addPage();
+      currentY = margin;
       /**********************************************************/
 
       /********************  ACHIEVEMENTS  **********************/
@@ -235,12 +353,8 @@ export default function ExportPdfButton({ className = "" }) {
           location: locationStr,
         });
 
-        // Title
-        pdf.setFontSize(14);
-        pdf.setFont("helvetica", "bold");
-        pdf.setTextColor(0, 0, 0);
-        pdf.text(achievement.title, margin, currentY);
-        currentY += 10;
+        // Styled header with title + QR
+        await renderAchievementHeader(achievement);
 
         // Date
         if (achievement.date) {
@@ -336,51 +450,89 @@ export default function ExportPdfButton({ className = "" }) {
       }
       /**********************************************************/
 
-      /* Insert Table of Contents page at the beginning */
-      pdf.insertPage(1);
+      /* -------- Insert Table of Contents pages right after cover -------- */
+      let pagesInserted = 0;
+      const addTocPage = () => {
+        pdf.insertPage(2 + pagesInserted); // after cover + previous TOC pages
+        pdf.setPage(2 + pagesInserted);
+        pagesInserted += 1;
+        return margin;
+      };
+
+      // start TOC on cover page right after reference box
       pdf.setPage(1);
-      pdf.setFillColor(245, 158, 11);
-      pdf.rect(0, 0, pageWidth, 40, "F");
-      pdf.setFontSize(18);
+      let tocY = tocStartY + 5;
+
+      pdf.setFontSize(14);
       pdf.setFont("helvetica", "bold");
-      pdf.setTextColor(255, 255, 255);
-      pdf.text("Table of Contents", margin, 20);
+      pdf.text("Table of Contents", margin, tocY);
+      tocY += 8;
 
-      pdf.setFontSize(11);
+      pdf.setFontSize(9);
       pdf.setFont("helvetica", "normal");
-      pdf.setTextColor(0, 0, 0);
-      let tocY = 50;
-      toc.forEach((entry, idx) => {
-        const numText = `${idx + 1}.`;
-        pdf.setTextColor(0, 0, 0);
-        pdf.text(numText, margin, tocY);
-        pdf.textWithLink(entry.title, margin + 12, tocY, {
-          pageNumber: entry.page + 1,
-          top: entry.y,
-        });
-        // second line for location & date
-        const secondLineY = tocY + 4;
-        if (entry.location) {
-          pdf.setTextColor(245, 158, 11); // orange for location
-          pdf.text(entry.location, margin + 20, secondLineY);
-        }
-        if (entry.date) {
-          const locWidth = entry.location
-            ? pdf.getTextWidth(entry.location) + 4
-            : 0;
-          pdf.setTextColor(59, 130, 246); // blue for date
-          pdf.text(entry.date, margin + 20 + locWidth, secondLineY);
-        }
-        tocY += 10;
-        // page break check
-        if (tocY > pageHeight - margin) {
-          pdf.addPage();
-          tocY = margin;
-        }
-      });
-      pdf.setTextColor(0, 0, 0);
 
+      toc.forEach((entry, idx) => {
+        // if near bottom, create new TOC page contiguous
+        if (tocY > pageHeight - margin - 20) {
+          tocY = addTocPage();
+        }
+
+        pdf.setTextColor(0, 0, 0);
+        pdf.text(`${idx + 1}.`, margin, tocY);
+
+        const maxW = pageWidth - 2 * margin - 20;
+        const lines = pdf.splitTextToSize(entry.title, maxW);
+        lines.forEach((line, i) => {
+          if (i === 0) {
+            pdf.textWithLink(line, margin + 12, tocY, {
+              pageNumber: entry.page + pagesInserted,
+              top: entry.y,
+            });
+          } else {
+            pdf.text(line, margin + 12, tocY);
+          }
+          tocY += 5;
+        });
+
+        // location/date on same line if space else wrap
+        const loc = entry.location || "";
+        const date = entry.date || "";
+        if (loc || date) {
+          const baseX = margin + 20;
+          const locWidth = pdf.getTextWidth(loc);
+          const dateWidth = pdf.getTextWidth(date);
+          if (locWidth + dateWidth + 6 <= maxW) {
+            if (loc) {
+              const [lr, lg, lb] = getLocationColor(loc);
+              pdf.setTextColor(lr, lg, lb);
+              pdf.text(loc, baseX, tocY);
+            }
+            if (date) {
+              pdf.setTextColor(59, 130, 246);
+              pdf.text(date, baseX + locWidth + 6, tocY);
+            }
+            tocY += 5;
+          } else {
+            if (loc) {
+              const [lr, lg, lb] = getLocationColor(loc);
+              pdf.setTextColor(lr, lg, lb);
+              pdf.text(loc, baseX, tocY);
+              tocY += 5;
+            }
+            if (date) {
+              pdf.setTextColor(59, 130, 246);
+              pdf.text(date, baseX, tocY);
+              tocY += 5;
+            }
+          }
+        }
+
+        tocY += 2;
+      });
+
+      pdf.setTextColor(0, 0, 0);
       pdf.setPage(pdf.getNumberOfPages());
+      /* ------------------------------------------------------------------ */
 
       pdf.save("batikan-achievements-summary.pdf");
     } catch (e) {
