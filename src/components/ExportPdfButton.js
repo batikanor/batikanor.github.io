@@ -14,21 +14,75 @@ export default function ExportPdfButton({
   hideWhenAuto = true,
 }) {
   const [loading, setLoading] = useState(false);
+  const [progress, setProgress] = useState(null); // null when inactive, 0..1 when active
+  const [includeImages, setIncludeImages] = useState(true);
+  const [compressPdf, setCompressPdf] = useState(true);
+  const [compressionStrength, setCompressionStrength] = useState(0.1); // default 10% compression strength
+  const [imageScale, setImageScale] = useState(1); // 0.2 .. 1 (as fraction of default width)
+
+  // Preview state for compression demo image
+  const [previewSrc, setPreviewSrc] = useState(null);
+  const [previewSize, setPreviewSize] = useState(null);
+  const [showPreview, setShowPreview] = useState(false);
+
+  const PREVIEW_BASE = 560; // px - approximates PDF embed width at 100%
+  const previewImgPath = "/photos/batikan/batikan-pamukkale.jpeg";
+
+  // Generate compression preview whenever strength changes or imageScale toggles
+  useEffect(() => {
+    (async () => {
+      try {
+        const resp = await fetch(previewImgPath); // sample image
+        const blob = await resp.blob();
+
+        const imgEl = await new Promise((res, rej) => {
+          const url = URL.createObjectURL(blob);
+          const img = new Image();
+          img.onload = () => {
+            URL.revokeObjectURL(url);
+            res(img);
+          };
+          img.onerror = rej;
+          img.src = url;
+        });
+
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+        const maxW = PREVIEW_BASE * imageScale;
+        const scale = maxW / imgEl.width;
+        canvas.width = maxW;
+        canvas.height = imgEl.height * scale;
+        ctx.drawImage(imgEl, 0, 0, canvas.width, canvas.height);
+
+        const quality = compressPdf ? 1 - compressionStrength : 1;
+        const dataUrl = canvas.toDataURL("image/jpeg", quality);
+        setPreviewSrc(dataUrl);
+        const approxKB = Math.round((dataUrl.length * 0.75) / 1024);
+        setPreviewSize(approxKB);
+      } catch (e) {
+        console.error("Preview generation failed", e);
+      }
+    })();
+  }, [compressionStrength, compressPdf, imageScale]);
 
   const generatePDF = async () => {
     setLoading(true);
+    setProgress(0);
 
     try {
       // Dynamic imports (avoid bloating initial bundle)
       const jsPDF = (await import("jspdf")).default;
       const QRCode = (await import("qrcode")).default;
 
-      const pdf = new jsPDF();
+      const pdf = new jsPDF({ compress: compressPdf });
       const toc = [];
       const pageWidth = pdf.internal.pageSize.width;
       const pageHeight = pdf.internal.pageSize.height;
       const margin = 20;
       let currentY = margin;
+
+      // expose flags to inner helpers via closure
+      const shouldEmbedImages = includeImages;
 
       // ---------------------------------------------------------------------------
       // Gradient color helper: pick a color between purple and orange based on a
@@ -51,10 +105,21 @@ export default function ExportPdfButton({
         locationColorCache[loc] = color;
         return color; // [r, g, b]
       };
+
+      // Helper: convert a Google Drive share/view link to direct download URL
+      const gDriveToDirectUrl = (url) => {
+        try {
+          const m = url.match(/\/d\/([^/]+)\//);
+          if (m && m[1]) {
+            return `https://drive.google.com/uc?export=download&id=${m[1]}`;
+          }
+        } catch (_) {}
+        return url;
+      };
       // ---------------------------------------------------------------------------
 
       /**********************  HELPERS  *************************/
-      // Draw a full-width reference box with QR & link
+      // Draw a full-width reference box with QR & link (now supports inline image)
       const addReferenceBox = async (url, label = "Reference") => {
         const qrSize = 20;
         const leftX = margin + qrSize + 10;
@@ -85,7 +150,79 @@ export default function ExportPdfButton({
         const lineHeight = 4;
         const textHeight =
           (labelLines.length + urlLines.length) * lineHeight + 6; // padding
-        const boxHeight = Math.max(qrSize + 8, textHeight);
+        const baseBoxHeight = Math.max(qrSize + 8, textHeight);
+
+        /* ------------ Attempt to fetch Google Drive image --------------- */
+        let imgData = null;
+        let imgDisplayW = 0;
+        let imgDisplayH = 0;
+        if (shouldEmbedImages && url.includes("drive.google.com")) {
+          try {
+            const directUrl = gDriveToDirectUrl(url);
+            const proxyUrl = `/api/proxy-image?url=${encodeURIComponent(
+              directUrl
+            )}`;
+            const resp = await fetch(proxyUrl);
+            if (!resp.ok) throw new Error("proxy fetch fail");
+            const blob = await resp.blob();
+
+            // Convert blob -> DataURL
+            const dataUrl = await new Promise((res, rej) => {
+              const fr = new FileReader();
+              fr.onload = () => res(fr.result);
+              fr.onerror = rej;
+              fr.readAsDataURL(blob);
+            });
+
+            // Load into Image to determine dimensions
+            const imgEl = await new Promise((res, rej) => {
+              const img = new Image();
+              img.onload = () => res(img);
+              img.onerror = rej;
+              img.src = dataUrl;
+            });
+
+            // Pick format based on original blob type or fallback to JPEG
+            let baseFormat = "JPEG";
+            if (blob.type.includes("png")) baseFormat = "PNG";
+            else if (blob.type.includes("jpeg") || blob.type.includes("jpg"))
+              baseFormat = "JPEG";
+
+            let finalDataUrl = dataUrl;
+            let finalFormat = baseFormat;
+
+            // If compression requested, downscale & convert to JPEG quality 0.6
+            if (compressPdf) {
+              try {
+                const canvas = document.createElement("canvas");
+                const ctx = canvas.getContext("2d");
+                const baseW = Math.min(imgEl.naturalWidth, 800);
+                const targetW = baseW * imageScale;
+                const scale = targetW / imgEl.naturalWidth;
+                canvas.width = targetW;
+                canvas.height = imgEl.naturalHeight * scale;
+                ctx.drawImage(imgEl, 0, 0, canvas.width, canvas.height);
+                finalDataUrl = canvas.toDataURL(
+                  "image/jpeg",
+                  1 - compressionStrength
+                );
+                finalFormat = "JPEG";
+              } catch (cErr) {
+                console.warn("Image compression failed", cErr);
+              }
+            }
+
+            imgData = { data: finalDataUrl, format: finalFormat };
+            const availW = (pageWidth - 2 * margin - 10) * imageScale;
+            imgDisplayW = availW;
+            imgDisplayH = (imgEl.naturalHeight / imgEl.naturalWidth) * availW;
+          } catch (err) {
+            console.error("Failed to embed Drive image", err);
+          }
+        }
+        /* ----------------------------------------------------------------- */
+
+        const boxHeight = baseBoxHeight + (imgData ? imgDisplayH + 6 : 0); // +padding if image present
 
         // Page break if needed
         if (currentY + boxHeight > pageHeight - margin) {
@@ -93,7 +230,7 @@ export default function ExportPdfButton({
           currentY = margin;
         }
 
-        // Draw box
+        // Draw box background/border
         pdf.setFillColor(248, 250, 252);
         pdf.setDrawColor(226, 232, 240);
         pdf.setLineWidth(0.4);
@@ -125,7 +262,6 @@ export default function ExportPdfButton({
         pdf.setFontSize(8);
         pdf.setFont("helvetica", "normal");
         pdf.setTextColor(59, 130, 246);
-
         urlLines.forEach((line, idx) => {
           if (idx === 0) {
             pdf.textWithLink(line, leftX, textY, { url });
@@ -137,6 +273,20 @@ export default function ExportPdfButton({
 
         // Reset color back to black for following content
         pdf.setTextColor(0, 0, 0);
+
+        // Draw image (below text section) if available
+        if (imgData) {
+          const imgX = margin + 5; // small inner padding
+          const imgY = currentY + baseBoxHeight + 4; // spacing after text
+          pdf.addImage(
+            imgData.data,
+            imgData.format,
+            imgX,
+            imgY,
+            imgDisplayW,
+            imgDisplayH
+          );
+        }
 
         currentY += boxHeight + 5;
       };
@@ -445,9 +595,12 @@ export default function ExportPdfButton({
       /**********************************************************/
 
       /********************  ACHIEVEMENTS  **********************/
-      const valid = achievements.filter((a) => a && a.title);
-
-      for (const achievement of valid) {
+      const achievementsSorted = achievements
+        .filter((a) => a && a.title)
+        .sort((a, b) => new Date(b.date) - new Date(a.date));
+      const totalAchievements = achievementsSorted.length;
+      for (let achIdx = 0; achIdx < totalAchievements; achIdx++) {
+        const achievement = achievementsSorted[achIdx];
         // record toc entry
         const locationStr = achievement.mapData
           ? `${achievement.mapData.city}, ${achievement.mapData.country}`
@@ -553,6 +706,9 @@ export default function ExportPdfButton({
         }
 
         currentY += 15; // space before next achievement
+
+        // Update progress bar
+        setProgress((achIdx + 1) / totalAchievements);
 
         // Page break if near bottom
         if (currentY > pageHeight - 60) {
@@ -667,12 +823,19 @@ export default function ExportPdfButton({
       pdf.setPage(totalPages);
       /* ------------------------------------------------------------------ */
 
-      pdf.save("batikan-achievements-summary.pdf");
+      const fileName = compressPdf
+        ? "batikan-achievements-summary-compressed.pdf"
+        : includeImages
+        ? "batikan-achievements-summary-with-images.pdf"
+        : "batikan-achievements-summary.pdf";
+
+      pdf.save(fileName);
     } catch (e) {
       console.error(e);
       alert("PDF generation failed. Check console for details.");
     } finally {
       setLoading(false);
+      setProgress(null);
     }
   };
 
@@ -685,17 +848,133 @@ export default function ExportPdfButton({
   }, []);
 
   return (
-    <button
-      onClick={generatePDF}
-      disabled={loading}
-      className={`btn flex items-center gap-3 ${className} ${
-        autoStart && hideWhenAuto ? "hidden" : ""
-      }`}
-    >
-      <FaDownload className="text-sm" />
-      {loading
-        ? "Generating PDF..."
-        : "Download summary of achievements as PDF"}
-    </button>
+    <div className={`flex flex-col gap-2 ${className}`}>
+      {/* Options under collapsible */}
+      <details className="relative">
+        <summary className="cursor-pointer select-none mb-2 font-medium text-sm">
+          Configure PDF export
+        </summary>
+
+        {/* Preview popover */}
+        {showPreview && previewSrc && (
+          <div className="absolute z-50 bg-white border shadow p-2 rounded top-full left-0 mt-2 flex flex-col items-center">
+            <img
+              src={previewSrc}
+              alt="preview"
+              className="border max-w-[300px]"
+              style={{
+                width: `${PREVIEW_BASE * imageScale}px`,
+                height: "auto",
+              }}
+            />
+            <span className="text-[10px] text-gray-500">{previewSize} KB</span>
+          </div>
+        )}
+
+        {/* Include Images Row */}
+        <div className="flex flex-wrap items-center gap-3 text-sm mt-2">
+          <input
+            type="checkbox"
+            className="checkbox checkbox-sm"
+            style={{ accentColor: "#f59e0b" }}
+            checked={includeImages}
+            onChange={(e) => setIncludeImages(e.target.checked)}
+          />
+          <span>
+            Include images in PDF
+            <span className="text-xs text-gray-500">
+              {" "}
+              (takes time, increases size)
+            </span>
+          </span>
+
+          {includeImages && (
+            <>
+              <span className="ml-4 text-xs whitespace-nowrap">
+                Image&nbsp;size&nbsp;%
+              </span>
+              <input
+                type="range"
+                min="0.2"
+                max="1"
+                step="0.1"
+                value={imageScale}
+                onChange={(e) => setImageScale(parseFloat(e.target.value))}
+                className="range range-xs w-24 sm:w-32 flex-shrink-0"
+                style={{ accentColor: "#f59e0b" }}
+                onMouseEnter={() => setShowPreview(true)}
+                onMouseLeave={() => setShowPreview(false)}
+                onTouchStart={() => setShowPreview(true)}
+                onTouchEnd={() => setShowPreview(false)}
+              />
+              <span className="text-xs w-10 text-right">
+                {Math.round(imageScale * 100)}%
+              </span>
+            </>
+          )}
+        </div>
+
+        {/* Compress Row */}
+        <div className="flex flex-wrap items-center gap-3 text-sm mt-3">
+          <input
+            type="checkbox"
+            className="checkbox checkbox-sm"
+            style={{ accentColor: "#f59e0b" }}
+            checked={compressPdf}
+            onChange={(e) => setCompressPdf(e.target.checked)}
+          />
+          <span>Compress PDF</span>
+
+          {compressPdf && (
+            <>
+              <span className="ml-4 text-xs whitespace-nowrap">
+                Compression&nbsp;strength&nbsp;%
+              </span>
+              <input
+                type="range"
+                min="0.1"
+                max="0.9"
+                step="0.1"
+                value={compressionStrength}
+                onChange={(e) =>
+                  setCompressionStrength(parseFloat(e.target.value))
+                }
+                className="range range-xs w-24 sm:w-32 flex-shrink-0"
+                style={{ accentColor: "#f59e0b" }}
+                onMouseEnter={() => setShowPreview(true)}
+                onMouseLeave={() => setShowPreview(false)}
+                onTouchStart={() => setShowPreview(true)}
+                onTouchEnd={() => setShowPreview(false)}
+              />
+              <span className="text-xs w-10 text-right">
+                {Math.round(compressionStrength * 100)}%
+              </span>
+            </>
+          )}
+        </div>
+      </details>
+
+      {/* Download button */}
+      <button
+        onClick={generatePDF}
+        disabled={loading}
+        className={`btn flex items-center gap-3 ${
+          autoStart && hideWhenAuto ? "hidden" : ""
+        }`}
+      >
+        <FaDownload className="text-sm" />
+        {loading ? "Generating PDF..." : "Download summary of achievements"}
+      </button>
+
+      {/* Progress bar */}
+      {progress !== null && (
+        <div className="w-full h-2 bg-gray-200 rounded">
+          <div
+            className="h-full bg-blue-500 rounded"
+            style={{ width: `${Math.round(progress * 100)}%` }}
+          />
+        </div>
+      )}
+    </div>
   );
 }
