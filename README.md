@@ -71,6 +71,8 @@ brew install sui
 
 ### 2. First-Time Configuration
 
+First, you need some gas. Run `sui client faucet` to get the devnet coins.
+
 The first time you run a command like `publish`, the CLI will prompt you to configure it:
 
 ```bash

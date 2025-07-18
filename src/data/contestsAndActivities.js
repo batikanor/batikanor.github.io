@@ -32,6 +32,8 @@ I hacked solo, wrote my first Move smart contract, and built a word-joining dApp
 
 If you'd like to try the app, note that you should have a slush wallet, and use the openrouter endpoints. Start playing by clicking on a word, and then you'll figure the rest out. You need some devnet faucet tokens, and then you can mint the words you compose and put whatever image you want on them. Note that I didn't bother with IPFS, since this was just a demo.
 
+Also, since the app was deployed on Devnet, it is likely that the NFT minting functionality will break around once a month, unless I re-deploy the Move contract each time it breaks right away.
+
 A huge thank you to Oleksandr (1st place winner), Alex and Andrii from Sui, Adam Welc from Mysten Labs, and the entire community for making it an unforgettable experience.
 
 They said they'll even ship me a My 3rd place trophy all the way to Cottbus. Looking forward to it!`,

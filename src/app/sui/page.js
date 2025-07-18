@@ -22,6 +22,7 @@ import {
   SRGBColorSpace,
   TextureLoader,
 } from "three";
+import { NFT_PACKAGE_ID } from "../../components/SuiPageContent";
 
 // 3D graph library & text sprites
 const ForceGraph3D = dynamic(() => import("react-force-graph-3d"), {
@@ -36,9 +37,6 @@ const Globe = dynamic(() => import("../../components/GlobeWrapper"), {
 
 // constants
 
-const NFT_PACKAGE_ID =
-  "0x8fcba05c0a64ca8f36ff0f8cc65d93bb6327bbba2b6280ed232acd468eaa2576";
-const GRAPH_HEIGHT = "70vh";
 const vibrantColors = [
   "#FF5733",
   "#33FF57",

@@ -13,8 +13,8 @@ import { Transaction } from "@mysten/sui/transactions";
 import { MIST_PER_SUI } from "@mysten/sui/utils";
 import { useState } from "react";
 
-const NFT_PACKAGE_ID =
-  "0x8fcba05c0a64ca8f36ff0f8cc65d93bb6327bbba2b6280ed232acd468eaa2576";
+export const NFT_PACKAGE_ID =
+  "0x650f80cba49c47fafa4ed605f2afbb683ec960cfe2f16eb9a612a5838a82f159";
 
 export default function SuiPageContent() {
   const account = useCurrentAccount();
@@ -103,8 +103,7 @@ function MintNFT() {
 
       // Call the mint function from your NFT contract
       tx.moveCall({
-        target:
-          "0x8fcba05c0a64ca8f36ff0f8cc65d93bb6327bbba2b6280ed232acd468eaa2576::my_nft::mint",
+        target: `{NFT_PACKAGE_ID}::my_nft::mint`,
         arguments: [
           tx.pure.string(nftName),
           tx.pure.string(nftDesc),
