@@ -159,10 +159,10 @@ export default function ExportPdfButton({
         if (shouldEmbedImages && url.includes("drive.google.com")) {
           try {
             const directUrl = gDriveToDirectUrl(url);
-            const proxyUrl = `/api/proxy-image?url=${encodeURIComponent(
+            const proxied = `https://images.weserv.nl/?url=${encodeURIComponent(
               directUrl
             )}`;
-            const resp = await fetch(proxyUrl);
+            const resp = await fetch(proxied);
             if (!resp.ok) throw new Error("proxy fetch fail");
             const blob = await resp.blob();
 
