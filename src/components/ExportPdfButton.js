@@ -617,7 +617,7 @@ export default function ExportPdfButton({
       pdf.setFontSize(15);
       pdf.setFont("helvetica", "bold");
       pdf.setTextColor(255, 255, 255);
-      pdf.text("Summary Report of Batikan's Achievements", margin, 10);
+      pdf.text("PDF Report of Batikan's Achievements", margin, 10);
 
       // Download date + latest version note
       pdf.setFontSize(9);
@@ -637,7 +637,7 @@ export default function ExportPdfButton({
 
       await addReferenceBox(
         "https://batikanor.com",
-        "This is a PDF summary of my achievements listed on my homepage. For a more interactive experience, visit my homepage using a web browser."
+        "This is a PDF export of my achievements listed on my homepage. For a more interactive experience, visit my homepage using a web browser. Note that I mostly exclude professional work experience here. For that, check my CV."
       );
 
       // store Y where TOC should start later

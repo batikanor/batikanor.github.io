@@ -78,9 +78,7 @@ export const SummaryReportPdf = ({ achievements }) => {
   return (
     <Document>
       <Page size="A4" style={styles.page}>
-        <Text style={styles.title}>
-          Summary Report of Batikan's Achievements
-        </Text>
+        <Text style={styles.title}>PDF Report of Batikan's Achievements</Text>
         <Text style={styles.subtitle}>
           Check the achievement map on batikanor.com for more details.
         </Text>
