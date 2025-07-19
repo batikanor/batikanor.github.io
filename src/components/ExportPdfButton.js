@@ -493,8 +493,62 @@ export default function ExportPdfButton({
         // Title text in orange theme color
         pdf.setTextColor(245, 158, 11);
         let textY = currentY + paddingY + lineHeight - 2; // slight vertical align tweak
-        titleLines.forEach((line) => {
+        titleLines.forEach((line, i) => {
           pdf.text(line, margin + paddingX, textY);
+
+          // Add stars after the last line of the title
+          if (i === titleLines.length - 1) {
+            const fullStars = Math.floor((ach.importance || 0) / 2);
+            const halfStar = (ach.importance || 0) % 2;
+            const totalStarsWidth = fullStars * 5 + (halfStar ? 5 : 0);
+            const starX = margin + paddingX + pdf.getTextWidth(line) + 3;
+
+            // Check if stars would overlap with QR code
+            const qrX = pageWidth - margin - qrSize - paddingX;
+            const starsWillOverlap = starX + totalStarsWidth > qrX - 10; // 10px buffer
+
+            let currentStarY = textY;
+            let currentStarX = starX;
+
+            // If stars would overlap, move them to next line
+            if (starsWillOverlap) {
+              currentStarY += lineHeight; // Move to next line
+              currentStarX = margin + paddingX; // Align with text
+            }
+
+            // Orange to purple gradient colors - consistent across all entries
+            const orangeColor = "#F59E0B";
+            const purpleColor = "#8B5CF6";
+            const maxStars = 5; // Maximum number of full stars (importance 10 / 2)
+
+            for (let i = 0; i < fullStars; i++) {
+              const factor = maxStars > 1 ? i / (maxStars - 1) : 0;
+              const color = interpolateColor(orangeColor, purpleColor, factor);
+              const starDataURL = createStarDataURL(color);
+              pdf.addImage(
+                starDataURL,
+                "PNG",
+                currentStarX + i * 5,
+                currentStarY - 3,
+                4,
+                4
+              );
+            }
+            if (halfStar) {
+              const factor = maxStars > 1 ? fullStars / (maxStars - 1) : 0;
+              const color = interpolateColor(orangeColor, purpleColor, factor);
+              const halfStarDataURL = createHalfStarDataURL(color);
+              pdf.addImage(
+                halfStarDataURL,
+                "PNG",
+                currentStarX + fullStars * 5,
+                currentStarY - 3,
+                4,
+                4
+              );
+            }
+          }
+
           textY += lineHeight;
         });
 
@@ -611,6 +665,7 @@ export default function ExportPdfButton({
           y: currentY,
           date: achievement.date,
           location: locationStr,
+          importance: achievement.importance || 0, // Add importance field
         });
 
         // Styled header with title + QR
@@ -739,6 +794,79 @@ export default function ExportPdfButton({
       pdf.setFontSize(9);
       pdf.setFont("helvetica", "normal");
 
+      // Function to create a star pixel art and return as data URL
+      function createStarDataURL(color) {
+        const canvas = document.createElement("canvas");
+        canvas.width = 12; // Higher resolution
+        canvas.height = 12; // Higher resolution
+        const ctx = canvas.getContext("2d");
+
+        // Draw a simple star with specific color
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.moveTo(6, 0);
+        ctx.lineTo(7.5, 4);
+        ctx.lineTo(12, 4);
+        ctx.lineTo(8.5, 7);
+        ctx.lineTo(10, 12);
+        ctx.lineTo(6, 9.5);
+        ctx.lineTo(2, 12);
+        ctx.lineTo(3.5, 7);
+        ctx.lineTo(0, 4);
+        ctx.lineTo(4.5, 4);
+        ctx.closePath();
+        ctx.fill();
+
+        return canvas.toDataURL("image/png");
+      }
+
+      // Function to create a half-star pixel art and return as data URL
+      function createHalfStarDataURL(color) {
+        const canvas = document.createElement("canvas");
+        canvas.width = 12; // Higher resolution
+        canvas.height = 12; // Higher resolution
+        const ctx = canvas.getContext("2d");
+
+        // Draw a half star with specific color (left half)
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.moveTo(6, 0);
+        ctx.lineTo(4.5, 4);
+        ctx.lineTo(0, 4);
+        ctx.lineTo(3.5, 7);
+        ctx.lineTo(2, 12);
+        ctx.lineTo(6, 9.5);
+        ctx.closePath();
+        ctx.fill();
+
+        return canvas.toDataURL("image/png");
+      }
+
+      // Function to interpolate between two colors
+      function interpolateColor(color1, color2, factor) {
+        const rgb1 = [
+          parseInt(color1.slice(1, 3), 16),
+          parseInt(color1.slice(3, 5), 16),
+          parseInt(color1.slice(5, 7), 16),
+        ];
+        const rgb2 = [
+          parseInt(color2.slice(1, 3), 16),
+          parseInt(color2.slice(3, 5), 16),
+          parseInt(color2.slice(5, 7), 16),
+        ];
+
+        const r = Math.round(rgb1[0] + (rgb2[0] - rgb1[0]) * factor);
+        const g = Math.round(rgb1[1] + (rgb2[1] - rgb1[1]) * factor);
+        const b = Math.round(rgb1[2] + (rgb2[2] - rgb1[2]) * factor);
+
+        return `rgb(${r}, ${g}, ${b})`;
+      }
+
+      // Use the star data URL in the PDF
+      const starDataURL = createStarDataURL();
+      const halfStarDataURL = createHalfStarDataURL();
+
+      // Modify the ToC rendering to include star images
       toc.forEach((entry, idx) => {
         // if near bottom, create new TOC page contiguous
         if (tocY > pageHeight - margin - 20) {
@@ -751,56 +879,76 @@ export default function ExportPdfButton({
         const maxW = pageWidth - 2 * margin - 20;
         const lines = pdf.splitTextToSize(entry.title, maxW);
         lines.forEach((line, i) => {
-          if (i === 0) {
+          if (i === lines.length - 1) {
             pdf.textWithLink(line, margin + 12, tocY, {
               pageNumber: entry.page + pagesInserted,
               top: entry.y,
             });
-            // page number right-aligned
+
+            // Add star images based on importance
+            const fullStars = Math.floor(entry.importance / 2);
+            const halfStar = entry.importance % 2;
+            const totalStarsWidth = fullStars * 5 + (halfStar ? 5 : 0);
+            const starX = margin + 12 + pdf.getTextWidth(line) + 2; // Adjust position
+
+            // Check if stars would overlap with page number
             const pLabel = (entry.page + pagesInserted).toString();
-            pdf.text(
-              pLabel,
-              pageWidth - margin - pdf.getTextWidth(pLabel),
-              tocY
-            );
+            const pageNumberX = pageWidth - margin - pdf.getTextWidth(pLabel);
+            const starsWillOverlap = starX + totalStarsWidth > pageNumberX - 5; // 5px buffer
+
+            let currentStarY = tocY;
+            let currentStarX = starX;
+
+            // If stars would overlap, move them to next line
+            if (starsWillOverlap) {
+              currentStarY += 5; // Move to next line
+              currentStarX = margin + 12; // Same as text indent, no extra tab
+            }
+
+            // Orange to purple gradient colors - consistent across all entries
+            const orangeColor = "#F59E0B";
+            const purpleColor = "#8B5CF6";
+            const maxStars = 5; // Maximum number of full stars (importance 10 / 2)
+
+            for (let i = 0; i < fullStars; i++) {
+              const factor = maxStars > 1 ? i / (maxStars - 1) : 0;
+              const color = interpolateColor(orangeColor, purpleColor, factor);
+              const starDataURL = createStarDataURL(color);
+              pdf.addImage(
+                starDataURL,
+                "PNG",
+                currentStarX + i * 5,
+                currentStarY - 3,
+                4,
+                4
+              );
+            }
+            if (halfStar) {
+              const factor = maxStars > 1 ? fullStars / (maxStars - 1) : 0;
+              const color = interpolateColor(orangeColor, purpleColor, factor);
+              const halfStarDataURL = createHalfStarDataURL(color);
+              pdf.addImage(
+                halfStarDataURL,
+                "PNG",
+                currentStarX + fullStars * 5,
+                currentStarY - 3,
+                4,
+                4
+              );
+            }
+
+            // page number right-aligned
+            pdf.text(pLabel, pageNumberX, tocY);
+
+            // Adjust tocY if stars were moved to next line
+            if (starsWillOverlap) {
+              tocY += 5; // Add extra space for the star line
+            }
           } else {
             pdf.text(line, margin + 12, tocY);
           }
           tocY += 5;
         });
-
-        // location/date on same line if space else wrap
-        const loc = entry.location || "";
-        const date = entry.date || "";
-        if (loc || date) {
-          const baseX = margin + 20;
-          const locWidth = pdf.getTextWidth(loc);
-          const dateWidth = pdf.getTextWidth(date);
-          if (locWidth + dateWidth + 6 <= maxW) {
-            if (loc) {
-              const [lr, lg, lb] = getLocationColor(loc);
-              pdf.setTextColor(lr, lg, lb);
-              pdf.text(loc, baseX, tocY);
-            }
-            if (date) {
-              pdf.setTextColor(59, 130, 246);
-              pdf.text(date, baseX + locWidth + 6, tocY);
-            }
-            tocY += 5;
-          } else {
-            if (loc) {
-              const [lr, lg, lb] = getLocationColor(loc);
-              pdf.setTextColor(lr, lg, lb);
-              pdf.text(loc, baseX, tocY);
-              tocY += 5;
-            }
-            if (date) {
-              pdf.setTextColor(59, 130, 246);
-              pdf.text(date, baseX, tocY);
-              tocY += 5;
-            }
-          }
-        }
 
         tocY += 2;
       });
