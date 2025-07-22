@@ -36,7 +36,9 @@ Also, since the app was deployed on Devnet, it is likely that the NFT minting fu
 
 A huge thank you to Oleksandr (1st place winner), Alex and Andrii from Sui, Adam Welc from Mysten Labs, and the entire community for making it an unforgettable experience.
 
-They said they'll even ship me a My 3rd place trophy all the way to Cottbus. Looking forward to it!`,
+They said they would even ship me my 3rd place trophy all the way to Cottbus. True to their word, it arrived safely! Here I am with it.
+
+{{gdrive_embed[3]}}`,
     technologies: ["Sui", "Move", "ReactJS", "dApp"],
     links: [
       {
@@ -74,6 +76,13 @@ They said they'll even ship me a My 3rd place trophy all the way to Cottbus. Loo
       {
         url: "https://drive.google.com/file/d/1Trloz4z104Cj2DCMvNUF6psydyyAqICQ/view?usp=drive_link",
         abovePhotoCaption: "With the helpful Sui people.",
+        desktopSize: "XL",
+        mobileSize: "S",
+      },
+      {
+        url: "https://drive.google.com/file/d/1Z-rMjgQQe2KjdG2IfHsG0GTNp22zktKR/view?usp=sharing",
+        abovePhotoCaption:
+          "The 3rd place trophy from the Sui hackathon has arrived!",
         desktopSize: "XL",
         mobileSize: "S",
       },
@@ -632,7 +641,7 @@ We built an innovative GraphRAG solution using Mistral AI, OpenAI, and Neo4j to 
     shortDescription: `Awarded funding for co-designing an AI-based employee surveying platform to enable sustainability and climate-related discussions between employees and employers. Pilot project currently planned in Zurich.`,
     technologies: ["AI", "Employee Engagement", "Sustainability", "Climate"],
     links: [],
-    longDescription: `At the 2024 Zurich Climathon, our team developed GreenDoor, an AI-driven employee engagement platform designed to bring transparency and accountability to corporate sustainability practices. GreenDoor operates as a “Glassdoor for Sustainability,” providing employees with an anonymous platform to rate and review their companies’ environmental and sustainability efforts. This tool empowers employees to highlight their company’s commitment—or lack thereof—to sustainable practices, encouraging companies to improve based on transparent feedback.
+    longDescription: `At the 2024 Zurich Climathon, our team developed GreenDoor, an AI-driven employee engagement platform designed to bring transparency and accountability to corporate sustainability practices. GreenDoor operates as a "Glassdoor for Sustainability," providing employees with an anonymous platform to rate and review their companies' environmental and sustainability efforts. This tool empowers employees to highlight their company's commitment—or lack thereof—to sustainable practices, encouraging companies to improve based on transparent feedback.
 
 The platform supports sustainable decision-making and aligns with global Sustainable Development Goals (SDGs) by structuring survey questions around these objectives. To ensure relevance and accuracy, we aim to partner with sustainability certification bodies and industry ranking organizations to provide integrated insights. With a freemium model, GreenDoor offers free public data access while monetizing through premium features, such as predictive analytics for companies on meeting sustainability targets and advertisement placements for sustainability-focused job positions. Additionally, advanced AI-based bot detection and authentication methods guarantee data reliability and user anonymity.
 
@@ -715,7 +724,7 @@ Our roadmap includes launching the platform in Zurich, gathering initial data, a
     },
     date: "10/2024",
     shortDescription: `We built a RL-based intricate fraud detection solution and pitched in front of 6000+ SAP user company CEO/CIO/CFO and experts. We later discussed partnership opportunities with many of them.`,
-    longDescription: `We designed a reinforcement-learning based, multi-transaction supporting fraud detection system and pitched it in front of 6000+ people, where we had an audience consisting of representatives from countless SAP user / partner companies in the DSAG Jahreskonferenz (German Speaking SAP Users Yearly Conference). We made it to the final, and in the final the top 3 were selected through a decibel-metre measuring the claps of the audience. We got 2nd Place and won Airpods Max’s for each of us. We called our system HippoSAP, where we used Hierarchical Proximal Policy Optimization to tell if a transaction in an SAP system is fraud or not based on time-series-graph data provided as context.`,
+    longDescription: `We designed a reinforcement-learning based, multi-transaction supporting fraud detection system and pitched it in front of 6000+ people, where we had an audience consisting of representatives from countless SAP user / partner companies in the DSAG Jahreskonferenz (German Speaking SAP Users Yearly Conference). We made it to the final, and in the final the top 3 were selected through a decibel-metre measuring the claps of the audience. We got 2nd Place and won Airpods Max's for each of us. We called our system HippoSAP, where we used Hierarchical Proximal Policy Optimization to tell if a transaction in an SAP system is fraud or not based on time-series-graph data provided as context.`,
     links: [
       {
         label: "LinkedIn Winner Declaration",
@@ -795,7 +804,7 @@ Our roadmap includes launching the platform in Zurich, gathering initial data, a
     },
     date: "09/2024",
     shortDescription: `Cost minimization for tenants and landlords through energy management using AI (multivariate forecasters, neural networks, …), and Mathematical Optimization (interior-point methods)  (Role: FullStack, Cloud, RL).`,
-    longDescription: `The challenge was to minimise costs for single & multiple family households through self-devised energy management methods, and provide the tenants and landlord(s) with utility functions. We were provided real and/or realistic data to work with from industry experts. We won first place with our solution called “Bright Grid”. To summarise, we formulated 2 mathematical optimization problems and used multiple forecasting-related AI solutions to tackle the challenge. My role in the team was full stack development, cloud deployment, and universal forecasting experimentation. Our main mathematical optimization was minimising the energy cost through distributing the load across battery, PV, and grid using forecasted data and under reasonable constraints. Our secondary optimization was to help the landlord increase their profits when selling electricity to the tenants. We mainly used interior-point methods for optimization, for we found them to be sufficient for PoC. We considered a later switch to ADMM. Our forecasts were made through both real and mocked data, using Moirai (universal multivariate time series forecasting), conventional neural networks, etc. We deployed on azure in two separate containers (BE, FE).`,
+    longDescription: `The challenge was to minimise costs for single & multiple family households through self-devised energy management methods, and provide the tenants and landlord(s) with utility functions. We were provided real and/or realistic data to work with from industry experts. We won first place with our solution called "Bright Grid". To summarise, we formulated 2 mathematical optimization problems and used multiple forecasting-related AI solutions to tackle the challenge. My role in the team was full stack development, cloud deployment, and universal forecasting experimentation. Our main mathematical optimization was minimising the energy cost through distributing the load across battery, PV, and grid using forecasted data and under reasonable constraints. Our secondary optimization was to help the landlord increase their profits when selling electricity to the tenants. We mainly used interior-point methods for optimization, for we found them to be sufficient for PoC. We considered a later switch to ADMM. Our forecasts were made through both real and mocked data, using Moirai (universal multivariate time series forecasting), conventional neural networks, etc. We deployed on azure in two separate containers (BE, FE).`,
     links: [
       {
         label: "LinkedIn Announcement for winners",
@@ -843,7 +852,7 @@ Our roadmap includes launching the platform in Zurich, gathering initial data, a
     },
     date: "09/2024",
     shortDescription: `Designed a solana microbetting solution.`,
-    longDescription: `We prepared a microbetting solution that works on Solana. The system would also accept natural text bets, and enable “pinky-betting” style bets where “the house always wins” principle can be challenged. Liquidity pools can also be created through whale-funded AIs that are searching for newly opened bets that fulfil certain conditions. Closing of bets could be orchestrated through decentralised Oracles. We were voted 2nd through community voting. We won ourselves CUDIS AI rings and solana mousepads.`,
+    longDescription: `We prepared a microbetting solution that works on Solana. The system would also accept natural text bets, and enable "pinky-betting" style bets where "the house always wins" principle can be challenged. Liquidity pools can also be created through whale-funded AIs that are searching for newly opened bets that fulfil certain conditions. Closing of bets could be orchestrated through decentralised Oracles. We were voted 2nd through community voting. We won ourselves CUDIS AI rings and solana mousepads.`,
     links: [
       {
         label: "LinkedIn Announcement for winners",
@@ -876,8 +885,8 @@ Our roadmap includes launching the platform in Zurich, gathering initial data, a
       coordinates: { lat: 47.3667, lng: 8.55 }, // SIX Swiss Exchange Zurich
     },
     date: "06/2024",
-    shortDescription: `Developed “BizzWizz”, an AI-driven sustainability reporting assistance platform. Also presented in front of VC & on PointZero forum. Talks ongoing with Swiss Exchange business developers regarding turning this idea into a company.`,
-    longDescription: `At SwissHacks2024 (flagship event by Swiss Financial Innovation Desk (FIND), backed by the Swiss government), our team won 1st place for the ‘SIX’ track and the Audience Award for developing BizzWizz, an AI-driven platform designed to revolutionise sustainability reporting. The platform allows companies to navigate the complexities of sustainability compliance by offering AI-driven framework assessments, KPI calculations, market tools, and peer analytics. My role as the Back-End Developer included constructing the scalable infrastructure to handle vast amounts of data and implementing the AI models for KPI suggestions and peer benchmark analytics. We used a stack comprising React for the web app and Flask for the backend, integrated with llm(s), leveraging emerging technologies like ChromaDB for Retrieval-Augmented Generation (RAG). The innovative framework assessment and KPI calculation features were particularly praised, leading to our double victory in the competition. They also invited us for a free tour of the Swiss parliament.`,
+    shortDescription: `Developed "BizzWizz", an AI-driven sustainability reporting assistance platform. Also presented in front of VC & on PointZero forum. Talks ongoing with Swiss Exchange business developers regarding turning this idea into a company.`,
+    longDescription: `At SwissHacks2024 (flagship event by Swiss Financial Innovation Desk (FIND), backed by the Swiss government), our team won 1st place for the 'SIX' track and the Audience Award for developing BizzWizz, an AI-driven platform designed to revolutionise sustainability reporting. The platform allows companies to navigate the complexities of sustainability compliance by offering AI-driven framework assessments, KPI calculations, market tools, and peer analytics. My role as the Back-End Developer included constructing the scalable infrastructure to handle vast amounts of data and implementing the AI models for KPI suggestions and peer benchmark analytics. We used a stack comprising React for the web app and Flask for the backend, integrated with llm(s), leveraging emerging technologies like ChromaDB for Retrieval-Augmented Generation (RAG). The innovative framework assessment and KPI calculation features were particularly praised, leading to our double victory in the competition. They also invited us for a free tour of the Swiss parliament.`,
     links: [
       {
         label: "LinkedIn Announcement for winners",
@@ -911,7 +920,7 @@ Our roadmap includes launching the platform in Zurich, gathering initial data, a
     },
     date: "05/2024",
     shortDescription: `Advanced Travel Planning w/ user-interest & city-description embeddings using Intersystems Vector Search (Role: Fullstack Dev., Presenter). We got 3rd place out of 30+ teams.`,
-    longDescription: `The challenge given on the hackathon was called “Best use of GenAI using InterSystems IRIS Vector Search”. Our team built a travel assistant tool that makes use of embeddings of user interests and city descriptions in order to suggest alternative flight routes s.t. Users with similar interests might be recommended to take the same flight OR users might be recommended to take flights to cities that they are likely to find interesting.  (Note: We improvised our presentation, and the video I embedded below wasn't meant to have sound, so please ignore the sound :D)`,
+    longDescription: `The challenge given on the hackathon was called "Best use of GenAI using InterSystems IRIS Vector Search". Our team built a travel assistant tool that makes use of embeddings of user interests and city descriptions in order to suggest alternative flight routes s.t. Users with similar interests might be recommended to take the same flight OR users might be recommended to take flights to cities that they are likely to find interesting.  (Note: We improvised our presentation, and the video I embedded below wasn't meant to have sound, so please ignore the sound :D)`,
     links: [
       {
         label: "Devpost page",
@@ -958,7 +967,7 @@ Our roadmap includes launching the platform in Zurich, gathering initial data, a
     },
     date: "01/2024",
     shortDescription: `3D Visualization of football players as spheres during a live match, clustering them into lines and detecting line breaks, predictive analysis, providing an intuitive UI for configuration (Role: FullStack Developer).`,
-    longDescription: `We focused on the line breaks during football matches. We worked on clustering the players in lines, determining when lines (offensive/defensive) have been broken, predicting when line breaks are expected to come, and considering how this information can be used to evaluate game performance. We built a 3D Visualisation app of football players as spheres during a live match, clustering them into lines and counting line breaks, providing an intuitive UI for configuration. We also used classical data mining methods such as XGBoost, Random Forest, Shapley etc to conduct further predictive analysis. We worked on a special confidential cluster to which we don’t have access anymore, and we cannot share some other details due to the confidentiality clause.`,
+    longDescription: `We focused on the line breaks during football matches. We worked on clustering the players in lines, determining when lines (offensive/defensive) have been broken, predicting when line breaks are expected to come, and considering how this information can be used to evaluate game performance. We built a 3D Visualisation app of football players as spheres during a live match, clustering them into lines and counting line breaks, providing an intuitive UI for configuration. We also used classical data mining methods such as XGBoost, Random Forest, Shapley etc to conduct further predictive analysis. We worked on a special confidential cluster to which we don't have access anymore, and we cannot share some other details due to the confidentiality clause.`,
     links: [],
     technologies: ["Python Flask", "ReactJS", "ThreeJS"],
     gdrive_embed: [
@@ -988,7 +997,7 @@ Our roadmap includes launching the platform in Zurich, gathering initial data, a
     },
     date: "10/2023",
     shortDescription: `Predicting heart attacks through sensor readings (Role: AI Engineer).`,
-    longDescription: `Dräger produces technologies for medicine and security. Using the VitalDB dataset where there is a great count of sensor readings of thousands of patients available online, we modelled and trained an AI model that can predict whether there’ll be a ‘shock’ in the coming 30 seconds / 2.5 minutes / 5 minutes. We reached test accuracies ranging from 70% to 90% using the methods we developed, and demonstrated them live using the aforementioned monitor. We had a doctor in the team who guided us towards measuring shock index (SI) as HRT / ART_SBP. For predictions we experimented with different models, but within the limited time and without access to GPUs, we could only prepare our LSTM model in time (even on that model we had made simple training mistakes, which we could only -to some extent- fix in the last minutes of the event), with which we reached the aforementioned accuracies. We also had working code to extract frequency information from some sensor readings using Mexican hat wavelet transformations, but even though we made use of as much multithreading as we could think, we couldn’t transform all the necessary data within the given time. We also had trouble finding pretrained autoencoders/embedders with which we could embed the data in order to put it into more explainable models. My role in the team was mainly participating in AI brainstorming sessions and trying to implement respective transformations and hopefully run explainable models. The jury and other Dräger employers especially praised our team for demonstrating ‘order in chaos’ and shared expertise on the domain. The source code is confidential and thus cannot be shared here.`,
+    longDescription: `Dräger produces technologies for medicine and security. Using the VitalDB dataset where there is a great count of sensor readings of thousands of patients available online, we modelled and trained an AI model that can predict whether there'll be a 'shock' in the coming 30 seconds / 2.5 minutes / 5 minutes. We reached test accuracies ranging from 70% to 90% using the methods we developed, and demonstrated them live using the aforementioned monitor. We had a doctor in the team who guided us towards measuring shock index (SI) as HRT / ART_SBP. For predictions we experimented with different models, but within the limited time and without access to GPUs, we could only prepare our LSTM model in time (even on that model we had made simple training mistakes, which we could only -to some extent- fix in the last minutes of the event), with which we reached the aforementioned accuracies. We also had working code to extract frequency information from some sensor readings using Mexican hat wavelet transformations, but even though we made use of as much multithreading as we could think, we couldn't transform all the necessary data within the given time. We also had trouble finding pretrained autoencoders/embedders with which we could embed the data in order to put it into more explainable models. My role in the team was mainly participating in AI brainstorming sessions and trying to implement respective transformations and hopefully run explainable models. The jury and other Dräger employers especially praised our team for demonstrating 'order in chaos' and shared expertise on the domain. The source code is confidential and thus cannot be shared here.`,
     links: [
       {
         label: "Sample dräger monitor",
@@ -1065,7 +1074,7 @@ Our roadmap includes launching the platform in Zurich, gathering initial data, a
     },
     date: "06/2023",
     shortDescription: `Built a CO-2-considerate route planner which won a hackathon organized by Münchner Softwaregesellschaft (MSG).`,
-    longDescription: `We programmed a CO-2 considering route planner called Navigo which takes into consideration self calculated metrics that we called ‘efficiency’ and ‘catastrophe score’. We aren’t hosting it live due to api costs.`,
+    longDescription: `We programmed a CO-2 considering route planner called Navigo which takes into consideration self calculated metrics that we called 'efficiency' and 'catastrophe score'. We aren't hosting it live due to api costs.`,
     links: [
       {
         label: "GitHub repository",
@@ -1098,7 +1107,7 @@ Our roadmap includes launching the platform in Zurich, gathering initial data, a
     slug: "bachelors-thesis", // Unique slug for each project
     importance: 6, // If less than 5, pink text
 
-    title: "Bachelor’s Thesis: Cat identification using Noseprints",
+    title: "Bachelor's Thesis: Cat identification using Noseprints",
     mapData: {
       venue: "Turkish-German University",
       // city: "Istanbul",
