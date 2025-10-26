@@ -161,6 +161,7 @@ const ResizableEmbed = ({
 const Projects = () => {
   const [expandedActivity, setExpandedActivity] = useState(null);
   const [isMobile, setIsMobile] = useState(false);
+  const [selectedCategories, setSelectedCategories] = useState([]);
 
   // Function to handle scrolling to a project
   const scrollToProject = (slug) => {
@@ -458,15 +459,85 @@ const Projects = () => {
       });
   };
 
+  // Calculate category counts
+  const categoryCounts = {
+    Jury: 0,
+    Mentor: 0,
+    Hacker: 0,
+    Project: 0,
+  };
+
+  contestsAndActivities.forEach((activity) => {
+    if (activity.categories) {
+      activity.categories.forEach((category) => {
+        if (categoryCounts.hasOwnProperty(category)) {
+          categoryCounts[category]++;
+        }
+      });
+    }
+  });
+
+  // Toggle filter selection
+  const toggleCategory = (category) => {
+    setSelectedCategories((prev) => {
+      if (prev.includes(category)) {
+        return prev.filter((c) => c !== category);
+      } else {
+        return [...prev, category];
+      }
+    });
+  };
+
+  // Clear all filters
+  const clearFilters = () => {
+    setSelectedCategories([]);
+  };
+
+  // Filter projects based on selected categories
+  const filteredActivities =
+    selectedCategories.length === 0
+      ? contestsAndActivities
+      : contestsAndActivities.filter((activity) =>
+          activity.categories?.some((cat) => selectedCategories.includes(cat))
+        );
+
   return (
     <div className="w-full">
       {/* PDF Download Button */}
       <div className="my-8 flex justify-center">
         <ExportPdfButton achievements={contestsAndActivities} />
       </div>
+
+      {/* Filter Buttons */}
+      <div className="mb-8 flex flex-wrap gap-3 justify-center">
+        <button
+          onClick={clearFilters}
+          className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+            selectedCategories.length === 0
+              ? "bg-gradient-to-r from-accent to-accent-hover text-text-on-accent shadow-lg"
+              : "bg-light-background-secondary dark:bg-dark-background-secondary text-light-foreground dark:text-dark-foreground hover:bg-accent/20 dark:hover:bg-accent/20"
+          }`}
+        >
+          All ({contestsAndActivities.length})
+        </button>
+        {Object.keys(categoryCounts).map((category) => (
+          <button
+            key={category}
+            onClick={() => toggleCategory(category)}
+            className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+              selectedCategories.includes(category)
+                ? "bg-gradient-to-r from-accent to-accent-hover text-text-on-accent shadow-lg"
+                : "bg-light-background-secondary dark:bg-dark-background-secondary text-light-foreground dark:text-dark-foreground hover:bg-accent/20 dark:hover:bg-accent/20"
+            }`}
+          >
+            {category} ({categoryCounts[category]})
+          </button>
+        ))}
+      </div>
+
       {/* Activities Grid - Using more width */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
-        {contestsAndActivities.map((activity, index) => {
+        {filteredActivities.map((activity, index) => {
           const isExpanded = expandedActivity === activity;
           const isMicro = activity.importance < 2;
           const isMinor = activity.importance >= 2 && activity.importance < 5;
@@ -481,9 +552,11 @@ const Projects = () => {
                   : isMicro
                   ? "col-span-1"
                   : isMinor
-                  ? "col-span-1"
+                  ? "col-span-1 sm:col-span-1"
                   : "col-span-1 sm:col-span-2 lg:col-span-2"
-              } transition-all duration-300`}
+              } transition-all duration-300 ${
+                isMinor && !isExpanded ? "minor-project-card" : ""
+              }`}
             >
               <div
                 className={`tilt-card relative p-4 sm:p-6 rounded-2xl shadow-xl backdrop-blur-lg overflow-hidden hover:shadow-2xl transition-all duration-300 ${
@@ -557,36 +630,40 @@ const Projects = () => {
                   </div>
 
                   <div className="overflow-hidden">
-                    <LocationDisplay
-                      activity={activity}
-                      onClick={() => handleLocationClick(activity)}
-                    />
+                    {!isMinor && (
+                      <LocationDisplay
+                        activity={activity}
+                        onClick={() => handleLocationClick(activity)}
+                      />
+                    )}
 
                     <p className="mb-4 text-light-foreground-secondary dark:text-dark-foreground-secondary truncate">
                       {activity.date}
                     </p>
 
-                    {/* Display Short Description */}
-                    <div
-                      className={`mb-3 p-2 bg-light-background-secondary/50 dark:bg-dark-background-secondary/50 rounded-lg ${
-                        !isExpanded
-                          ? "border-l-4 border-accent dark:border-accent"
-                          : ""
-                      }`}
-                    >
-                      <div className="flex items-center mb-1">
-                        <span className="text-xs uppercase tracking-wider text-accent dark:text-accent font-semibold">
-                          Summary
-                        </span>
-                      </div>
-                      <p
-                        className={`text-xs sm:text-sm text-light-foreground-secondary dark:text-dark-foreground-secondary italic ${
-                          !isExpanded ? "line-clamp-2 sm:line-clamp-1" : ""
+                    {/* Display Short Description - hide for minor projects when not expanded */}
+                    {(!isMinor || isExpanded) && (
+                      <div
+                        className={`mb-3 p-2 bg-light-background-secondary/50 dark:bg-dark-background-secondary/50 rounded-lg ${
+                          !isExpanded
+                            ? "border-l-4 border-accent dark:border-accent"
+                            : ""
                         }`}
                       >
-                        {activity.shortDescription}
-                      </p>
-                    </div>
+                        <div className="flex items-center mb-1">
+                          <span className="text-xs uppercase tracking-wider text-accent dark:text-accent font-semibold">
+                            Summary
+                          </span>
+                        </div>
+                        <p
+                          className={`text-xs sm:text-sm text-light-foreground-secondary dark:text-dark-foreground-secondary italic ${
+                            !isExpanded ? "line-clamp-2 sm:line-clamp-1" : ""
+                          }`}
+                        >
+                          {activity.shortDescription}
+                        </p>
+                      </div>
+                    )}
                   </div>
 
                   {/* Display Long Description if Expanded */}
@@ -674,7 +751,7 @@ const Projects = () => {
                       {activity.gdrive_embed &&
                         activity.gdrive_embed.length > 0 && (
                           <div className="mb-4">
-                            {activity.gdrive_embed.map((embedUrl, index) => {
+                            {activity.gdrive_embed.map((_, index) => {
                               // Check if this embed was already used inline
                               const wasUsedInline =
                                 activity.longDescription.includes(

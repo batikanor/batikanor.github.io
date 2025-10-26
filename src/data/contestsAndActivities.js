@@ -1,7 +1,94 @@
 export const contestsAndActivities = [
   {
+    slug: "ethrome-2025",
+    importance: 6,
+    categories: ["Hacker"],
+    title: "3rd Place (Zama) & Pool Prize (ENS) at ETHRome 2025",
+    mapData: {
+      venue: "Via Ostiense, 92",
+      city: "Rome",
+      country: "Italy",
+      coordinates: { lat: 41.8719, lng: 12.4802 },
+    },
+    date: "10/2025",
+    shortDescription:
+      "Built 'SecSanta' - a privacy-focused group gifting platform where individuals can pool funds and let recipients choose their own gifts while keeping individual contributions secret using Web3 privacy technologies.",
+    longDescription: `SecSanta stands for 'secure' and/or 'secret' Santa. The idea is simple: pool a gift amount, and let the recipient choose their own gifts while hiding individual contributions in a secure and secret way.
+
+This project was submitted for the privacy track, targeting sponsors ENS, IExec, and Zama. We were awarded 3rd place by Zama and received part of the pool prize for ENS. The prize was enough to pay for my Rome and Bologna trip, which means it won alright!
+
+{{gdrive_embed[0]}}
+
+Overall, this was a great opportunity to meet the builder space in Rome and make new Web3 friends.
+
+The app used the testnets of bounty sponsors, and it's unlikely to be deployed on mainnet anytime soon. But who knows, maybe we might work on it further and eventually deploy it. The project is open source and the code is available on GitHub.`,
+    technologies: ["Web3", "Privacy Tech", "ENS", "IExec", "Zama", "Smart Contracts", "Solidity"],
+    links: [
+      {
+        label: "ETHRome Hacker Manual",
+        url: "https://ethrome25.notion.site/",
+      },
+      {
+        label: "Project on Taikai",
+        url: "https://taikai.network/ethrome/hackathons/2025/projects/cmgxarsvv01zn8697shj4llh9/idea",
+      },
+      {
+        label: "Live Demo (may not be up)",
+        url: "https://secsanta.vercel.app/",
+      },
+      {
+        label: "GitHub Repository",
+        url: "https://github.com/batikanor/SecSanta",
+      },
+    ],
+    gdrive_embed: [
+      {
+        url: "https://drive.google.com/file/d/1E2NMqvyvtq8Igmvl0UB77SNCUcYvcR3n/view?usp=sharing",
+        abovePhotoCaption: "Our 2-minute pitch for SecSanta. Sorry that it's a bit fast-spoken - we were time-constrained!",
+        desktopSize: "XL",
+        mobileSize: "M",
+      },
+    ],
+  },
+  {
+    slug: "nasa-space-apps-zurich-2025",
+    importance: 4,
+    categories: ["Mentor"],
+    title: "Expert Mentor at NASA Space Apps Challenge in Zurich",
+    mapData: {
+      venue: "NovuCampus Zurich, The Circle 60",
+      city: "Zurich",
+      country: "Switzerland",
+      coordinates: { lat: 47.4525, lng: 8.5617 },
+    },
+    date: "10/2025",
+    shortDescription:
+      "Mentored participants at NASA Space Apps Challenge in Zurich, sharing expertise in winning hackathons, satellite/geography APIs, AI methods, and product-market fit.",
+    longDescription: `I assisted the participants through my knowledge and experience in winning comparable competitions, using satellite and geography-based APIs, AI methods, and product-market fit matters.
+
+{{gdrive_embed[0]}}
+
+It was great to see the enthusiasm and creativity of the teams tackling real-world space and earth science challenges.`,
+    technologies: ["Mentorship", "Space Tech", "Satellite APIs", "AI", "Product Strategy"],
+    links: [
+      {
+        label: "LinkedIn Post by Organizers",
+        url: "https://www.linkedin.com/posts/space-apps-ch_nasa-space-apps-challenge-zurich-meet-activity-7377979184670932992-3XaS?utm_source=share&utm_medium=member_desktop&rcm=ACoAACL8UREBa3FbjBW-yu7HCZmgCHJBrj-opz4",
+      },
+    ],
+    gdrive_embed: [
+      {
+        url: "https://drive.google.com/file/d/1z7zsXb7DmStr8RQMBJ5qszdwBI7QB_yf/view?usp=sharing",
+        abovePhotoCaption: "Expert Mentor Certificate from NASA Space Apps Challenge Zurich.",
+        desktopSize: "L",
+        mobileSize: "M",
+      },
+    ],
+  },
+  {
     slug: "sui-hackathon-poland-2025",
     importance: 5,
+    categories: ["Hacker"],
     title: "3rd Place at the First Sui Hackathon in Poland",
     mapData: {
       venue: "triQube - Inkubator Przedsiębiorczości",
@@ -92,6 +179,7 @@ They said they would even ship me my 3rd place trophy all the way to Cottbus. Tr
     slug: "decarbon-days-climathon-2025",
     importance: 9,
     highlighted: true,
+    categories: ["Jury", "Mentor"],
     title: "Lead Jury & Mentor at Decarbon Days Climathon",
     mapData: {
       venue: "Decarbon Days",
@@ -182,6 +270,7 @@ Thank you to zweihelden gmbh for making this possible. A special thank you to Ne
     slug: "music-ai-osaka-2025",
     importance: 6,
     highlighted: true,
+    categories: ["Hacker"],
     title:
       "Winner with distinction 'Open Source' in Music & AI Hackathon in Japan. Participation in World Expo as VIP of Austria",
     mapData: {
@@ -318,6 +407,7 @@ Final note: Osaka is extremely humid. You aren't prepared. You cannot prepare. J
   {
     slug: "european-defense-tech-2025-munich",
     importance: 3,
+    categories: ["Hacker"],
     title: "Finalist at European Defense Tech Competition 2025 Munich",
     mapData: {
       venue: "Unternehmertum Garching",
@@ -367,6 +457,7 @@ All for a safer Europe!`,
   {
     slug: "tech-berlin-ai-hackathon-2",
     importance: 2,
+    categories: ["Hacker"],
     title:
       "Winner of Balderton Capital Challenge at {Tech: Berlin} AI Hackathon",
     mapData: {
@@ -439,6 +530,7 @@ We built an innovative GraphRAG solution using Mistral AI, OpenAI, and Neo4j to 
   {
     slug: "huawei-agorize-2024",
     importance: 5,
+    categories: ["Hacker"],
     title:
       "Outstanding Award Winner at Huawei AI Individual Head-Related Transfer Functions (HRTFs) Competition",
     mapData: {
@@ -490,6 +582,7 @@ We built an innovative GraphRAG solution using Mistral AI, OpenAI, and Neo4j to 
   {
     slug: "masters-thesis",
     importance: 7,
+    categories: ["Project"],
     title:
       "Master's Thesis: (TEA) Trajectory Encoding Augmentation for Robust and Transferable Policies in Offline Reinforcement Learning",
     mapData: {
@@ -519,6 +612,7 @@ We built an innovative GraphRAG solution using Mistral AI, OpenAI, and Neo4j to 
   {
     slug: "lauzhack-2024",
     importance: 3,
+    categories: ["Hacker"],
     title: "Finalist at LauzHack 2024: VR Classroom for Focus Improvement",
     mapData: {
       venue: "EPFL",
@@ -564,6 +658,7 @@ We built an innovative GraphRAG solution using Mistral AI, OpenAI, and Neo4j to 
     slug: "salzburg-tourism-2024", // Unique slug for each project
     importance: 8, // If less than 5, pink text
     highlighted: true,
+    categories: ["Hacker"],
     title: "1st Place at the biggest Tourism Technology Festival in Europe",
     mapData: {
       venue: "Alles Für den GAST",
@@ -629,6 +724,7 @@ We built an innovative GraphRAG solution using Mistral AI, OpenAI, and Neo4j to 
   {
     slug: "zurich-climathon-2024", // Unique slug for each project
     importance: 7, // If less than 5, pink text
+    categories: ["Hacker"],
     title:
       "Awarded 7000 CHF by the City of Zurich: AI-Based Employee Surveying Platform",
     mapData: {
@@ -674,7 +770,7 @@ Our roadmap includes launching the platform in Zurich, gathering initial data, a
   {
     slug: "bayer-ai-2024", // Unique slug for each project
     importance: 5, // If less than 5, pink text
-
+    categories: ["Hacker"],
     title: "2nd Place at Bayer AI Innovation Platform Hackathon",
     mapData: {
       venue: "Google Office",
@@ -713,7 +809,7 @@ Our roadmap includes launching the platform in Zurich, gathering initial data, a
   {
     slug: "dsag-ideathon-2024", // Unique slug for each project
     importance: 5, // If less than 5, pink text
-
+    categories: ["Hacker"],
     highlighted: true,
     title: "2nd Place at DSAG Ideathon",
     mapData: {
@@ -757,7 +853,7 @@ Our roadmap includes launching the platform in Zurich, gathering initial data, a
   {
     slug: "circular-bsh-2024", // Unique slug for each project
     importance: 4, // If less than 5, pink text
-
+    categories: ["Hacker"],
     title: "Best Business Opportunity Award Winner at Circular Hackfest",
     mapData: {
       venue: "Makerspace",
@@ -795,6 +891,7 @@ Our roadmap includes launching the platform in Zurich, gathering initial data, a
   {
     slug: "thuega-2024", // Unique slug for each project
     importance: 6, // If less than 5, pink text
+    categories: ["Hacker"],
     title: "1st Place at Thüga Solutions Hackathon",
     mapData: {
       venue: "Thüga Solutions",
@@ -843,6 +940,7 @@ Our roadmap includes launching the platform in Zurich, gathering initial data, a
   {
     slug: "solana-ideathon-2024", // Unique slug for each project
     importance: 4, // If less than 5, pink text
+    categories: ["Hacker"],
     title: "2nd Place at Solana Superteam Ideathon",
     mapData: {
       venue: "TUM Blockchain Conference",
@@ -876,6 +974,7 @@ Our roadmap includes launching the platform in Zurich, gathering initial data, a
     slug: "six-swisshacks-2024", // Unique slug for each project
     importance: 8, // If less than 5, pink text
     highlighted: true,
+    categories: ["Hacker"],
     title:
       "1st Place on Swiss Exchange Track & Audience Award at SwissHacks2024",
     mapData: {
@@ -910,7 +1009,7 @@ Our roadmap includes launching the platform in Zurich, gathering initial data, a
   {
     slug: "hackupc-2024", // Unique slug for each project
     importance: 5, // If less than 5, pink text
-
+    categories: ["Hacker"],
     title: "3rd Place at HackUPC (Sponsor: Intersystems)",
     mapData: {
       venue: "UPC",
@@ -957,7 +1056,7 @@ Our roadmap includes launching the platform in Zurich, gathering initial data, a
   {
     slug: "mdsi-bundesliga-2024", // Unique slug for each project
     importance: 4, // If less than 5, pink text
-
+    categories: ["Project"],
     title: "Proof of Concept: Detecting line-breaks in football matches",
     mapData: {
       venue: "TUM MDSI",
@@ -986,7 +1085,7 @@ Our roadmap includes launching the platform in Zurich, gathering initial data, a
   {
     slug: "draeger-2023", // Unique slug for each project
     importance: 5, // If less than 5, pink text
-
+    categories: ["Hacker"],
     title: "2nd Place at Dräger hackathon",
     mapData: {
       venue: "Dräger",
@@ -1024,7 +1123,7 @@ Our roadmap includes launching the platform in Zurich, gathering initial data, a
   {
     slug: "ethmunich-2023", // Unique slug for each project
     importance: 8, // If less than 5, pink text
-
+    categories: ["Hacker"],
     highlighted: true,
     title:
       "1st Place (Main Track) at the first Ethereum-focused hackathon in Munich",
@@ -1064,7 +1163,7 @@ Our roadmap includes launching the platform in Zurich, gathering initial data, a
   {
     slug: "msg-karlsruhe-2023", // Unique slug for each project
     importance: 6, // If less than 5, pink text
-
+    categories: ["Hacker"],
     title: "1st Place at  MSG Code & Create Hackathon",
     mapData: {
       venue: "MSG",
@@ -1106,7 +1205,7 @@ Our roadmap includes launching the platform in Zurich, gathering initial data, a
   {
     slug: "bachelors-thesis", // Unique slug for each project
     importance: 6, // If less than 5, pink text
-
+    categories: ["Project"],
     title: "Bachelor's Thesis: Cat identification using Noseprints",
     mapData: {
       venue: "Turkish-German University",
@@ -1132,6 +1231,7 @@ Our roadmap includes launching the platform in Zurich, gathering initial data, a
     slug: "tgu-perfect-gpa", // Unique slug for each project
     importance: 9, // If less than 5, pink text
     highlighted: true,
+    categories: ["Project"],
     title: "First student ever to graduate from TGU with Perfect GPA",
     mapData: {
       venue: "Turkish-German University",
