@@ -22,7 +22,15 @@ This project was submitted for the privacy track, targeting sponsors ENS, IExec,
 Overall, this was a great opportunity to meet the builder space in Rome and make new Web3 friends.
 
 The app used the testnets of bounty sponsors, and it's unlikely to be deployed on mainnet anytime soon. But who knows, maybe we might work on it further and eventually deploy it. The project is open source and the code is available on GitHub.`,
-    technologies: ["Web3", "Privacy Tech", "ENS", "IExec", "Zama", "Smart Contracts", "Solidity"],
+    technologies: [
+      "Web3",
+      "Privacy Tech",
+      "ENS",
+      "IExec",
+      "Zama",
+      "Smart Contracts",
+      "Solidity",
+    ],
     links: [
       {
         label: "ETHRome Hacker Manual",
@@ -40,11 +48,16 @@ The app used the testnets of bounty sponsors, and it's unlikely to be deployed o
         label: "GitHub Repository",
         url: "https://github.com/batikanor/SecSanta",
       },
+      {
+        label: "Twitter mention by ZAMA",
+        url: "https://x.com/eugenie22262/status/1980710509533130973",
+      },
     ],
     gdrive_embed: [
       {
         url: "https://drive.google.com/file/d/1E2NMqvyvtq8Igmvl0UB77SNCUcYvcR3n/view?usp=sharing",
-        abovePhotoCaption: "Our 2-minute pitch for SecSanta. Sorry that it's a bit fast-spoken - we were time-constrained!",
+        abovePhotoCaption:
+          "Our 2-minute pitch for SecSanta. Sorry that it's a bit fast-spoken - we were time-constrained!",
         desktopSize: "XL",
         mobileSize: "M",
       },
@@ -69,7 +82,13 @@ The app used the testnets of bounty sponsors, and it's unlikely to be deployed o
 {{gdrive_embed[0]}}
 
 It was great to see the enthusiasm and creativity of the teams tackling real-world space and earth science challenges.`,
-    technologies: ["Mentorship", "Space Tech", "Satellite APIs", "AI", "Product Strategy"],
+    technologies: [
+      "Mentorship",
+      "Space Tech",
+      "Satellite APIs",
+      "AI",
+      "Product Strategy",
+    ],
     links: [
       {
         label: "LinkedIn Post by Organizers",
@@ -79,7 +98,8 @@ It was great to see the enthusiasm and creativity of the teams tackling real-wor
     gdrive_embed: [
       {
         url: "https://drive.google.com/file/d/1z7zsXb7DmStr8RQMBJ5qszdwBI7QB_yf/view?usp=sharing",
-        abovePhotoCaption: "Expert Mentor Certificate from NASA Space Apps Challenge Zurich.",
+        abovePhotoCaption:
+          "Expert Mentor Certificate from NASA Space Apps Challenge Zurich.",
         desktopSize: "L",
         mobileSize: "M",
       },
