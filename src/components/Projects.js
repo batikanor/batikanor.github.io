@@ -158,6 +158,98 @@ const ResizableEmbed = ({
   );
 };
 
+// GitHub Stats Component
+const GitHubStats = ({ repo }) => {
+  const [stats, setStats] = useState({ stars: null, watchers: null });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!repo) return;
+
+    const fetchStats = async () => {
+      try {
+        const response = await fetch(`https://api.github.com/repos/${repo}`);
+        if (response.ok) {
+          const data = await response.json();
+          setStats({
+            stars: data.stargazers_count,
+            watchers: data.subscribers_count, // subscribers_count is the correct field for watchers
+          });
+        }
+      } catch (error) {
+        console.error("Failed to fetch GitHub stats:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStats();
+  }, [repo]);
+
+  const buttonClass =
+    "flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-semibold transition-all duration-200 bg-[#f6f8fa] dark:bg-[#21262d] text-[#24292f] dark:text-[#c9d1d9] border border-[#d0d7de] dark:border-[#30363d] hover:bg-[#f3f4f6] dark:hover:bg-[#30363d]";
+
+  return (
+    <div className="flex flex-wrap gap-3 items-center">
+      <a
+        href={`https://github.com/${repo}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={buttonClass}
+        aria-label="Star on GitHub"
+      >
+        <svg
+          height="16"
+          width="16"
+          viewBox="0 0 16 16"
+          className="fill-current text-yellow-500"
+        >
+          <path d="M8 .25a.75.75 0 01.673.418l1.882 3.815 4.21.612a.75.75 0 01.416 1.279l-3.046 2.97.719 4.192a.75.75 0 01-1.088.791L8 12.347l-3.766 1.98a.75.75 0 01-1.088-.79l.719-4.192-3.046-2.97a.75.75 0 01.416-1.28l4.21-.612L7.327.668A.75.75 0 018 .25z"></path>
+        </svg>
+        <span>Star</span>
+        {stats.stars !== null && (
+          <>
+            <span className="w-px h-4 bg-gray-300 dark:bg-gray-600 mx-1"></span>
+            <span className="font-bold">{stats.stars}</span>
+          </>
+        )}
+      </a>
+
+      <a
+        href={`https://github.com/${repo}/watchers`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={buttonClass}
+        aria-label="Watch on GitHub"
+      >
+        <svg
+          height="16"
+          width="16"
+          viewBox="0 0 16 16"
+          className={`fill-current ${
+            stats.watchers !== null
+              ? "text-blue-500"
+              : "text-[#57606a] dark:text-[#8b949e]"
+          }`}
+        >
+          <path d="M6 9a.75.75 0 100-1.5.75.75 0 000 1.5zM8 9a.75.75 0 100-1.5.75.75 0 000 1.5zM10 9a.75.75 0 100-1.5.75.75 0 000 1.5z"></path>
+          <path
+            fillRule="evenodd"
+            d="M8 1a7 7 0 100 14A7 7 0 008 1zM2.5 8a5.5 5.5 0 1111 0 5.5 5.5 0 01-11 0z"
+          ></path>
+        </svg>
+        <span>Watch</span>
+        {stats.watchers !== null && (
+          <>
+            <span className="w-px h-4 bg-gray-300 dark:bg-gray-600 mx-1"></span>
+            <span className="font-bold">{stats.watchers}</span>
+          </>
+        )}
+      </a>
+    </div>
+  );
+};
+
 const Projects = () => {
   const [expandedActivity, setExpandedActivity] = useState(null);
   const [isMobile, setIsMobile] = useState(false);
@@ -166,7 +258,7 @@ const Projects = () => {
   // Function to handle scrolling to a project
   const scrollToProject = (slug) => {
     const foundActivity = contestsAndActivities.find(
-      (activity) => activity.slug === slug
+      (activity) => activity.slug === slug,
     );
     if (foundActivity) {
       setExpandedActivity(foundActivity);
@@ -223,7 +315,7 @@ const Projects = () => {
     } catch (err) {
       console.error("Clipboard API error:", err);
       alert(
-        "Clipboard operation failed. Please make sure the document is focused."
+        "Clipboard operation failed. Please make sure the document is focused.",
       );
     }
   };
@@ -283,43 +375,77 @@ const Projects = () => {
     }
   }, [isMobile, expandedActivity]); // Re-run when cards expand/collapse
 
-  // Function to render text with inline markdown links
-  const renderTextWithLinks = (text) => {
-    // Find all markdown links and replace them
-    const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
-    const parts = [];
-    let lastIndex = 0;
-    let match;
+  // Function to render text with markdown formatting (Bold, Italic, Links)
+  const renderMarkdown = (text) => {
+    if (!text || typeof text !== "string") return text;
 
-    while ((match = linkRegex.exec(text)) !== null) {
-      // Add text before the link
-      if (match.index > lastIndex) {
-        parts.push(text.slice(lastIndex, match.index));
+    // Helper to process text recursively
+    const processText = (currentText) => {
+      // Find the first occurrence of any formatting syntax
+      const matchBold = /\*\*(.+?)\*\*/.exec(currentText);
+      const matchItalic = /\*(.+?)\*/.exec(currentText);
+      const matchLink = /\[([^\]]+)\]\(([^)]+)\)/.exec(currentText);
+
+      // determine which match is first
+      let bestMatch = null;
+      let type = null;
+
+      const candidates = [
+        { match: matchBold, type: "bold" },
+        { match: matchItalic, type: "italic" },
+        { match: matchLink, type: "link" },
+      ].filter((c) => c.match);
+
+      if (candidates.length === 0) return [currentText];
+
+      // Sort by index
+      candidates.sort((a, b) => a.match.index - b.match.index);
+      bestMatch = candidates[0].match;
+      type = candidates[0].type;
+
+      const before = currentText.slice(0, bestMatch.index);
+      const after = currentText.slice(bestMatch.index + bestMatch[0].length);
+      const content = bestMatch[1]; // for bold/italic/link text
+      const url = bestMatch[2]; // for link url
+
+      const components = [];
+      if (before) components.push(...processText(before));
+
+      if (type === "bold") {
+        components.push(
+          <strong
+            key={`b-${bestMatch.index}`}
+            className="font-bold text-light-foreground dark:text-dark-foreground"
+          >
+            {processText(content)}
+          </strong>,
+        );
+      } else if (type === "italic") {
+        components.push(
+          <em key={`i-${bestMatch.index}`} className="italic">
+            {processText(content)}
+          </em>,
+        );
+      } else if (type === "link") {
+        components.push(
+          <a
+            key={`l-${bestMatch.index}`}
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-accent hover:text-accent-hover hover:underline transition-colors"
+          >
+            {content}
+          </a>,
+        );
       }
 
-      // Add the link component
-      parts.push(
-        <a
-          key={`link-${match.index}`}
-          href={match[2]}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-accent hover:text-accent-hover hover:underline transition-colors"
-        >
-          {match[1]}
-        </a>
-      );
+      if (after) components.push(...processText(after));
 
-      lastIndex = match.index + match[0].length;
-    }
+      return components;
+    };
 
-    // Add remaining text after the last link
-    if (lastIndex < text.length) {
-      parts.push(text.slice(lastIndex));
-    }
-
-    // If no links found, return the original text
-    return parts.length > 0 ? parts : text;
+    return processText(text);
   };
 
   // Function to parse and render content with inline images/embeds
@@ -328,7 +454,7 @@ const Projects = () => {
 
     // Split content by inline media placeholders
     const parts = content.split(
-      /(\{\{(?:image|embed|gdrive_embed)\[\d+\]\}\})/g
+      /(\{\{(?:image|embed|gdrive_embed)\[\d+\]\}\})/g,
     );
 
     return parts
@@ -337,7 +463,7 @@ const Projects = () => {
         // Check if this part is an inline media placeholder
         const imageMatch = part.match(/\{\{image\[(\d+)\]\}\}/);
         const embedMatch = part.match(
-          /\{\{(?:embed|gdrive_embed)\[(\d+)\]\}\}/
+          /\{\{(?:embed|gdrive_embed)\[(\d+)\]\}\}/,
         );
 
         if (imageMatch) {
@@ -446,9 +572,9 @@ const Projects = () => {
               return (
                 <p
                   key={`${index}-${lineIndex}`}
-                  className="text-light-foreground dark:text-dark-foreground mb-4"
+                  className="text-light-foreground dark:text-dark-foreground mb-4 leading-relaxed"
                 >
-                  {renderTextWithLinks(line)}
+                  {renderMarkdown(line)}
                 </p>
               );
             }
@@ -498,7 +624,7 @@ const Projects = () => {
     selectedCategories.length === 0
       ? contestsAndActivities
       : contestsAndActivities.filter((activity) =>
-          activity.categories?.some((cat) => selectedCategories.includes(cat))
+          activity.categories?.some((cat) => selectedCategories.includes(cat)),
         );
 
   return (
@@ -550,10 +676,10 @@ const Projects = () => {
                 isExpanded
                   ? "col-span-1 sm:col-span-2 lg:col-span-3 xl:col-span-4"
                   : isMicro
-                  ? "col-span-1"
-                  : isMinor
-                  ? "col-span-1 sm:col-span-1"
-                  : "col-span-1 sm:col-span-2 lg:col-span-2"
+                    ? "col-span-1"
+                    : isMinor
+                      ? "col-span-1 sm:col-span-1"
+                      : "col-span-1 sm:col-span-2 lg:col-span-2"
               } transition-all duration-300 ${
                 isMinor && !isExpanded ? "minor-project-card" : ""
               }`}
@@ -602,8 +728,8 @@ const Projects = () => {
                         isMicro
                           ? "text-xs sm:text-sm"
                           : isMinor
-                          ? "text-sm sm:text-base"
-                          : "text-base sm:text-lg"
+                            ? "text-sm sm:text-base"
+                            : "text-base sm:text-lg"
                       } font-semibold mb-2 max-w-[70%]`}
                     >
                       {activity.title}
@@ -673,7 +799,7 @@ const Projects = () => {
                       <div className="prose prose-lg dark:prose-invert max-w-none">
                         {renderContentWithInlineMedia(
                           activity.longDescription,
-                          activity
+                          activity,
                         )}
                       </div>
 
@@ -685,6 +811,37 @@ const Projects = () => {
                           Copy Link to this Project
                         </button>
                       </div>
+
+                      {/* GitHub Repository Widget */}
+                      {activity.githubRepo && (
+                        <div className="mb-6 p-4 rounded-xl bg-light-background-secondary dark:bg-dark-background-secondary border border-light-border dark:border-dark-border">
+                          <h4 className="font-semibold text-lg mb-4 flex items-center gap-2">
+                            <svg
+                              height="24"
+                              width="24"
+                              viewBox="0 0 16 16"
+                              className="fill-current"
+                            >
+                              <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path>
+                            </svg>
+                            GitHub Repository
+                          </h4>
+                          <div className="flex flex-col gap-4">
+                            {/* Custom GitHub Buttons using API */}
+                            <GitHubStats repo={activity.githubRepo} />
+
+                            <div className="w-full overflow-hidden rounded-lg bg-white dark:bg-[#0d1117] p-2 border border-light-border dark:border-gray-800">
+                              <div className="flex justify-center">
+                                <img
+                                  src={`https://api.star-history.com/svg?repos=${activity.githubRepo}&type=Date`}
+                                  alt="Star History Chart"
+                                  className="max-w-full"
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
 
                       {/* Add Links */}
                       {activity.links && activity.links.length > 0 && (
@@ -729,7 +886,7 @@ const Projects = () => {
                             // Check if this image was already used inline
                             const wasUsedInline =
                               activity.longDescription.includes(
-                                `{{image[${index}]}}`
+                                `{{image[${index}]}}`,
                               );
                             if (!wasUsedInline) {
                               return (
@@ -755,10 +912,10 @@ const Projects = () => {
                               // Check if this embed was already used inline
                               const wasUsedInline =
                                 activity.longDescription.includes(
-                                  `{{embed[${index}]}}`
+                                  `{{embed[${index}]}}`,
                                 ) ||
                                 activity.longDescription.includes(
-                                  `{{gdrive_embed[${index}]}}`
+                                  `{{gdrive_embed[${index}]}}`,
                                 );
                               if (!wasUsedInline) {
                                 const embedData =

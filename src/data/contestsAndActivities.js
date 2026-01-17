@@ -1,5 +1,65 @@
 export const contestsAndActivities = [
   {
+    slug: "huawei-tech-arena-finland-2025",
+    importance: 5,
+    categories: ["Hacker"],
+    title:
+      "Finalist and Honorable Mention Award winner at Huawei Tech Arena Finland 2025",
+    mapData: {
+      venue: "Huawei Finland R&D (Läkkisepäntie 23)",
+      city: "Helsinki",
+      country: "Finland",
+      coordinates: { lat: 60.2205, lng: 24.9438 },
+    },
+    date: "12/2025",
+    shortDescription:
+      "Finalist and Honorable Mention winner for an innovative solution at Huawei Tech Arena Finland. Features 'Gralobe', a 3D globe transitions library.",
+    longDescription: `Achieved Finalist status and won an Honorable Mention Award at the Huawei Tech Arena Finland 2025.
+
+This project heavily utilized **[Gralobe](https://github.com/batikanor/gralobe)**, an open-source library I developed. Gralobe is a globe component capable of seamless transitions between 2D and 3D views, designed to be a central tool for map enthusiasts in the web development space.
+
+At the time of writing, the repository has around 20 stars, but we hope to see it grow as it provides a unique and "easy" way to visualize global data dynamically.
+
+We also want to thank the Huawei officials for the opportunity, for the travel reimbursement to Finland, and also for the nice sea-side dinner they treated us to!
+
+You can find more info about Gralobe here: [https://gralobe.vercel.app/](https://gralobe.vercel.app/)
+
+*Note: The Gralobe repository is constantly changing, and I don't want to update this post each time there's a new development, so that's why I won't give any more details here! :D*
+
+{{gdrive_embed[0]}}`,
+    technologies: [
+      "TypeScript",
+      "React",
+      "Three.js",
+      "WebGL",
+      "Open Source",
+      "Gralobe",
+    ],
+    githubRepo: "batikanor/gralobe",
+    links: [
+      {
+        label: "Gralobe Demo",
+        url: "https://gralobe.vercel.app/",
+      },
+      {
+        label: "GitHub Repository",
+        url: "https://github.com/batikanor/gralobe",
+      },
+      {
+        label: "Huawei Tech Arena Info",
+        url: "https://huawei.bemyapp.com/finland-tech-arena",
+      },
+    ],
+    gdrive_embed: [
+      {
+        url: "https://drive.google.com/file/d/1ZykL3ZwROggdzYMdmMG0tsDfEZ9yydPF/view?usp=sharing",
+        abovePhotoCaption: "Certificate of Achievement",
+        desktopSize: "XL",
+        mobileSize: "M",
+      },
+    ],
+  },
+  {
     slug: "real-coin-map-2025",
     importance: 5,
     categories: ["Hacker"],
