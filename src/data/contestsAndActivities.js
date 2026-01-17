@@ -1,5 +1,54 @@
 export const contestsAndActivities = [
   {
+    slug: "real-coin-map-2025",
+    importance: 5,
+    categories: ["Hacker"],
+    title:
+      "Winner of Best Technical Solution Award at Berlin State Library Hackathon",
+    mapData: {
+      venue: "Staatsbibliothek zu Berlin",
+      city: "Berlin",
+      country: "Germany",
+      coordinates: { lat: 52.5074, lng: 13.3708 },
+    },
+    date: "10/2025",
+    shortDescription:
+      "Won Best Technical Solution for creating 'Real Coin Map' - a dashboard visualizing ancient coins and mints using AI and embeddings to solve numismatic challenges.",
+    longDescription: `This project created a proof of concept through visualizing the average look of coins from certain mints or for finding locations on a beautiful map, and demonstrated reasonable business cases for its realisation in academic or industrial contexts. 
+
+The project also demonstrated the use of AI, Embeddings, and LLMs to address numismatics and archeology problems through a nice, state-of-the-art technology dashboard.
+
+{{gdrive_embed[0]}}
+
+Small note: I couldn't find where I put the prize certificate. I'll add a picture of it if I find it sometime, not that it matters...`,
+    technologies: [
+      "AI",
+      "Embeddings",
+      "LLM",
+      "Python",
+      "Numismatics",
+      "Geospatial Data",
+    ],
+    links: [
+      {
+        label: "Live Demo",
+        url: "https://lab.sbb.berlin/real-coin-map/",
+      },
+      {
+        label: "GitHub Repository",
+        url: "https://github.com/batikanor/realcoinmap",
+      },
+    ],
+    gdrive_embed: [
+      {
+        url: "https://drive.google.com/file/d/1ZQqW433UVN3nR6zc0_dC8VFxuzsh4Ihj/view?t=2",
+        abovePhotoCaption: "Pitching the project results at the hackathon.",
+        desktopSize: "XL",
+        mobileSize: "M",
+      },
+    ],
+  },
+  {
     slug: "ethrome-2025",
     importance: 6,
     categories: ["Hacker"],
