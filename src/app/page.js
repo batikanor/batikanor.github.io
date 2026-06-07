@@ -3,6 +3,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { FaCode, FaRocket, FaTrophy } from "react-icons/fa";
 import CVContent from "../components/CVContent";
@@ -27,12 +28,23 @@ const GlobeGame = dynamic(() => import("../components/GlobeGame"), {
   ),
 });
 
+const HERO_MOTTOS = ["Friend", "a fine gentleman", "a strange dude"];
+
 export default function Home() {
   const [mounted, setMounted] = useState(false);
   const [show3D, setShow3D] = useState(false);
+  const [mottoIndex, setMottoIndex] = useState(0);
 
   useEffect(() => {
     setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    const intervalId = window.setInterval(() => {
+      setMottoIndex((currentIndex) => (currentIndex + 1) % HERO_MOTTOS.length);
+    }, 2200);
+
+    return () => window.clearInterval(intervalId);
   }, []);
 
   const navigateWithRefresh = (slug) => {
@@ -60,7 +72,20 @@ export default function Home() {
             </h1>
             <p className="text-xl md:text-3xl text-gray-600 dark:text-gray-400">
               Hacker • Developer • Entrepreneur •{" "}
-              <span className="gradient-text">Friend</span>
+              <span className="inline-flex min-w-[12ch] justify-start">
+                <AnimatePresence mode="wait">
+                  <motion.span
+                    key={HERO_MOTTOS[mottoIndex]}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.35, ease: "easeOut" }}
+                    className="gradient-text"
+                  >
+                    {HERO_MOTTOS[mottoIndex]}
+                  </motion.span>
+                </AnimatePresence>
+              </span>
             </p>
           </div>
 

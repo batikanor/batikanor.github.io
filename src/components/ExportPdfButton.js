@@ -462,6 +462,11 @@ export default function ExportPdfButton({
       };
 
       // ---------------------------------------------------------------------------
+      const getCurrentDestination = () => {
+        const { pageNumber } = pdf.internal.getCurrentPageInfo();
+        return { pageNumber, top: currentY };
+      };
+
       // Helper to render an achievement header with orange title + small QR code
       const renderAchievementHeader = async (ach) => {
         const qrSize = 18; // small QR
@@ -483,6 +488,8 @@ export default function ExportPdfButton({
           pdf.addPage();
           currentY = margin;
         }
+
+        const destination = getCurrentDestination();
 
         // Box border for nice styling
         pdf.setFillColor(255, 255, 255);
@@ -606,6 +613,7 @@ export default function ExportPdfButton({
         }
 
         currentY += boxHeight + 6; // space after header
+        return destination;
       };
       // ---------------------------------------------------------------------------
       /**********************************************************/
@@ -655,21 +663,21 @@ export default function ExportPdfButton({
       const totalAchievements = achievementsSorted.length;
       for (let achIdx = 0; achIdx < totalAchievements; achIdx++) {
         const achievement = achievementsSorted[achIdx];
-        // record toc entry
+        // Styled header with title + QR
+        const destination = await renderAchievementHeader(achievement);
+
+        // record toc entry after the header layout has finalized the target page
         const locationStr = achievement.mapData
           ? `${achievement.mapData.city}, ${achievement.mapData.country}`
           : "";
         toc.push({
           title: achievement.title,
-          page: pdf.internal.getCurrentPageInfo().pageNumber,
-          y: currentY,
+          page: destination.pageNumber,
+          top: destination.top,
           date: achievement.date,
           location: locationStr,
           importance: achievement.importance || 0, // Add importance field
         });
-
-        // Styled header with title + QR
-        await renderAchievementHeader(achievement);
 
         // Date
         if (achievement.date) {
@@ -862,10 +870,6 @@ export default function ExportPdfButton({
         return `rgb(${r}, ${g}, ${b})`;
       }
 
-      // Use the star data URL in the PDF
-      const starDataURL = createStarDataURL();
-      const halfStarDataURL = createHalfStarDataURL();
-
       // Modify the ToC rendering to include star images
       toc.forEach((entry, idx) => {
         // if near bottom, create new TOC page contiguous
@@ -882,7 +886,7 @@ export default function ExportPdfButton({
           if (i === lines.length - 1) {
             pdf.textWithLink(line, margin + 12, tocY, {
               pageNumber: entry.page + pagesInserted,
-              top: entry.y,
+              top: entry.top,
             });
 
             // Add star images based on importance
