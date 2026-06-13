@@ -1,5 +1,172 @@
 export const contestsAndActivities = [
   {
+    slug: "hong-kong-talent-engage-eurotech-healthtech-2026",
+    importance: 9,
+    categories: ["Hacker"],
+    title:
+      "Winner at Hong Kong Talent Engage x EuroTech Federation Hackathon",
+    mapData: {
+      venue: "Hong Kong Talent Engage, Revenue Tower",
+      city: "Hong Kong",
+      country: "Hong Kong",
+      coordinates: { lat: 22.2745, lng: 114.1698 },
+    },
+    date: "06/2026",
+    shortDescription:
+      "Won the health-tech challenge at a Munich hackathon organized by Hong Kong Talent Engage and EuroTech Federation, earning a sponsored trip to Hong Kong.",
+    longDescription: `A Hong Kong government office, [Hong Kong Talent Engage](https://www.linkedin.com/company/hk-talent-engage/), organized a hackathon in Munich together with [EuroTech Federation](https://www.linkedin.com/company/eurotech-federation/). More than 1,000 hackers applied, less than half were selected, and around 100 teams ended up at the venue.
+
+Our team, [Ulaş Mısırlıoğlu](https://www.linkedin.com/in/ulasmisirlioglu/), [Cem Araz](https://www.linkedin.com/in/cemaraz/), [Muhammad Moiz](https://www.linkedin.com/in/m2moiz/), and me, focused on the health-tech challenge and won the hackathon. Thanks to the sponsors, we will go to Hong Kong together later this year.
+
+We developed a way to estimate hemoglobin from conjunctiva images. During the competition, we also reached out to residential care homes for the elderly in Hong Kong, where anemia among elderly people is especially prevalent, and booked a few online calls with them.
+
+The pitch we delivered was enjoyed by the rest of the participants so much that a few of them congratulated us in person after the finale.
+
+Initiative matters the most: the initiative the organizers took to organize, the sponsors took to sponsor, the hackers took to hack, and the winners took to win.
+
+If we all lie in bed and watch Netflix on the weekends, nothing interesting ever happens.
+
+What life keeps showing me is that you just need to keep doing things, pressing buttons, and your understanding of the world, your talent, and the opportunities you find keep increasing.
+
+Thanks to everyone who took initiative, including [Laurenz Sommerlad](https://www.linkedin.com/in/laurenzsommerlad/), [Clément Sporrer](https://www.linkedin.com/in/clementsporrer/), [Grace Lai](https://www.linkedin.com/in/gracepslai/), [Tanmay Gupta, PhD](https://www.linkedin.com/in/tgupta089/), [Michele Fung](https://www.linkedin.com/in/michelefung/), [Wilson Chan](https://www.linkedin.com/in/wilson-chan-907322b9/), [Wendy Yau](https://www.linkedin.com/in/wendy-yau-55586b93/), and many others.
+
+{{gdrive_embed[0]}}`,
+    technologies: [
+      "Health Tech",
+      "Computer Vision",
+      "Machine Learning",
+      "Medical AI",
+      "Hemoglobin Estimation",
+      "Conjunctiva Imaging",
+    ],
+    links: [
+      {
+        label: "My LinkedIn Post",
+        url: "https://www.linkedin.com/posts/batikanor_a-hong-kong-government-office-hong-kong-activity-7471684145832747008-CfBX?utm_source=share&utm_medium=member_desktop&rcm=ACoAACL8UREBa3FbjBW-yu7HCZmgCHJBrj-opz4",
+      },
+      {
+        label: "Ulaş Mısırlıoğlu's LinkedIn Post",
+        url: "https://www.linkedin.com/posts/ulasmisirlioglu_300-people-came-to-munich-for-one-prize-ugcPost-7470002554139992064-hhhn/?utm_source=share&utm_medium=member_desktop&rcm=ACoAACL8UREBa3FbjBW-yu7HCZmgCHJBrj-opz4",
+      },
+      {
+        label: "Cem Araz's LinkedIn Post",
+        url: "https://www.linkedin.com/feed/update/urn:li:activity:7469991719707500544/",
+      },
+      {
+        label: "Muhammad Moiz's LinkedIn Post",
+        url: "https://www.linkedin.com/feed/update/urn:li:activity:7470145247638110209/",
+      },
+      {
+        label: "A version of our pitch",
+        url: "https://docs.google.com/presentation/d/1D_xKlEpKfUM02-Cx2fBPCgS_OlWjhpGOIxt1g0R3PEU/edit?usp=sharing",
+      },
+      {
+        label: "Hong Kong Talent Engage",
+        url: "https://www.linkedin.com/company/hk-talent-engage/",
+      },
+      {
+        label: "EuroTech Federation",
+        url: "https://www.linkedin.com/company/eurotech-federation/",
+      },
+    ],
+    gdrive_embed: [
+      {
+        url: "https://docs.google.com/presentation/d/1D_xKlEpKfUM02-Cx2fBPCgS_OlWjhpGOIxt1g0R3PEU/embed?start=false&loop=false&delayms=3000",
+        abovePhotoCaption: "A version of our pitch",
+        desktopSize: "XL",
+        mobileSize: "S",
+      },
+    ],
+  },
+  {
+    slug: "pdm-kill-the-search-bar-2026",
+    importance: 7,
+    categories: ["Hacker"],
+    title:
+      "1st Place at pdm solutions 'Kill the Search Bar' Hackathon about gelbeseiten.de",
+    mapData: {
+      venue: "pdm solutions GmbH, Boxhagener Str. 78",
+      city: "Berlin",
+      country: "Germany",
+      coordinates: { lat: 52.5067, lng: 13.4691 },
+    },
+    date: "05/15/2026 - 05/17/2026",
+    shortDescription:
+      "Won 1st place at pdm solutions' Berlin hackathon focused on rethinking search, discovery, trust, and interaction with digital platforms.",
+    longDescription: `pdm solutions GmbH organized the "Kill the Search Bar" hackathon in Berlin: three days, five teams, and a shared goal of rethinking how people discover, trust, and interact with digital platforms. The hackathon was mainly about their [gelbeseiten.de](https://www.gelbeseiten.de/) website, which most German developers are likely very familiar with.
+
+Over an intense weekend, teams built concepts, working prototypes, and new approaches to digital interaction, ranging from AI-native platform ideas to real-time data experiences. The final presentations and award ceremony took place at the [vdav - Verband deutscher Auskunfts- und Verzeichnismedien e.V.](https://www.linkedin.com/company/vdav-verband-deutscher-asukunfts-und-verzeichnismedien-e-v/) industry meetup.
+
+Our team, [Enrico Michael](https://www.linkedin.com/in/enrico-michael-bln/), [Martin Trifonov](https://www.linkedin.com/in/martin-trifonov-945581196/), [Richard M.](https://www.linkedin.com/in/richard-meinsen/), and me, won 1st place. We built novel, creative, and lucrative concepts for improving data quality that are now confidential.
+
+Thanks to pdm solutions GmbH, the mentors, participants, and the jury: [Felix Güßfeld](https://www.linkedin.com/in/felixguessfeld/), [Michael Lesch](https://www.linkedin.com/in/mlesch/), [Ilja Radusch](https://www.linkedin.com/in/radusch/), and [Arnon Cavaeiro](https://www.linkedin.com/in/acavaeiro/).`,
+    technologies: [
+      "AI",
+      "Search",
+      "Product Discovery",
+      "Platform UX",
+      "Rapid Prototyping",
+    ],
+    links: [
+      {
+        label: "Official LinkedIn Post",
+        url: "https://www.linkedin.com/posts/pdm-solutions-gmbh_three-days-five-teams-maximum-builder-vibes-activity-7464956643739570178-Nopg?utm_source=share&utm_medium=member_desktop&rcm=ACoAACL8UREBa3FbjBW-yu7HCZmgCHJBrj-opz4",
+      },
+      {
+        label: "Hackathon Details",
+        url: "https://luma.com/2e3aa6yj",
+      },
+      {
+        label: "pdm solutions GmbH",
+        url: "https://www.linkedin.com/company/pdm-solutions-gmbh/posts",
+      },
+    ],
+  },
+  {
+    slug: "zero-one-hack-supercompute-industrial-2026",
+    importance: 4,
+    categories: ["Hacker"],
+    title: "2nd Place in the Industrial Track at Zero One Hack",
+    mapData: {
+      venue: "AI:AT Coworking Hub, Karl-Farkas-Gasse 22",
+      city: "Vienna",
+      country: "Austria",
+      coordinates: { lat: 48.1882, lng: 16.4038 },
+    },
+    date: "05/29/2026 - 05/31/2026",
+    shortDescription:
+      "Won 2nd place in Infineon's Industrial track at the Zero One Hack Supercompute Hackathon in Vienna, using HPC to model semiconductor fabrication process sequences.",
+    longDescription: `From May 29 to 31, I joined the [Zero One Hack](https://www.linkedin.com/company/zero-one-hack/) Supercompute Hackathon hosted by [Lumos Student Organisation](https://www.linkedin.com/company/lumos-student-organisation/) at the [AI Factory Austria AI:AT](https://www.linkedin.com/company/ai-factory-austria/) Coworking Hub in Vienna.
+
+Our team worked on the Industrial track provided by [Infineon Technologies](https://www.linkedin.com/company/infineon-technologies/). The challenge involved synthetic semiconductor fabrication process-sequence data, where we trained and benchmarked models on the Leonardo supercomputer for next-step prediction, sequence completion, and anomaly detection.
+
+After 36 hours of late nights, debugging, model training, and sleeping on the hard floors of the venue, we won 2nd place in the Industrial track.
+
+The team was [Morgan Nihlmar](https://www.linkedin.com/in/morgan-nihlmar/), [Ariunzaya Odontugs](https://www.linkedin.com/in/angie-odontugs/), [Cristian Vortolomei](https://www.linkedin.com/in/cristianvortolomei/), and me. It was my first time in Vienna, and it was a good first time, since we won something.`,
+    technologies: [
+      "HPC",
+      "Supercomputing",
+      "AI",
+      "Semiconductor Manufacturing",
+      "Sequence Modeling",
+      "Anomaly Detection",
+    ],
+    links: [
+      {
+        label: "Morgan Nihlmar's LinkedIn Post",
+        url: "https://www.linkedin.com/posts/morgan-nihlmar_on-may-29th-31st-i-attended-my-first-hackathon-activity-7469805127793758209-UQOO?utm_source=share&utm_medium=member_desktop&rcm=ACoAACL8UREBa3FbjBW-yu7HCZmgCHJBrj-opz4",
+      },
+      {
+        label: "Hackathon Website",
+        url: "https://zero-one.lumos-consulting.at/",
+      },
+      {
+        label: "AI:AT Event Page",
+        url: "https://ai-at.eu/en/news/zero-one-hack-young-ai-talents-train-real-models-at-the-ai-factory-austria-aiat/",
+      },
+    ],
+  },
+  {
     slug: "huawei-tech-arena-finland-2025",
     importance: 5,
     categories: ["Hacker"],
