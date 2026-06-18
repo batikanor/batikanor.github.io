@@ -99,7 +99,9 @@ Over an intense weekend, teams built concepts, working prototypes, and new appro
 
 Our team, [Enrico Michael](https://www.linkedin.com/in/enrico-michael-bln/), [Martin Trifonov](https://www.linkedin.com/in/martin-trifonov-945581196/), [Richard M.](https://www.linkedin.com/in/richard-meinsen/), and me, won 1st place. We built novel, creative, and lucrative concepts for improving data quality that are now confidential.
 
-Thanks to pdm solutions GmbH, the mentors, participants, and the jury: [Felix Güßfeld](https://www.linkedin.com/in/felixguessfeld/), [Michael Lesch](https://www.linkedin.com/in/mlesch/), [Ilja Radusch](https://www.linkedin.com/in/radusch/), and [Arnon Cavaeiro](https://www.linkedin.com/in/acavaeiro/).`,
+Thanks to pdm solutions GmbH, the mentors, participants, and the jury: [Felix Güßfeld](https://www.linkedin.com/in/felixguessfeld/), [Michael Lesch](https://www.linkedin.com/in/mlesch/), [Ilja Radusch](https://www.linkedin.com/in/radusch/), and [Arnon Cavaeiro](https://www.linkedin.com/in/acavaeiro/).
+
+{{gdrive_embed[0]}}`,
     technologies: [
       "AI",
       "Search",
@@ -119,6 +121,14 @@ Thanks to pdm solutions GmbH, the mentors, participants, and the jury: [Felix G�
       {
         label: "pdm solutions GmbH",
         url: "https://www.linkedin.com/company/pdm-solutions-gmbh/posts",
+      },
+    ],
+    gdrive_embed: [
+      {
+        url: "https://drive.google.com/file/d/1SaPVN7GKyx3lKH8SRSj20sS2I82LaCqL/view?usp=sharing",
+        abovePhotoCaption: "First place certificate",
+        desktopSize: "XL",
+        mobileSize: "S",
       },
     ],
   },
