@@ -630,39 +630,39 @@ const Projects = () => {
   return (
     <div className="w-full">
       {/* PDF Download Button */}
-      <div className="my-8 flex justify-center">
+      <div className="my-6 flex justify-center">
         <ExportPdfButton achievements={contestsAndActivities} />
       </div>
 
       {/* Filter Buttons */}
-      <div className="mb-8 flex flex-wrap gap-3 justify-center">
+      <div className="mb-6 flex flex-wrap justify-center gap-2 rounded-lg border border-light-border bg-white/70 p-2 shadow-sm dark:border-dark-border dark:bg-dark-background-secondary/70">
         <button
           onClick={clearFilters}
-          className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+          className={`rounded-md px-3 py-2 text-sm font-semibold transition-all duration-200 ${
             selectedCategories.length === 0
-              ? "bg-gradient-to-r from-accent to-accent-hover text-text-on-accent shadow-lg"
-              : "bg-light-background-secondary dark:bg-dark-background-secondary text-light-foreground dark:text-dark-foreground hover:bg-accent/20 dark:hover:bg-accent/20"
+              ? "bg-accent text-text-on-accent shadow-sm"
+              : "text-light-foreground-secondary hover:bg-light-background-secondary dark:text-dark-foreground-secondary dark:hover:bg-dark-background"
           }`}
         >
           All ({contestsAndActivities.length})
         </button>
         {Object.keys(categoryCounts).map((category) => (
           <button
-            key={category}
-            onClick={() => toggleCategory(category)}
-            className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
-              selectedCategories.includes(category)
-                ? "bg-gradient-to-r from-accent to-accent-hover text-text-on-accent shadow-lg"
-                : "bg-light-background-secondary dark:bg-dark-background-secondary text-light-foreground dark:text-dark-foreground hover:bg-accent/20 dark:hover:bg-accent/20"
-            }`}
-          >
+          key={category}
+          onClick={() => toggleCategory(category)}
+          className={`rounded-md px-3 py-2 text-sm font-semibold transition-all duration-200 ${
+            selectedCategories.includes(category)
+              ? "bg-accent text-text-on-accent shadow-sm"
+              : "text-light-foreground-secondary hover:bg-light-background-secondary dark:text-dark-foreground-secondary dark:hover:bg-dark-background"
+          }`}
+        >
             {category} ({categoryCounts[category]})
           </button>
         ))}
       </div>
 
       {/* Activities Grid - Using more width */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {filteredActivities.map((activity, index) => {
           const isExpanded = expandedActivity === activity;
           const isMicro = activity.importance < 2;
@@ -685,11 +685,11 @@ const Projects = () => {
               }`}
             >
               <div
-                className={`tilt-card relative p-4 sm:p-6 rounded-2xl shadow-xl backdrop-blur-lg overflow-hidden hover:shadow-2xl transition-all duration-300 ${
+                className={`tilt-card relative overflow-hidden rounded-lg p-4 shadow-sm backdrop-blur-lg transition-all duration-300 sm:p-5 ${
                   activity.highlighted && !isExpanded ? "highlight" : ""
                 } ${isExpanded ? "expanded" : ""} ${
                   activity.highlighted && !isExpanded
-                    ? "ring-2 ring-accent"
+                    ? "ring-1 ring-accent"
                     : ""
                 } ${
                   !isExpanded
@@ -711,6 +711,10 @@ const Projects = () => {
                   }),
                 }}
               >
+                {activity.highlighted && !isExpanded && (
+                  <span className="highlight-ribbon" aria-hidden="true" />
+                )}
+
                 {/* Replace the colored bar with a subtle gradient background - only when not expanded */}
                 {!isExpanded && (
                   <div
@@ -722,7 +726,7 @@ const Projects = () => {
 
                 {/* Remove the old colored bar div and continue with existing content */}
                 <div className="relative z-20">
-                  <div className="flex justify-between items-start flex-wrap">
+                  <div className="flex items-start justify-between gap-3">
                     <h3
                       className={`${
                         isMicro
@@ -730,7 +734,7 @@ const Projects = () => {
                           : isMinor
                             ? "text-sm sm:text-base"
                             : "text-base sm:text-lg"
-                      } font-semibold mb-2 max-w-[70%]`}
+                      } mb-2 max-w-[72%] font-bold leading-snug`}
                     >
                       {activity.title}
                     </h3>
@@ -748,7 +752,7 @@ const Projects = () => {
                       )}
                       <button
                         onClick={() => toggleExpandedView(activity)}
-                        className="px-3 py-1 rounded hover:bg-light-background-secondary dark:hover:bg-dark-background-secondary whitespace-nowrap"
+                        className="whitespace-nowrap rounded-md border border-light-border bg-white/70 px-3 py-1 text-xs font-semibold text-light-foreground-secondary shadow-sm hover:border-accent hover:text-accent dark:border-dark-border dark:bg-dark-background/50 dark:text-dark-foreground-secondary"
                       >
                         {isExpanded ? "Collapse" : "See more"}
                       </button>
@@ -770,9 +774,9 @@ const Projects = () => {
                     {/* Display Short Description - hide for minor projects when not expanded */}
                     {(!isMinor || isExpanded) && (
                       <div
-                        className={`mb-3 p-2 bg-light-background-secondary/50 dark:bg-dark-background-secondary/50 rounded-lg ${
+                        className={`mb-3 rounded-md bg-light-background-secondary/70 p-3 dark:bg-dark-background/35 ${
                           !isExpanded
-                            ? "border-l-4 border-accent dark:border-accent"
+                            ? "border-l-2 border-accent dark:border-accent"
                             : ""
                         }`}
                       >

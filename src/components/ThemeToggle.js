@@ -24,6 +24,7 @@ export default function ThemeToggle() {
 
   return (
     <button
+      data-floating-site-control
       onClick={toggleTheme}
       className="fixed top-6 right-6 z-50 p-3 rounded-full transition-all duration-500 transform hover:scale-110 shadow-lg hover:shadow-2xl backdrop-blur-sm"
       style={{

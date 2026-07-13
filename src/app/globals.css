@@ -48,6 +48,27 @@ body {
   user-select: none;
 }
 
+/* The project browser is an immersive surface with its own controls. */
+body.project-lab-active [data-floating-site-control] {
+  display: none !important;
+}
+
+body.projects-world-active [data-floating-site-control] {
+  display: none !important;
+}
+
+body.projects-world-active {
+  overflow: hidden;
+}
+
+body.bounce-world-active [data-floating-site-control] {
+  display: none !important;
+}
+
+body.bounce-world-active {
+  overflow: hidden;
+}
+
 /* Modern Background Pattern */
 body::before {
   content: "";

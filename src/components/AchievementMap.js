@@ -562,9 +562,6 @@ export default function AchievementMap({ navigateWithRefresh, onToggle3D }) {
                 Lower Impact
               </span>
             </div>
-            <div className="text-center text-xs text-gray-400 border-t border-gray-600 pt-2">
-              Red → Yellow → Green
-            </div>
           </div>
         </div>
       </div>

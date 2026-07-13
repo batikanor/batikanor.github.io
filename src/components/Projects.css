@@ -1,36 +1,3 @@
-@keyframes wiggle {
-  0%,
-  100% {
-    transform: translateY(-50%) translateX(0); /* Original position */
-  }
-  50% {
-    transform: translateY(-50%) translateX(5px); /* Move right slightly */
-  }
-}
-
-.highlight {
-  position: relative;
-  transition: all 0.3s ease-in-out;
-}
-
-/* Only apply highlight border when not expanded */
-.highlight:not(.expanded) {
-  border: 2px solid #ffd700; /* Gold border */
-  box-shadow: 0 4px 10px rgba(255, 215, 0, 0.3); /* Golden shadow */
-  transform: scale(1.02); /* Slight zoom effect */
-}
-
-.highlight::before {
-  content: "";
-  position: absolute;
-  top: 50%; /* Center vertically */
-  left: -25px; /* Position arrow more to the left */
-  transform: translateY(-50%);
-  border: 10px solid transparent; /* Arrow shape */
-  border-left: 10px solid #ffd700; /* Gold arrow color pointing right */
-  animation: wiggle 0.6s ease-in-out infinite; /* Wiggle animation */
-}
-
 .minor-achievement {
   font-size: 0.5rem; /* Tiny text for "MINOR ACHIEVEMENT" */
   text-align: center;
@@ -208,17 +175,54 @@
 /* Highlighted project effect */
 .highlight {
   position: relative;
-  animation: pulseHighlight 2s ease-in-out infinite;
+  isolation: isolate;
 }
 
-@keyframes pulseHighlight {
-  0%,
-  100% {
-    box-shadow: 0 0 0 0 rgba(212, 165, 116, 0.4);
-  }
-  50% {
-    box-shadow: 0 0 0 10px rgba(212, 165, 116, 0);
-  }
+.highlight:not(.expanded) {
+  box-shadow:
+    0 20px 52px -38px rgba(246, 188, 38, 0.8),
+    inset 1px 0 rgba(255, 231, 159, 0.28);
+}
+
+/* A restrained, dimensional award ribbon for featured projects. */
+.highlight-ribbon {
+  position: absolute;
+  z-index: 16;
+  top: -1px;
+  left: 0;
+  width: 13px;
+  height: 104px;
+  clip-path: polygon(0 0, 100% 0, 100% 88%, 50% 100%, 0 88%);
+  background:
+    linear-gradient(90deg, rgba(92, 53, 0, 0.3), transparent 22%, transparent 72%, rgba(93, 54, 0, 0.34)),
+    linear-gradient(105deg, #d99708 0%, #ffd85b 42%, #f2ad0d 74%, #b66a00 100%);
+  box-shadow:
+    3px 7px 14px rgba(0, 0, 0, 0.24),
+    inset 1px 0 rgba(255, 250, 218, 0.62),
+    inset -1px 0 rgba(112, 62, 0, 0.36);
+  pointer-events: none;
+}
+
+.highlight-ribbon::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(115deg, transparent 0 34%, rgba(255, 255, 255, 0.34) 46%, transparent 58%) 0 0 / 100% 48px no-repeat,
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.05) 0 1px, transparent 1px 4px);
+  mix-blend-mode: screen;
+}
+
+.highlight-ribbon::after {
+  content: "";
+  position: absolute;
+  right: 1px;
+  bottom: 9px;
+  left: 1px;
+  height: 20px;
+  background: linear-gradient(155deg, rgba(104, 55, 0, 0.38), transparent 54%);
+  transform: skewY(-10deg);
+  transform-origin: bottom left;
 }
 
 /* Importance level indicators */

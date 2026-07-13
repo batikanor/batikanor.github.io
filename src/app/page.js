@@ -5,7 +5,6 @@
 import dynamic from "next/dynamic";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
-import { FaCode, FaRocket, FaTrophy } from "react-icons/fa";
 import CVContent from "../components/CVContent";
 import Projects from "../components/Projects";
 
@@ -28,7 +27,7 @@ const GlobeGame = dynamic(() => import("../components/GlobeGame"), {
   ),
 });
 
-const HERO_MOTTOS = ["Friend", "a fine gentleman", "a strange dude"];
+const HERO_MOTTOS = ["Someone", "a Friend"];
 
 export default function Home() {
   const [mounted, setMounted] = useState(false);
@@ -54,6 +53,43 @@ export default function Home() {
 
   const toggle3D = () => {
     setShow3D(!show3D);
+  };
+
+  const scrollToCv = (event) => {
+    event.preventDefault();
+
+    const cvSection = document.getElementById("cv");
+    if (!cvSection) return;
+
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      cvSection.scrollIntoView();
+      window.history.replaceState(null, "", "#cv");
+      return;
+    }
+
+    const startY = window.scrollY;
+    const targetY = cvSection.getBoundingClientRect().top + startY;
+    const distance = targetY - startY;
+    const duration = 1200;
+    const startedAt = performance.now();
+
+    const animateScroll = (now) => {
+      const progress = Math.min((now - startedAt) / duration, 1);
+      const eased =
+        progress < 0.5
+          ? 4 * progress * progress * progress
+          : 1 - Math.pow(-2 * progress + 2, 3) / 2;
+
+      window.scrollTo(0, startY + distance * eased);
+
+      if (progress < 1) {
+        window.requestAnimationFrame(animateScroll);
+      } else {
+        window.history.replaceState(null, "", "#cv");
+      }
+    };
+
+    window.requestAnimationFrame(animateScroll);
   };
 
   // Prevent hydration mismatch by not rendering until client-side
@@ -122,45 +158,34 @@ export default function Home() {
             )}
           </div>
 
-          {/* CTA Buttons */}
-          <div className="flex flex-wrap gap-6 justify-center mt-12">
-            <a href="#projects" className="btn text-lg px-8 py-4">
-              Explore My Projects
-            </a>
-            <a href="/cv" className="btn-secondary text-lg px-8 py-4">
-              View CV
-            </a>
-          </div>
         </div>
+
+        <a
+          href="#cv"
+          onClick={scrollToCv}
+          className="fixed left-2 top-1/2 z-30 hidden -translate-y-1/2 rotate-180 items-center gap-2 rounded-full border border-gray-300/60 bg-white/55 px-2 py-3 text-[9px] font-semibold uppercase tracking-[0.14em] text-gray-500 shadow-sm backdrop-blur-md transition-colors hover:border-amber-500/60 hover:text-amber-700 dark:border-gray-700/70 dark:bg-gray-950/45 dark:text-gray-400 dark:hover:text-amber-400 sm:flex [writing-mode:vertical-rl]"
+          aria-label="Scroll to view CV"
+        >
+          <span aria-hidden="true">↓</span>
+          <span>
+            Scroll to view <span className="gradient-text">CV</span>
+          </span>
+        </a>
+
+        <a
+          href="#cv"
+          onClick={scrollToCv}
+          className="fixed left-2 top-1/2 z-30 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-[linear-gradient(135deg,#f59e0b_0%,#f97316_52%,#ef4444_100%)] text-xs font-black tracking-wide text-white shadow-lg ring-1 ring-white/60 transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-amber-400 dark:ring-gray-950 sm:hidden"
+          aria-label="Scroll to view CV"
+        >
+          CV
+        </a>
 
         {/* Animated Background Elements */}
         <div className="absolute inset-0 -z-10 overflow-hidden">
           <div className="absolute top-20 left-10 w-72 h-72 bg-amber-300/20 rounded-full mix-blend-multiply filter blur-xl animate-blob"></div>
           <div className="absolute top-40 right-10 w-72 h-72 bg-yellow-200/20 rounded-full mix-blend-multiply filter blur-xl animate-blob animation-delay-2000"></div>
           <div className="absolute -bottom-8 left-20 w-72 h-72 bg-orange-200/20 rounded-full mix-blend-multiply filter blur-xl animate-blob animation-delay-4000"></div>
-        </div>
-      </section>
-
-      {/* Stats Section */}
-      <section className="py-12 animate-slideIn">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="card text-center hover-lift">
-            <FaTrophy className="text-4xl text-yellow-600 mx-auto mb-4" />
-            <h3 className="text-2xl font-bold mb-2">10+</h3>
-            <p className="text-gray-600 dark:text-gray-400">Competition wins</p>
-          </div>
-          <div className="card text-center hover-lift">
-            <FaCode className="text-4xl text-amber-600 mx-auto mb-4" />
-            <h3 className="text-2xl font-bold mb-2">Many</h3>
-            <p className="text-gray-600 dark:text-gray-400">Projects built</p>
-          </div>
-          <div className="card text-center hover-lift">
-            <FaRocket className="text-4xl text-orange-600 mx-auto mb-4" />
-            <h3 className="text-2xl font-bold mb-2">100+</h3>
-            <p className="text-gray-600 dark:text-gray-400">
-              Teammates befriended for life.
-            </p>
-          </div>
         </div>
       </section>
 
@@ -178,10 +203,29 @@ export default function Home() {
           </p>
         </div>
         <Projects />
+        <nav
+          className="mt-14 text-center"
+          aria-label="Alternate project views"
+        >
+          <p className="mb-4 text-sm font-semibold uppercase tracking-[0.14em] text-gray-500 dark:text-gray-400">
+            Explore alternate views to read about my projects
+          </p>
+          <div className="flex flex-wrap justify-center gap-3">
+            <a href="/lab" className="btn px-5 py-3">
+              Enter Project Lab
+            </a>
+            <a href="/explore-projects-world" className="btn px-5 py-3">
+              Explore Projects World
+            </a>
+            <a href="/catalyst-run" className="btn px-5 py-3">
+              Play Catalyst Run
+            </a>
+          </div>
+        </nav>
       </section>
 
       {/* CV Section */}
-      <section className="py-12">
+      <section id="cv" className="scroll-mt-8 py-12">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
             My <span className="gradient-text">Experience</span>
@@ -195,20 +239,6 @@ export default function Home() {
 
       {/* Export PDF Button removed: now available in Projects section */}
 
-      {/* Legacy Link */}
-      <section className="text-center py-12">
-        <p className="text-sm text-gray-600 dark:text-gray-400">
-          Looking for my old homepage? Find it{" "}
-          <a
-            href="http://batikanor.netlify.app"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-amber-600 dark:text-amber-500 hover:text-amber-700 dark:hover:text-amber-400 underline"
-          >
-            here
-          </a>
-        </p>
-      </section>
     </div>
   );
 }

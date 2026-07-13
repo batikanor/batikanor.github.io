@@ -67,8 +67,8 @@ export default function CVContent() {
           >
             {/* Main CV Container - Clean and Modern */}
             <div
-              className="relative card overflow-hidden hover-lift"
-              style={{ width: "1350px" }}
+              className="relative overflow-hidden rounded-2xl border border-light-border/70 bg-[#f8f9fa] shadow-2xl dark:border-dark-border/70"
+              style={{ width: "min(100%, 880px)" }}
             >
               {/* CV Content Container */}
               <div className="relative bg-white dark:bg-gray-900 rounded-xl overflow-hidden">
@@ -88,7 +88,7 @@ export default function CVContent() {
                 <div
                   style={{
                     width: "100%",
-                    height: "1747px",
+                    aspectRatio: "596 / 842",
                     overflow: "hidden",
                   }}
                 >
@@ -100,7 +100,7 @@ export default function CVContent() {
                       height: "100%",
                       border: "none",
                       opacity: isLoading ? 0 : 1,
-                      zoom: "1.3",
+                      display: "block",
                     }}
                     title="Batıkan's CV"
                     className="transition-opacity duration-500 bg-white"
@@ -129,21 +129,6 @@ export default function CVContent() {
             </motion.a>
           </motion.div>
 
-          {/* Info Card */}
-          <motion.div
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.8 }}
-            className="text-center"
-          >
-            <div className="card max-w-2xl mx-auto">
-              <p className="text-gray-600 dark:text-gray-400">
-                If you expected my experience(s) to be listed through a
-                different format, please send me an email and I will do my best
-                to present myself better.
-              </p>
-            </div>
-          </motion.div>
         </div>
       )}
     </motion.div>

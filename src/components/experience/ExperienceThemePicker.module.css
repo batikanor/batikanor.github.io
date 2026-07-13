@@ -1,0 +1,49 @@
+.picker {
+  z-index: 9;
+  display: flex;
+  gap: 3px;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: 999px;
+  background: rgba(7, 10, 16, 0.68);
+  padding: 4px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.18);
+  backdrop-filter: blur(14px);
+}
+
+.picker button {
+  display: grid;
+  width: 23px;
+  height: 23px;
+  place-items: center;
+  border: 1px solid transparent;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--theme-swatch);
+  cursor: pointer;
+  font: 10px/1 var(--font-geist-mono), monospace;
+  opacity: 0.62;
+  transition: background 150ms ease, border-color 150ms ease, opacity 150ms ease;
+}
+
+.picker button:hover {
+  background: color-mix(in srgb, var(--theme-swatch) 12%, transparent);
+  opacity: 1;
+}
+
+.picker .active {
+  border-color: color-mix(in srgb, var(--theme-swatch) 55%, transparent);
+  background: color-mix(in srgb, var(--theme-swatch) 16%, transparent);
+  opacity: 1;
+}
+
+@media (max-width: 760px) {
+  .picker {
+    padding: 3px;
+  }
+
+  .picker button {
+    width: 21px;
+    height: 21px;
+    font-size: 9px;
+  }
+}

@@ -1,5 +1,30 @@
 export const contestsAndActivities = [
   {
+    slug: "tesla-gigathon-2026",
+    importance: 8.5,
+    categories: ["Hacker"],
+    title: "1st Place at Tesla Gigathon 2026",
+    mapData: {
+      venue: "Tesla Gigafactory Berlin-Brandenburg",
+      city: "Grünheide",
+      country: "Germany",
+      coordinates: { lat: 52.391331, lng: 13.79215 },
+    },
+    date: "07/2026",
+    shortDescription:
+      "Won 1st place at Tesla Gigathon 2026, a supply chain and logistics competition using real Tesla data.",
+    longDescription: `I teamed up with people I met for the first time, as I have in many other competitions I won in the past, and we won 1st place at this supply chain and logistics-focused competition.
+
+Real Tesla data was used during the competition, and we signed comprehensive NDAs. Even taking photos inside the factory was not allowed, so I will have to wait for the organisers to provide more footage. I will update my website once it becomes available.`,
+    technologies: [
+      "Supply Chain",
+      "Logistics",
+      "Data Analytics",
+      "Manufacturing",
+      "Rapid Prototyping",
+    ],
+  },
+  {
     slug: "hong-kong-talent-engage-eurotech-healthtech-2026",
     importance: 9,
     categories: ["Hacker"],
@@ -75,6 +100,38 @@ Thanks to everyone who took initiative, including [Laurenz Sommerlad](https://ww
         abovePhotoCaption: "A version of our pitch",
         desktopSize: "XL",
         mobileSize: "S",
+      },
+    ],
+  },
+  {
+    slug: "decarbon-days-climathon-2026",
+    importance: 9,
+    highlighted: true,
+    categories: ["Jury", "Mentor"],
+    title: "Lead Jury & Mentor at Decarbon Days Climathon 2026",
+    mapData: {
+      venue: "Konrad-Wachsmann-Allee 3",
+      city: "Cottbus",
+      country: "Germany",
+      coordinates: { lat: 51.767384, lng: 14.326165 },
+    },
+    date: "06/2026",
+    shortDescription:
+      "For the second time, I served as lead jury and mentor at the growing Decarbon Days Climathon in Cottbus.",
+    longDescription: `For the second time, I was lead jury and mentor at the Decarbon Days Climathon event organised together with BTU Cottbus / Germany and Zielona Gora / Poland. This time, the event grew, the submission and pitch qualities increased, and even Tesla became a sponsor, awarding winning teams with free tours of the Berlin Gigafactory.
+
+I will add more footage from the event here once it is published.`,
+    technologies: [
+      "Climate Tech",
+      "Jury",
+      "Mentoring",
+      "Sustainability",
+      "Pitch Evaluation",
+    ],
+    links: [
+      {
+        label: "See the 2025 Decarbon Days Climathon",
+        url: "/projects/#decarbon-days-climathon-2025",
       },
     ],
   },

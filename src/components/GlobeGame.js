@@ -1645,9 +1645,6 @@ export default function GlobeGame({ navigateWithRefresh, onProjectSelect }) {
                 </li>
               )}
             </ul>
-            <div className="text-center text-xs text-gray-400 mt-2 pt-2 border-t border-gray-500">
-              Colors: Red → Yellow → Green
-            </div>
           </div>
 
           <Globe

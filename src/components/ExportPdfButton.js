@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { FaDownload } from "react-icons/fa";
 import { contestsAndActivities as achievements } from "../data/contestsAndActivities";
+import { normalizeTopAlignedDestination } from "../lib/pdfTocDestination.mjs";
 
 // Completely redesigned PDF exporter with:
 // • Clean text (no weird characters)
@@ -464,7 +465,11 @@ export default function ExportPdfButton({
       // ---------------------------------------------------------------------------
       const getCurrentDestination = () => {
         const { pageNumber } = pdf.internal.getCurrentPageInfo();
-        return { pageNumber, top: currentY };
+        return normalizeTopAlignedDestination({
+          pageHeight,
+          pageNumber,
+          topFromPageTop: currentY,
+        });
       };
 
       // Helper to render an achievement header with orange title + small QR code
@@ -674,6 +679,7 @@ export default function ExportPdfButton({
           title: achievement.title,
           page: destination.pageNumber,
           top: destination.top,
+          magFactor: destination.magFactor,
           date: achievement.date,
           location: locationStr,
           importance: achievement.importance || 0, // Add importance field
@@ -886,6 +892,7 @@ export default function ExportPdfButton({
           if (i === lines.length - 1) {
             pdf.textWithLink(line, margin + 12, tocY, {
               pageNumber: entry.page + pagesInserted,
+              magFactor: entry.magFactor,
               top: entry.top,
             });
 
