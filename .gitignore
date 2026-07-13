@@ -12,6 +12,7 @@
 # next.js
 /.next/
 /out/
+/public/cv/batikan-bora-ormanci-cv.pdf
 
 # production
 /build

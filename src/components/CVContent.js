@@ -1,136 +1,88 @@
 "use client";
+
 import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
-import { FaDownload, FaFileAlt } from "react-icons/fa";
+import { FaDownload, FaGoogleDrive } from "react-icons/fa";
 import { CV_CONFIG } from "../app/cv/config";
 
+const compactActionClass =
+  "inline-flex min-h-10 items-center justify-center gap-2 rounded-full px-3 py-2 text-xs font-bold shadow-sm transition-transform hover:scale-[1.03] focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 dark:focus:ring-offset-gray-950 sm:px-4 sm:text-sm";
+
 export default function CVContent() {
-  const [isMobile, setIsMobile] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth <= 768);
-    };
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-  const handleIframeLoad = () => {
-    setIsLoading(false);
-  };
-
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.6 }}
-      className="w-full max-w-6xl mx-auto px-4"
+      className="mx-auto w-full max-w-6xl px-2 sm:px-4"
     >
-      {isMobile ? (
+      <div className="space-y-4 sm:space-y-8">
         <motion.div
-          initial={{ scale: 0.95, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ delay: 0.2 }}
-          className="card text-center space-y-6"
+          initial={{ y: 30, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.2, duration: 0.7 }}
+          className="mx-auto w-full max-w-[880px] overflow-hidden rounded-2xl border border-light-border/70 bg-[#f8f9fa] shadow-2xl dark:border-dark-border/70 dark:bg-gray-950"
         >
-          <div className="space-y-4">
-            <FaFileAlt className="text-5xl text-accent mx-auto" />
-            <h3 className="text-2xl font-bold gradient-text">My CV</h3>
+          <div className="flex items-center justify-end gap-2 border-b border-gray-200 bg-white/95 p-3 dark:border-gray-800 dark:bg-gray-900/95 sm:p-4">
+            <div className="flex shrink-0 items-center gap-2">
+              <a
+                href={CV_CONFIG.embeddedViewUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`${compactActionClass} border border-[#0f9d58]/35 bg-[#0f9d58]/10 text-[#0b8043] hover:border-[#0f9d58] hover:bg-[#0f9d58]/15 dark:border-[#34a853]/40 dark:bg-[#34a853]/10 dark:text-[#81c995]`}
+                aria-label="Open CV in Google Drive"
+                title="Open CV in Google Drive"
+              >
+                <FaGoogleDrive aria-hidden="true" className="text-sm" />
+                <span className="sm:hidden">Drive</span>
+                <span className="hidden sm:inline">Google Drive</span>
+              </a>
+              <a
+                href={CV_CONFIG.pdfDownloadUrl}
+                download="Batikan-Bora-Ormanci-CV.pdf"
+                className={`${compactActionClass} bg-gradient-to-r from-amber-600 via-orange-600 to-red-600 text-white hover:from-amber-700 hover:via-orange-700 hover:to-red-700`}
+                aria-label="Download CV as PDF"
+              >
+                <FaDownload aria-hidden="true" className="text-[11px]" />
+                <span>PDF</span>
+              </a>
+            </div>
           </div>
-          <p>
-            Please access this page through a computer if you&apos;d like to
-            download a pdf version.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <motion.a
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              href={CV_CONFIG.pdfDownloadUrl}
-              download
-              className="btn flex items-center gap-2"
-            >
-              <FaDownload className="text-sm" />
-              View in Google Docs
-            </motion.a>
+
+          <div className="relative aspect-[596/842] overflow-hidden bg-white dark:bg-gray-900">
+            <iframe
+              src={`${CV_CONFIG.pdfDownloadUrl}#view=FitH&toolbar=0&navpanes=0`}
+              title="Batıkan Bora Ormancı's mobile CV preview"
+              className="block h-full w-full border-0 bg-white sm:hidden"
+            />
+            <iframe
+              src={CV_CONFIG.embeddedViewUrl}
+              title="Batıkan Bora Ormancı's CV"
+              className="hidden h-full w-full border-0 bg-white sm:block"
+            />
           </div>
         </motion.div>
-      ) : (
-        <div className="space-y-8">
-          {/* CV Viewer */}
-          <motion.div
-            initial={{ y: 30, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.3, duration: 0.8 }}
-            className="flex justify-center"
+
+        <p className="mx-auto max-w-[880px] px-2 text-center text-xs leading-relaxed text-gray-500 dark:text-gray-400 sm:hidden">
+          Tap <strong>Drive</strong> for a full-screen, zoomable view. The{" "}
+          <strong>PDF</strong> button downloads the latest version directly.
+        </p>
+
+        <motion.div
+          initial={{ y: 16, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.45 }}
+          className="hidden justify-center sm:flex"
+        >
+          <a
+            href={CV_CONFIG.pdfDownloadUrl}
+            download="Batikan-Bora-Ormanci-CV.pdf"
+            className="btn flex items-center gap-3"
           >
-            {/* Main CV Container - Clean and Modern */}
-            <div
-              className="relative overflow-hidden rounded-2xl border border-light-border/70 bg-[#f8f9fa] shadow-2xl dark:border-dark-border/70"
-              style={{ width: "min(100%, 880px)" }}
-            >
-              {/* CV Content Container */}
-              <div className="relative bg-white dark:bg-gray-900 rounded-xl overflow-hidden">
-                {/* Loading Overlay */}
-                {isLoading && (
-                  <div className="absolute inset-0 bg-white dark:bg-gray-900 flex items-center justify-center z-10 rounded-xl">
-                    <div className="text-center space-y-4">
-                      <div className="animate-spin w-12 h-12 border-4 border-accent border-t-transparent rounded-full mx-auto"></div>
-                      <p className="text-gray-600 dark:text-gray-400">
-                        Loading CV...
-                      </p>
-                    </div>
-                  </div>
-                )}
-
-                {/* Google Docs Iframe */}
-                <div
-                  style={{
-                    width: "100%",
-                    aspectRatio: "596 / 842",
-                    overflow: "hidden",
-                  }}
-                >
-                  <iframe
-                    src={CV_CONFIG.embeddedViewUrl}
-                    onLoad={handleIframeLoad}
-                    style={{
-                      width: "100%",
-                      height: "100%",
-                      border: "none",
-                      opacity: isLoading ? 0 : 1,
-                      display: "block",
-                    }}
-                    title="Batıkan's CV"
-                    className="transition-opacity duration-500 bg-white"
-                  />
-                </div>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Action Buttons */}
-          <motion.div
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.6 }}
-            className="flex flex-wrap gap-4 justify-center"
-          >
-            <motion.a
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              href={CV_CONFIG.pdfDownloadUrl}
-              download
-              className="btn flex items-center gap-3"
-            >
-              <FaDownload className="text-sm" />
-              Download CV as PDF
-            </motion.a>
-          </motion.div>
-
-        </div>
-      )}
+            <FaDownload className="text-sm" aria-hidden="true" />
+            Download CV as PDF
+          </a>
+        </motion.div>
+      </div>
     </motion.div>
   );
 }

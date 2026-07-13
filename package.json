@@ -3,9 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "predev": "npm run sync:cv",
     "dev": "next dev",
+    "prebuild": "npm run sync:cv",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "sync:cv": "node scripts/sync-cv-pdf.mjs"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
