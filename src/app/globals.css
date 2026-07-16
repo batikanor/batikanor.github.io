@@ -53,6 +53,11 @@ body.project-lab-active [data-floating-site-control] {
   display: none !important;
 }
 
+body.project-lab-embedded-active [data-floating-site-control],
+body.project-lab-embedded-active [data-floating-cv-control] {
+  display: none !important;
+}
+
 body.projects-world-active [data-floating-site-control] {
   display: none !important;
 }

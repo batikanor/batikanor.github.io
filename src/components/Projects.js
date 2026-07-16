@@ -1,9 +1,19 @@
-import { useEffect, useState } from "react";
-import { FaGlobe } from "react-icons/fa";
+import dynamic from "next/dynamic";
+import { useEffect, useRef, useState } from "react";
+import { FaChevronDown, FaGlobe, FaLayerGroup } from "react-icons/fa";
 import VanillaTilt from "vanilla-tilt";
 import { contestsAndActivities } from "../data/contestsAndActivities";
 import ExportPdfButton from "./ExportPdfButton";
 import "./Projects.css";
+
+const ProjectLab = dynamic(() => import("./ProjectLab3D"), {
+  ssr: false,
+  loading: () => (
+    <div className="grid min-h-[680px] place-items-center rounded-[30px] bg-[#090711] font-mono text-xs tracking-[0.12em] text-white/60">
+      INITIALIZING PROJECT LAB…
+    </div>
+  ),
+});
 
 // import ResizePanel from "react-resize-panel";
 const ResizePanel =
@@ -254,6 +264,32 @@ const Projects = () => {
   const [expandedActivity, setExpandedActivity] = useState(null);
   const [isMobile, setIsMobile] = useState(false);
   const [selectedCategories, setSelectedCategories] = useState([]);
+  const [projectView, setProjectView] = useState("list");
+  const [isViewMenuOpen, setIsViewMenuOpen] = useState(false);
+  const viewMenuRef = useRef(null);
+
+  useEffect(() => {
+    const closeViewMenu = (event) => {
+      if (event.type === "keydown" && event.key !== "Escape") return;
+
+      if (
+        event.type === "pointerdown" &&
+        viewMenuRef.current?.contains(event.target)
+      ) {
+        return;
+      }
+
+      setIsViewMenuOpen(false);
+    };
+
+    document.addEventListener("pointerdown", closeViewMenu);
+    document.addEventListener("keydown", closeViewMenu);
+
+    return () => {
+      document.removeEventListener("pointerdown", closeViewMenu);
+      document.removeEventListener("keydown", closeViewMenu);
+    };
+  }, []);
 
   // Function to handle scrolling to a project
   const scrollToProject = (slug) => {
@@ -605,6 +641,7 @@ const Projects = () => {
 
   // Toggle filter selection
   const toggleCategory = (category) => {
+    setProjectView("list");
     setSelectedCategories((prev) => {
       if (prev.includes(category)) {
         return prev.filter((c) => c !== category);
@@ -616,7 +653,18 @@ const Projects = () => {
 
   // Clear all filters
   const clearFilters = () => {
+    setProjectView("list");
     setSelectedCategories([]);
+  };
+
+  const showProjectLab = () => {
+    setProjectView("lab");
+    setIsViewMenuOpen(false);
+  };
+
+  const showProjectList = () => {
+    setProjectView("list");
+    setIsViewMenuOpen(false);
   };
 
   // Filter projects based on selected categories
@@ -634,35 +682,133 @@ const Projects = () => {
         <ExportPdfButton achievements={contestsAndActivities} />
       </div>
 
-      {/* Filter Buttons */}
-      <div className="mb-6 flex flex-wrap justify-center gap-2 rounded-lg border border-light-border bg-white/70 p-2 shadow-sm dark:border-dark-border dark:bg-dark-background-secondary/70">
-        <button
-          onClick={clearFilters}
-          className={`rounded-md px-3 py-2 text-sm font-semibold transition-all duration-200 ${
-            selectedCategories.length === 0
-              ? "bg-accent text-text-on-accent shadow-sm"
-              : "text-light-foreground-secondary hover:bg-light-background-secondary dark:text-dark-foreground-secondary dark:hover:bg-dark-background"
-          }`}
-        >
-          All ({contestsAndActivities.length})
-        </button>
-        {Object.keys(categoryCounts).map((category) => (
+      {/* Project filters and alternate views */}
+      <div className="mb-6 flex flex-col gap-2 rounded-lg border border-light-border bg-white/70 p-2 shadow-sm dark:border-dark-border dark:bg-dark-background-secondary/70 lg:flex-row lg:items-center lg:justify-between">
+        <div className="flex min-w-0 flex-wrap justify-center gap-2 lg:justify-start">
           <button
-          key={category}
-          onClick={() => toggleCategory(category)}
-          className={`rounded-md px-3 py-2 text-sm font-semibold transition-all duration-200 ${
-            selectedCategories.includes(category)
-              ? "bg-accent text-text-on-accent shadow-sm"
-              : "text-light-foreground-secondary hover:bg-light-background-secondary dark:text-dark-foreground-secondary dark:hover:bg-dark-background"
-          }`}
-        >
-            {category} ({categoryCounts[category]})
+            onClick={clearFilters}
+            className={`rounded-md px-3 py-2 text-sm font-semibold transition-all duration-200 ${
+              projectView === "list" && selectedCategories.length === 0
+                ? "bg-accent text-text-on-accent shadow-sm"
+                : "text-light-foreground-secondary hover:bg-light-background-secondary dark:text-dark-foreground-secondary dark:hover:bg-dark-background"
+            }`}
+          >
+            All ({contestsAndActivities.length})
           </button>
-        ))}
+          {Object.keys(categoryCounts).map((category) => (
+            <button
+              key={category}
+              onClick={() => toggleCategory(category)}
+              className={`rounded-md px-3 py-2 text-sm font-semibold transition-all duration-200 ${
+                projectView === "list" && selectedCategories.includes(category)
+                  ? "bg-accent text-text-on-accent shadow-sm"
+                  : "text-light-foreground-secondary hover:bg-light-background-secondary dark:text-dark-foreground-secondary dark:hover:bg-dark-background"
+              }`}
+            >
+              {category} ({categoryCounts[category]})
+            </button>
+          ))}
+        </div>
+
+        <div
+          ref={viewMenuRef}
+          className="relative flex shrink-0 justify-center lg:justify-end"
+        >
+          <button
+            type="button"
+            onClick={() => setIsViewMenuOpen((isOpen) => !isOpen)}
+            className={`inline-flex min-h-10 items-center gap-2 rounded-md border px-3 py-2 text-sm font-semibold shadow-sm transition-colors ${
+              projectView === "lab"
+                ? "border-accent bg-accent/10 text-accent-hover dark:text-accent"
+                : "border-light-border bg-white/80 text-light-foreground hover:border-accent/60 dark:border-dark-border dark:bg-dark-background dark:text-dark-foreground"
+            }`}
+            aria-haspopup="menu"
+            aria-expanded={isViewMenuOpen}
+          >
+            <FaLayerGroup aria-hidden="true" className="text-accent" />
+            <span>{projectView === "lab" ? "Project Lab" : "Project view"}</span>
+            <FaChevronDown
+              aria-hidden="true"
+              className={`text-[10px] transition-transform ${
+                isViewMenuOpen ? "rotate-180" : ""
+              }`}
+            />
+          </button>
+
+          {isViewMenuOpen && (
+            <div
+              role="menu"
+              aria-label="Choose a project view"
+              className="absolute right-0 top-[calc(100%+0.5rem)] z-50 w-64 overflow-hidden rounded-xl border border-light-border bg-white p-1.5 text-left shadow-2xl dark:border-dark-border dark:bg-dark-background-secondary"
+            >
+              <button
+                type="button"
+                role="menuitem"
+                onClick={showProjectList}
+                className={`block w-full rounded-lg px-3 py-2.5 text-left transition-colors ${
+                  projectView === "list"
+                    ? "bg-accent/10"
+                    : "hover:bg-light-background-secondary dark:hover:bg-dark-background"
+                }`}
+              >
+                <span className="block text-sm font-semibold text-light-foreground dark:text-dark-foreground">
+                  Project list
+                </span>
+                <span className="block text-xs text-light-foreground-secondary dark:text-dark-foreground-secondary">
+                  The standard filtered view
+                </span>
+              </button>
+              <button
+                type="button"
+                role="menuitem"
+                onClick={showProjectLab}
+                className={`block w-full rounded-lg px-3 py-2.5 text-left transition-colors ${
+                  projectView === "lab"
+                    ? "bg-accent/10"
+                    : "hover:bg-light-background-secondary dark:hover:bg-dark-background"
+                }`}
+              >
+                <span className="block text-sm font-semibold text-light-foreground dark:text-dark-foreground">
+                  Project Lab
+                </span>
+                <span className="block text-xs text-light-foreground-secondary dark:text-dark-foreground-secondary">
+                  Replace the list with the 3D trail
+                </span>
+              </button>
+              <div className="my-1 border-t border-light-border dark:border-dark-border" />
+              <a
+                href="/explore-projects-world"
+                role="menuitem"
+                className="block rounded-lg px-3 py-2.5 transition-colors hover:bg-light-background-secondary dark:hover:bg-dark-background"
+              >
+                <span className="block text-sm font-semibold text-light-foreground dark:text-dark-foreground">
+                  Explore Projects World ↗
+                </span>
+                <span className="block text-xs text-light-foreground-secondary dark:text-dark-foreground-secondary">
+                  Open the full-screen world
+                </span>
+              </a>
+              <a
+                href="/catalyst-run"
+                role="menuitem"
+                className="block rounded-lg px-3 py-2.5 transition-colors hover:bg-light-background-secondary dark:hover:bg-dark-background"
+              >
+                <span className="block text-sm font-semibold text-light-foreground dark:text-dark-foreground">
+                  Catalyst Run ↗
+                </span>
+                <span className="block text-xs text-light-foreground-secondary dark:text-dark-foreground-secondary">
+                  Launch the full-screen game
+                </span>
+              </a>
+            </div>
+          )}
+        </div>
       </div>
 
-      {/* Activities Grid - Using more width */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      {projectView === "lab" ? (
+        <ProjectLab embedded />
+      ) : (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {filteredActivities.map((activity, index) => {
           const isExpanded = expandedActivity === activity;
           const isMicro = activity.importance < 2;
@@ -1029,7 +1175,8 @@ const Projects = () => {
             </div>
           );
         })}
-      </div>
+        </div>
+      )}
     </div>
   );
 };

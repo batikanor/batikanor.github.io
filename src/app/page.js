@@ -163,6 +163,7 @@ export default function Home() {
         <a
           href="#cv"
           onClick={scrollToCv}
+          data-floating-cv-control
           className="fixed left-2 top-1/2 z-[2000] hidden -translate-y-1/2 rotate-180 items-center gap-2 rounded-full border border-gray-300/60 bg-white/55 px-2 py-3 text-[9px] font-semibold uppercase tracking-[0.14em] text-gray-500 shadow-sm backdrop-blur-md transition-colors hover:border-amber-500/60 hover:text-amber-700 dark:border-gray-700/70 dark:bg-gray-950/45 dark:text-gray-400 dark:hover:text-amber-400 sm:flex [writing-mode:vertical-rl]"
           aria-label="Scroll to view CV"
         >
@@ -175,6 +176,7 @@ export default function Home() {
         <a
           href="#cv"
           onClick={scrollToCv}
+          data-floating-cv-control
           className="fixed left-2 top-1/2 z-[2000] flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-[linear-gradient(135deg,#f59e0b_0%,#f97316_52%,#ef4444_100%)] text-xs font-black tracking-wide text-white shadow-lg ring-1 ring-white/60 transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-amber-400 dark:ring-gray-950 sm:hidden"
           aria-label="Scroll to view CV"
         >
@@ -203,25 +205,6 @@ export default function Home() {
           </p>
         </div>
         <Projects />
-        <nav
-          className="mt-14 text-center"
-          aria-label="Alternate project views"
-        >
-          <p className="mb-4 text-sm font-semibold uppercase tracking-[0.14em] text-gray-500 dark:text-gray-400">
-            Explore alternate views to read about my projects
-          </p>
-          <div className="flex flex-wrap justify-center gap-3">
-            <a href="/lab" className="btn px-5 py-3">
-              Enter Project Lab
-            </a>
-            <a href="/explore-projects-world" className="btn px-5 py-3">
-              Explore Projects World
-            </a>
-            <a href="/catalyst-run" className="btn px-5 py-3">
-              Play Catalyst Run
-            </a>
-          </div>
-        </nav>
       </section>
 
       {/* CV Section */}

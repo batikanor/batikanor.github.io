@@ -18,6 +18,19 @@ const PALETTE = [
   ["#7a53ff", "#ff67ba"],
 ];
 
+const HOMEPAGE_PALETTE = [
+  ["#b45309", "#f59e0b"],
+  ["#475569", "#cbd5e1"],
+  ["#92400e", "#fbbf24"],
+  ["#334155", "#94a3b8"],
+  ["#78350f", "#fdba74"],
+  ["#1f2937", "#f59e0b"],
+];
+
+const PROJECT_LAB_THEME_OVERRIDES = {
+  aurora: { label: "Portfolio", color: "#f59e0b" },
+};
+
 const LAB_PROJECTS = [...contestsAndActivities].sort(
   (first, second) => second.importance - first.importance,
 );
@@ -63,12 +76,13 @@ function wrapCanvasText(context, text, maxWidth, maxLines) {
   return lines;
 }
 
-function createProjectTexture(project, index) {
+function createProjectTexture(project, index, homepageAligned = false) {
   const canvas = document.createElement("canvas");
   canvas.width = 640;
   canvas.height = 360;
   const context = canvas.getContext("2d");
-  const [accentA, accentB] = PALETTE[index % PALETTE.length];
+  const palette = homepageAligned ? HOMEPAGE_PALETTE : PALETTE;
+  const [accentA, accentB] = palette[index % palette.length];
 
   const background = context.createLinearGradient(
     0,
@@ -76,9 +90,9 @@ function createProjectTexture(project, index) {
     canvas.width,
     canvas.height,
   );
-  background.addColorStop(0, "#11101d");
-  background.addColorStop(0.55, "#19132b");
-  background.addColorStop(1, "#080812");
+  background.addColorStop(0, homepageAligned ? "#111827" : "#11101d");
+  background.addColorStop(0.55, homepageAligned ? "#1f2937" : "#19132b");
+  background.addColorStop(1, homepageAligned ? "#0f172a" : "#080812");
   context.fillStyle = background;
   context.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -90,8 +104,8 @@ function createProjectTexture(project, index) {
     canvas.height * 0.22,
     canvas.width * 0.65,
   );
-  glow.addColorStop(0, `${accentA}cc`);
-  glow.addColorStop(0.34, `${accentB}42`);
+  glow.addColorStop(0, `${accentA}${homepageAligned ? "7a" : "cc"}`);
+  glow.addColorStop(0.34, `${accentB}${homepageAligned ? "2e" : "42"}`);
   glow.addColorStop(1, "transparent");
   context.fillStyle = glow;
   context.fillRect(0, 0, canvas.width, canvas.height);
@@ -169,6 +183,8 @@ function ProjectLabScene({
   selectedIndex,
   onSelect,
   focused,
+  theme,
+  embedded,
 }) {
   const hostRef = useRef(null);
   const selectedRef = useRef(selectedIndex);
@@ -191,9 +207,15 @@ function ProjectLabScene({
     const host = hostRef.current;
     if (!host) return undefined;
 
+    const homepageAligned = theme === "aurora";
+    const blendWithHomepage = homepageAligned && embedded;
+    const sceneBackground = homepageAligned ? "#111827" : "#090711";
+
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color("#090711");
-    scene.fog = new THREE.Fog("#090711", 10, 28);
+    scene.background = blendWithHomepage
+      ? null
+      : new THREE.Color(sceneBackground);
+    scene.fog = new THREE.Fog(sceneBackground, 10, 28);
 
     const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 100);
     camera.position.set(0.25, 2.7, 8.3);
@@ -201,7 +223,9 @@ function ProjectLabScene({
     const renderer = new THREE.WebGLRenderer({
       antialias: true,
       powerPreference: "high-performance",
+      alpha: blendWithHomepage,
     });
+    if (blendWithHomepage) renderer.setClearColor(0x000000, 0);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.7));
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -217,7 +241,9 @@ function ProjectLabScene({
     const contentRoot = new THREE.Group();
     scene.add(contentRoot);
 
-    scene.add(new THREE.AmbientLight(0x8f82b5, 1.15));
+    scene.add(
+      new THREE.AmbientLight(homepageAligned ? 0x94a3b8 : 0x8f82b5, 1.05),
+    );
 
     const keyLight = new THREE.DirectionalLight(0xfff2db, 3.2);
     keyLight.position.set(-4, 9, 7);
@@ -225,34 +251,50 @@ function ProjectLabScene({
     keyLight.shadow.mapSize.set(1024, 1024);
     scene.add(keyLight);
 
-    const violetLight = new THREE.PointLight(0x7b54ff, 45, 12);
+    const violetLight = new THREE.PointLight(
+      homepageAligned ? 0x64748b : 0x7b54ff,
+      homepageAligned ? 20 : 45,
+      12,
+    );
     violetLight.position.set(6, 4, 3);
     scene.add(violetLight);
 
-    const orangeLight = new THREE.PointLight(0xff6f27, 34, 10);
+    const orangeLight = new THREE.PointLight(
+      homepageAligned ? 0xf59e0b : 0xff6f27,
+      homepageAligned ? 22 : 34,
+      10,
+    );
     orangeLight.position.set(-5, 1, 2);
     scene.add(orangeLight);
 
     const ground = new THREE.Mesh(
       new THREE.PlaneGeometry(44, 44),
       new THREE.MeshStandardMaterial({
-        color: 0x0b0811,
+        color: homepageAligned ? 0x0f172a : 0x0b0811,
         roughness: 0.96,
         metalness: 0.05,
+        transparent: blendWithHomepage,
+        opacity: blendWithHomepage ? 0.04 : 1,
+        depthWrite: !blendWithHomepage,
       }),
     );
     ground.rotation.x = -Math.PI / 2;
     ground.receiveShadow = true;
     scene.add(ground);
 
-    const grid = new THREE.GridHelper(44, 64, 0x855084, 0x35234d);
+    const grid = new THREE.GridHelper(
+      44,
+      64,
+      homepageAligned ? 0x6b7280 : 0x855084,
+      homepageAligned ? 0x1f2937 : 0x35234d,
+    );
     grid.position.y = 0.012;
     grid.material.transparent = true;
-    grid.material.opacity = 0.62;
+    grid.material.opacity = blendWithHomepage ? 0.18 : 0.62;
     scene.add(grid);
 
     const compactTextures = projects.map((project, index) =>
-      createProjectTexture(project, index),
+      createProjectTexture(project, index, homepageAligned),
     );
 
     const chainGroup = new THREE.Group();
@@ -275,7 +317,7 @@ function ProjectLabScene({
       true,
     );
     const chainMaterial = new THREE.MeshPhysicalMaterial({
-      color: 0x77747d,
+      color: homepageAligned ? 0x6b7280 : 0x77747d,
       metalness: 1,
       roughness: 0.19,
       clearcoat: 0.35,
@@ -301,7 +343,7 @@ function ProjectLabScene({
       contentRoot.add(group);
 
       const frameMaterial = new THREE.MeshStandardMaterial({
-        color: 0x272238,
+        color: homepageAligned ? 0x374151 : 0x272238,
         metalness: 0.6,
         roughness: 0.28,
       });
@@ -337,7 +379,7 @@ function ProjectLabScene({
     const particles = new THREE.Points(
       particleGeometry,
       new THREE.PointsMaterial({
-        color: 0xff9d62,
+        color: homepageAligned ? 0xf59e0b : 0xff9d62,
         size: 0.035,
         transparent: true,
         opacity: 0.75,
@@ -405,8 +447,18 @@ function ProjectLabScene({
         transition = 1;
         selectorCards.forEach((item, index) => {
           const active = index === selection;
-          item.frameMaterial.color.set(active ? 0xff8f3f : 0x272238);
-          item.frameMaterial.emissive.set(active ? 0xff5d19 : 0x000000);
+          item.frameMaterial.color.set(
+            active
+              ? homepageAligned
+                ? 0xf59e0b
+                : 0xff8f3f
+              : homepageAligned
+                ? 0x374151
+                : 0x272238,
+          );
+          item.frameMaterial.emissive.set(
+            active ? (homepageAligned ? 0xb45309 : 0xff5d19) : 0x000000,
+          );
           item.frameMaterial.emissiveIntensity = active ? 0.24 : 0;
         });
       }
@@ -585,12 +637,12 @@ function ProjectLabScene({
       renderer.dispose();
       renderer.domElement.remove();
     };
-  }, [projects]);
+  }, [embedded, projects, theme]);
 
   return <div ref={hostRef} className={styles.canvasHost} />;
 }
 
-export default function ProjectLab3D() {
+export default function ProjectLab3D({ embedded = false }) {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [focused, setFocused] = useState(true);
   const [experienceTheme, selectExperienceTheme] = useExperienceTheme();
@@ -601,9 +653,13 @@ export default function ProjectLab3D() {
   const selectedMediaUrl = getProjectMediaUrl(selectedMedia?.url);
 
   useEffect(() => {
-    document.body.classList.add("project-lab-active");
-    return () => document.body.classList.remove("project-lab-active");
-  }, []);
+    const bodyClass = embedded
+      ? "project-lab-embedded-active"
+      : "project-lab-active";
+
+    document.body.classList.add(bodyClass);
+    return () => document.body.classList.remove(bodyClass);
+  }, [embedded]);
 
   const selectRelative = useCallback((direction) => {
     setSelectedIndex(
@@ -656,6 +712,7 @@ export default function ProjectLab3D() {
     <section
       className={styles.lab}
       data-experience-theme={experienceTheme}
+      data-embedded={embedded ? "true" : undefined}
       onWheel={handleWheel}
       onPointerDown={handlePointerDown}
       onPointerUp={handlePointerUp}
@@ -666,17 +723,22 @@ export default function ProjectLab3D() {
         selectedIndex={selectedIndex}
         onSelect={setSelectedIndex}
         focused={focused}
+        theme={experienceTheme}
+        embedded={embedded}
       />
 
-      <div className={styles.topBar}>
-        <Link href="/" className={styles.homeLink}>
-          <span aria-hidden="true">←</span> Go back to main menu
-        </Link>
-      </div>
+      {!embedded && (
+        <div className={styles.topBar}>
+          <Link href="/" className={styles.homeLink}>
+            <span aria-hidden="true">←</span> Go back to main menu
+          </Link>
+        </div>
+      )}
       <ExperienceThemePicker
         className={styles.themePicker}
         theme={experienceTheme}
         onChange={selectExperienceTheme}
+        overrides={PROJECT_LAB_THEME_OVERRIDES}
       />
 
       <article
