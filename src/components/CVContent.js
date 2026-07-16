@@ -1,19 +1,76 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { FaDownload, FaGoogleDrive } from "react-icons/fa";
+import { useEffect, useState } from "react";
+import { FaDownload, FaGoogleDrive, FaRedo } from "react-icons/fa";
 import { CV_CONFIG } from "../app/cv/config";
 
 const compactActionClass =
   "inline-flex min-h-10 items-center justify-center gap-2 rounded-full px-3 py-2 text-xs font-bold shadow-sm transition-transform hover:scale-[1.03] focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 dark:focus:ring-offset-gray-950 sm:px-4 sm:text-sm";
 
 export default function CVContent() {
+  const [mobilePdfUrl, setMobilePdfUrl] = useState(null);
+  const [mobilePdfStatus, setMobilePdfStatus] = useState("idle");
+  const [mobilePdfAttempt, setMobilePdfAttempt] = useState(0);
+
+  useEffect(() => {
+    if (!window.matchMedia("(max-width: 639px)").matches) return undefined;
+
+    let cancelled = false;
+    let objectUrl;
+
+    const prepareLatestPdf = async () => {
+      setMobilePdfUrl(null);
+      setMobilePdfStatus("loading");
+
+      try {
+        const response = await fetch(CV_CONFIG.pdfDownloadUrl, {
+          cache: "no-store",
+          credentials: "omit",
+          mode: "cors",
+          redirect: "follow",
+        });
+
+        if (!response.ok) {
+          throw new Error(`Google Docs returned HTTP ${response.status}`);
+        }
+
+        const pdf = await response.blob();
+        const signature = await pdf.slice(0, 5).text();
+
+        if (signature !== "%PDF-") {
+          throw new Error("Google Docs did not return a PDF");
+        }
+
+        objectUrl = URL.createObjectURL(
+          new Blob([pdf], { type: "application/pdf" }),
+        );
+
+        if (!cancelled) {
+          setMobilePdfUrl(objectUrl);
+          setMobilePdfStatus("ready");
+        }
+      } catch (error) {
+        console.error("Unable to prepare the latest mobile CV PDF", error);
+        if (!cancelled) setMobilePdfStatus("error");
+      }
+    };
+
+    prepareLatestPdf();
+
+    return () => {
+      cancelled = true;
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+    };
+  }, [mobilePdfAttempt]);
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.6 }}
       className="mx-auto w-full max-w-6xl px-2 sm:px-4"
+      data-mobile-pdf-status={mobilePdfStatus}
     >
       <div className="space-y-4 sm:space-y-8">
         <motion.div
@@ -36,10 +93,41 @@ export default function CVContent() {
                 <span className="sm:hidden">Drive</span>
                 <span className="hidden sm:inline">Google Drive</span>
               </a>
+              {mobilePdfUrl ? (
+                <a
+                  href={mobilePdfUrl}
+                  download="Batikan-Bora-Ormanci-CV.pdf"
+                  className={`${compactActionClass} bg-gradient-to-r from-amber-600 via-orange-600 to-red-600 text-white hover:from-amber-700 hover:via-orange-700 hover:to-red-700 sm:hidden`}
+                  aria-label="Download latest CV as PDF"
+                >
+                  <FaDownload aria-hidden="true" className="text-[11px]" />
+                  <span>PDF</span>
+                </a>
+              ) : mobilePdfStatus === "error" ? (
+                <button
+                  type="button"
+                  onClick={() => setMobilePdfAttempt((attempt) => attempt + 1)}
+                  className={`${compactActionClass} bg-gradient-to-r from-amber-600 via-orange-600 to-red-600 text-white sm:hidden`}
+                  aria-label="Retry preparing latest CV PDF"
+                >
+                  <FaRedo aria-hidden="true" className="text-[11px]" />
+                  <span>Retry</span>
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  disabled
+                  className={`${compactActionClass} cursor-wait bg-gradient-to-r from-amber-600 via-orange-600 to-red-600 text-white opacity-70 sm:hidden`}
+                  aria-label="Preparing latest CV PDF"
+                >
+                  <span className="h-3 w-3 animate-spin rounded-full border-2 border-white/40 border-t-white" />
+                  <span>PDF</span>
+                </button>
+              )}
               <a
                 href={CV_CONFIG.pdfDownloadUrl}
                 download="Batikan-Bora-Ormanci-CV.pdf"
-                className={`${compactActionClass} bg-gradient-to-r from-amber-600 via-orange-600 to-red-600 text-white hover:from-amber-700 hover:via-orange-700 hover:to-red-700`}
+                className={`${compactActionClass} hidden bg-gradient-to-r from-amber-600 via-orange-600 to-red-600 text-white hover:from-amber-700 hover:via-orange-700 hover:to-red-700 sm:inline-flex`}
                 aria-label="Download CV as PDF"
               >
                 <FaDownload aria-hidden="true" className="text-[11px]" />
@@ -50,14 +138,9 @@ export default function CVContent() {
 
           <div className="relative aspect-[596/842] overflow-hidden bg-white dark:bg-gray-900">
             <iframe
-              src={`${CV_CONFIG.pdfDownloadUrl}#view=FitH&toolbar=0&navpanes=0`}
-              title="Batıkan Bora Ormancı's mobile CV preview"
-              className="block h-full w-full border-0 bg-white sm:hidden"
-            />
-            <iframe
               src={CV_CONFIG.embeddedViewUrl}
               title="Batıkan Bora Ormancı's CV"
-              className="hidden h-full w-full border-0 bg-white sm:block"
+              className="block h-full w-full border-0 bg-white"
             />
           </div>
         </motion.div>
