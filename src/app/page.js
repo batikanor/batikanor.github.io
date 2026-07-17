@@ -4,7 +4,14 @@
 
 import dynamic from "next/dynamic";
 import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import {
+  FiChevronDown,
+  FiGlobe,
+  FiMap,
+  FiNavigation,
+  FiRadio,
+} from "react-icons/fi";
 import CVContent from "../components/CVContent";
 import Projects from "../components/Projects";
 
@@ -21,7 +28,7 @@ const AchievementMap = dynamic(() => import("../components/AchievementMap"), {
 const GlobeGame = dynamic(() => import("../components/GlobeGame"), {
   ssr: false,
   loading: () => (
-    <div className="flex items-center justify-center h-[800px] bg-gray-900/50 rounded-2xl">
+    <div className="flex h-[800px] items-center justify-center rounded-2xl bg-gray-900/50">
       <div className="text-gray-400">Loading globe...</div>
     </div>
   ),
@@ -29,10 +36,35 @@ const GlobeGame = dynamic(() => import("../components/GlobeGame"), {
 
 const HERO_MOTTOS = ["Someone", "a Friend"];
 
+const ACHIEVEMENT_VIEWS = [
+  {
+    id: "original",
+    shortLabel: "Classic map",
+    icon: FiMap,
+  },
+  {
+    id: "journeys",
+    shortLabel: "Connected map",
+    icon: FiNavigation,
+  },
+  {
+    id: "satellite",
+    shortLabel: "Satellite map",
+    icon: FiRadio,
+  },
+  {
+    id: "globe",
+    shortLabel: "3D map",
+    icon: FiGlobe,
+  },
+];
+
 export default function Home() {
   const [mounted, setMounted] = useState(false);
-  const [show3D, setShow3D] = useState(false);
+  const [achievementView, setAchievementView] = useState("original");
+  const [viewMenuOpen, setViewMenuOpen] = useState(false);
   const [mottoIndex, setMottoIndex] = useState(0);
+  const viewMenuRef = useRef(null);
 
   useEffect(() => {
     setMounted(true);
@@ -46,13 +78,22 @@ export default function Home() {
     return () => window.clearInterval(intervalId);
   }, []);
 
+  useEffect(() => {
+    if (!viewMenuOpen) return undefined;
+
+    const closeViewMenu = (event) => {
+      if (!viewMenuRef.current?.contains(event.target)) {
+        setViewMenuOpen(false);
+      }
+    };
+
+    document.addEventListener("pointerdown", closeViewMenu);
+    return () => document.removeEventListener("pointerdown", closeViewMenu);
+  }, [viewMenuOpen]);
+
   const navigateWithRefresh = (slug) => {
     const url = `${window.location.origin}/projects#${slug}`;
     window.location.href = url;
-  };
-
-  const toggle3D = () => {
-    setShow3D(!show3D);
   };
 
   const scrollToCv = (event) => {
@@ -125,39 +166,108 @@ export default function Home() {
             </p>
           </div>
 
-          {/* Map/Globe Container - Much Larger and More Prominent */}
+          {/* Achievement visualization */}
           <div className="mt-16 w-full px-0 sm:px-4">
-            {show3D ? (
-              <div className="relative">
-                <div className="glass rounded-3xl p-2 sm:p-6 shadow-2xl border border-gray-200 dark:border-gray-800 backdrop-blur-xl">
+            <div className="relative">
+              <div
+                ref={viewMenuRef}
+                className="absolute right-3 top-3 z-[2100] text-left sm:right-10 sm:top-6"
+              >
+                <button
+                  type="button"
+                  aria-haspopup="menu"
+                  aria-expanded={viewMenuOpen}
+                  onClick={() => setViewMenuOpen((open) => !open)}
+                  className="group flex items-center gap-2 rounded-full border border-amber-400/35 bg-gray-950/85 px-3 py-2 text-xs font-semibold text-white shadow-xl backdrop-blur-xl transition hover:border-amber-400/70 hover:bg-gray-950 sm:px-4 sm:py-2.5 sm:text-sm"
+                >
+                  <FiMap className="text-amber-400" aria-hidden="true" />
+                  <span>Alternative views</span>
+                  <FiChevronDown
+                    className={`text-amber-300 transition-transform ${
+                      viewMenuOpen ? "rotate-180" : ""
+                    }`}
+                    aria-hidden="true"
+                  />
+                </button>
+
+                <AnimatePresence>
+                  {viewMenuOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -6, scale: 0.98 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: -6, scale: 0.98 }}
+                      transition={{ duration: 0.16, ease: "easeOut" }}
+                      role="menu"
+                      aria-label="Alternative achievement views"
+                      className="absolute right-0 top-full mt-2 w-[min(290px,calc(100vw-2rem))] overflow-hidden rounded-2xl border border-white/10 bg-gray-950/95 p-1.5 shadow-2xl backdrop-blur-2xl"
+                    >
+                      {ACHIEVEMENT_VIEWS.map((view) => {
+                        const ViewIcon = view.icon;
+                        const isActive = achievementView === view.id;
+
+                        return (
+                          <button
+                            key={view.id}
+                            type="button"
+                            role="menuitemradio"
+                            aria-checked={isActive}
+                            onClick={() => {
+                              setAchievementView(view.id);
+                              setViewMenuOpen(false);
+                            }}
+                            className={`flex w-full items-center gap-3 rounded-xl border px-3 py-2.5 text-left transition ${
+                              isActive
+                                ? "border-amber-400/35 bg-amber-400/10"
+                                : "border-transparent hover:bg-white/[0.07]"
+                            }`}
+                          >
+                            <span
+                              className={`grid h-9 w-9 flex-none place-items-center rounded-xl ${
+                                isActive
+                                  ? "bg-gradient-to-br from-amber-400 to-orange-500 text-gray-950"
+                                  : "bg-white/[0.07] text-gray-300"
+                              }`}
+                            >
+                              <ViewIcon aria-hidden="true" />
+                            </span>
+                            <span className="min-w-0 flex-1">
+                              <span className="flex items-center justify-between gap-2">
+                                <strong className="text-xs text-white sm:text-sm">
+                                  {view.shortLabel}
+                                </strong>
+                                {isActive && (
+                                  <span className="font-mono text-[8px] uppercase tracking-[0.13em] text-amber-300">
+                                    Current
+                                  </span>
+                                )}
+                              </span>
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+
+              {achievementView === "globe" ? (
+                <div className="glass rounded-3xl border border-gray-200 p-2 shadow-2xl backdrop-blur-xl dark:border-gray-800 sm:p-6">
                   <div
-                    className="w-full py-4 sm:py-12 globe-container"
+                    className="globe-container w-full py-4 sm:py-12"
                     style={{ minHeight: "800px" }}
                   >
                     <GlobeGame navigateWithRefresh={navigateWithRefresh} />
                   </div>
                 </div>
-
-                {/* Switch back to 2D button */}
-                <div className="absolute top-6 left-6 z-10">
-                  <button
-                    onClick={toggle3D}
-                    className="bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white px-3 sm:px-6 py-2 sm:py-3 rounded-full font-medium transition-all transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center gap-2"
-                  >
-                    <span className="text-sm sm:text-base font-semibold">
-                      ← Back to 2D Map
-                    </span>
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <AchievementMap
-                navigateWithRefresh={navigateWithRefresh}
-                onToggle3D={toggle3D}
-              />
-            )}
+              ) : (
+                <AchievementMap
+                  key={achievementView}
+                  variant={achievementView}
+                  navigateWithRefresh={navigateWithRefresh}
+                />
+              )}
+            </div>
           </div>
-
         </div>
 
         <a
@@ -221,7 +331,6 @@ export default function Home() {
       </section>
 
       {/* Export PDF Button removed: now available in Projects section */}
-
     </div>
   );
 }

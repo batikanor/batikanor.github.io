@@ -192,12 +192,14 @@
   background: #08070e;
 }
 
-.monitorMedia iframe {
+.monitorMedia iframe,
+.monitorMedia img {
   display: block;
   width: 100%;
   aspect-ratio: 16 / 9;
   border: 0;
   background: #08070e;
+  object-fit: contain;
 }
 
 .monitorMedia figcaption {

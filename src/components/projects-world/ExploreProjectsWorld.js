@@ -53,6 +53,10 @@ function wrapText(context, text, maxWidth, maxLines) {
   return lines;
 }
 
+function isImageMediaUrl(url) {
+  return /\.(?:avif|gif|jpe?g|png|webp)(?:\?.*)?$/i.test(url || "");
+}
+
 function makeProjectTexture(site, index) {
   const { project } = site;
   const canvas = document.createElement("canvas");
@@ -1142,16 +1146,29 @@ export default function ExploreProjectsWorld() {
 
             {selectedMediaUrl && (
               <figure className={styles.detailsMedia}>
-                <iframe
-                  key={`${selectedProject.slug}-${selectedMediaUrl}`}
-                  src={selectedMediaUrl}
-                  title={selectedMedia?.abovePhotoCaption || `${selectedProject.title} media`}
-                  loading="eager"
-                  allow="autoplay; fullscreen"
-                  allowFullScreen
-                />
+                {isImageMediaUrl(selectedMediaUrl) ? (
+                  <img
+                    key={`${selectedProject.slug}-${selectedMediaUrl}`}
+                    src={selectedMediaUrl}
+                    alt={selectedMedia?.abovePhotoCaption || `${selectedProject.title} media`}
+                    loading="eager"
+                    decoding="async"
+                  />
+                ) : (
+                  <iframe
+                    key={`${selectedProject.slug}-${selectedMediaUrl}`}
+                    src={selectedMediaUrl}
+                    title={selectedMedia?.abovePhotoCaption || `${selectedProject.title} media`}
+                    loading="eager"
+                    allow="autoplay; fullscreen"
+                    allowFullScreen
+                  />
+                )}
                 {selectedMedia?.abovePhotoCaption && (
                   <figcaption>{selectedMedia.abovePhotoCaption}</figcaption>
+                )}
+                {selectedMedia?.credit && (
+                  <figcaption>{selectedMedia.credit}</figcaption>
                 )}
               </figure>
             )}

@@ -6,9 +6,12 @@ import "leaflet.markercluster/dist/MarkerCluster.css";
 import "leaflet.markercluster/dist/MarkerCluster.Default.css";
 import "leaflet/dist/leaflet.css";
 import { useEffect, useRef, useState } from "react";
-import { FaGlobe } from "react-icons/fa";
 import { contestsAndActivities } from "../data/contestsAndActivities";
 import MarkerInfo from "./MarkerInfo";
+
+const chronologicalActivities = [...contestsAndActivities]
+  .filter((activity) => activity.mapData?.coordinates)
+  .reverse();
 
 // Function to generate a deterministic color based on the importance
 const getDeterministicColor = (importance) => {
@@ -21,13 +24,13 @@ const getDeterministicColor = (importance) => {
 
   // Interpolate between colors
   const r = Math.round(
-    startColor.r + (endColor.r - startColor.r) * normalizedImportance
+    startColor.r + (endColor.r - startColor.r) * normalizedImportance,
   );
   const g = Math.round(
-    startColor.g + (endColor.g - startColor.g) * normalizedImportance
+    startColor.g + (endColor.g - startColor.g) * normalizedImportance,
   );
   const b = Math.round(
-    startColor.b + (endColor.b - startColor.b) * normalizedImportance
+    startColor.b + (endColor.b - startColor.b) * normalizedImportance,
   );
 
   return `rgb(${r}, ${g}, ${b})`;
@@ -94,15 +97,18 @@ const processAchievements = () => {
       venue.totalImportance >= 15
         ? "major"
         : venue.totalImportance >= 8
-        ? "medium"
-        : "minor",
+          ? "medium"
+          : "minor",
     averageImportance: venue.totalImportance / venue.count,
     maxImportance: Math.max(...venue.achievements.map((a) => a.importance)),
     label: `${venue.venue}, ${venue.city}`, // Changed to show venue + city instead of just city
   }));
 };
 
-export default function AchievementMap({ navigateWithRefresh, onToggle3D }) {
+export default function AchievementMap({
+  navigateWithRefresh,
+  variant = "original",
+}) {
   const mapRef = useRef(null);
   const mapInstanceRef = useRef(null);
   const [isExpanded, setIsExpanded] = useState(false);
@@ -147,16 +153,50 @@ export default function AchievementMap({ navigateWithRefresh, onToggle3D }) {
       attributionControl: false,
     });
 
-    // Add dark theme tile layer
-    L.tileLayer(
-      "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
-      {
-        attribution:
-          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-        subdomains: "abcd",
-        maxZoom: 20,
-      }
-    ).addTo(map);
+    const usesSatelliteTiles = variant === "satellite";
+    const tileUrl = usesSatelliteTiles
+      ? "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+      : "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png";
+    const tileAttribution = usesSatelliteTiles
+      ? "Tiles © Esri — Source: Esri, Maxar, Earthstar Geographics"
+      : '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>';
+
+    const tileOptions = {
+      attribution: tileAttribution,
+      maxZoom: 20,
+      className: usesSatelliteTiles ? "satellite-map-tiles" : "dark-map-tiles",
+    };
+    if (!usesSatelliteTiles) tileOptions.subdomains = "abcd";
+
+    L.tileLayer(tileUrl, tileOptions).addTo(map);
+
+    if (variant !== "original") {
+      const routeCoordinates = chronologicalActivities.map((activity) => [
+        activity.mapData.coordinates.lat,
+        activity.mapData.coordinates.lng,
+      ]);
+
+      L.polyline(routeCoordinates, {
+        color: variant === "satellite" ? "#fde68a" : "#f59e0b",
+        weight: variant === "satellite" ? 8 : 7,
+        opacity: variant === "satellite" ? 0.08 : 0.1,
+        smoothFactor: 0.75,
+        interactive: false,
+        className: "project-route-halo",
+      }).addTo(map);
+
+      L.polyline(routeCoordinates, {
+        color: variant === "satellite" ? "#fef3c7" : "#fbbf24",
+        weight: variant === "satellite" ? 1.15 : 1.5,
+        opacity: variant === "satellite" ? 0.56 : 0.62,
+        dashArray: variant === "satellite" ? "2 11" : "4 10",
+        lineCap: "round",
+        lineJoin: "round",
+        smoothFactor: 0.75,
+        interactive: false,
+        className: "project-route-flow",
+      }).addTo(map);
+    }
 
     // If we're focusing on a specific location, add a highlight marker
     if (!isNaN(lat) && !isNaN(lng)) {
@@ -174,6 +214,24 @@ export default function AchievementMap({ navigateWithRefresh, onToggle3D }) {
 
     // Custom icon for major achievements
     const createCustomIcon = (count, type, maxImportance) => {
+      if (variant === "journeys") {
+        const size = type === "major" ? 42 : type === "medium" ? 34 : 28;
+        return L.divIcon({
+          html: `<div class="journey-beacon ${type}"><span class="journey-beacon-core"></span><span class="journey-beacon-count">${count}</span></div>`,
+          iconSize: [size, size],
+          className: "custom-div-icon",
+        });
+      }
+
+      if (variant === "satellite") {
+        const size = type === "major" ? 46 : type === "medium" ? 38 : 30;
+        return L.divIcon({
+          html: `<div class="satellite-beacon ${type}"><span class="satellite-beacon-orbit"></span><span class="satellite-beacon-core"></span><span class="satellite-beacon-count">${count}</span></div>`,
+          iconSize: [size, size],
+          className: "custom-div-icon",
+        });
+      }
+
       const color = getDeterministicColor(maxImportance);
       const iconHtml = `<div class="custom-marker ${type}" style="background: ${color}; border-color: ${color};"><span class="marker-count">${count}</span></div>`;
       const size = type === "major" ? 50 : type === "medium" ? 40 : 30;
@@ -205,7 +263,7 @@ export default function AchievementMap({ navigateWithRefresh, onToggle3D }) {
             totalImportance += marker.locationData.totalImportance;
             maxImportance = Math.max(
               maxImportance,
-              marker.locationData.maxImportance
+              marker.locationData.maxImportance,
             );
           }
         });
@@ -224,6 +282,22 @@ export default function AchievementMap({ navigateWithRefresh, onToggle3D }) {
           className = "marker-cluster-large";
         }
 
+        if (variant === "journeys") {
+          return L.divIcon({
+            html: `<div class="journey-cluster ${className}"><span>${totalCount}</span><i></i></div>`,
+            className: "custom-cluster-icon",
+            iconSize: [size, size],
+          });
+        }
+
+        if (variant === "satellite") {
+          return L.divIcon({
+            html: `<div class="satellite-cluster ${className}"><span>${totalCount}</span><i></i></div>`,
+            className: "custom-cluster-icon",
+            iconSize: [size, size],
+          });
+        }
+
         return L.divIcon({
           html: `<div class="marker-cluster ${className}" style="background: ${color}; border-color: ${color};">
                    <span>${totalCount}</span>
@@ -239,7 +313,7 @@ export default function AchievementMap({ navigateWithRefresh, onToggle3D }) {
       const icon = createCustomIcon(
         location.count,
         location.type,
-        location.maxImportance
+        location.maxImportance,
       );
       const marker = L.marker(location.coords, { icon });
 
@@ -268,7 +342,7 @@ export default function AchievementMap({ navigateWithRefresh, onToggle3D }) {
         setIsMapReady(false);
       }
     };
-  }, [achievements]);
+  }, [achievements, variant]);
 
   // Update map settings when expanded/fullscreen state changes
   useEffect(() => {
@@ -355,6 +429,175 @@ export default function AchievementMap({ navigateWithRefresh, onToggle3D }) {
 
         .custom-marker.minor .marker-count {
           font-size: 10px;
+        }
+
+        .satellite-map-tiles {
+          filter: saturate(0.46) brightness(0.46) contrast(1.24)
+            hue-rotate(-8deg);
+        }
+
+        .dark-map-tiles {
+          filter: saturate(0.88) contrast(1.05);
+        }
+
+        .project-route-flow {
+          animation: projectRouteFlow 7s linear infinite;
+          filter: drop-shadow(0 0 4px rgba(245, 158, 11, 0.5));
+        }
+
+        .project-route-halo {
+          filter: blur(3px);
+        }
+
+        @keyframes projectRouteFlow {
+          to {
+            stroke-dashoffset: -84;
+          }
+        }
+
+        .journey-beacon,
+        .satellite-beacon {
+          position: relative;
+          display: grid;
+          width: 100%;
+          height: 100%;
+          place-items: center;
+          border-radius: 999px;
+        }
+
+        .journey-beacon::before,
+        .satellite-beacon::before {
+          position: absolute;
+          inset: 2px;
+          border: 1px solid rgba(254, 243, 199, 0.74);
+          border-radius: inherit;
+          box-shadow:
+            0 0 0 5px rgba(245, 158, 11, 0.1),
+            0 0 24px rgba(245, 158, 11, 0.72);
+          content: "";
+          animation: beaconBreath 2.8s ease-in-out infinite;
+        }
+
+        .journey-beacon-core,
+        .satellite-beacon-core {
+          position: absolute;
+          width: 44%;
+          height: 44%;
+          border: 1px solid #fff7d6;
+          border-radius: inherit;
+          background: radial-gradient(
+            circle at 35% 30%,
+            #fff7d6,
+            #f59e0b 55%,
+            #9a3412
+          );
+          box-shadow: 0 0 14px rgba(251, 191, 36, 0.92);
+        }
+
+        .journey-beacon-count,
+        .satellite-beacon-count {
+          position: relative;
+          z-index: 2;
+          color: #111827;
+          font-size: 9px;
+          font-weight: 900;
+          text-shadow: 0 1px rgba(255, 255, 255, 0.3);
+        }
+
+        .satellite-beacon::before {
+          border-color: rgba(224, 242, 254, 0.9);
+          box-shadow:
+            0 0 0 6px rgba(56, 189, 248, 0.1),
+            0 0 30px rgba(125, 211, 252, 0.82);
+        }
+
+        .satellite-beacon-core {
+          background: radial-gradient(
+            circle at 35% 30%,
+            #ffffff,
+            #fde68a 45%,
+            #38bdf8
+          );
+          box-shadow: 0 0 16px rgba(186, 230, 253, 0.95);
+        }
+
+        .satellite-beacon-orbit {
+          position: absolute;
+          width: 125%;
+          height: 52%;
+          border: 1px solid rgba(186, 230, 253, 0.58);
+          border-radius: 50%;
+          transform: rotate(-24deg);
+        }
+
+        @keyframes beaconBreath {
+          0%,
+          100% {
+            opacity: 0.58;
+            transform: scale(0.86);
+          }
+          50% {
+            opacity: 1;
+            transform: scale(1.08);
+          }
+        }
+
+        .journey-cluster,
+        .satellite-cluster {
+          position: relative;
+          display: grid;
+          width: 100%;
+          height: 100%;
+          place-items: center;
+          border: 1px solid rgba(254, 243, 199, 0.84);
+          border-radius: 999px;
+          background: rgba(15, 23, 42, 0.82);
+          box-shadow:
+            inset 0 0 18px rgba(245, 158, 11, 0.25),
+            0 0 0 6px rgba(245, 158, 11, 0.1),
+            0 0 32px rgba(245, 158, 11, 0.55);
+          color: #fef3c7;
+          font-family: var(--font-geist-mono), monospace;
+          font-size: 12px;
+          font-weight: 900;
+        }
+
+        .journey-cluster i,
+        .satellite-cluster i {
+          position: absolute;
+          inset: -7px;
+          border: 1px dashed rgba(251, 191, 36, 0.38);
+          border-radius: inherit;
+          animation: orbitCluster 12s linear infinite;
+        }
+
+        .satellite-cluster {
+          border-color: rgba(224, 242, 254, 0.9);
+          background: rgba(2, 6, 23, 0.78);
+          box-shadow:
+            inset 0 0 20px rgba(56, 189, 248, 0.25),
+            0 0 0 7px rgba(56, 189, 248, 0.09),
+            0 0 38px rgba(125, 211, 252, 0.62);
+          color: #fef3c7;
+        }
+
+        .satellite-cluster i {
+          animation-name: orbitSatellite;
+          border-color: rgba(186, 230, 253, 0.48);
+          border-style: solid;
+          transform: scaleY(0.52) rotate(-18deg);
+        }
+
+        @keyframes orbitCluster {
+          to {
+            transform: rotate(360deg);
+          }
+        }
+
+        @keyframes orbitSatellite {
+          to {
+            transform: scaleY(0.52) rotate(342deg);
+          }
         }
 
         /* Highlight marker styles for focused location */
@@ -461,6 +704,16 @@ export default function AchievementMap({ navigateWithRefresh, onToggle3D }) {
           }
         }
 
+        @media (prefers-reduced-motion: reduce) {
+          .project-route-flow,
+          .journey-beacon::before,
+          .satellite-beacon::before,
+          .journey-cluster i,
+          .satellite-cluster i {
+            animation: none;
+          }
+        }
+
         .leaflet-container {
           background: theme("colors.dark-background-secondary");
           font-family: inherit;
@@ -483,6 +736,7 @@ export default function AchievementMap({ navigateWithRefresh, onToggle3D }) {
       `}</style>
 
       <div
+        data-map-study={variant}
         className={`
           relative overflow-hidden rounded-3xl transition-all duration-700
           ${
@@ -504,66 +758,50 @@ export default function AchievementMap({ navigateWithRefresh, onToggle3D }) {
           }}
         />
 
-        {/* Control Buttons Container */}
-        <div className="absolute top-6 right-10 z-[1000] flex justify-between items-start gap-10">
-          {/* Left side buttons */}
-          <div className="flex flex-col gap-3">
-            {/* 3D Globe Toggle Button */}
-            <button
-              onClick={onToggle3D}
-              className="group relative bg-gradient-to-r from-accent-dark to-accent-darker hover:from-accent-darker hover:to-accent-dark text-text-on-accent px-3 sm:px-4 py-2 rounded-full font-medium transition-all transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center gap-2"
-            >
-              <FaGlobe className="text-base sm:text-lg animate-spin-slow" />
-              <span className="text-xs sm:text-sm font-semibold">
-                Switch to 3D Globe
-              </span>
-              <div className="absolute -top-1 -right-1 w-3 h-3 bg-accent-hover rounded-full animate-ping"></div>
-              <div className="absolute -top-1 -right-1 w-3 h-3 bg-accent rounded-full"></div>
-            </button>
-          </div>
-
-          {/* Right side - Legend - Hidden on mobile */}
-          <div className="hidden sm:block bg-black/80 backdrop-blur-sm rounded-lg p-3 text-sm">
-            <div className="mb-2 text-center">
-              <span className="text-white font-semibold text-xs">
-                Achievement Importance
-              </span>
-            </div>
-            <div className="flex items-center gap-2 mb-1.5">
-              <div
-                className="w-4 h-4 rounded-full flex items-center justify-center text-white text-xs font-bold"
-                style={{ backgroundColor: getDeterministicColor(9) }}
-              >
-                9+
+        {variant === "original" && (
+          <div className="absolute right-10 top-20 z-[1000]">
+            <div className="hidden sm:block bg-black/80 backdrop-blur-sm rounded-lg p-3 text-sm">
+              <div className="mb-2 text-center">
+                <span className="text-white font-semibold text-xs">
+                  Achievement Importance
+                </span>
               </div>
-              <span className="text-dark-foreground-secondary text-xs">
-                High Impact
-              </span>
-            </div>
-            <div className="flex items-center gap-2 mb-1.5">
-              <div
-                className="w-3.5 h-3.5 rounded-full flex items-center justify-center text-white text-xs font-bold"
-                style={{ backgroundColor: getDeterministicColor(6) }}
-              >
-                6
+              <div className="flex items-center gap-2 mb-1.5">
+                <div
+                  className="w-4 h-4 rounded-full flex items-center justify-center text-white text-xs font-bold"
+                  style={{ backgroundColor: getDeterministicColor(9) }}
+                >
+                  9+
+                </div>
+                <span className="text-dark-foreground-secondary text-xs">
+                  High Impact
+                </span>
               </div>
-              <span className="text-dark-foreground-secondary text-xs">
-                Medium Impact
-              </span>
-            </div>
-            <div className="flex items-center gap-2 mb-2">
-              <div
-                className="w-3 h-3 rounded-full flex items-center justify-center text-white text-xs font-bold"
-                style={{ backgroundColor: getDeterministicColor(3) }}
-              >
-                3
+              <div className="flex items-center gap-2 mb-1.5">
+                <div
+                  className="w-3.5 h-3.5 rounded-full flex items-center justify-center text-white text-xs font-bold"
+                  style={{ backgroundColor: getDeterministicColor(6) }}
+                >
+                  6
+                </div>
+                <span className="text-dark-foreground-secondary text-xs">
+                  Medium Impact
+                </span>
               </div>
-              <span className="text-dark-foreground-secondary text-xs">
-                Lower Impact
-              </span>
+              <div className="flex items-center gap-2 mb-2">
+                <div
+                  className="w-3 h-3 rounded-full flex items-center justify-center text-white text-xs font-bold"
+                  style={{ backgroundColor: getDeterministicColor(3) }}
+                >
+                  3
+                </div>
+                <span className="text-dark-foreground-secondary text-xs">
+                  Lower Impact
+                </span>
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* MarkerInfo component for detailed project view */}

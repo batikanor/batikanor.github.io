@@ -304,11 +304,13 @@
   background: #101418;
 }
 
-.detailsMedia iframe {
+.detailsMedia iframe,
+.detailsMedia img {
   display: block;
   width: 100%;
   aspect-ratio: 16 / 9;
   border: 0;
+  object-fit: contain;
 }
 
 .detailsMedia figcaption {

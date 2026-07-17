@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 // Function to convert Google Drive link to embeddable format for videos and documents
 const getGoogleDriveEmbedUrl = (url) => {
   if (url.includes("youtube.com/embed/")) return url;
+  if (!url.includes("drive.google.com")) return url;
   const fileIdMatch = url.match(/[-\w]{25,}/);
   return fileIdMatch
     ? `https://drive.google.com/file/d/${fileIdMatch[0]}/preview`
@@ -217,6 +218,23 @@ const ResizableEmbed = ({
       setIsExpanded(true);
     }
   };
+
+  const isDirectImage = /\.(?:avif|gif|jpe?g|png|webp)(?:\?.*)?$/i.test(url);
+
+  if (isDirectImage) {
+    return (
+      <div className="relative mb-4 overflow-hidden rounded-lg bg-black/10">
+        <img
+          src={url}
+          alt="Project media"
+          loading="lazy"
+          decoding="async"
+          className="mx-auto h-auto w-full object-contain"
+          style={{ maxHeight: `${height}px` }}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="relative mb-4 embed-container">

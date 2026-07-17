@@ -49,6 +49,10 @@ function getProjectMediaUrl(url) {
   return url;
 }
 
+function isImageMediaUrl(url) {
+  return /\.(?:avif|gif|jpe?g|png|webp)(?:\?.*)?$/i.test(url || "");
+}
+
 function wrapCanvasText(context, text, maxWidth, maxLines) {
   const words = text.split(" ");
   const lines = [];
@@ -758,16 +762,29 @@ export default function ProjectLab3D({ embedded = false }) {
 
           {selectedMediaUrl && (
             <figure className={styles.monitorMedia}>
-              <iframe
-                key={`${selectedProject.slug}-${selectedMediaUrl}`}
-                src={selectedMediaUrl}
-                title={selectedMedia.abovePhotoCaption || `${selectedProject.title} media`}
-                loading="eager"
-                allow="autoplay; fullscreen"
-                allowFullScreen
-              />
+              {isImageMediaUrl(selectedMediaUrl) ? (
+                <img
+                  key={`${selectedProject.slug}-${selectedMediaUrl}`}
+                  src={selectedMediaUrl}
+                  alt={selectedMedia.abovePhotoCaption || `${selectedProject.title} media`}
+                  loading="eager"
+                  decoding="async"
+                />
+              ) : (
+                <iframe
+                  key={`${selectedProject.slug}-${selectedMediaUrl}`}
+                  src={selectedMediaUrl}
+                  title={selectedMedia.abovePhotoCaption || `${selectedProject.title} media`}
+                  loading="eager"
+                  allow="autoplay; fullscreen"
+                  allowFullScreen
+                />
+              )}
               {selectedMedia.abovePhotoCaption && (
                 <figcaption>{selectedMedia.abovePhotoCaption}</figcaption>
+              )}
+              {selectedMedia.credit && (
+                <figcaption>{selectedMedia.credit}</figcaption>
               )}
             </figure>
           )}

@@ -15,6 +15,8 @@ export const contestsAndActivities = [
       "Won 1st place at Tesla Gigathon 2026, a supply chain and logistics competition using real Tesla data.",
     longDescription: `I teamed up with people I met for the first time, as I have in many other competitions I won in the past, and we won 1st place at this supply chain and logistics-focused competition.
 
+{{gdrive_embed[0]}}
+
 Real Tesla data was used during the competition, and we signed comprehensive NDAs. Even taking photos inside the factory was not allowed, so I will have to wait for the organisers to provide more footage. I will update my website once it becomes available.`,
     technologies: [
       "Supply Chain",
@@ -22,6 +24,14 @@ Real Tesla data was used during the competition, and we signed comprehensive NDA
       "Data Analytics",
       "Manufacturing",
       "Rapid Prototyping",
+    ],
+    gdrive_embed: [
+      {
+        url: "/photos/tesla-gigathon/tesla-gigathon-2026-first-place-prize.jpg",
+        abovePhotoCaption: "My photo with the 1st place prize",
+        desktopSize: "L",
+        mobileSize: "L",
+      },
     ],
   },
   {
@@ -120,7 +130,21 @@ Thanks to everyone who took initiative, including [Laurenz Sommerlad](https://ww
       "For the second time, I served as lead jury and mentor at the growing Decarbon Days Climathon in Cottbus.",
     longDescription: `For the second time, I was lead jury and mentor at the Decarbon Days Climathon event organised together with BTU Cottbus / Germany and Zielona Gora / Poland. This time, the event grew, the submission and pitch qualities increased, and even Tesla became a sponsor, awarding winning teams with free tours of the Berlin Gigafactory.
 
-I will add more footage from the event here once it is published.`,
+I'd like to thank the rest of the jury-team, including:
+
+- Matthias Ecke — Member of the European Parliament for Saxony
+- Lisa Janßen — Climate KIC
+- Daniela Hertzer — LEAG
+- Prof. Dr. Roh Pin Lee — Chair of Decarbonization and Transformation of Industry, BTU Cottbus-Senftenberg
+- Dr.-Ing. Kamil Leksycki — Assistant Professor at the Institute of Mechanical Engineering, University of Zielona Góra
+- Czesław Fiedorowicz — Chairman of the Spree-Neiße-Bober Euroregion
+- Carsten Jacob — Managing Director of the German office of the Spree-Neiße-Bober Euroregion
+
+{{gdrive_embed[0]}}
+
+I also had the honor of presenting the ceremonial award cheque to the winning team.
+
+{{gdrive_embed[1]}}`,
     technologies: [
       "Climate Tech",
       "Jury",
@@ -132,6 +156,28 @@ I will add more footage from the event here once it is published.`,
       {
         label: "See the 2025 Decarbon Days Climathon",
         url: "/projects/#decarbon-days-climathon-2025",
+      },
+      {
+        label:
+          "Additional photo: me at the jury desk — Andreas Franke, Decarbon Days Cottbus",
+        url: "/photos/decarbon-days/decarbon-days-cottbus-2026-jury-close-up-andreas-franke.jpg",
+      },
+    ],
+    gdrive_embed: [
+      {
+        url: "/photos/decarbon-days/decarbon-days-cottbus-2026-jury-andreas-franke.jpg",
+        abovePhotoCaption: "Me together with the rest of the jury",
+        credit: "Photo: Andreas Franke · Decarbon Days Cottbus",
+        desktopSize: "XL",
+        mobileSize: "L",
+      },
+      {
+        url: "/photos/decarbon-days/decarbon-days-cottbus-2026-winning-team.jpg",
+        abovePhotoCaption: "Me together with the winning team",
+        credit:
+          "Photo: Decarbon Days Cottbus · photographer credit pending confirmation",
+        desktopSize: "XL",
+        mobileSize: "L",
       },
     ],
   },
