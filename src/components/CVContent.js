@@ -9,12 +9,25 @@ const compactActionClass =
   "inline-flex min-h-10 items-center justify-center gap-2 rounded-full px-3 py-2 text-xs font-bold shadow-sm transition-transform hover:scale-[1.03] focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 dark:focus:ring-offset-gray-950 sm:px-4 sm:text-sm";
 
 export default function CVContent() {
+  const [viewportMode, setViewportMode] = useState("unknown");
   const [mobilePdfUrl, setMobilePdfUrl] = useState(null);
   const [mobilePdfStatus, setMobilePdfStatus] = useState("idle");
   const [mobilePdfAttempt, setMobilePdfAttempt] = useState(0);
 
   useEffect(() => {
-    if (!window.matchMedia("(max-width: 639px)").matches) return undefined;
+    const desktopQuery = window.matchMedia("(min-width: 640px)");
+    const syncViewportMode = () => {
+      setViewportMode(desktopQuery.matches ? "desktop" : "mobile");
+    };
+
+    syncViewportMode();
+    desktopQuery.addEventListener("change", syncViewportMode);
+
+    return () => desktopQuery.removeEventListener("change", syncViewportMode);
+  }, []);
+
+  useEffect(() => {
+    if (viewportMode !== "mobile") return undefined;
 
     let cancelled = false;
     let objectUrl;
@@ -62,7 +75,7 @@ export default function CVContent() {
       cancelled = true;
       if (objectUrl) URL.revokeObjectURL(objectUrl);
     };
-  }, [mobilePdfAttempt]);
+  }, [mobilePdfAttempt, viewportMode]);
 
   return (
     <motion.div
@@ -71,6 +84,7 @@ export default function CVContent() {
       transition={{ duration: 0.6 }}
       className="mx-auto w-full max-w-6xl px-2 sm:px-4"
       data-mobile-pdf-status={mobilePdfStatus}
+      data-cv-viewport={viewportMode}
     >
       <div className="space-y-4 sm:space-y-8">
         <motion.div
@@ -136,13 +150,15 @@ export default function CVContent() {
             </div>
           </div>
 
-          <div className="relative aspect-[596/842] overflow-hidden bg-white dark:bg-gray-900">
-            <iframe
-              src={CV_CONFIG.embeddedViewUrl}
-              title="Batıkan Bora Ormancı's CV"
-              className="block h-full w-full border-0 bg-white"
-            />
-          </div>
+          {viewportMode === "desktop" && (
+            <div className="relative aspect-[596/842] overflow-hidden bg-white dark:bg-gray-900">
+              <iframe
+                src={CV_CONFIG.embeddedViewUrl}
+                title="Batıkan Bora Ormancı's CV"
+                className="block h-full w-full border-0 bg-white"
+              />
+            </div>
+          )}
         </motion.div>
 
         <p className="mx-auto max-w-[880px] px-2 text-center text-xs leading-relaxed text-gray-500 dark:text-gray-400 sm:hidden">
