@@ -48,14 +48,44 @@ Real Tesla data was used during the competition, and we signed comprehensive NDA
     },
     date: "06/2026",
     shortDescription:
-      "Won the health-tech challenge at a Munich hackathon organized by Hong Kong Talent Engage and EuroTech Federation, earning a sponsored trip to Hong Kong.",
+      "Won the health-tech challenge in Munich and joined a sponsored delegation to Hong Kong, Shenzhen and Guangzhou, visiting research centres, technology companies and incubators, and meeting Hong Kong's Secretary for Labour and Welfare.",
     longDescription: `A Hong Kong government office, [Hong Kong Talent Engage](https://www.linkedin.com/company/hk-talent-engage/), organized a hackathon in Munich together with [EuroTech Federation](https://www.linkedin.com/company/eurotech-federation/). More than 1,000 hackers applied, less than half were selected, and around 100 teams ended up at the venue.
 
-Our team, [Ulaş Mısırlıoğlu](https://www.linkedin.com/in/ulasmisirlioglu/), [Cem Araz](https://www.linkedin.com/in/cemaraz/), [Muhammad Moiz](https://www.linkedin.com/in/m2moiz/), and me, focused on the health-tech challenge and won the hackathon. Thanks to the sponsors, we will go to Hong Kong together later this year.
+Our team, [Ulaş Mısırlıoğlu](https://www.linkedin.com/in/ulasmisirlioglu/), [Cem Araz](https://www.linkedin.com/in/cemaraz/), [Muhammad Moiz](https://www.linkedin.com/in/m2moiz/), and me, focused on the health-tech challenge and won the hackathon. The prize led to a sponsored trip to Hong Kong and the Greater Bay Area in September 2026.
 
 We developed a way to estimate hemoglobin from conjunctiva images. During the competition, we also reached out to residential care homes for the elderly in Hong Kong, where anemia among elderly people is especially prevalent, and booked a few online calls with them.
 
 The pitch we delivered was enjoyed by the rest of the participants so much that a few of them congratulated us in person after the finale.
+
+{{gdrive_embed[1]}}
+
+**From the Munich hackathon to Hong Kong and the Greater Bay Area**
+
+From 7 to 11 September 2026, I joined HKTE and EuroTech Federation's 20-member delegation of hackathon winners and federation representatives. We travelled through Hong Kong, Qianhai in Shenzhen and Nansha in Guangzhou, exploring the region's research, technology and startup ecosystem. The programme connected us with research institutes, companies and founders working on AI, robotics, smart transport and biotechnology.
+
+One personal highlight was having lunch with and shaking hands with Mr Chris Sun, Hong Kong's Secretary for Labour and Welfare, alongside many other distinguished guests. Beyond the visits themselves, the trip was an opportunity to have valuable conversations with people across government, research and industry.
+
+{{gdrive_embed[0]}}
+
+**Research, company visits and technology demonstrations**
+
+We visited CUHK's Multi-Scale Medical Robotics Centre, GoerTek, Pinnacle Food, 51WORLD, LimX Dynamics, the HKU-Qianhai Institute of Intelligent Transport and Tencent Headquarters. The itinerary also included Sealien Robotics and Guangzhou Runsheng Cell Medicine Technology Co., Ltd., giving us a closer look at work spanning medical technology, robotics and intelligent transport.
+
+We experienced Pony.ai's autonomous vehicles and saw a drone food delivery demonstration at Talent Park: memorable opportunities to see these technologies outside a presentation or pitch deck.
+
+**Incubators, innovation hubs and support for founders**
+
+At Hong Kong Science and Technology Parks Corporation (HKSTP), Hong Kong-Shenzhen Innovation and Technology Park (HSITP), and Cyberport, we learned about programmes and facilities for technology companies. Our visits included HSITP's VC Sandbox and Incubation Centre, as well as Cyberport's Low-Altitude Economy Application Exhibition Hub and Digital Tech Centre.
+
+Across the Greater Bay Area, we also visited Qianhai Block V, Yuexiu iPark Innovation & Entrepreneurship Themed Exhibition Hall, the HKUST(GZ) Innovation and Technology Transfer Base, and Guangdong Medical Valley. These visits gave us a more concrete understanding of the infrastructure and support available to founders considering the region.
+
+**Getting to know the region beyond technology**
+
+The programme also took us to Hung Shui Kiu Community Liaison Centre, West Kowloon Cultural District, Art Park, Hong Kong Palace Museum, Xiqu Centre and The Peak. In Guangzhou, we visited Nansha Wetland Scenic Area and Nansha Marina. A visit to the Chinese Culinary Institute, a Cantonese Opera Movement Workshop and a Hong Kong tram tour rounded out the experience.
+
+It was my first time in Guangdong, and I plan to stay in touch with many of the people I met. Thank you to the HKTE and EuroTech Federation teams, Felix Chan, Anna Au, our guides Ricky Lo and Bruce, and everyone else who made the trip possible.
+
+Read [my LinkedIn trip recap](https://www.linkedin.com/posts/batikanor_i-was-one-of-the-winners-of-a-competition-ugcPost-7507379061267263488-EKkm/) and watch [HKTE's official delegation recap and video](https://www.linkedin.com/posts/hk-talent-engage_explore-more-to-work-and-live-in-hong-kong-activity-7504147997786537985-TDSp).
 
 Initiative matters the most: the initiative the organizers took to organize, the sponsors took to sponsor, the hackers took to hack, and the winners took to win.
 
@@ -63,9 +93,7 @@ If we all lie in bed and watch Netflix on the weekends, nothing interesting ever
 
 What life keeps showing me is that you just need to keep doing things, pressing buttons, and your understanding of the world, your talent, and the opportunities you find keep increasing.
 
-Thanks to everyone who took initiative, including [Laurenz Sommerlad](https://www.linkedin.com/in/laurenzsommerlad/), [Clément Sporrer](https://www.linkedin.com/in/clementsporrer/), [Grace Lai](https://www.linkedin.com/in/gracepslai/), [Tanmay Gupta, PhD](https://www.linkedin.com/in/tgupta089/), [Michele Fung](https://www.linkedin.com/in/michelefung/), [Wilson Chan](https://www.linkedin.com/in/wilson-chan-907322b9/), [Wendy Yau](https://www.linkedin.com/in/wendy-yau-55586b93/), and many others.
-
-{{gdrive_embed[0]}}`,
+Thanks to everyone who took initiative, including [Laurenz Sommerlad](https://www.linkedin.com/in/laurenzsommerlad/), [Clément Sporrer](https://www.linkedin.com/in/clementsporrer/), [Grace Lai](https://www.linkedin.com/in/gracepslai/), [Tanmay Gupta, PhD](https://www.linkedin.com/in/tgupta089/), [Michele Fung](https://www.linkedin.com/in/michelefung/), [Wilson Chan](https://www.linkedin.com/in/wilson-chan-907322b9/), [Wendy Yau](https://www.linkedin.com/in/wendy-yau-55586b93/), and many others.`,
     technologies: [
       "Health Tech",
       "Computer Vision",
@@ -76,7 +104,15 @@ Thanks to everyone who took initiative, including [Laurenz Sommerlad](https://ww
     ],
     links: [
       {
-        label: "My LinkedIn Post",
+        label: "My LinkedIn Trip Recap",
+        url: "https://www.linkedin.com/posts/batikanor_i-was-one-of-the-winners-of-a-competition-ugcPost-7507379061267263488-EKkm/",
+      },
+      {
+        label: "HKTE's Official Delegation Recap & Video",
+        url: "https://www.linkedin.com/posts/hk-talent-engage_explore-more-to-work-and-live-in-hong-kong-activity-7504147997786537985-TDSp",
+      },
+      {
+        label: "My LinkedIn Hackathon Post",
         url: "https://www.linkedin.com/posts/batikanor_a-hong-kong-government-office-hong-kong-activity-7471684145832747008-CfBX?utm_source=share&utm_medium=member_desktop&rcm=ACoAACL8UREBa3FbjBW-yu7HCZmgCHJBrj-opz4",
       },
       {
@@ -105,6 +141,14 @@ Thanks to everyone who took initiative, including [Laurenz Sommerlad](https://ww
       },
     ],
     gdrive_embed: [
+      {
+        url: "/photos/hkte-eurotech/hkte-eurotech-2026-delegation-orange-backpack.png",
+        abovePhotoCaption:
+          "With the HKTE × EuroTech delegation during our September 2026 trip — that's me on the left, beside my orange backpack.",
+        credit: "Image from Hong Kong Talent Engage's delegation video",
+        desktopSize: "L",
+        mobileSize: "S",
+      },
       {
         url: "https://docs.google.com/presentation/d/1D_xKlEpKfUM02-Cx2fBPCgS_OlWjhpGOIxt1g0R3PEU/embed?start=false&loop=false&delayms=3000",
         abovePhotoCaption: "A version of our pitch",
