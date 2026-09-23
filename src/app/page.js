@@ -61,7 +61,7 @@ const ACHIEVEMENT_VIEWS = [
 
 export default function Home() {
   const [mounted, setMounted] = useState(false);
-  const [achievementView, setAchievementView] = useState("original");
+  const [achievementView, setAchievementView] = useState("satellite");
   const [viewMenuOpen, setViewMenuOpen] = useState(false);
   const [mottoIndex, setMottoIndex] = useState(0);
   const viewMenuRef = useRef(null);
