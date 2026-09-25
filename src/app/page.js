@@ -85,7 +85,7 @@ export default function Home() {
         </div>
 
         {/* Bottom Hero Navigation Anchor - Projects & CV side-by-side */}
-        <div className="w-full flex flex-wrap items-center justify-center gap-3 sm:gap-4 pb-2 px-4 pointer-events-auto">
+        <div className="w-full flex flex-wrap items-center justify-center gap-3 sm:gap-4 pb-24 sm:pb-6 px-4 pointer-events-auto">
           <a
             href="#projects"
             className="group flex items-center gap-2 rounded-full border border-amber-500/30 bg-[#160f0a]/90 px-4 py-2 sm:px-5 sm:py-2.5 text-xs sm:text-sm font-semibold text-amber-100 hover:text-white shadow-xl backdrop-blur-xl transition hover:border-amber-400 hover:bg-[#24170f]"

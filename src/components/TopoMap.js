@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useMemo } from "react";
+import { createPortal } from "react-dom";
 import * as THREE from "three";
 import { contestsAndActivities } from "../data/contestsAndActivities";
 import MarkerInfo from "./MarkerInfo";
@@ -1166,23 +1167,39 @@ export default function TopoMap({ navigateWithRefresh, isSiteBackground = false 
             top: `${tooltipPos.y - 12}px`,
           }}
         >
-          <div className="min-w-[210px] max-w-[300px] rounded-xl border border-amber-400/40 bg-[#160f09]/95 px-3 py-2 text-left shadow-2xl backdrop-blur-xl">
+          <div className="min-w-[220px] max-w-[380px] rounded-xl border border-amber-400/40 bg-[#160f09]/95 px-3 py-2.5 text-left shadow-2xl backdrop-blur-xl">
             <div className="flex items-center justify-between gap-2">
               <span className="font-semibold text-xs text-white">
                 {hoveredItem.isCluster
                   ? `${hoveredItem.city}, ${hoveredItem.country}`
                   : `${hoveredItem.locations[0].city}, ${hoveredItem.locations[0].country}`}
               </span>
-              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-amber-400/20 text-amber-300 font-bold">
+              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-amber-400/20 text-amber-300 font-bold whitespace-nowrap flex-shrink-0">
                 {hoveredItem.count} {hoveredItem.count === 1 ? "milestone" : "milestones"}
               </span>
             </div>
-            <div className="mt-1 text-[11px] text-amber-200/70 truncate">
+            <div className="mt-1 text-[11px] text-amber-200/70">
               {hoveredItem.isCluster
                 ? `${hoveredItem.locations.length} venues in this region`
                 : hoveredItem.locations[0].venue}
             </div>
-            <div className="mt-1 text-[10px] text-amber-400/90 font-medium">
+            {/* Achievement titles for individual venues */}
+            {!hoveredItem.isCluster && hoveredItem.locations[0].achievements && (
+              <div className="mt-1.5 pt-1.5 border-t border-amber-400/15 space-y-0.5">
+                {hoveredItem.locations[0].achievements.slice(0, 3).map((ach, i) => (
+                  <div key={i} className="text-[11px] text-amber-100/90 leading-snug flex items-start gap-1.5">
+                    <span className="text-amber-400/70 flex-shrink-0 mt-px">▸</span>
+                    <span className="line-clamp-2">{ach.title}</span>
+                  </div>
+                ))}
+                {hoveredItem.locations[0].achievements.length > 3 && (
+                  <div className="text-[10px] text-amber-300/50 pl-4">
+                    +{hoveredItem.locations[0].achievements.length - 3} more
+                  </div>
+                )}
+              </div>
+            )}
+            <div className="mt-1.5 text-[10px] text-amber-400/90 font-medium">
               {hoveredItem.isCluster
                 ? "Click to zoom into this cluster →"
                 : "Click to view achievements →"}
@@ -1191,14 +1208,16 @@ export default function TopoMap({ navigateWithRefresh, isSiteBackground = false 
         </div>
       )}
 
-      {/* Detailed Modal/Drawer */}
-      {selectedMarker && (
-        <MarkerInfo
-          marker={selectedMarker}
-          onClose={() => setSelectedMarker(null)}
-          navigateWithRefresh={handleProjectNav}
-        />
-      )}
+      {/* Detailed Modal/Drawer — portaled to body to escape z-0 stacking context */}
+      {selectedMarker &&
+        createPortal(
+          <MarkerInfo
+            marker={selectedMarker}
+            onClose={() => setSelectedMarker(null)}
+            navigateWithRefresh={handleProjectNav}
+          />,
+          document.body
+        )}
     </div>
   );
 }
