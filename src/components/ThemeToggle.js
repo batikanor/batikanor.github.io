@@ -29,9 +29,9 @@ export default function ThemeToggle() {
       className="fixed top-6 right-6 z-50 p-3 rounded-full transition-all duration-500 transform hover:scale-110 shadow-lg hover:shadow-2xl backdrop-blur-sm"
       style={{
         background: isDark
-          ? "linear-gradient(135deg, #374151, #1f2937)"
+          ? "linear-gradient(135deg, #2d1c12, #140d08)"
           : "linear-gradient(135deg, #fbbf24, #f59e0b)",
-        border: `2px solid ${isDark ? "#6b7280" : "rgba(251, 191, 36, 0.3)"}`,
+        border: `2px solid ${isDark ? "rgba(245, 158, 11, 0.4)" : "rgba(251, 191, 36, 0.4)"}`,
       }}
       title={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
     >

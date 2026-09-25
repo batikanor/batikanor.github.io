@@ -1129,7 +1129,7 @@ export default function ExportPdfButton({
       {progress !== null && (
         <div className="w-full h-2 bg-gray-200 rounded">
           <div
-            className="h-full bg-blue-500 rounded"
+            className="h-full bg-amber-500 rounded"
             style={{ width: `${Math.round(progress * 100)}%` }}
           />
         </div>

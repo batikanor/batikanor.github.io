@@ -5,7 +5,7 @@
 
 @layer base {
   body {
-    @apply bg-light-background text-light-foreground dark:bg-dark-background dark:text-dark-foreground;
+    @apply bg-transparent text-light-foreground dark:bg-transparent dark:text-dark-foreground;
   }
   h1,
   h2,
@@ -27,6 +27,7 @@
 }
 
 html {
+  background-color: #0a0806;
   scroll-behavior: smooth;
 }
 
@@ -474,11 +475,22 @@ p,
 }
 
 .gradient-text {
-  background: linear-gradient(135deg, #f59e0b 0%, #f97316 50%, #ef4444 100%);
+  background: linear-gradient(135deg, #f5a867 0%, #d97706 45%, #9a3412 85%, #6e2709 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   text-fill-color: transparent;
+}
+
+.hero-name {
+  font-weight: 950;
+  letter-spacing: -0.05em;
+  background: linear-gradient(135deg, #ffffff 0%, #ffedd5 18%, #fba053 45%, #ea6c1a 70%, #b94508 90%, #7c2d08 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-fill-color: transparent;
+  filter: drop-shadow(0 8px 36px rgba(234, 108, 26, 0.55));
 }
 
 /* Force remove all borders when expanded - highest specificity */

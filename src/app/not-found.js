@@ -23,7 +23,7 @@ const NotFoundPage = () => {
             href="https://github.com/batikanor/website-gatsby-src/blob/master/static/_redirects"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-blue-400 hover:underline"
+            className="text-amber-400 hover:underline"
           >
             here
           </a>.
@@ -35,7 +35,7 @@ const NotFoundPage = () => {
             href="http://batikanor.netlify.app"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-blue-400 hover:underline"
+            className="text-amber-400 hover:underline"
           >
             here
           </a>.

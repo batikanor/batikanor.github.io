@@ -256,7 +256,7 @@ const GitHubStats = ({ repo }) => {
           viewBox="0 0 16 16"
           className={`fill-current ${
             stats.watchers !== null
-              ? "text-blue-500"
+              ? "text-amber-500"
               : "text-[#57606a] dark:text-[#8b949e]"
           }`}
         >
@@ -310,45 +310,67 @@ const Projects = () => {
   }, []);
 
   // Function to handle scrolling to a project
-  const scrollToProject = (slug) => {
+  const scrollToProject = (slug, forceScroll = true) => {
     const foundActivity = contestsAndActivities.find(
       (activity) => activity.slug === slug,
     );
     if (foundActivity) {
+      // Ensure current category filter does not hide this project
+      setSelectedCategories((prev) => {
+        if (
+          prev.length > 0 &&
+          !prev.some((cat) => foundActivity.categories?.includes(cat))
+        ) {
+          return [];
+        }
+        return prev;
+      });
+
       setExpandedActivity(foundActivity);
 
-      // Wait for state update and content expansion
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          const element = document.getElementById(foundActivity.slug);
-          if (element) {
-            const offset = element.offsetTop - 20; // No navbar height needed anymore
+      // Wait for state update & DOM expansion
+      setTimeout(() => {
+        const element = document.getElementById(foundActivity.slug);
+        if (element) {
+          const rect = element.getBoundingClientRect();
+          const isInViewport =
+            rect.top >= 40 && rect.bottom <= window.innerHeight - 40;
+          if (!isInViewport || forceScroll) {
+            const top = rect.top + window.scrollY - 30;
             window.scrollTo({
-              top: offset,
+              top: Math.max(0, top),
               behavior: "smooth",
             });
           }
-        });
-      });
+        }
+      }, 100);
     }
   };
 
-  // Handle initial load from URL hash
+  // Handle URL hash changes dynamically & on initial load
   useEffect(() => {
-    const hash = window.location.hash;
-    if (hash) {
-      const slug = hash.replace("#", "");
-      scrollToProject(slug);
-    }
+    const handleHash = () => {
+      const hash = window.location.hash;
+      if (hash) {
+        const slug = hash.replace("#", "");
+        scrollToProject(slug, true);
+      }
+    };
+
+    handleHash();
+
+    window.addEventListener("hashchange", handleHash);
+    return () => window.removeEventListener("hashchange", handleHash);
   }, []);
 
   // Handle project expansion toggle
   const toggleExpandedView = (activity) => {
-    const newExpandedActivity = activity === expandedActivity ? null : activity;
+    const isCurrentlyExpanded = activity === expandedActivity;
+    const newExpandedActivity = isCurrentlyExpanded ? null : activity;
     setExpandedActivity(newExpandedActivity);
 
     if (newExpandedActivity) {
-      scrollToProject(activity.slug);
+      scrollToProject(activity.slug, false);
     }
   };
 
