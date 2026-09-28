@@ -17,7 +17,7 @@ import {markerLevelForZoom, MARKER_ZOOM, geographicCentroid, declutterMarkers} f
 import {portfolioLinks} from './portfolioData.js';
 import {getProject, renderProjectContent} from './projectContent.js';
 import {readPortfolioRoute, portfolioUrl} from './portfolioRoute.js';
-import {initialMapCamera, ISOMETRIC_CAMERA, preferLocalStart} from './initialCamera.js';
+import {initialMapCamera, ISOMETRIC_CAMERA, COTTBUS_HANGAR_CAMERA, preferLocalStart} from './initialCamera.js';
 import './projectContent.css';
 import {createCvView} from './cvView.js';
 import {bindCvDownload} from './cvDownload.js';
@@ -440,6 +440,8 @@ function selectEvent(event,{showDetail=false,historyMode='push',view=null,skipFl
   closePopovers();
   const isHero=event.slug===HERO_VENUE_EVENT;
   const chapterId=ISOMETRIC_EVENT_REGIONS.get(event.slug)??null;
+  const chapterCamera=event.slug==='decarbon-days-climathon-2025'
+    ? COTTBUS_HANGAR_CAMERA : ISOMETRIC_CAMERA;
   isometricRegions.setFocus(chapterId);
   romeVenue.setFocus(event.slug);
   const isometricView=cityDetailOn&&!!chapterId;
@@ -454,9 +456,9 @@ function selectEvent(event,{showDetail=false,historyMode='push',view=null,skipFl
   // native z14 ceiling. Other cities need their own orthophoto chapter first.
   if(!skipFly){
   fly({center:isHero?HERO_VENUE_LOCATION:[event.coordinates.lng,event.coordinates.lat],
-    zoom:isHero?20.23:isometricView?ISOMETRIC_CAMERA.zoom:romeView?17.45:localImage?16.4:13.8,
-    pitch:isHero?68:isometricView?ISOMETRIC_CAMERA.pitch:romeView?55:localImage?67:55,
-    bearing:isHero?285:isometricView?ISOMETRIC_CAMERA.bearing:romeView?38:-18,
+    zoom:isHero?20.23:isometricView?chapterCamera.zoom:romeView?17.45:localImage?16.4:13.8,
+    pitch:isHero?68:isometricView?chapterCamera.pitch:romeView?55:localImage?67:55,
+    bearing:isHero?285:isometricView?chapterCamera.bearing:romeView?38:-18,
       ...(showDetail?{offset:detailMapOffset()}:{})},{chronologyNavigation});
     if(restoreReliefAfterArrival)resumeTerrainAfterFlight();
     showEventDetail(event);

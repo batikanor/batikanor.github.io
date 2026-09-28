@@ -1,4 +1,8 @@
 export const ISOMETRIC_CAMERA = Object.freeze({zoom:16.8, pitch:49, bearing:42});
+// Hangar 1 is a low, wide hall. Approach it more closely than the taller
+// Munich/Berlin/Cottbus campus chapters so its real wall volume is legible
+// beside the project panel, including on a phone.
+export const COTTBUS_HANGAR_CAMERA = Object.freeze({...ISOMETRIC_CAMERA, zoom:17.5});
 
 /**
  * Avoid a globe-to-street tile waterfall on an explicit achievement deep link.
@@ -17,7 +21,9 @@ export function initialMapCamera(route, achievements, worldCamera,
   // Starting an authored 3D chapter at its final framing lets the single
   // active mesh begin loading on style.load, before the popup-offset fly.
   if (route?.eventSlug && isometricEventSlugs.has(route.eventSlug)) {
-    return {center:[lng, lat], ...ISOMETRIC_CAMERA};
+    const framing = route.eventSlug === 'decarbon-days-climathon-2025'
+      ? COTTBUS_HANGAR_CAMERA : ISOMETRIC_CAMERA;
+    return {center:[lng, lat], ...framing};
   }
   // Else remain within the regional imagery's native z14 ceiling. The short
   // flyTo supplies the venue's final pitch/bearing.

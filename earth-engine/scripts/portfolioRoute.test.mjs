@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readPortfolioRoute, portfolioUrl} from '../src/portfolioRoute.js';
-import {initialMapCamera, ISOMETRIC_CAMERA, preferLocalStart} from '../src/initialCamera.js';
+import {initialMapCamera, ISOMETRIC_CAMERA, COTTBUS_HANGAR_CAMERA, preferLocalStart} from '../src/initialCamera.js';
 
 const slugs = new Set(['tesla-gigathon-2026', 'sui-hackathon-poland-2025']);
 
@@ -34,6 +34,10 @@ test('only explicit achievement deep links begin locally; World and CV still beg
   assert.deepEqual(initialMapCamera({eventSlug:'bayer-ai-2024',view:null},events,world,
     {isometricEventSlugs:new Set(['bayer-ai-2024'])}),
   {center:[11.5802,48.1392],...ISOMETRIC_CAMERA});
+  const hangar = {slug:'decarbon-days-climathon-2025',coordinates:{lng:14.301040317339991,lat:51.775269384379186}};
+  assert.deepEqual(initialMapCamera({eventSlug:hangar.slug,view:null},[hangar],world,
+    {isometricEventSlugs:new Set([hangar.slug])}),
+  {center:[hangar.coordinates.lng,hangar.coordinates.lat],...COTTBUS_HANGAR_CAMERA});
   for (const route of [
     {eventSlug:null,view:null},
     {eventSlug:'bayer-ai-2024',view:'world'},
