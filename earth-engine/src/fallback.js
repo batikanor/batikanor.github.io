@@ -8,6 +8,7 @@ import {readPortfolioRoute, portfolioUrl} from './portfolioRoute.js';
 import {createCvView} from './cvView.js';
 import {bindCvDownload} from './cvDownload.js';
 import {installExportControls} from './exportControls.js';
+import {createDetailPanel} from './detailPanel.js';
 
 const $ = id => document.getElementById(id);
 const ordered = sortAchievementsNewestFirst(achievements);
@@ -18,6 +19,7 @@ const forcedList = new URLSearchParams(location.search).get('view') === 'list';
 /** A complete, chronological portfolio when the 3D map cannot initialize. */
 export function startFallback() {
   document.body.classList.add('fallback-mode');
+  const detailPanel = createDetailPanel($('detail'));
   $('settings-toggle').hidden = true;
   $('settings-panel').hidden = true;
   $('sources').hidden = true;
@@ -99,18 +101,12 @@ export function startFallback() {
   }
   function showDetail(event) {
     const root = $('detail');
-    root.replaceChildren();
-    const close = document.createElement('button');
-    close.type = 'button';
-    close.className = 'close-detail';
-    close.setAttribute('aria-label', 'Close project details');
-    close.textContent = '×';
-    close.addEventListener('click', () => {root.hidden = true;});
+    const scroll = detailPanel.render();
     const content = document.createElement('div');
     content.className = 'project-content-host';
-    root.append(close, content);
+    scroll.append(content);
     renderProjectContent(content, event.slug, {onProjectLink: slug => select(bySlug.get(slug))});
-    root.scrollTop = 0;
+    scroll.scrollTop = 0;
     root.hidden = false;
   }
   function select(event, {historyMode = 'push', showDetail: openDetail = true, view = null} = {}) {

@@ -12,7 +12,7 @@
 .fallback-mode .drive-hud { display: none !important; }
 .fallback-mode .journey { bottom: 14px; }
 .fallback-mode .socials { bottom: 25px; }
-.fallback-content { width: calc(100% - min(520px, 42vw) - 48px); max-width: 800px; margin: 0 auto 0 0; }
+.fallback-content { width: calc(100% - min(780px, 63vw) - 48px); max-width: 800px; margin: 0 auto 0 0; }
 .fallback-heading { padding: 0 0 23px; }
 .fallback-eyebrow { margin: 0 0 12px; color: #eccf9b; font-size: 10px; font-weight: 700; letter-spacing: .17em; }
 .fallback-heading h1 { margin: 0 0 10px; font: 500 clamp(36px, 4vw, 58px)/1.05 'Playfair Display', Georgia, serif; }
@@ -37,6 +37,13 @@
   background: #0d1d22; color: #fff; line-height: 1.5;
 }
 @media (max-width: 900px) { .fallback-mode .socials { display: none; } }
+@media (min-width: 761px) and (max-width: 980px) {
+  .fallback-content { width: 100%; }
+  .fallback-mode .detail {
+    top: auto; left: 18px; right: 18px; bottom: 100px;
+    width: auto; height: min(50dvh, 500px);
+  }
+}
 @media (max-width: 760px) {
   .fallback-mode #map { padding: calc(var(--mobile-safe-top) + 72px) var(--mobile-left) 92px; }
   .fallback-content { width: 100%; max-width: 680px; }

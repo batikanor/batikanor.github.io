@@ -22,8 +22,10 @@ import './projectContent.css';
 import {createCvView} from './cvView.js';
 import {bindCvDownload} from './cvDownload.js';
 import {installExportControls} from './exportControls.js';
+import {createDetailPanel} from './detailPanel.js';
 
 const $ = (id) => document.getElementById(id);
+const detailPanel = createDetailPanel($('detail'), {onGeometrySettled: keepCurrentEventVisible});
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const status = (message) => { $('status').textContent = message; };
 const cvView=createCvView({root:$('cv-view-root'),onProjectLink:slug=>{
@@ -327,11 +329,49 @@ function selectCity(city) {
   if(newest)selectEvent(newest,{showDetail:true});
 }
 function detailMapOffset(){
-  if(window.innerWidth<=760){
-    if(window.innerHeight<=560&&window.innerWidth>window.innerHeight*1.3)return [175,0];
-    return [0,-Math.min(window.innerHeight*.29,290)];
+  const panel=detailPanel.getRect();
+  if(!panel){
+    if(window.innerWidth<=760){
+      if(window.innerHeight<=560&&window.innerWidth>window.innerHeight*1.3)return [175,0];
+      return [0,-Math.min(window.innerHeight*.29,290)];
+    }
+    return [-Math.min(390,window.innerWidth*.31),0];
   }
-  return [-Math.min(260,window.innerWidth*.21),0];
+  const appRect=$('app').getBoundingClientRect();
+  const width=appRect.width, height=appRect.height;
+  const safeTop=$('app').querySelector('.topbar').getBoundingClientRect().bottom-appRect.top+8;
+  const safeBottom=$('journey').getBoundingClientRect().top-appRect.top-8;
+  const safeHeight=Math.max(0,safeBottom-safeTop);
+  const leftRoom=Math.max(0,panel.x);
+  const rightRoom=Math.max(0,width-panel.x-panel.width);
+  const topRoom=Math.max(0,panel.y-safeTop);
+  const bottomRoom=Math.max(0,safeBottom-panel.y-panel.height);
+  // Choose the largest unobstructed piece of the map. This also handles a
+  // bottom-sheet dragged upward or a landscape/mobile sheet moved sideways.
+  const choices=[
+    {area:leftRoom*safeHeight,x:leftRoom/2,y:safeTop+safeHeight/2},
+    {area:rightRoom*safeHeight,x:panel.x+panel.width+rightRoom/2,y:safeTop+safeHeight/2},
+    {area:topRoom*width,x:width/2,y:safeTop+topRoom/2},
+    {area:bottomRoom*width,x:width/2,y:panel.y+panel.height+bottomRoom/2}
+  ];
+  const target=choices.reduce((best,choice)=>choice.area>best.area?choice:best);
+  const x=Math.max(-Math.min(420,width*.45),Math.min(Math.min(420,width*.45),target.x-width/2));
+  const y=Math.max(-Math.min(320,height*.45),Math.min(Math.min(320,height*.45),target.y-height/2));
+  return [x,y];
+}
+function keepCurrentEventVisible(){
+  if($('detail').hidden||!activeEvent||drive.active)return;
+  const focus=activeEvent.slug===HERO_VENUE_EVENT
+    ? document.querySelector('[data-venue-view="campus"][aria-pressed="true"]')
+      ? [11.666954,48.262269] : HERO_VENUE_LOCATION
+    : [activeEvent.coordinates.lng,activeEvent.coordinates.lat];
+  const point=map.project(focus);
+  const mapRect=$('map').getBoundingClientRect();
+  const panelRect=$('detail').getBoundingClientRect();
+  const screenX=point.x+mapRect.left, screenY=point.y+mapRect.top;
+  if(screenX<panelRect.left-12||screenX>panelRect.right+12
+    ||screenY<panelRect.top-12||screenY>panelRect.bottom+12)return;
+  map.easeTo({center:focus,offset:detailMapOffset(),duration:prefersReducedMotion?0:400});
 }
 function selectEvent(event,{showDetail=false,historyMode='push',view=null,skipFly=false}={}) {
   if(!event)return;
@@ -370,13 +410,10 @@ function selectEvent(event,{showDetail=false,historyMode='push',view=null,skipFl
 function showEventDetail(event) {
   const root=$('detail');
   const isHero=event.slug===HERO_VENUE_EVENT;
-  root.replaceChildren();
-  const close=document.createElement('button');
-  close.type='button';close.className='close-detail';close.setAttribute('aria-label','Close project details');close.textContent='×';
-  root.append(close);
+  const scroll=detailPanel.render();
   const content=document.createElement('div');
   content.className='project-content-host';
-  root.append(content);
+  scroll.append(content);
   const project=renderProjectContent(content,event.slug,{onProjectLink:slug=>{
     const linked=orderedAchievements.find(candidate=>candidate.slug===slug);
     if(linked)selectEvent(linked,{showDetail:true});
@@ -390,13 +427,12 @@ function showEventDetail(event) {
     const controls=document.createElement('div');
     controls.className='venue-views';controls.setAttribute('aria-label','Map views');
     controls.innerHTML='<button data-venue-view="campus" aria-pressed="false">3D CAMPUS</button><button data-venue-view="radar" aria-pressed="true">INSTALLATION</button>';
-    root.insertBefore(controls,content);
+    scroll.insertBefore(controls,content);
   }
-  root.scrollTop=0;
+  scroll.scrollTop=0;
   bindDetail(root);
 }
 function bindDetail(root){
-  root.querySelector('.close-detail').addEventListener('click',()=>root.hidden=true);
   root.querySelectorAll('[data-venue-view]').forEach(el=>el.addEventListener('click',()=>goHeroView(el.dataset.venueView)));
 }
 
