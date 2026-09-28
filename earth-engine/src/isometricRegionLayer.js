@@ -14,6 +14,10 @@ const MIPMAP_STORAGE_FACTOR = 4 / 3;
 const DEFAULT_MIN_ZOOM = 15.5;
 const DEFAULT_MAX_ZOOM = 20.25;
 const RENDER_RADIUS_PADDING_M = 550;
+// Keep only compressed, same-origin chapter payloads warm. GPU meshes/textures
+// are still released when a visitor leaves a city.
+const MAX_WARM_CHAPTERS = 3;
+const FETCH_RETRIES = 2;
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
@@ -140,6 +144,8 @@ function makeMesh(positionArray, colour, roughness) {
 
 function lowMemoryDevice() {
   const memory = typeof navigator === 'undefined' ? undefined : navigator.deviceMemory;
+  const connection = typeof navigator === 'undefined' ? undefined : navigator.connection;
+  if (connection?.saveData || /^(slow-2g|2g)$/.test(connection?.effectiveType ?? '')) return true;
   // Chromium exposes deviceMemory; Safari often does not. When it is unknown,
   // a coarse primary pointer is a conservative proxy for a phone/tablet GPU.
   return Number.isFinite(memory) ? memory <= 4
@@ -168,6 +174,46 @@ export function chooseRoofAtlasVersion(full, reduced, {maxTextureSize, lowMemory
 function reducedAtlasUrl(url, extension) {
   assert(url.endsWith(extension), `Roof atlas URL must end in ${extension}`);
   return `${url.slice(0, -extension.length)}-half${extension}`;
+}
+
+function waitForRetry(ms, signal) {
+  return new Promise((resolve, reject) => {
+    if (signal.aborted) { reject(signal.reason); return; }
+    const timer = setTimeout(done, ms);
+    function done() { signal.removeEventListener('abort', cancel); resolve(); }
+    function cancel() { clearTimeout(timer); reject(signal.reason); }
+    signal.addEventListener('abort', cancel, {once: true});
+  });
+}
+
+/** Retry only temporary transport/server failures, not missing or invalid assets. */
+export async function fetchChapterAsset(url, {signal, maxBytes, kind = 'blob'} = {}) {
+  for (let attempt = 0; attempt <= FETCH_RETRIES; attempt++) {
+    try {
+      const response = await fetch(url, {signal});
+      if (!response.ok) {
+        const error = new Error(`Chapter asset HTTP ${response.status}`);
+        error.retryable = response.status === 408 || response.status === 429 || response.status >= 500;
+        throw error;
+      }
+      const advertised = Number(response.headers.get('content-length'));
+      if (advertised > maxBytes) throw new Error('Chapter asset exceeds transfer budget');
+      const result = kind === 'arrayBuffer' ? await response.arrayBuffer()
+        : kind === 'json' ? await response.text() : await response.blob();
+      const actualBytes = kind === 'arrayBuffer' ? result.byteLength
+        : kind === 'json' ? new TextEncoder().encode(result).byteLength : result.size;
+      if (actualBytes > maxBytes) {
+        throw new Error('Chapter asset exceeds transfer budget');
+      }
+      return kind === 'json' ? JSON.parse(result) : result;
+    } catch (error) {
+      if (signal.aborted || attempt === FETCH_RETRIES || error.retryable === false) throw error;
+      // Fetch's TypeError is commonly a dropped connection. It is safe to
+      // retry same-origin immutable release assets; a 404 is not retried.
+      if (error.retryable !== true && !(error instanceof TypeError)) throw error;
+      await waitForRetry(250 * 2 ** attempt, signal);
+    }
+  }
 }
 
 /** The smaller file must be a traceable resampling of this exact source atlas. */
@@ -207,6 +253,13 @@ export function createIsometricRegionLayer({regions, onChange = null} = {}) {
   assert(new Set(chapters.map(region => region.id)).size === chapters.length, 'Duplicate isometric region id');
   let focusId = null;
   let enabled = true;
+  const warm = new Map();
+  const discardWarm = (id, {onlyPending = false} = {}) => {
+    const entry = warm.get(id);
+    if (!entry || onlyPending && entry.settled) return;
+    entry.abort.abort();
+    warm.delete(id);
+  };
   const notifyChange = layer => {
     if (!onChange) return;
     try {
@@ -230,14 +283,28 @@ export function createIsometricRegionLayer({regions, onChange = null} = {}) {
       if (!this.map) return;
       if (!enabled) {
         this.releaseActive();
+        for (const id of [...warm.keys()]) discardWarm(id);
         this.map.triggerRepaint();
       } else if (!this.map.isMoving()) this.evaluate();
     },
     getEnabled() { return enabled; },
     setFocus(id = null) {
       assert(id == null || chapters.some(region => region.id === id), `Unknown isometric region: ${id}`);
+      const changed = focusId !== id;
       focusId = id;
-      if (this.map && !this.map.isMoving()) this.evaluate();
+      if (changed) {
+        if (this.active && this.active.region.id !== id) this.releaseActive();
+        // A rapid chronology click should not leave the previous city
+        // downloading during the new flight. Completed entries remain warm.
+        for (const key of [...warm.keys()]) {
+          if (key !== id) discardWarm(key, {onlyPending: true});
+        }
+      }
+      if (!this.map || !enabled) return;
+      if (id) this.prepareRegion(chapters.find(region => region.id === id));
+      // A null focus normally precedes a flight to a non-chapter event. Do
+      // not immediately reactivate the city we are in before that flight.
+      if (id && !this.map.isMoving()) this.evaluate();
     },
     getActiveRegionId() { return this.active?.region.id ?? null; },
     getActiveAttribution() { return this.active?.region.credit ?? null; },
@@ -258,6 +325,52 @@ export function createIsometricRegionLayer({regions, onChange = null} = {}) {
       map.on('moveend', this.onMoveEnd);
       this.evaluate();
     },
+    prepareRegion(region) {
+      if (!region || !enabled || this.destroyed || !this.map) return null;
+      const existing = warm.get(region.id);
+      if (existing && !existing.failed) {
+        warm.delete(region.id);
+        warm.set(region.id, existing);
+        return existing;
+      }
+      if (existing) discardWarm(region.id);
+      while (warm.size >= MAX_WARM_CHAPTERS) discardWarm(warm.keys().next().value);
+      const abort = new AbortController();
+      const entry = {region, abort, settled: false, failed: false};
+      const roofAtlas = region.roofAtlas;
+      entry.meshPromise = fetchChapterAsset(region.meshUrl,
+        {signal: abort.signal, maxBytes: MAX_MESH_BYTES, kind: 'arrayBuffer'});
+      entry.atlasPromise = roofAtlas ? (async () => {
+        const metadata = await fetchChapterAsset(roofAtlas.metadataUrl,
+          {signal: abort.signal, maxBytes: 16_000, kind: 'json'});
+        const memoryConstrained = lowMemoryDevice();
+        let chosen = chooseRoofAtlasVersion(metadata, null,
+          {maxTextureSize: this.maxTextureSize, lowMemory: memoryConstrained});
+        let imageUrl = roofAtlas.imageUrl;
+        if (!chosen) {
+          const reduced = validateReducedAtlas(metadata,
+            await fetchChapterAsset(reducedAtlasUrl(roofAtlas.metadataUrl, '.json'),
+              {signal: abort.signal, maxBytes: 16_000, kind: 'json'}));
+          chosen = chooseRoofAtlasVersion(metadata, reduced,
+            {maxTextureSize: this.maxTextureSize, lowMemory: memoryConstrained});
+          if (!chosen) return null;
+          imageUrl = reducedAtlasUrl(imageUrl, '.webp');
+        }
+        const imageBlob = await fetchChapterAsset(imageUrl,
+          {signal: abort.signal, maxBytes: MAX_COMPRESSED_ATLAS_BYTES});
+        if (imageBlob.size !== chosen.bytes) throw new Error('Roof atlas image byte count differs from metadata');
+        return {metadata, chosen, imageBlob, memoryConstrained};
+      })() : Promise.resolve(null);
+      // Attach handlers immediately: a prefetched asset can fail before the
+      // camera arrives and before loadRegion awaits either promise.
+      for (const promise of [entry.meshPromise, entry.atlasPromise]) {
+        promise.catch(() => { entry.failed = true; });
+      }
+      Promise.allSettled([entry.meshPromise, entry.atlasPromise])
+        .then(() => { entry.settled = true; });
+      warm.set(region.id, entry);
+      return entry;
+    },
     evaluate() {
       if (this.destroyed || !this.map || this.map.isMoving()) return;
       if (!enabled) {
@@ -268,7 +381,9 @@ export function createIsometricRegionLayer({regions, onChange = null} = {}) {
       const region = chooseIsometricRegion(chapters,
         {center: [center.lng, center.lat], zoom: this.map.getZoom()}, focusId);
       if (region?.id === this.active?.region.id) return;
+      const previousId = this.active?.region.id;
       this.releaseActive();
+      if (previousId && previousId !== region?.id) discardWarm(previousId, {onlyPending: true});
       if (!region) {
         this.map.triggerRepaint();
         return;
@@ -279,18 +394,14 @@ export function createIsometricRegionLayer({regions, onChange = null} = {}) {
         .makeTranslation(merc.x, merc.y, merc.z)
         .multiply(new THREE.Matrix4().makeRotationX(Math.PI / 2))
         .multiply(new THREE.Matrix4().makeScale(scale, scale, scale));
-      const active = {region, model, abort: new AbortController(), meshes: null, texture: null, buffer: null};
+      const active = {region, model, meshes: null, texture: null, buffer: null};
       this.active = active;
       notifyChange(this);
-      void this.loadRegion(active);
+      void this.loadRegion(active, this.prepareRegion(region));
     },
-    async loadRegion(active) {
+    async loadRegion(active, prepared) {
       try {
-        const response = await fetch(active.region.meshUrl, {signal: active.abort.signal});
-        if (!response.ok) throw new Error(`BLD2 HTTP ${response.status}`);
-        const advertised = Number(response.headers.get('content-length'));
-        if (advertised > MAX_MESH_BYTES) throw new Error('BLD2 mesh exceeds local budget');
-        const buffer = await response.arrayBuffer();
+        const buffer = await prepared.meshPromise;
         if (this.destroyed || this.active !== active) return;
         const {roofCount, wallCount, positions} = parseBld2(buffer, active.region.origin);
         active.buffer = buffer; // Typed geometry views keep the one payload alive.
@@ -300,62 +411,36 @@ export function createIsometricRegionLayer({regions, onChange = null} = {}) {
         this.scene.add(roof, wall);
         this.map.triggerRepaint();
         notifyChange(this);
-        if (active.region.roofAtlas) void this.loadRoofAtlas(active);
+        if (active.region.roofAtlas) void this.loadRoofAtlas(active, prepared);
       } catch (error) {
-        if (active.abort.signal.aborted || this.destroyed || this.active !== active) return;
+        if (prepared.abort.signal.aborted || this.destroyed || this.active !== active) return;
         console.warn(`${active.region.id} official isometric buildings unavailable; satellite map remains visible.`, error);
         this.releaseActive();
       }
     },
-    async loadRoofAtlas(active) {
+    async loadRoofAtlas(active, prepared) {
       let texture = null;
       try {
-        const response = await fetch(active.region.roofAtlas.metadataUrl, {signal: active.abort.signal});
-        if (!response.ok) throw new Error(`Roof atlas metadata HTTP ${response.status}`);
-        const metadata = await response.json();
+        const atlas = await prepared.atlasPromise;
+        if (!atlas) return;
         if (this.destroyed || this.active !== active) return;
         const roof = active.meshes?.[0];
         if (!roof) return;
         const uv = roofUvForAtlas(roof.geometry.getAttribute('position').array,
-          active.region.origin, metadata);
-        const memoryConstrained = lowMemoryDevice();
-        let chosen = chooseRoofAtlasVersion(metadata, null,
-          {maxTextureSize: this.maxTextureSize, lowMemory: memoryConstrained});
-        let imageUrl = active.region.roofAtlas.imageUrl;
-        if (!chosen) {
-          // Only low-memory/low-GPU clients fetch this tiny extra manifest.
-          const reducedMetadataUrl = reducedAtlasUrl(active.region.roofAtlas.metadataUrl, '.json');
-          const reducedResponse = await fetch(reducedMetadataUrl, {signal: active.abort.signal});
-          if (!reducedResponse.ok) throw new Error(`Reduced roof atlas metadata HTTP ${reducedResponse.status}`);
-          const reduced = validateReducedAtlas(metadata, await reducedResponse.json());
-          chosen = chooseRoofAtlasVersion(metadata, reduced,
-            {maxTextureSize: this.maxTextureSize, lowMemory: memoryConstrained});
-          if (!chosen) return;
-          imageUrl = reducedAtlasUrl(imageUrl, '.webp');
-        }
-        if (this.destroyed || this.active !== active) return;
-        // Metadata/UV validation precedes the image request. Fetch is abortable
-        // when chronology jumps between cities; TextureLoader alone is not.
-        const imageResponse = await fetch(imageUrl, {signal: active.abort.signal});
-        if (!imageResponse.ok) throw new Error(`Roof atlas image HTTP ${imageResponse.status}`);
-        const advertised = Number(imageResponse.headers.get('content-length'));
-        if (advertised > MAX_COMPRESSED_ATLAS_BYTES) throw new Error('Roof atlas image exceeds compressed budget');
-        const imageBlob = await imageResponse.blob();
-        if (imageBlob.size !== chosen.bytes) throw new Error('Roof atlas image byte count differs from metadata');
-        if (this.destroyed || this.active !== active) return;
-        const objectUrl = URL.createObjectURL(imageBlob);
+          active.region.origin, atlas.metadata);
+        const objectUrl = URL.createObjectURL(atlas.imageBlob);
         try {
           texture = await new THREE.TextureLoader().loadAsync(objectUrl);
         } finally {
           URL.revokeObjectURL(objectUrl);
         }
         if (this.destroyed || this.active !== active) return;
-        if (texture.image.width !== chosen.width || texture.image.height !== chosen.height) {
+        if (texture.image.width !== atlas.chosen.width || texture.image.height !== atlas.chosen.height) {
           throw new Error('Roof image dimensions differ from its georeferenced atlas metadata');
         }
         roof.geometry.setAttribute('uv', new THREE.BufferAttribute(uv, 2));
         texture.colorSpace = THREE.SRGBColorSpace;
-        texture.anisotropy = Math.min(memoryConstrained ? 2 : 8,
+        texture.anisotropy = Math.min(atlas.memoryConstrained ? 2 : 8,
           this.renderer.capabilities.getMaxAnisotropy());
         const material = new THREE.MeshBasicMaterial({
           map: texture, side: THREE.DoubleSide,
@@ -367,7 +452,7 @@ export function createIsometricRegionLayer({regions, onChange = null} = {}) {
         this.map.triggerRepaint();
         notifyChange(this);
       } catch (error) {
-        if (active.abort.signal.aborted || this.destroyed || this.active !== active) return;
+        if (prepared.abort.signal.aborted || this.destroyed || this.active !== active) return;
         console.warn(`${active.region.id} georeferenced roof texture unavailable; official LoD2 geometry remains.`, error);
       } finally {
         if (texture && texture !== active.texture) texture.dispose();
@@ -392,7 +477,6 @@ export function createIsometricRegionLayer({regions, onChange = null} = {}) {
       const active = this.active;
       if (!active) return;
       this.active = null;
-      active.abort.abort();
       for (const mesh of active.meshes ?? []) {
         this.scene?.remove(mesh);
         mesh.geometry.dispose();
@@ -406,6 +490,7 @@ export function createIsometricRegionLayer({regions, onChange = null} = {}) {
       this.destroyed = true;
       this.map?.off('moveend', this.onMoveEnd);
       this.releaseActive();
+      for (const id of [...warm.keys()]) discardWarm(id);
       this.renderer?.dispose();
       this.renderer = null;
       this.scene = null;

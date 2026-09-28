@@ -6,6 +6,7 @@ import {
   chooseIsometricRegion,
   chooseRoofAtlasVersion,
   createIsometricRegionLayer,
+  fetchChapterAsset,
   parseBld2,
   roofUvForAtlas,
   validateReducedAtlas,
@@ -18,6 +19,45 @@ const fixture = fixtureBytes.buffer.slice(
 );
 const atlas = JSON.parse(readFileSync(new URL('garching-roof-orthophoto-v1.json', data), 'utf8'));
 const origin = [11.666954, 48.262269];
+
+test('chapter asset loader retries a dropped connection but not a missing asset', async () => {
+  const originalFetch = globalThis.fetch;
+  let attempts = 0;
+  try {
+    globalThis.fetch = async () => {
+      attempts++;
+      if (attempts === 1) throw new TypeError('temporary network failure');
+      return new Response(new Uint8Array([1, 2, 3]));
+    };
+    const asset = await fetchChapterAsset('/chapter.bin', {
+      signal: new AbortController().signal, maxBytes: 10, kind: 'arrayBuffer',
+    });
+    assert.equal(attempts, 2);
+    assert.deepEqual([...new Uint8Array(asset)], [1, 2, 3]);
+    attempts = 0;
+    globalThis.fetch = async () => { attempts++; return new Response(null, {status: 404}); };
+    await assert.rejects(fetchChapterAsset('/missing.bin', {
+      signal: new AbortController().signal, maxBytes: 10,
+    }), /HTTP 404/);
+    assert.equal(attempts, 1);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test('chapter asset loader rejects oversized responses without retrying', async () => {
+  const originalFetch = globalThis.fetch;
+  let attempts = 0;
+  try {
+    globalThis.fetch = async () => { attempts++; return new Response(new Uint8Array(11)); };
+    await assert.rejects(fetchChapterAsset('/oversized.bin', {
+      signal: new AbortController().signal, maxBytes: 10, kind: 'arrayBuffer',
+    }), /budget/);
+    assert.equal(attempts, 1);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
 
 test('BLD2 decoder accepts an actual official LoD2 clip and keeps exact source vertices', () => {
   const result = parseBld2(fixture, origin);

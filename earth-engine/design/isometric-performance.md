@@ -3,15 +3,27 @@
 Measured on 2026-09-28 for the public release. Physical-device performance
 remains unverified; this document records asset budgets and emulator checks.
 
-The regional layer loads **one chapter only**, after a stopped camera reaches
-its 250 m area at z15.5+. Nothing under `public/data/*lod2*` or
-`public/data/*roof*` is requested on the whole-world view. A new chapter
-aborts the prior mesh/image fetch and releases the old WebGL geometry, material
-and texture. A low-memory device (reported `navigator.deviceMemory <= 4`, or a
-coarse-pointer device without that API) selects a true-source 2× downsampled
+The regional layer loads **one selected chapter only**. Explicitly selecting
+its achievement starts the bounded mesh and roof-atlas requests while the
+camera is travelling; rendering still waits until the camera reaches its
+250 m area at z15.5+. Nothing under `public/data/*lod2*` or
+`public/data/*roof*` is requested on the whole-world view. A superseding
+selection aborts unfinished requests, while up to three completed compressed
+chapter payloads stay in a same-page cache for revisits. GPU geometry, material
+and texture are released on departure. Transient network errors and 408/429/5xx
+responses receive two short bounded retries; invalid or missing assets do not.
+A low-memory or Save Data device (reported `navigator.deviceMemory <= 4`, a
+slow/Save Data connection, or a coarse-pointer device without that API) selects a true-source 2× downsampled
 roof atlas. Desktop/high-memory devices retain the original full-resolution
 atlas. A device whose GPU cannot fit even the smaller atlas displays the
 official LoD2 geometry without roof texture, over the normal satellite map.
+The separate Rome venue chapter follows the same on-selection prefetch and
+bounded-retry pattern, keeping at most one validated compressed chapter while
+it remains focused. At the Rome venue, relief is paused while the authored
+orthophoto/massing is shown: the external DEM has z13 tiles there but returned
+404 for the z14–16 tiles requested by the global source in local browser QA.
+Relief resumes at the next destination or World view, honoring the visitor's
+terrain setting.
 
 | Chapter | Mesh transfer | Full atlas | Half atlas | Roof GPU with mipmaps, full → half |
 | --- | ---: | ---: | ---: | ---: |
@@ -56,9 +68,11 @@ own starting view.
 
 Three repeated headless SwiftShader checks (1440×900, local Vite) measured
 navigation to textured chapter: Siemens **31.0→20.2 s**, Google **19.9→14.7 s**,
-Berlin **24.9→20.2 s** after the final-framing change. All three textures
-rendered and no local asset returned 404. These are software-renderer test
-times, not expected user device timings; they show that the asset load now
-overlaps map startup rather than waiting for a long flight. A future increment
-could skip very long chronology flights on constrained devices, but this is not
-part of the current patch.
+Berlin **24.9→20.2 s** after the earlier final-framing change. All three
+textures rendered and no local asset returned 404. These are software-renderer
+test times, not expected user device timings. The current increment additionally
+overlaps selected-chapter fetching with the flight and keeps completed compressed
+assets warm within the page. Chronology arrows now use a 1.4 s desktop
+cross-city flight (0.9 s nearby); constrained devices jump directly between
+distant achievements instead of streaming tiles along the whole route. Bare-home
+intro and non-chronology world/city flights retain their existing pacing.

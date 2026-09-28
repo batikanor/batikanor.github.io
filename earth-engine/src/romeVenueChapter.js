@@ -11,6 +11,7 @@ const MAX_DISTANCE_M = 460;
 const MAX_METADATA_BYTES = 8_000;
 const MAX_GEOMETRY_BYTES = 110_000;
 const MAX_IMAGE_BYTES = 850_000;
+const FETCH_RETRIES = 2;
 const LAYERS = [`${ID}-footprints`, `${ID}-massing`, `${ID}-ground`];
 
 function lowBandwidthDevice() {
@@ -34,14 +35,37 @@ export function chooseRomeImage(metadata, {mobile = false} = {}) {
   return product;
 }
 
-async function boundedFetch(url, maxBytes, signal) {
-  const response = await fetch(url, {signal});
-  if (!response.ok) throw new Error(`Rome chapter HTTP ${response.status}`);
-  const advertised = Number(response.headers.get('content-length'));
-  if (advertised > maxBytes) throw new Error('Rome chapter asset exceeds byte budget');
-  const blob = await response.blob();
-  if (blob.size > maxBytes) throw new Error('Rome chapter asset exceeds byte budget');
-  return blob;
+function waitForRetry(ms, signal) {
+  return new Promise((resolve, reject) => {
+    if (signal.aborted) { reject(new Error('Rome chapter fetch aborted')); return; }
+    const timer = setTimeout(done, ms);
+    function done() { signal.removeEventListener('abort', cancel); resolve(); }
+    function cancel() { clearTimeout(timer); reject(new Error('Rome chapter fetch aborted')); }
+    signal.addEventListener('abort', cancel, {once: true});
+  });
+}
+
+/** Retry only temporary transport/server failures; never retry invalid data. */
+export async function fetchRomeAsset(url, maxBytes, signal) {
+  for (let attempt = 0; attempt <= FETCH_RETRIES; attempt++) {
+    try {
+      const response = await fetch(url, {signal});
+      if (!response.ok) {
+        const error = new Error(`Rome chapter HTTP ${response.status}`);
+        error.retryable = response.status === 408 || response.status === 429 || response.status >= 500;
+        throw error;
+      }
+      const advertised = Number(response.headers.get('content-length'));
+      if (advertised > maxBytes) throw new Error('Rome chapter asset exceeds byte budget');
+      const blob = await response.blob();
+      if (blob.size > maxBytes) throw new Error('Rome chapter asset exceeds byte budget');
+      return blob;
+    } catch (error) {
+      if (signal.aborted || attempt === FETCH_RETRIES || error.retryable === false) throw error;
+      if (error.retryable !== true && !(error instanceof TypeError)) throw error;
+      await waitForRetry(250 * 2 ** attempt, signal);
+    }
+  }
 }
 
 function validateMetadata(metadata) {
@@ -70,9 +94,10 @@ function validateBuildings(collection, metadata) {
 }
 
 /**
- * One fixed-source, MapLibre-pitched venue miniature. No chapter bytes load at
- * the globe, and an interrupted chronology flight cancels all pending fetches.
- * The public project popup and its media remain entirely owned by main.js.
+ * One fixed-source, MapLibre-pitched venue miniature. The chapter stays inert
+ * on the homepage; explicitly focusing Rome prefetches its bounded assets
+ * during the camera flight. A superseding focus cancels pending fetches. The
+ * public project popup and its media remain entirely owned by main.js.
  */
 export function createRomeVenueChapter({baseUrl = import.meta.env?.BASE_URL ?? '/', onChange = null} = {}) {
   let map = null;
@@ -85,9 +110,7 @@ export function createRomeVenueChapter({baseUrl = import.meta.env?.BASE_URL ?? '
   const report = () => onChange?.({visible: hasLayers});
   const dataUrl = name => `${baseUrl}data/${name}`;
 
-  function release() {
-    active?.abort.abort();
-    active = null;
+  function removeLayers() {
     if (map) {
       for (const id of LAYERS) if (map.getLayer(id)) map.removeLayer(id);
       for (const id of [`${ID}-buildings`, `${ID}-image`]) {
@@ -99,6 +122,12 @@ export function createRomeVenueChapter({baseUrl = import.meta.env?.BASE_URL ?? '
     if (hasLayers) { hasLayers = false; report(); }
   }
 
+  function release() {
+    active?.abort.abort();
+    active = null;
+    removeLayers();
+  }
+
   function isEligible() {
     if (!map || !focused || !enabled || map.isMoving()) return false;
     const c = map.getCenter();
@@ -106,21 +135,11 @@ export function createRomeVenueChapter({baseUrl = import.meta.env?.BASE_URL ?? '
       && distanceMetres([c.lng, c.lat], VENUE) <= MAX_DISTANCE_M;
   }
 
-  async function load(entry) {
+  function mount(entry) {
+    if (active !== entry || !entry.data || !isEligible() || hasLayers) return;
     let pendingUrl = null;
     try {
-      const metadataBlob = await boundedFetch(dataUrl('rome-ostiense-v1.json'), MAX_METADATA_BYTES, entry.abort.signal);
-      const metadata = validateMetadata(JSON.parse(await metadataBlob.text()));
-      const product = chooseRomeImage(metadata, {mobile: lowBandwidthDevice()});
-      const [imageBlob, geometryBlob] = await Promise.all([
-        boundedFetch(dataUrl(product.asset), MAX_IMAGE_BYTES, entry.abort.signal),
-        boundedFetch(dataUrl(metadata.buildings.asset), MAX_GEOMETRY_BYTES, entry.abort.signal),
-      ]);
-      if (imageBlob.size !== product.bytes || geometryBlob.size !== metadata.buildings.bytes) {
-        throw new Error('Rome chapter bytes differ from source manifest');
-      }
-      const buildings = validateBuildings(JSON.parse(await geometryBlob.text()), metadata);
-      if (active !== entry || !isEligible()) return;
+      const {metadata, imageBlob, buildings} = entry.data;
       pendingUrl = URL.createObjectURL(imageBlob);
       map.addSource(`${ID}-image`, {
         type: 'image', url: pendingUrl, coordinates: metadata.image_corners_lonlat,
@@ -152,7 +171,6 @@ export function createRomeVenueChapter({baseUrl = import.meta.env?.BASE_URL ?? '
       hasLayers = true;
       report();
     } catch (error) {
-      if (entry.abort.signal.aborted || active !== entry) return;
       console.warn('Rome isometric miniature unavailable; geographic map remains usable.', error);
       release();
     } finally {
@@ -160,22 +178,63 @@ export function createRomeVenueChapter({baseUrl = import.meta.env?.BASE_URL ?? '
     }
   }
 
+  async function load(entry) {
+    try {
+      const metadataBlob = await fetchRomeAsset(dataUrl('rome-ostiense-v1.json'),
+        MAX_METADATA_BYTES, entry.abort.signal);
+      const metadata = validateMetadata(JSON.parse(await metadataBlob.text()));
+      const product = chooseRomeImage(metadata, {mobile: lowBandwidthDevice()});
+      const [imageBlob, geometryBlob] = await Promise.all([
+        fetchRomeAsset(dataUrl(product.asset), product.bytes, entry.abort.signal),
+        fetchRomeAsset(dataUrl(metadata.buildings.asset), MAX_GEOMETRY_BYTES, entry.abort.signal),
+      ]);
+      if (imageBlob.size !== product.bytes || geometryBlob.size !== metadata.buildings.bytes) {
+        throw new Error('Rome chapter bytes differ from source manifest');
+      }
+      const buildings = validateBuildings(JSON.parse(await geometryBlob.text()), metadata);
+      if (active !== entry || entry.abort.signal.aborted) return;
+      // Keep at most one validated, compressed chapter warm until moveend.
+      // Completing the fetch during a flight must not strand the active entry.
+      entry.data = {metadata, imageBlob, buildings};
+      mount(entry);
+    } catch (error) {
+      if (entry.abort.signal.aborted || active !== entry) return;
+      console.warn('Rome isometric miniature unavailable; geographic map remains usable.', error);
+      release();
+    }
+  }
+
+  function prepare() {
+    if (!map || !focused || !enabled || active) return;
+    active = {abort: new AbortController(), data: null};
+    void load(active);
+  }
+
   function evaluate() {
     if (!map || map.isMoving()) return;
-    if (!isEligible()) { release(); return; }
-    if (active) return;
-    active = {abort: new AbortController()};
-    void load(active);
+    if (!focused || !enabled) { release(); return; }
+    if (!isEligible()) { removeLayers(); return; }
+    prepare();
+    mount(active);
   }
 
   return {
     onAdd(nextMap) {
       map = nextMap;
       map.on('moveend', evaluate);
+      prepare();
       evaluate();
     },
-    setFocus(slug) { focused = slug === 'ethrome-2025'; if (!focused) release(); else evaluate(); },
-    setEnabled(value) { enabled = !!value; if (!enabled) release(); else evaluate(); },
+    setFocus(slug) {
+      focused = slug === 'ethrome-2025';
+      if (!focused) release();
+      else { prepare(); evaluate(); }
+    },
+    setEnabled(value) {
+      enabled = !!value;
+      if (!enabled) release();
+      else { prepare(); evaluate(); }
+    },
     isVisible() { return hasLayers; },
     destroy() { if (map) map.off('moveend', evaluate); release(); map = null; },
   };

@@ -81,11 +81,12 @@ const ISOMETRIC_EVENT_REGIONS = new Map([
   ['bayer-ai-2024','munich-google'],
   ['real-coin-map-2025','berlin-library']
 ]);
+const constrainedNavigation=preferLocalStart({deviceMemory:navigator.deviceMemory,
+  saveData:navigator.connection?.saveData,
+  coarsePointer:window.matchMedia('(pointer: coarse)').matches,
+  reducedMotion:prefersReducedMotion});
 const bootstrapCamera = initialMapCamera(initialRoute, orderedAchievements, initialCamera, {
-  fastStart:preferLocalStart({deviceMemory:navigator.deviceMemory,
-    saveData:navigator.connection?.saveData,
-    coarsePointer:window.matchMedia('(pointer: coarse)').matches,
-    reducedMotion:prefersReducedMotion}),
+  fastStart:constrainedNavigation,
   isometricEventSlugs:ISOMETRIC_EVENT_REGIONS
 });
 
@@ -116,6 +117,12 @@ if(PUBLIC_RELEASE){
   $('imagery-credit').innerHTML='<a href="https://esa-worldcover.org/en/data-access">© ESA WorldCover project 2021</a> / Contains modified Copernicus Sentinel data (2021) processed by ESA WorldCover consortium · <a href="https://science.nasa.gov/earth/earth-observatory/blue-marble-next-generation/base-map/">NASA Blue Marble underlay</a>';
 }
 let terrainOn = true;
+// Mapterhorn has z13 coverage around the Rome venue but returns 404 for the
+// z14–16 tiles requested by our global DEM source there. The city-scale Rome
+// orthophoto/massing is effectively flat; do not make dozens of doomed DEM
+// requests while approaching it. Restore relief on the next destination.
+let terrainPausedForRome = false;
+let terrainResumeToken = 0;
 let cityDetailOn = true;
 let creditedImagery = null;
 function syncTerrain(){
@@ -123,11 +130,23 @@ function syncTerrain(){
   // ground plane on short mobile canvases. The local campus is essentially
   // flat, so pause the DEM while driving and honour the user's preference again
   // on exit. Both the car and radar then query the same flat map surface.
-  const show=terrainOn&&!drive.active;
+  const show=terrainOn&&!drive.active&&!terrainPausedForRome;
   map.setTerrain(show?{source:'terrain',exaggeration:1}:null);
   map.setLayoutProperty('terrain-hillshade','visibility',show?'visible':'none');
   $('terrain-toggle').setAttribute('aria-pressed',String(terrainOn));
-  $('terrain-state').textContent=terrainOn?(drive.active?'PAUSED':'ON'):'OFF';
+  $('terrain-state').textContent=terrainOn?(drive.active||terrainPausedForRome?'PAUSED':'ON'):'OFF';
+}
+function resumeTerrainAfterFlight(){
+  const token=++terrainResumeToken;
+  const resume=()=>{
+    if(token!==terrainResumeToken)return; // A newer destination won the race.
+    terrainPausedForRome=false;
+    syncTerrain();
+  };
+  // Register after fly(), not before: map.stop() and its high-zoom safety
+  // jump can themselves emit moveend at the *old* Rome location.
+  if(map.isMoving())map.once('moveend',resume);
+  else resume();
 }
 // Two honest camera framings of the same 4.34 m car. No model-scale change.
 // The close chase helps the vehicle read; the overview keeps the installation
@@ -187,11 +206,11 @@ function renderJourney(){
 renderJourney();
 $('journey-previous').addEventListener('click',()=>{
   const event=stepChronology(orderedAchievements,activeEvent?.slug??null,'previous');
-  if(event)selectEvent(event,{showDetail:true});
+  if(event)selectEvent(event,{showDetail:true,chronologyNavigation:true});
 });
 $('journey-next').addEventListener('click',()=>{
   const event=stepChronology(orderedAchievements,activeEvent?.slug??null,'next');
-  if(event)selectEvent(event,{showDetail:true});
+  if(event)selectEvent(event,{showDetail:true,chronologyNavigation:true});
 });
 $('journey-current').addEventListener('click',()=>{
   const event=activeEvent??orderedAchievements[0];
@@ -273,18 +292,28 @@ function updateCredits(){
   }
 }
 
-function fly(target) {
+function fly(target,{chronologyNavigation=false}={}) {
   map.stop();
+  const current=map.getCenter();
+  const nextCenter=Array.isArray(target.center)
+    ? target.center : [target.center?.lng,target.center?.lat];
+  const crossCity=chronologyNavigation&&nextCenter.every(Number.isFinite)
+    &&distanceMetres([current.lng,current.lat],nextCenter)>35_000;
+  // The chronology is a navigation control, not a forced 2.4 s tour through
+  // every intervening raster/DEM zoom level. On constrained devices, a direct
+  // cross-city jump avoids downloading tiles that will immediately be discarded.
+  if(crossCity&&constrainedNavigation){map.jumpTo(target);return;}
   // MapLibre's globe+terrain DEM sampler cannot always project a distant
   // destination from a street-level camera. The resulting Infinity tile
   // coordinate aborts flyTo (notably Garching → WORLD). Back out locally
   // before the geographic flight instead of asking one flight to span z20→z2.
-  const nextLng=Array.isArray(target.center)?target.center[0]:target.center?.lng;
+  const nextLng=nextCenter[0];
   if(map.getZoom()>17 && (target.zoom<15 || Math.abs(map.getCenter().lng-nextLng)>5)){
     map.jumpTo({center:map.getCenter(),zoom:13.8,pitch:0,bearing:map.getBearing()});
   }
   if (prefersReducedMotion) {map.jumpTo(target);return;}
-  try {map.flyTo({...target,essential:true,duration:2400,curve:1.25});}
+  const duration=chronologyNavigation?(crossCity?1400:900):2400;
+  try {map.flyTo({...target,essential:true,duration,curve:1.25});}
   catch(error){
     // A failed animation must not strand the visitor on an unresponsive map.
     console.warn('Map flight fell back to a direct camera change:',error);
@@ -373,9 +402,13 @@ function keepCurrentEventVisible(){
     ||screenY<panelRect.top-12||screenY>panelRect.bottom+12)return;
   map.easeTo({center:focus,offset:detailMapOffset(),duration:prefersReducedMotion?0:400});
 }
-function selectEvent(event,{showDetail=false,historyMode='push',view=null,skipFly=false}={}) {
+function selectEvent(event,{showDetail=false,historyMode='push',view=null,skipFly=false,chronologyNavigation=false}={}) {
   if(!event)return;
   finishDrive();activeEvent=event;activeCity=byCity.get(keyOf(event));
+  const pauseRome=event.slug==='ethrome-2025';
+  terrainResumeToken++;
+  const restoreReliefAfterArrival=!pauseRome&&terrainPausedForRome;
+  if(pauseRome&&!terrainPausedForRome){terrainPausedForRome=true;syncTerrain();}
   if(historyMode!=='none'){
     const projectUrl=portfolioUrl(window.location.href,{eventSlug:event.slug,view});
     window.history[historyMode==='replace'?'replaceState':'pushState'](null,'',projectUrl);
@@ -401,9 +434,10 @@ function selectEvent(event,{showDetail=false,historyMode='push',view=null,skipFl
     zoom:isHero?20.23:isometricView?ISOMETRIC_CAMERA.zoom:romeView?17.45:localImage?16.4:13.8,
     pitch:isHero?68:isometricView?ISOMETRIC_CAMERA.pitch:romeView?55:localImage?67:55,
     bearing:isHero?285:isometricView?ISOMETRIC_CAMERA.bearing:romeView?38:-18,
-      ...(showDetail?{offset:detailMapOffset()}:{})});
+      ...(showDetail?{offset:detailMapOffset()}:{})},{chronologyNavigation});
+    if(restoreReliefAfterArrival)resumeTerrainAfterFlight();
     showEventDetail(event);
-  }
+  }else if(restoreReliefAfterArrival)resumeTerrainAfterFlight();
   $('detail').hidden=!showDetail;
   status(`${getProject(event.slug)?.title??event.title} · ${event.venue} · ${event.coordinates.lat.toFixed(5)}°, ${event.coordinates.lng.toFixed(5)}°`);
 }
@@ -550,11 +584,15 @@ function initializeEventLayers(){
 
 function showWholeEarth({historyMode='push'}={}){
   finishDrive();activeCity=null;$('detail').hidden=true;
+  terrainResumeToken++;
+  const restoreReliefAfterArrival=terrainPausedForRome;
   isometricRegions.setFocus(null);
   romeVenue.setFocus(null);
   $('drive-button').hidden=true;$('drive-button').disabled=true;
   heroVenue.setActive(false);$('scan-button').hidden=true;
-  closePopovers();fly(initialCamera);status('Whole Earth. The chronology remains on the selected achievement.');
+  closePopovers();fly(initialCamera);
+  if(restoreReliefAfterArrival)resumeTerrainAfterFlight();
+  status('Whole Earth. The chronology remains on the selected achievement.');
   if(historyMode!=='none'){
     const url=portfolioUrl(window.location.href,{eventSlug:activeEvent?.slug,view:'world'});
     window.history[historyMode==='replace'?'replaceState':'pushState'](null,'',url);
