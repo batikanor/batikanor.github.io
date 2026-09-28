@@ -1,0 +1,55 @@
+{
+  "asset": "cottbus-climathon-2025-ground-truedop20-v1.webp",
+  "source": "GeoBasis-DE/LGB Brandenburg, 20 cm RGB TrueDOP",
+  "source_urls": [
+    "https://data.geobasis-bb.de/geobasis/daten/dop/rgb_jpg/dop_33451-5735.zip",
+    "https://data.geobasis-bb.de/geobasis/daten/dop/rgb_jpg/dop_33451-5736.zip",
+    "https://data.geobasis-bb.de/geobasis/daten/dop/rgb_jpg/dop_33452-5735.zip",
+    "https://data.geobasis-bb.de/geobasis/daten/dop/rgb_jpg/dop_33452-5736.zip"
+  ],
+  "source_zip_sha256": {
+    "33451-5735": "caccd919aebc8a05507c13d65c19ae53ad7d60f34a367f5f8e906c642f7ea9c5",
+    "33451-5736": "31290f001deb1fe1b56bfbd0d21dafe6a9d107f1cb1c9198be4217830363a00b",
+    "33452-5735": "6ff9ad0e087b714af2df6683df91b4ad3bd0e4c9859ae2e254237e81cfa73098",
+    "33452-5736": "7234971616b7a9f3fde9000ee915235d0548111b741449155452bb0c505f8601"
+  },
+  "source_tile_zoom": 18,
+  "source_tile_bounds_xyxy": [
+    141478,
+    86848,
+    141491,
+    86861
+  ],
+  "origin_lonlat": [
+    14.301040317339991,
+    51.775269384379186
+  ],
+  "event_slug": "decarbon-days-climathon-2025",
+  "source_flight_date": "2025-04-26",
+  "width": 1792,
+  "height": 1792,
+  "coordinates": [
+    [
+      14.2904663086,
+      51.7814356044
+    ],
+    [
+      14.3096923828,
+      51.7814356044
+    ],
+    [
+      14.3096923828,
+      51.769539576
+    ],
+    [
+      14.2904663086,
+      51.769539576
+    ]
+  ],
+  "derived_changes": "1.1–1.3 km, lower-resolution Mercator-aligned TrueDOP image for a MapLibre image source; 12% outer alpha feather to blend into global imagery; no fabricated map pixels",
+  "license": "Datenlizenz Deutschland – Namensnennung – Version 2.0",
+  "license_url": "https://www.govdata.de/dl-de/by-2-0",
+  "credit": "© GeoBasis-DE/LGB, dl-de/by-2-0 (Daten geändert)",
+  "bytes": 913768,
+  "sha256": "01ae9f5ce77c867a2bfcd91a9c31dad09621a329a664c9d10ae34f82874b2f5e"
+}

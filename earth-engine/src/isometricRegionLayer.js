@@ -9,6 +9,7 @@ import {distanceMetres} from './geo.js';
 const EARTH_CIRCUMFERENCE_M = 40_075_016.68557849;
 const MAX_MESH_BYTES = 8_000_000;
 const MAX_COMPRESSED_ATLAS_BYTES = 10_000_000;
+const MAX_GROUND_IMAGE_BYTES = 4_000_000;
 const MAX_TEXTURE_DIMENSION = 4096;
 const MIPMAP_STORAGE_FACTOR = 4 / 3;
 const DEFAULT_MIN_ZOOM = 15.5;
@@ -42,6 +43,11 @@ function normalizeRegion(region) {
     assert(typeof region.roofAtlas.imageUrl === 'string' && typeof region.roofAtlas.metadataUrl === 'string',
       `${region.id}: roof atlas requires image and metadata URLs`);
   }
+  if (region.groundImage) {
+    assert(typeof region.groundImage.imageUrl === 'string'
+      && typeof region.groundImage.metadataUrl === 'string',
+    `${region.id}: ground image requires image and metadata URLs`);
+  }
   const minZoom = region.minZoom ?? DEFAULT_MIN_ZOOM;
   const maxZoom = region.maxZoom ?? DEFAULT_MAX_ZOOM;
   assert(Number.isFinite(minZoom) && Number.isFinite(maxZoom) && minZoom >= 12
@@ -52,7 +58,38 @@ function normalizeRegion(region) {
     minZoom,
     maxZoom,
     roofAtlas: region.roofAtlas ? Object.freeze({...region.roofAtlas}) : null,
+    groundImage: region.groundImage ? Object.freeze({...region.groundImage}) : null,
   });
+}
+
+/** Keep a local orthophoto bounded and correctly georeferenced before adding it to MapLibre. */
+export function validateGroundImageMetadata(metadata, region) {
+  assert(sameOrigin(metadata?.origin_lonlat, region.origin), 'Ground image origin differs from chapter');
+  assert(Number.isInteger(metadata.width) && Number.isInteger(metadata.height)
+    && metadata.width > 0 && metadata.height > 0
+    && metadata.width <= 2048 && metadata.height <= 2048,
+  'Ground image exceeds the 2048-pixel mobile texture budget');
+  assert(Number.isInteger(metadata.bytes) && metadata.bytes > 0
+    && metadata.bytes <= MAX_GROUND_IMAGE_BYTES, 'Ground image exceeds transfer budget');
+  assert(Array.isArray(metadata.coordinates) && metadata.coordinates.length === 4
+    && metadata.coordinates.every(point => Array.isArray(point) && point.length === 2
+      && point.every(Number.isFinite)
+      && Math.abs(point[0]) <= 180 && Math.abs(point[1]) < 85
+      && distanceMetres(point, region.origin) <= 2000),
+  'Ground image has invalid local WGS84 corners');
+  const [topLeft, topRight, bottomRight, bottomLeft] = metadata.coordinates;
+  const corners = metadata.coordinates;
+  const crosses = corners.map((point, index) => {
+    const next = corners[(index + 1) % 4];
+    const after = corners[(index + 2) % 4];
+    return (next[0] - point[0]) * (after[1] - next[1])
+      - (next[1] - point[1]) * (after[0] - next[0]);
+  });
+  assert(topRight[0] > topLeft[0] && bottomRight[0] > bottomLeft[0]
+    && topLeft[1] > bottomLeft[1] && topRight[1] > bottomRight[1]
+    && crosses.every(cross => cross < -1e-12),
+  'Ground image corners must be a clockwise top-left to bottom-left quadrilateral');
+  return metadata;
 }
 
 /** Strictly decode the small, offline-authored BLD2 v1 payload. */
@@ -237,7 +274,8 @@ export function validateReducedAtlas(full, reduced) {
  *
  * Region descriptor:
  * {id, origin:[lon,lat], radiusM, meshUrl,
- *  roofAtlas?:{imageUrl,metadataUrl}, credit?, minZoom?, maxZoom?}
+ *  roofAtlas?:{imageUrl,metadataUrl}, groundImage?:{imageUrl,metadataUrl},
+ *  credit?, minZoom?, maxZoom?}
  * Optional `onChange({regionId,credit,loaded,textured})` fires on activation,
  * resource upgrade and teardown so the host can refresh its attribution.
  *
@@ -361,12 +399,31 @@ export function createIsometricRegionLayer({regions, onChange = null} = {}) {
         if (imageBlob.size !== chosen.bytes) throw new Error('Roof atlas image byte count differs from metadata');
         return {metadata, chosen, imageBlob, memoryConstrained};
       })() : Promise.resolve(null);
+      entry.groundPromise = region.groundImage ? (async () => {
+        // Ground imagery is useful even before the rooftop atlas is decoded.
+        // Begin both same-origin requests together instead of serializing a
+        // metadata round trip ahead of the larger image transfer.
+        const [rawMetadata, imageBlob] = await Promise.all([
+          fetchChapterAsset(region.groundImage.metadataUrl,
+            {signal: abort.signal, maxBytes: 16_000, kind: 'json'}),
+          fetchChapterAsset(region.groundImage.imageUrl,
+            {signal: abort.signal, maxBytes: MAX_GROUND_IMAGE_BYTES}),
+        ]);
+        const metadata = validateGroundImageMetadata(rawMetadata, region);
+        if (imageBlob.size !== metadata.bytes) {
+          throw new Error('Ground image byte count differs from metadata');
+        }
+        return {metadata, imageBlob};
+      })() : Promise.resolve(null);
       // Attach handlers immediately: a prefetched asset can fail before the
       // camera arrives and before loadRegion awaits either promise.
       for (const promise of [entry.meshPromise, entry.atlasPromise]) {
         promise.catch(() => { entry.failed = true; });
       }
-      Promise.allSettled([entry.meshPromise, entry.atlasPromise])
+      // A photo failure must not prevent the sourced building geometry from
+      // activating; the existing global satellite layer remains underneath.
+      entry.groundPromise.catch(() => { entry.failed = true; });
+      Promise.allSettled([entry.meshPromise, entry.atlasPromise, entry.groundPromise])
         .then(() => { entry.settled = true; });
       warm.set(region.id, entry);
       return entry;
@@ -394,10 +451,12 @@ export function createIsometricRegionLayer({regions, onChange = null} = {}) {
         .makeTranslation(merc.x, merc.y, merc.z)
         .multiply(new THREE.Matrix4().makeRotationX(Math.PI / 2))
         .multiply(new THREE.Matrix4().makeScale(scale, scale, scale));
-      const active = {region, model, meshes: null, texture: null, buffer: null};
+      const active = {region, model, meshes: null, texture: null, buffer: null, groundObjectUrl: null};
       this.active = active;
       notifyChange(this);
-      void this.loadRegion(active, this.prepareRegion(region));
+      const prepared = this.prepareRegion(region);
+      void this.loadRegion(active, prepared);
+      if (region.groundImage) void this.loadGroundImage(active, prepared);
     },
     async loadRegion(active, prepared) {
       try {
@@ -458,6 +517,39 @@ export function createIsometricRegionLayer({regions, onChange = null} = {}) {
         if (texture && texture !== active.texture) texture.dispose();
       }
     },
+    async loadGroundImage(active, prepared) {
+      try {
+        const ground = await prepared.groundPromise;
+        if (!ground || this.destroyed || this.active !== active) return;
+        const objectUrl = URL.createObjectURL(ground.imageBlob);
+        active.groundObjectUrl = objectUrl;
+        const sourceId = 'earth-engine-local-orthophoto';
+        const layerId = 'earth-engine-local-orthophoto';
+        // An image source, unlike a raster tile source, makes exactly one
+        // small local transfer. Add it below the existing custom 3D chapter.
+        this.map.addSource(sourceId, {
+          type: 'image', url: objectUrl, coordinates: ground.metadata.coordinates,
+        });
+        this.map.addLayer({
+          id: layerId, type: 'raster', source: sourceId,
+          minzoom: active.region.minZoom, maxzoom: active.region.maxZoom,
+          paint: {'raster-fade-duration': 200},
+        }, this.id);
+        this.map.triggerRepaint();
+      } catch (error) {
+        if (prepared.abort.signal.aborted || this.destroyed || this.active !== active) return;
+        this.removeGroundImage(active);
+        console.warn(`${active.region.id} local orthophoto unavailable; global satellite imagery remains.`, error);
+      }
+    },
+    removeGroundImage(active) {
+      if (!active.groundObjectUrl) return;
+      const id = 'earth-engine-local-orthophoto';
+      if (this.map?.getLayer(id)) this.map.removeLayer(id);
+      if (this.map?.getSource(id)) this.map.removeSource(id);
+      URL.revokeObjectURL(active.groundObjectUrl);
+      active.groundObjectUrl = null;
+    },
     render(gl, args) {
       const active = this.active;
       if (!enabled || !active?.meshes || !this.map || !args.defaultProjectionData?.mainMatrix
@@ -477,6 +569,7 @@ export function createIsometricRegionLayer({regions, onChange = null} = {}) {
       const active = this.active;
       if (!active) return;
       this.active = null;
+      this.removeGroundImage(active);
       for (const mesh of active.meshes ?? []) {
         this.scene?.remove(mesh);
         mesh.geometry.dispose();

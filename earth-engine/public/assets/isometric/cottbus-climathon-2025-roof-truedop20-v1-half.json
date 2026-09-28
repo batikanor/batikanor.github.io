@@ -1,0 +1,30 @@
+{
+  "asset": "cottbus-climathon-2025-roof-truedop20-v1-half.webp",
+  "source_asset": "cottbus-climathon-2025-roof-truedop20-v1.webp",
+  "source_asset_sha256": "8348dc197083d00eb25c3bb9f47bae01b939c021230c83cb7e8248f9a9a125ec",
+  "source_metadata": "cottbus-climathon-2025-roof-truedop20-v1.json",
+  "source": "GeoBasis-DE/LGB Brandenburg, 20 cm RGB TrueDOP",
+  "source_urls": [
+    "https://data.geobasis-bb.de/geobasis/daten/dop/rgb_jpg/dop_33451-5736.zip",
+    "https://data.geobasis-bb.de/geobasis/daten/dop/rgb_jpg/dop_33452-5736.zip"
+  ],
+  "source_tile_zoom": 19,
+  "source_tile_bounds_xyxy": [
+    282966,
+    173704,
+    282976,
+    173714
+  ],
+  "origin_lonlat": [
+    14.301040317339991,
+    51.775269384379186
+  ],
+  "width": 1408,
+  "height": 1408,
+  "derived_changes": "Lanczos 2× reduction of the checksum-pinned official TrueDOP atlas for low-memory devices",
+  "license": "Datenlizenz Deutschland – Namensnennung – Version 2.0",
+  "license_url": "https://www.govdata.de/dl-de/by-2-0",
+  "credit": "© GeoBasis-DE/LGB, dl-de/by-2-0 (Daten geändert)",
+  "bytes": 567204,
+  "sha256": "8a146c42e2fe55ed235544428a1d935d4fed7756d36fc47144497f29d6420de6"
+}

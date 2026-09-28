@@ -52,10 +52,11 @@ const initialCamera = {center:[12,27],zoom:1.85,pitch:0,bearing:0};
 const DETAIL_MAX_ZOOM=21.35;
 const hasBavariaDetail = ([lng,lat]) => lng>=BAVARIA_TRIAL_BOUNDS[0] && lng<=BAVARIA_TRIAL_BOUNDS[2]
   && lat>=BAVARIA_TRIAL_BOUNDS[1] && lat<=BAVARIA_TRIAL_BOUNDS[3];
-// Three real-data pockets rather than a fabricated miniature world. Every
+// Small real-data pockets rather than a fabricated miniature world. Every
 // chapter has official LoD2 roofs/walls and a source-aligned 20 cm photo
 // atlas. Other achievements keep the existing satellite/terrain journey.
 const chapterUrl = name => `${import.meta.env.BASE_URL}data/${name}`;
+const cottbusUrl = name => `${import.meta.env.BASE_URL}assets/isometric/${name}`;
 const ISOMETRIC_CHAPTERS = [
   {
     id:'munich-siemens',origin:[11.5758,48.1453],radiusM:250,
@@ -74,12 +75,33 @@ const ISOMETRIC_CHAPTERS = [
     meshUrl:chapterUrl('berlin-library-lod2-v1.bin'),
     roofAtlas:{imageUrl:chapterUrl('berlin-library-roof-truedop20-v1.webp'),metadataUrl:chapterUrl('berlin-library-roof-truedop20-v1.json')},
     credit:'Geoportal Berlin · LoD2 buildings and TrueDOP 2026 imagery (modified), dl-de-zero-2.0'
-  }
+  },
+  ...[
+    {year:'2025',origin:[14.301040317339991,51.775269384379186]},
+    {year:'2026',origin:[14.326165,51.767384]}
+  ].map(({year,origin})=>{
+    const stem=`cottbus-climathon-${year}`;
+    return {
+      id:stem,origin,radiusM:250,
+      meshUrl:cottbusUrl(`${stem}-lod2-v1.bin`),
+      roofAtlas:{
+        imageUrl:cottbusUrl(`${stem}-roof-truedop20-v1.webp`),
+        metadataUrl:cottbusUrl(`${stem}-roof-truedop20-v1.json`)
+      },
+      groundImage:{
+        imageUrl:cottbusUrl(`${stem}-ground-truedop20-v1.webp`),
+        metadataUrl:cottbusUrl(`${stem}-ground-truedop20-v1.json`)
+      },
+      credit:'© GeoBasis-DE/LGB · Brandenburg LoD2 buildings and TrueDOP20 imagery (data modified), dl-de/by-2-0'
+    };
+  })
 ];
 const ISOMETRIC_EVENT_REGIONS = new Map([
   ['masters-thesis','munich-siemens'],
   ['bayer-ai-2024','munich-google'],
-  ['real-coin-map-2025','berlin-library']
+  ['real-coin-map-2025','berlin-library'],
+  ['decarbon-days-climathon-2025','cottbus-climathon-2025'],
+  ['decarbon-days-climathon-2026','cottbus-climathon-2026']
 ]);
 const constrainedNavigation=preferLocalStart({deviceMemory:navigator.deviceMemory,
   saveData:navigator.connection?.saveData,
@@ -176,7 +198,7 @@ const driveStarts = new Map([
 ]);
 const carLayer = createCarLayer(()=>drive);
 const bavariaBuildings = createBavariaBuildingLayer();
-const isometricRegions = createIsometricRegionLayer({regions:ISOMETRIC_CHAPTERS});
+const isometricRegions = createIsometricRegionLayer({regions:ISOMETRIC_CHAPTERS,onChange:()=>updateCredits()});
 const romeVenue = createRomeVenueChapter({onChange:()=>updateCredits()});
 const heroVenue = createHeroVenueLayer({onScan:({phase})=>{
   const button=$('scan-button');
@@ -281,6 +303,7 @@ function updateCredits(){
     &&bounds.getEast()>=BERLIN_TRUEDOP_BOUNDS[0]&&bounds.getWest()<=BERLIN_TRUEDOP_BOUNDS[2]
     &&bounds.getNorth()>=BERLIN_TRUEDOP_BOUNDS[1]&&bounds.getSouth()<=BERLIN_TRUEDOP_BOUNDS[3];
   $('berlin-credit').hidden=!berlin;
+  $('cottbus-credit').hidden=!isometricRegions.getActiveRegionId()?.startsWith('cottbus-');
   $('rome-credit').hidden=!romeVenue.isVisible();
   if(creditedImagery!==imagery){
     $('imagery-credit').innerHTML=imagery==='eox'
@@ -630,7 +653,7 @@ $('city-detail-toggle').addEventListener('click',()=>{
   $('city-detail-state').textContent=cityDetailOn?'ON':'OFF';
   updateCredits();
   status(cityDetailOn
-    ?'City detail enabled: official LoD2 in Munich/Berlin; source-audited illustrative venue massing in Rome.'
+    ?'City detail enabled: official LoD2 in Munich, Berlin and Cottbus; source-audited illustrative venue massing in Rome.'
     :'3D city detail hidden; the real aerial imagery remains.');
 });
 $('zoom-in').addEventListener('click',()=>map.zoomIn());

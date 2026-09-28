@@ -635,10 +635,10 @@ They said they would even ship me my 3rd place trophy all the way to Cottbus. Tr
     categories: ["Jury", "Mentor"],
     title: "Lead Jury & Mentor at Decarbon Days Climathon",
     mapData: {
-      venue: "Decarbon Days",
+      venue: "Hangar 1, Burger Chaussee 1",
       city: "Cottbus",
       country: "Germany",
-      coordinates: { lat: 51.7734, lng: 14.3315 },
+      coordinates: { lat: 51.775269384379186, lng: 14.301040317339991 },
     },
     date: "06/2025",
     shortDescription:

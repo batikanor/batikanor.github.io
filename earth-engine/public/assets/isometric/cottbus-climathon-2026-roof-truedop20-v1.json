@@ -1,0 +1,34 @@
+{
+  "asset": "cottbus-climathon-2026-roof-truedop20-v1.webp",
+  "source": "GeoBasis-DE/LGB Brandenburg, 20 cm RGB TrueDOP",
+  "source_urls": [
+    "https://data.geobasis-bb.de/geobasis/daten/dop/rgb_jpg/dop_33453-5735.zip"
+  ],
+  "source_zip_sha256": {
+    "33453-5735": "71ab298ee04c83d662a67885904144d0ac3a51a79fcf92b809e0e4804956d0f4"
+  },
+  "source_crs": "EPSG:25833",
+  "source_grid": "Official 20 cm UTM33 RGB JPEG reprojected offline to EPSG:3857 XYZ z19",
+  "source_tile_zoom": 19,
+  "source_tile_bounds_xyxy": [
+    283001,
+    173724,
+    283013,
+    173735
+  ],
+  "source_flight_date": "2025-04-26",
+  "source_publication_date": "2025-07-31",
+  "width": 3328,
+  "height": 3072,
+  "event_slug": "decarbon-days-climathon-2026",
+  "origin_lonlat": [
+    14.326165,
+    51.767384
+  ],
+  "derived_changes": "Official TrueDOP RGB samples reprojected to a Mercator-aligned WebP atlas; roof UVs use original LoD2 vertices; no invented roof or façade detail",
+  "license": "Datenlizenz Deutschland – Namensnennung – Version 2.0",
+  "license_url": "https://www.govdata.de/dl-de/by-2-0",
+  "credit": "© GeoBasis-DE/LGB, dl-de/by-2-0 (Daten geändert)",
+  "bytes": 1943962,
+  "sha256": "5f52153921b3fa736cae821c1a91f4014b2e80bc000ca31ddbf345faa155ab51"
+}

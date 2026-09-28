@@ -9,6 +9,7 @@ import {
   fetchChapterAsset,
   parseBld2,
   roofUvForAtlas,
+  validateGroundImageMetadata,
   validateReducedAtlas,
 } from '../src/isometricRegionLayer.js';
 
@@ -156,4 +157,23 @@ test('factory rejects duplicate or imaginary region descriptors before GL alloca
   layer.setEnabled(true);
   layer.setFocus('munich');
   assert.throws(() => layer.setFocus('not-a-real-chapter'), /Unknown/);
+});
+
+test('local ground imagery must be bounded, local and mobile-sized', () => {
+  const region = {origin: [14.3315, 51.7734]};
+  const metadata = {
+    origin_lonlat: region.origin, width: 1536, height: 1536, bytes: 500000,
+    coordinates: [
+      [14.327, 51.777], [14.336, 51.777],
+      [14.336, 51.770], [14.327, 51.770],
+    ],
+  };
+  assert.equal(validateGroundImageMetadata(metadata, region), metadata);
+  assert.throws(() => validateGroundImageMetadata({...metadata, width: 4096}, region), /texture budget/);
+  assert.throws(() => validateGroundImageMetadata({...metadata, bytes: 8_000_000}, region), /transfer budget/);
+  assert.throws(() => validateGroundImageMetadata({...metadata, coordinates: [[0, 0], ...metadata.coordinates.slice(1)]}, region), /corners/);
+  assert.throws(() => validateGroundImageMetadata({...metadata, coordinates: [
+    metadata.coordinates[0], metadata.coordinates[2], metadata.coordinates[1], metadata.coordinates[3],
+  ]}, region), /corners/);
+  assert.throws(() => validateGroundImageMetadata({...metadata, origin_lonlat: [14.326, 51.767]}, region), /origin/);
 });
