@@ -1,0 +1,27 @@
+{
+  "asset": "munich-siemens-roof-dop20-v1-half.webp",
+  "source_asset": "munich-siemens-roof-dop20-v1.webp",
+  "source_asset_sha256": "86a22537d56fbc51d459a7ea8c224aa30ed238c7d8167cc8222c4f1696f16cae",
+  "source_metadata": "munich-siemens-roof-dop20-v1.json",
+  "source": "Bayerische Vermessungsverwaltung / LDBV, Digitales Orthophoto DOP20 RGB",
+  "source_url": "https://wmtsod1.bayernwolke.de/wmts/by_dop/smerc/{z}/{x}/{y}",
+  "source_tile_zoom": 19,
+  "source_tile_bounds_xyxy": [
+    278996,
+    181927,
+    279008,
+    181938
+  ],
+  "origin_lonlat": [
+    11.5758,
+    48.1453
+  ],
+  "width": 1664,
+  "height": 1536,
+  "derived_changes": "Lanczos 2× downsample of the official-data roof atlas for low-memory devices; original georeferencing and LoD2 geometry retained; no fabricated detail",
+  "license": "CC BY 4.0 — attribution and modification notice required",
+  "license_url": "https://creativecommons.org/licenses/by/4.0/",
+  "credit": "Geobasisdaten: Bayerische Vermessungsverwaltung – www.geodaten.bayern.de (Daten verändert), Lizenz: CC BY 4.0",
+  "bytes": 775738,
+  "sha256": "cdf93a5503a56064a9a6fb143187ab4a44af8ca9141de53a2e9a3ed67457678b"
+}

@@ -1,0 +1,30 @@
+{
+  "asset": "berlin-library-roof-truedop20-v1.webp",
+  "source": "Geoportal Berlin / Senatsverwaltung für Stadtentwicklung, Bauen und Wohnen Berlin, Digitale farbige TrueOrthophotos 2026 DOP20RGBI",
+  "source_dataset": "https://daten.berlin.de/datensaetze/digitale-farbige-trueorthophotos-2026-dop20rgbi-wms-3801a94c",
+  "source_url": "https://gdi.berlin.de/services/wms/truedop_2026",
+  "source_grid": "Official WMS reprojected server-side to EPSG:3857 XYZ z19",
+  "source_tile_zoom": 19,
+  "source_tile_bounds_xyxy": [
+    281610,
+    171965,
+    281623,
+    171978
+  ],
+  "source_tile_count": 196,
+  "source_ordered_jpeg_sha256": "1958ba2c9fa89619b2c71dd1d6c323ef57c0f8858ab31833bf8d2183c7af7ae5",
+  "source_accessed_utc_date": "2026-09-28",
+  "width": 3584,
+  "height": 3584,
+  "event_slug": "real-coin-map-2025",
+  "origin_lonlat": [
+    13.3708,
+    52.5074
+  ],
+  "derived_changes": "Official 2026 TrueDOP20 JPEG WMS images requested in EPSG:3857, stitched into a roof-only WebP atlas; no fabricated roof or facade features",
+  "license": "Datenlizenz Deutschland – Zero – Version 2.0",
+  "license_url": "https://www.govdata.de/dl-de/zero-2-0",
+  "credit": "Geoportal Berlin / Senatsverwaltung für Stadtentwicklung, Bauen und Wohnen Berlin (Daten verändert), dl-de-zero-2.0",
+  "bytes": 3104330,
+  "sha256": "7052b765855013cad2e9941b228eb70b6e056036dffa68d7eaab6401236d9348"
+}

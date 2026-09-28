@@ -16,7 +16,16 @@ function supportsWebGl2() {
 }
 
 async function start() {
-  const forceList = new URLSearchParams(location.search).get('view') === 'list';
+  const view = new URLSearchParams(location.search).get('view');
+  // The live CV is a document, not a map scene. Do not start MapLibre/Three or
+  // thousands of tile requests behind PDF.js; slow devices otherwise hit the
+  // preview timeout before the first page can render.
+  if (view === 'cv') {
+    const {startCvOnly} = await import('./cvOnly.js');
+    startCvOnly();
+    return;
+  }
+  const forceList = view === 'list';
   if (forceList || !supportsWebGl2()) {
     const {startFallback} = await import('./fallback.js');
     startFallback();

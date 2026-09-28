@@ -4,9 +4,11 @@ import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
 maplibregl.setWorkerUrl(workerUrl);
 import './style.css';
 import achievements from './data/achievements.json';
-import {earthStyle, BAVARIA_TRIAL_BOUNDS, PUBLIC_RELEASE} from './sources.js';
+import {earthStyle, BAVARIA_TRIAL_BOUNDS, BERLIN_TRUEDOP_BOUNDS, PUBLIC_RELEASE} from './sources.js';
 import {createCarLayer} from './carLayer.js';
 import {createBavariaBuildingLayer} from './buildingLayer.js';
+import {createIsometricRegionLayer} from './isometricRegionLayer.js';
+import {createRomeVenueChapter} from './romeVenueChapter.js';
 import {createHeroVenueLayer, HERO_VENUE_EVENT, HERO_VENUE_LOCATION} from './heroVenueLayer.js';
 import {createDrivingState, drivingInputFromKeys, stepDriving} from './drivingPhysics.js';
 import {stepPosition, distanceMetres} from './geo.js';
@@ -15,6 +17,7 @@ import {markerLevelForZoom, MARKER_ZOOM, geographicCentroid, declutterMarkers} f
 import {portfolioLinks} from './portfolioData.js';
 import {getProject, renderProjectContent} from './projectContent.js';
 import {readPortfolioRoute, portfolioUrl} from './portfolioRoute.js';
+import {initialMapCamera, ISOMETRIC_CAMERA, preferLocalStart} from './initialCamera.js';
 import './projectContent.css';
 import {createCvView} from './cvView.js';
 import {bindCvDownload} from './cvDownload.js';
@@ -25,7 +28,7 @@ const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)
 const status = (message) => { $('status').textContent = message; };
 const cvView=createCvView({root:$('cv-view-root'),onProjectLink:slug=>{
   const projectEvent=orderedAchievements.find(event=>event.slug===slug);
-  if(projectEvent)selectEvent(projectEvent,{showDetail:true});
+  if(projectEvent){refocusAfterCv=false;selectEvent(projectEvent,{showDetail:true});}
 }});
 const orderedAchievements=sortAchievementsNewestFirst(achievements);
 const knownSlugs=new Set(orderedAchievements.map(event=>event.slug));
@@ -47,14 +50,50 @@ const initialCamera = {center:[12,27],zoom:1.85,pitch:0,bearing:0};
 const DETAIL_MAX_ZOOM=21.35;
 const hasBavariaDetail = ([lng,lat]) => lng>=BAVARIA_TRIAL_BOUNDS[0] && lng<=BAVARIA_TRIAL_BOUNDS[2]
   && lat>=BAVARIA_TRIAL_BOUNDS[1] && lat<=BAVARIA_TRIAL_BOUNDS[3];
+// Three real-data pockets rather than a fabricated miniature world. Every
+// chapter has official LoD2 roofs/walls and a source-aligned 20 cm photo
+// atlas. Other achievements keep the existing satellite/terrain journey.
+const chapterUrl = name => `${import.meta.env.BASE_URL}data/${name}`;
+const ISOMETRIC_CHAPTERS = [
+  {
+    id:'munich-siemens',origin:[11.5758,48.1453],radiusM:250,
+    meshUrl:chapterUrl('munich-siemens-lod2-v1.bin'),
+    roofAtlas:{imageUrl:chapterUrl('munich-siemens-roof-dop20-v1.webp'),metadataUrl:chapterUrl('munich-siemens-roof-dop20-v1.json')},
+    credit:'Bayerische Vermessungsverwaltung · LoD2 buildings and DOP20 imagery (modified), CC BY 4.0'
+  },
+  {
+    id:'munich-google',origin:[11.5802,48.1392],radiusM:250,
+    meshUrl:chapterUrl('munich-google-lod2-v1.bin'),
+    roofAtlas:{imageUrl:chapterUrl('munich-google-roof-dop20-v1.webp'),metadataUrl:chapterUrl('munich-google-roof-dop20-v1.json')},
+    credit:'Bayerische Vermessungsverwaltung · LoD2 buildings and DOP20 imagery (modified), CC BY 4.0'
+  },
+  {
+    id:'berlin-library',origin:[13.3708,52.5074],radiusM:250,
+    meshUrl:chapterUrl('berlin-library-lod2-v1.bin'),
+    roofAtlas:{imageUrl:chapterUrl('berlin-library-roof-truedop20-v1.webp'),metadataUrl:chapterUrl('berlin-library-roof-truedop20-v1.json')},
+    credit:'Geoportal Berlin · LoD2 buildings and TrueDOP 2026 imagery (modified), dl-de-zero-2.0'
+  }
+];
+const ISOMETRIC_EVENT_REGIONS = new Map([
+  ['masters-thesis','munich-siemens'],
+  ['bayer-ai-2024','munich-google'],
+  ['real-coin-map-2025','berlin-library']
+]);
+const bootstrapCamera = initialMapCamera(initialRoute, orderedAchievements, initialCamera, {
+  fastStart:preferLocalStart({deviceMemory:navigator.deviceMemory,
+    saveData:navigator.connection?.saveData,
+    coarsePointer:window.matchMedia('(pointer: coarse)').matches,
+    reducedMotion:prefersReducedMotion}),
+  isometricEventSlugs:ISOMETRIC_EVENT_REGIONS
+});
 
 const map = new maplibregl.Map({
   container:'map',
   style:earthStyle(),
-  center:initialCamera.center,
-  zoom:initialCamera.zoom,
-  pitch:initialCamera.pitch,
-  bearing:initialCamera.bearing,
+  center:bootstrapCamera.center,
+  zoom:bootstrapCamera.zoom,
+  pitch:bootstrapCamera.pitch,
+  bearing:bootstrapCamera.bearing,
   minZoom:1.3,
   maxZoom:DETAIL_MAX_ZOOM,
   maxPitch:82,
@@ -75,6 +114,7 @@ if(PUBLIC_RELEASE){
   $('imagery-credit').innerHTML='<a href="https://esa-worldcover.org/en/data-access">© ESA WorldCover project 2021</a> / Contains modified Copernicus Sentinel data (2021) processed by ESA WorldCover consortium · <a href="https://science.nasa.gov/earth/earth-observatory/blue-marble-next-generation/base-map/">NASA Blue Marble underlay</a>';
 }
 let terrainOn = true;
+let cityDetailOn = true;
 let creditedImagery = null;
 function syncTerrain(){
   // At street-level drive zoom, MapLibre's terrain projection can show a black
@@ -115,6 +155,8 @@ const driveStarts = new Map([
 ]);
 const carLayer = createCarLayer(()=>drive);
 const bavariaBuildings = createBavariaBuildingLayer();
+const isometricRegions = createIsometricRegionLayer({regions:ISOMETRIC_CHAPTERS});
+const romeVenue = createRomeVenueChapter({onChange:()=>updateCredits()});
 const heroVenue = createHeroVenueLayer({onScan:({phase})=>{
   const button=$('scan-button');
   button.classList.toggle('active',phase==='scanning'||phase==='contact');
@@ -157,16 +199,30 @@ $('journey-current').addEventListener('click',()=>{
 
 $('cv-download').href=portfolioLinks.cvPdf;
 bindCvDownload($('cv-download'));
+// PDF.js and a cross-continent map flight should not compete for the main
+// thread when the CV opens. In particular, a direct ?view=cv entry starts at
+// the globe and has no reason to render the selected venue behind a modal.
+let refocusAfterCv=false;
+function openCvView({mapFocusSkipped=false}={}){
+  refocusAfterCv=mapFocusSkipped||map.isMoving();
+  if(map.isMoving())map.stop();
+  cvView.open();
+}
 $('cv-link').addEventListener('click',()=>{
   closePopovers();
   const url=portfolioUrl(window.location.href,{eventSlug:activeEvent?.slug,view:'cv'});
-  window.history.pushState(null,'',url);
-  cvView.open();
+  // A full navigation selects the map-free bootstrap path for the PDF viewer.
+  // Keeping the map running behind a modal can starve PDF.js on slow devices.
+  window.location.assign(url.href);
 });
 $('cv-view').addEventListener('close',()=>{
   if(readPortfolioRoute(window.location.href,knownSlugs).view==='cv'){
     const url=portfolioUrl(window.location.href,{eventSlug:activeEvent?.slug});
     window.history.replaceState(null,'',url);
+  }
+  if(refocusAfterCv&&activeEvent){
+    refocusAfterCv=false;
+    selectEvent(activeEvent,{showDetail:!$('detail').hidden,historyMode:'none'});
   }
 });
 installExportControls({announce: status});
@@ -194,15 +250,17 @@ creditsObserver.observe($('sources'));
 
 function updateCredits(){
   const bounds=map.getBounds();
-  const center=map.getCenter();
   // Show the attribution conservatively whenever a Bavaria tile could intersect
   // the viewport; the camera center may be outside while an edge tile is shown.
   const bavaria=imagery!=='nasa'&&map.getZoom()>=12
     &&bounds.getEast()>=BAVARIA_TRIAL_BOUNDS[0]&&bounds.getWest()<=BAVARIA_TRIAL_BOUNDS[2]
     &&bounds.getNorth()>=BAVARIA_TRIAL_BOUNDS[1]&&bounds.getSouth()<=BAVARIA_TRIAL_BOUNDS[3];
   $('bavaria-credit').hidden=!bavaria;
-  const nearGarching=Math.abs(center.lng-11.666954)<=0.023&&Math.abs(center.lat-48.262269)<=0.017;
-  $('buildings-credit').hidden=!(bavaria&&nearGarching&&map.getZoom()>=15.5&&map.getZoom()<18.5);
+  const berlin=imagery!=='nasa'&&map.getZoom()>=16
+    &&bounds.getEast()>=BERLIN_TRUEDOP_BOUNDS[0]&&bounds.getWest()<=BERLIN_TRUEDOP_BOUNDS[2]
+    &&bounds.getNorth()>=BERLIN_TRUEDOP_BOUNDS[1]&&bounds.getSouth()<=BERLIN_TRUEDOP_BOUNDS[3];
+  $('berlin-credit').hidden=!berlin;
+  $('rome-credit').hidden=!romeVenue.isVisible();
   if(creditedImagery!==imagery){
     $('imagery-credit').innerHTML=imagery==='eox'
       ? '<a href="https://cloudless.eox.at">EOxCloudless</a> by EOX IT Services GmbH (Contains modified Copernicus Sentinel data 2024) · <a href="https://cloudless.eox.at/license-non-commercial">CC BY-NC-SA 4.0</a>'
@@ -275,7 +333,7 @@ function detailMapOffset(){
   }
   return [-Math.min(260,window.innerWidth*.21),0];
 }
-function selectEvent(event,{showDetail=false,historyMode='push',view=null}={}) {
+function selectEvent(event,{showDetail=false,historyMode='push',view=null,skipFly=false}={}) {
   if(!event)return;
   finishDrive();activeEvent=event;activeCity=byCity.get(keyOf(event));
   if(historyMode!=='none'){
@@ -285,6 +343,11 @@ function selectEvent(event,{showDetail=false,historyMode='push',view=null}={}) {
   if(imagery==='nasa')applyImagery('esa');
   closePopovers();
   const isHero=event.slug===HERO_VENUE_EVENT;
+  const chapterId=ISOMETRIC_EVENT_REGIONS.get(event.slug)??null;
+  isometricRegions.setFocus(chapterId);
+  romeVenue.setFocus(event.slug);
+  const isometricView=cityDetailOn&&!!chapterId;
+  const romeView=cityDetailOn&&event.slug==='ethrome-2025';
   const localImage=hasBavariaDetail([event.coordinates.lng,event.coordinates.lat]);
   heroVenue.setActive(isHero);$('scan-button').hidden=!isHero;
   const drivable=driveStarts.has(event.slug);
@@ -293,8 +356,14 @@ function selectEvent(event,{showDetail=false,historyMode='push',view=null}={}) {
   renderJourney();
   // Never enlarge the global Sentinel mosaic several zoom levels beyond its
   // native z14 ceiling. Other cities need their own orthophoto chapter first.
-  fly({center:isHero?HERO_VENUE_LOCATION:[event.coordinates.lng,event.coordinates.lat],zoom:isHero?20.23:localImage?16.4:13.8,pitch:isHero?68:localImage?67:55,bearing:isHero?285:-18,...(showDetail?{offset:detailMapOffset()}:{})});
-  showEventDetail(event);
+  if(!skipFly){
+  fly({center:isHero?HERO_VENUE_LOCATION:[event.coordinates.lng,event.coordinates.lat],
+    zoom:isHero?20.23:isometricView?ISOMETRIC_CAMERA.zoom:romeView?17.45:localImage?16.4:13.8,
+    pitch:isHero?68:isometricView?ISOMETRIC_CAMERA.pitch:romeView?55:localImage?67:55,
+    bearing:isHero?285:isometricView?ISOMETRIC_CAMERA.bearing:romeView?38:-18,
+      ...(showDetail?{offset:detailMapOffset()}:{})});
+    showEventDetail(event);
+  }
   $('detail').hidden=!showDetail;
   status(`${getProject(event.slug)?.title??event.title} · ${event.venue} · ${event.coordinates.lat.toFixed(5)}°, ${event.coordinates.lng.toFixed(5)}°`);
 }
@@ -445,6 +514,8 @@ function initializeEventLayers(){
 
 function showWholeEarth({historyMode='push'}={}){
   finishDrive();activeCity=null;$('detail').hidden=true;
+  isometricRegions.setFocus(null);
+  romeVenue.setFocus(null);
   $('drive-button').hidden=true;$('drive-button').disabled=true;
   heroVenue.setActive(false);$('scan-button').hidden=true;
   closePopovers();fly(initialCamera);status('Whole Earth. The chronology remains on the selected achievement.');
@@ -463,6 +534,7 @@ function applyImagery(next){
   map.setLayoutProperty('esa-imagery','visibility',imagery==='esa'?'visible':'none');
   map.setLayoutProperty('nasa-imagery','visibility',imagery==='nasa'||imagery==='esa'?'visible':'none');
   map.setLayoutProperty('bavaria-imagery','visibility',imagery!=='nasa'?'visible':'none');
+  map.setLayoutProperty('berlin-imagery','visibility',imagery!=='nasa'?'visible':'none');
   document.querySelectorAll('[data-imagery]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.imagery===imagery)));
   updateCredits();
   if(imagery==='nasa'&&map.getZoom()>8)fly({center:map.getCenter(),zoom:8,pitch:50,bearing:map.getBearing()});
@@ -475,6 +547,17 @@ function applyImagery(next){
 document.querySelectorAll('[data-imagery]').forEach(button=>button.addEventListener('click',()=>applyImagery(button.dataset.imagery)));
 $('terrain-toggle').addEventListener('click',()=>{
   terrainOn=!terrainOn;syncTerrain();
+});
+$('city-detail-toggle').addEventListener('click',()=>{
+  cityDetailOn=!cityDetailOn;
+  isometricRegions.setEnabled(cityDetailOn);
+  romeVenue.setEnabled(cityDetailOn);
+  $('city-detail-toggle').setAttribute('aria-pressed',String(cityDetailOn));
+  $('city-detail-state').textContent=cityDetailOn?'ON':'OFF';
+  updateCredits();
+  status(cityDetailOn
+    ?'City detail enabled: official LoD2 in Munich/Berlin; source-audited illustrative venue massing in Rome.'
+    :'3D city detail hidden; the real aerial imagery remains.');
 });
 $('zoom-in').addEventListener('click',()=>map.zoomIn());
 $('zoom-out').addEventListener('click',()=>map.zoomOut());
@@ -566,16 +649,19 @@ let mapReady=false;
 map.on('style.load',()=>{
   map.setProjection({type:'globe'});
   map.addLayer(bavariaBuildings);
+  map.addLayer(isometricRegions);
   map.addLayer(carLayer);
   map.addLayer(heroVenue);
+  romeVenue.onAdd(map);
   initializeEventLayers();
   initializeMarkers();
   mapReady=true;
   const event=orderedAchievements.find(candidate=>candidate.slug===initialRoute.eventSlug)??orderedAchievements[0];
-  selectEvent(event,{showDetail:!initialRoute.view,historyMode:'replace',view:initialRoute.view});
+  const cvRoute=initialRoute.view==='cv';
+  selectEvent(event,{showDetail:!initialRoute.view,historyMode:'replace',view:initialRoute.view,skipFly:cvRoute});
   if(initialRoute.view==='world')showWholeEarth({historyMode:'none'});
   if(initialRoute.view==='cv'){
-    cvView.open();
+    openCvView({mapFocusSkipped:true});
     if(initialRoute.downloadCv)$('cv-download').click();
   }
 });
@@ -584,9 +670,10 @@ function restorePortfolioRoute(){
   const route=readPortfolioRoute(window.location.href,knownSlugs);
   const event=orderedAchievements.find(candidate=>candidate.slug===route.eventSlug)??orderedAchievements[0];
   if(route.view==='cv'){
-    selectEvent(event,{showDetail:false,historyMode:'none'});
-    if(!cvView.isOpen())cvView.open();
+    selectEvent(event,{showDetail:false,historyMode:'none',skipFly:true});
+    if(!cvView.isOpen())openCvView({mapFocusSkipped:true});
   }else{
+    refocusAfterCv=false;
     if(cvView.isOpen())cvView.close();
     selectEvent(event,{showDetail:route.view!=='world',historyMode:'none'});
     if(route.view==='world')showWholeEarth({historyMode:'none'});
@@ -607,4 +694,4 @@ map.on('error',e=>{
   console.warn('Earth tile/render issue:',e.error||e);
   status('A terrain or imagery tile did not load. Check the network; other tiles continue to render.');
 });
-window.__earthEngine={map,cities,achievements,selectCity,selectEvent,drive,heroVenue};
+window.__earthEngine={map,cities,achievements,selectCity,selectEvent,drive,heroVenue,isometricRegions,romeVenue};

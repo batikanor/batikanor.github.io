@@ -162,7 +162,12 @@ export function createCvView({ root = document.body, onProjectLink } = {}) {
         const link = document.createElement('a');
         link.className = 'cv-view-document-link';
         const localUrl = new URL(window.location.href);
-        if (projectSlug) { localUrl.searchParams.set('event', projectSlug); localUrl.hash = ''; }
+        if (projectSlug) {
+          localUrl.searchParams.set('event', projectSlug);
+          localUrl.searchParams.delete('view');
+          localUrl.searchParams.delete('download');
+          localUrl.hash = '';
+        }
         link.href = projectSlug ? localUrl.href : annotation.url;
         link.target = '_blank';
         link.rel = 'noopener noreferrer';
@@ -208,7 +213,7 @@ export function createCvView({ root = document.body, onProjectLink } = {}) {
         if (!dialog.open || loading.hidden) return;
         abortController?.abort();
         loading.textContent = 'The CV preview timed out. Open it in Drive or download the PDF above.';
-      }, 20000);
+      }, 30000);
       fetchCvPdfBlob({ signal })
         .then((pdf) => {
           if (signal.aborted || !dialog.open) return;

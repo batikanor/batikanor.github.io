@@ -28,7 +28,13 @@ test('the local portfolio snapshot still matches the existing-site source', () =
     assert.equal(mapEvent?.city, project.mapData.city === 'Laussane' ? 'Lausanne' : project.mapData.city);
     assert.equal(mapEvent?.country, project.mapData.country);
     assert.equal(mapEvent?.venue, project.mapData.venue);
-    assert.deepEqual(mapEvent?.coordinates, project.mapData.coordinates);
+    if (project.slug === 'ethrome-2025') {
+      // The author snapshot stays byte-for-byte intact. The old map-only pin
+      // was ~470m north of Via Ostiense 92; audited venue sources are in
+      // design/rome-venue-pilot.md, and only achievements.json is corrected.
+      assert.deepEqual(mapEvent?.coordinates, {lat:41.8678291,lng:12.4791336});
+      assert.deepEqual(project.mapData.coordinates, {lat:41.8719,lng:12.4802});
+    } else assert.deepEqual(mapEvent?.coordinates, project.mapData.coordinates);
   }
 });
 

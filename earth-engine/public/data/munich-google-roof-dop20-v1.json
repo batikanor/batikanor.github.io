@@ -1,0 +1,29 @@
+{
+  "asset": "munich-google-roof-dop20-v1.webp",
+  "source": "Bayerische Vermessungsverwaltung / LDBV, Digitales Orthophoto DOP20 RGB",
+  "source_url": "https://wmtsod1.bayernwolke.de/wmts/by_dop/smerc/{z}/{x}/{y}",
+  "source_grid": "smerc / EPSG:3857 XYZ",
+  "source_tile_zoom": 19,
+  "source_tile_bounds_xyxy": [
+    279003,
+    181940,
+    279015,
+    181952
+  ],
+  "source_tile_count": 169,
+  "source_ordered_jpeg_sha256": "f30da3d9f016bde16478adad24a4284311dd9b94a9672ffbf0b9d604fb457536",
+  "source_accessed_utc_date": "2026-09-28",
+  "width": 3328,
+  "height": 3328,
+  "event_slug": "bayer-ai-2024",
+  "origin_lonlat": [
+    11.5802,
+    48.1392
+  ],
+  "derived_changes": "Stitched official z19 RGB DOP20 JPEGs into a 20 cm/px roof-only WebP atlas; georeferenced to original LoD2 roof surfaces; no fabricated roof or facade features",
+  "license": "CC BY 4.0 — attribution and modification notice required",
+  "license_url": "https://creativecommons.org/licenses/by/4.0/",
+  "credit": "Geobasisdaten: Bayerische Vermessungsverwaltung – www.geodaten.bayern.de (Daten verändert), Lizenz: CC BY 4.0",
+  "bytes": 2274830,
+  "sha256": "29bd9f3c0d45b9bda1b506ebdd9f638f7f74e8865d9879331720a97dac1a426f"
+}

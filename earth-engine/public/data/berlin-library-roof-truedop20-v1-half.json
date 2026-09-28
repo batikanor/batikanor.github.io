@@ -1,0 +1,27 @@
+{
+  "asset": "berlin-library-roof-truedop20-v1-half.webp",
+  "source_asset": "berlin-library-roof-truedop20-v1.webp",
+  "source_asset_sha256": "7052b765855013cad2e9941b228eb70b6e056036dffa68d7eaab6401236d9348",
+  "source_metadata": "berlin-library-roof-truedop20-v1.json",
+  "source": "Geoportal Berlin / Senatsverwaltung für Stadtentwicklung, Bauen und Wohnen Berlin, Digitale farbige TrueOrthophotos 2026 DOP20RGBI",
+  "source_url": "https://gdi.berlin.de/services/wms/truedop_2026",
+  "source_tile_zoom": 19,
+  "source_tile_bounds_xyxy": [
+    281610,
+    171965,
+    281623,
+    171978
+  ],
+  "origin_lonlat": [
+    13.3708,
+    52.5074
+  ],
+  "width": 1792,
+  "height": 1792,
+  "derived_changes": "Lanczos 2× downsample of the official-data roof atlas for low-memory devices; original georeferencing and LoD2 geometry retained; no fabricated detail",
+  "license": "Datenlizenz Deutschland – Zero – Version 2.0",
+  "license_url": "https://www.govdata.de/dl-de/zero-2-0",
+  "credit": "Geoportal Berlin / Senatsverwaltung für Stadtentwicklung, Bauen und Wohnen Berlin (Daten verändert), dl-de-zero-2.0",
+  "bytes": 906150,
+  "sha256": "fd9cddf7b346a86b4e2e241fbd1dc147e96a54603c8d63fd218311d2c6c349c6"
+}

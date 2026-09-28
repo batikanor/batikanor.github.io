@@ -1,0 +1,21 @@
+{
+  "source_id": "berlin-library-truedop20-2026",
+  "type": "raster",
+  "tiles": [
+    "https://gdi.berlin.de/services/wms/truedop_2026?service=WMS&version=1.3.0&request=GetMap&layers=truedop_2026&styles=&CRS=EPSG%3A3857&bbox={bbox-epsg-3857}&width=256&height=256&format=image%2Fjpeg"
+  ],
+  "tileSize": 256,
+  "minzoom": 16,
+  "maxzoom": 19,
+  "bounds": [
+    13.366241455078125,
+    52.504937490853756,
+    13.3758544921875,
+    52.51078849036717
+  ],
+  "source_dataset": "https://daten.berlin.de/datensaetze/digitale-farbige-trueorthophotos-2026-dop20rgbi-wms-3801a94c",
+  "license": "Datenlizenz Deutschland – Zero – Version 2.0",
+  "license_url": "https://www.govdata.de/dl-de/zero-2-0",
+  "credit": "Geoportal Berlin / Senatsverwaltung für Stadtentwicklung, Bauen und Wohnen Berlin (Daten verändert), dl-de-zero-2.0",
+  "notes": "Official WMS is CORS-enabled and delivers RGB imagery at z16–19. Add this source/layer only near the State Library and do not use it as a global basemap; z19 requests approximate 18 cm ground pixels at Berlin."
+}

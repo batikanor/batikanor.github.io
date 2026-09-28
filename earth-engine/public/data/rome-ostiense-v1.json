@@ -1,0 +1,64 @@
+{
+  "id": "rome-ostiense-v1",
+  "image_corners_lonlat": [
+    [
+      12.475964853,
+      41.869876052
+    ],
+    [
+      12.481743347,
+      41.870002982
+    ],
+    [
+      12.481912953,
+      41.865683865
+    ],
+    [
+      12.476134847,
+      41.865556954
+    ]
+  ],
+  "venue_lonlat": [
+    12.4791336,
+    41.8678291
+  ],
+  "ground": {
+    "source": "Regione Lazio Ortofoto AGEA v. 2020",
+    "license": "CC BY 4.0",
+    "capture_year": 2020,
+    "source_sha256": "24f32f2d67b9a1dbadf343da83d5febce18f66735de06dc0bd1550adb88a4a9d",
+    "utm_epsg": 25833,
+    "utm_bounds": [
+      290532.57579051994,
+      4637929.377485718,
+      291012.57579051994,
+      4638409.377485718
+    ],
+    "products": {
+      "800": {
+        "asset": "rome-ostiense-agea2020-800-v1.webp",
+        "bytes": 151486,
+        "sha256": "02c2d9b31353c51929a486bee44807812007b47bc86fc9d098ca69c84e00ee9b",
+        "decoded_rgba_bytes": 2560000
+      },
+      "1600": {
+        "asset": "rome-ostiense-agea2020-1600-v1.webp",
+        "bytes": 626114,
+        "sha256": "056ef976be5a3ab7f1f3b6ecc635c2e66168391b3793e7ef60b32e1cc28181b4",
+        "decoded_rgba_bytes": 10240000
+      }
+    }
+  },
+  "buildings": {
+    "asset": "rome-ostiense-buildings-v1.geojson",
+    "bytes": 46025,
+    "sha256": "f26d1cc4e2ec5d2e83b61db0d58985414847e40fa5272cc4af21d7cd20d9305c",
+    "features": 115,
+    "raised_features": 74,
+    "source": "OpenStreetMap contributors",
+    "license": "ODbL 1.0",
+    "source_sha256": "1c2c4c98b25196dea4d8abf7ed18ba8ad399d9ce15696b26ff11306ad4b81ea6",
+    "unknown_height_policy": "planar footprint only"
+  },
+  "truth_label": "2020 official orthophoto; OSM outlines; illustrative massing, not surveyed 3D"
+}
