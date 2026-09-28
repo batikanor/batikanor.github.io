@@ -1,0 +1,450 @@
+[
+  {
+    "slug": "tesla-gigathon-2026",
+    "title": "1st Place at Tesla Gigathon 2026",
+    "city": "Grünheide",
+    "country": "Germany",
+    "venue": "Tesla Gigafactory Berlin-Brandenburg",
+    "coordinates": {
+      "lat": 52.391331,
+      "lng": 13.79215
+    },
+    "date": "07/2026",
+    "importance": 8.5,
+    "highlighted": false
+  },
+  {
+    "slug": "hong-kong-talent-engage-eurotech-healthtech-2026",
+    "title": "Winner at Hong Kong Talent Engage x EuroTech Federation Hackathon",
+    "city": "Hong Kong",
+    "country": "Hong Kong",
+    "venue": "Hong Kong Talent Engage, Revenue Tower",
+    "coordinates": {
+      "lat": 22.2745,
+      "lng": 114.1698
+    },
+    "date": "06/2026",
+    "importance": 9,
+    "highlighted": false
+  },
+  {
+    "slug": "decarbon-days-climathon-2026",
+    "title": "Lead Jury & Mentor at Decarbon Days Climathon 2026",
+    "city": "Cottbus",
+    "country": "Germany",
+    "venue": "Konrad-Wachsmann-Allee 3",
+    "coordinates": {
+      "lat": 51.767384,
+      "lng": 14.326165
+    },
+    "date": "06/2026",
+    "importance": 9,
+    "highlighted": true
+  },
+  {
+    "slug": "pdm-kill-the-search-bar-2026",
+    "title": "1st Place at pdm solutions 'Kill the Search Bar' Hackathon about gelbeseiten.de",
+    "city": "Berlin",
+    "country": "Germany",
+    "venue": "pdm solutions GmbH, Boxhagener Str. 78",
+    "coordinates": {
+      "lat": 52.5067,
+      "lng": 13.4691
+    },
+    "date": "05/15/2026 - 05/17/2026",
+    "importance": 7,
+    "highlighted": false
+  },
+  {
+    "slug": "zero-one-hack-supercompute-industrial-2026",
+    "title": "2nd Place in the Industrial Track at Zero One Hack",
+    "city": "Vienna",
+    "country": "Austria",
+    "venue": "AI:AT Coworking Hub, Karl-Farkas-Gasse 22",
+    "coordinates": {
+      "lat": 48.1882,
+      "lng": 16.4038
+    },
+    "date": "05/29/2026 - 05/31/2026",
+    "importance": 4,
+    "highlighted": false
+  },
+  {
+    "slug": "huawei-tech-arena-finland-2025",
+    "title": "Finalist and Honorable Mention Award winner at Huawei Tech Arena Finland 2025",
+    "city": "Helsinki",
+    "country": "Finland",
+    "venue": "Huawei Finland R&D (Läkkisepäntie 23)",
+    "coordinates": {
+      "lat": 60.2205,
+      "lng": 24.9438
+    },
+    "date": "12/2025",
+    "importance": 5,
+    "highlighted": false
+  },
+  {
+    "slug": "real-coin-map-2025",
+    "title": "Winner of Best Technical Solution Award at Berlin State Library Hackathon",
+    "city": "Berlin",
+    "country": "Germany",
+    "venue": "Staatsbibliothek zu Berlin",
+    "coordinates": {
+      "lat": 52.5074,
+      "lng": 13.3708
+    },
+    "date": "10/2025",
+    "importance": 5,
+    "highlighted": false
+  },
+  {
+    "slug": "ethrome-2025",
+    "title": "3rd Place (Zama) & Pool Prize (ENS) at ETHRome 2025",
+    "city": "Rome",
+    "country": "Italy",
+    "venue": "Via Ostiense, 92",
+    "coordinates": {
+      "lat": 41.8719,
+      "lng": 12.4802
+    },
+    "date": "10/2025",
+    "importance": 6,
+    "highlighted": false
+  },
+  {
+    "slug": "nasa-space-apps-zurich-2025",
+    "title": "Expert Mentor at NASA Space Apps Challenge in Zurich",
+    "city": "Zurich",
+    "country": "Switzerland",
+    "venue": "NovuCampus Zurich, The Circle 60",
+    "coordinates": {
+      "lat": 47.4525,
+      "lng": 8.5617
+    },
+    "date": "10/2025",
+    "importance": 4,
+    "highlighted": false
+  },
+  {
+    "slug": "sui-hackathon-poland-2025",
+    "title": "3rd Place at the First Sui Hackathon in Poland",
+    "city": "Wroclaw",
+    "country": "Poland",
+    "venue": "triQube - Inkubator Przedsiębiorczości",
+    "coordinates": {
+      "lat": 51.107883,
+      "lng": 17.038538
+    },
+    "date": "07/2025",
+    "importance": 5,
+    "highlighted": false
+  },
+  {
+    "slug": "decarbon-days-climathon-2025",
+    "title": "Lead Jury & Mentor at Decarbon Days Climathon",
+    "city": "Cottbus",
+    "country": "Germany",
+    "venue": "Decarbon Days",
+    "coordinates": {
+      "lat": 51.7734,
+      "lng": 14.3315
+    },
+    "date": "06/2025",
+    "importance": 9,
+    "highlighted": true
+  },
+  {
+    "slug": "music-ai-osaka-2025",
+    "title": "Winner with distinction 'Open Source' in Music & AI Hackathon in Japan. Participation in World Expo as VIP of Austria",
+    "city": "Nara",
+    "country": "Japan",
+    "venue": "Gyokuzoin Temple, Mount Shigi",
+    "coordinates": {
+      "lat": 34.6128,
+      "lng": 135.6682
+    },
+    "date": "06/2025",
+    "importance": 6,
+    "highlighted": true
+  },
+  {
+    "slug": "european-defense-tech-2025-munich",
+    "title": "Finalist at European Defense Tech Competition 2025 Munich",
+    "city": "Munich",
+    "country": "Germany",
+    "venue": "Unternehmertum Garching",
+    "coordinates": {
+      "lat": 48.2625,
+      "lng": 11.6671
+    },
+    "date": "02/2025",
+    "importance": 3,
+    "highlighted": false
+  },
+  {
+    "slug": "tech-berlin-ai-hackathon-2",
+    "title": "Winner of Balderton Capital Challenge at {Tech: Berlin} AI Hackathon",
+    "city": "Berlin",
+    "country": "Germany",
+    "venue": "CODE Berlin",
+    "coordinates": {
+      "lat": 52.520008,
+      "lng": 13.404954
+    },
+    "date": "01/2025",
+    "importance": 2,
+    "highlighted": false
+  },
+  {
+    "slug": "huawei-agorize-2024",
+    "title": "Outstanding Award Winner at Huawei AI Individual Head-Related Transfer Functions (HRTFs) Competition",
+    "city": "Munich",
+    "country": "Germany",
+    "venue": "Huawei Research Center",
+    "coordinates": {
+      "lat": 48.1786,
+      "lng": 11.5353
+    },
+    "date": "12/2024 - 01/2025",
+    "importance": 5,
+    "highlighted": false
+  },
+  {
+    "slug": "masters-thesis",
+    "title": "Master's Thesis: (TEA) Trajectory Encoding Augmentation for Robust and Transferable Policies in Offline Reinforcement Learning",
+    "city": "Munich",
+    "country": "Germany",
+    "venue": "Siemens AG",
+    "coordinates": {
+      "lat": 48.1453,
+      "lng": 11.5758
+    },
+    "date": "12/2024",
+    "importance": 7,
+    "highlighted": false
+  },
+  {
+    "slug": "lauzhack-2024",
+    "title": "Finalist at LauzHack 2024: VR Classroom for Focus Improvement",
+    "city": "Lausanne",
+    "country": "Switzerland",
+    "venue": "EPFL",
+    "coordinates": {
+      "lat": 46.5191,
+      "lng": 6.5668
+    },
+    "date": "11/2024",
+    "importance": 3,
+    "highlighted": false
+  },
+  {
+    "slug": "salzburg-tourism-2024",
+    "title": "1st Place at the biggest Tourism Technology Festival in Europe",
+    "city": "Salzburg",
+    "country": "Austria",
+    "venue": "Alles Für den GAST",
+    "coordinates": {
+      "lat": 47.8014,
+      "lng": 13.0448
+    },
+    "date": "11/2024",
+    "importance": 8,
+    "highlighted": true
+  },
+  {
+    "slug": "zurich-climathon-2024",
+    "title": "Awarded 7000 CHF by the City of Zurich: AI-Based Employee Surveying Platform",
+    "city": "Zurich",
+    "country": "Switzerland",
+    "venue": "Kraftwerk",
+    "coordinates": {
+      "lat": 47.3882,
+      "lng": 8.5153
+    },
+    "date": "11/2024",
+    "importance": 7,
+    "highlighted": false
+  },
+  {
+    "slug": "bayer-ai-2024",
+    "title": "2nd Place at Bayer AI Innovation Platform Hackathon",
+    "city": "Munich",
+    "country": "Germany",
+    "venue": "Google Office",
+    "coordinates": {
+      "lat": 48.1392,
+      "lng": 11.5802
+    },
+    "date": "10/2024",
+    "importance": 5,
+    "highlighted": false
+  },
+  {
+    "slug": "dsag-ideathon-2024",
+    "title": "2nd Place at DSAG Ideathon",
+    "city": "Leipzig",
+    "country": "Germany",
+    "venue": "DSAG Jahreskonferenz",
+    "coordinates": {
+      "lat": 51.3397,
+      "lng": 12.3731
+    },
+    "date": "10/2024",
+    "importance": 5,
+    "highlighted": true
+  },
+  {
+    "slug": "circular-bsh-2024",
+    "title": "Best Business Opportunity Award Winner at Circular Hackfest",
+    "city": "Munich",
+    "country": "Germany",
+    "venue": "Makerspace",
+    "coordinates": {
+      "lat": 48.148,
+      "lng": 11.568
+    },
+    "date": "10/2024",
+    "importance": 4,
+    "highlighted": false
+  },
+  {
+    "slug": "thuega-2024",
+    "title": "1st Place at Thüga Solutions Hackathon",
+    "city": "Munich",
+    "country": "Germany",
+    "venue": "Thüga Solutions",
+    "coordinates": {
+      "lat": 48.1445,
+      "lng": 11.5892
+    },
+    "date": "09/2024",
+    "importance": 6,
+    "highlighted": false
+  },
+  {
+    "slug": "solana-ideathon-2024",
+    "title": "2nd Place at Solana Superteam Ideathon",
+    "city": "Munich",
+    "country": "Germany",
+    "venue": "TUM Blockchain Conference",
+    "coordinates": {
+      "lat": 48.1497,
+      "lng": 11.5677
+    },
+    "date": "09/2024",
+    "importance": 4,
+    "highlighted": false
+  },
+  {
+    "slug": "six-swisshacks-2024",
+    "title": "1st Place on Swiss Exchange Track & Audience Award at SwissHacks2024",
+    "city": "Zurich",
+    "country": "Switzerland",
+    "venue": "SIX Swiss Exchange",
+    "coordinates": {
+      "lat": 47.3667,
+      "lng": 8.55
+    },
+    "date": "06/2024",
+    "importance": 8,
+    "highlighted": true
+  },
+  {
+    "slug": "hackupc-2024",
+    "title": "3rd Place at HackUPC (Sponsor: Intersystems)",
+    "city": "Barcelona",
+    "country": "Spain",
+    "venue": "UPC",
+    "coordinates": {
+      "lat": 41.3851,
+      "lng": 2.1734
+    },
+    "date": "05/2024",
+    "importance": 5,
+    "highlighted": false
+  },
+  {
+    "slug": "mdsi-bundesliga-2024",
+    "title": "Proof of Concept: Detecting line-breaks in football matches",
+    "city": "Munich",
+    "country": "Germany",
+    "venue": "TUM MDSI",
+    "coordinates": {
+      "lat": 48.1497,
+      "lng": 11.5677
+    },
+    "date": "01/2024",
+    "importance": 4,
+    "highlighted": false
+  },
+  {
+    "slug": "draeger-2023",
+    "title": "2nd Place at Dräger hackathon",
+    "city": "Lübeck",
+    "country": "Germany",
+    "venue": "Dräger",
+    "coordinates": {
+      "lat": 53.8655,
+      "lng": 10.6866
+    },
+    "date": "10/2023",
+    "importance": 5,
+    "highlighted": false
+  },
+  {
+    "slug": "ethmunich-2023",
+    "title": "1st Place (Main Track) at the first Ethereum-focused hackathon in Munich",
+    "city": "Munich",
+    "country": "Germany",
+    "venue": "PretzelDAO & TUM",
+    "coordinates": {
+      "lat": 48.1351,
+      "lng": 11.582
+    },
+    "date": "08/2023",
+    "importance": 8,
+    "highlighted": true
+  },
+  {
+    "slug": "msg-karlsruhe-2023",
+    "title": "1st Place at  MSG Code & Create Hackathon",
+    "city": "Karlsruhe",
+    "country": "Germany",
+    "venue": "MSG",
+    "coordinates": {
+      "lat": 49.0069,
+      "lng": 8.4037
+    },
+    "date": "06/2023",
+    "importance": 6,
+    "highlighted": false
+  },
+  {
+    "slug": "bachelors-thesis",
+    "title": "Bachelor's Thesis: Cat identification using Noseprints",
+    "city": "Beykoz",
+    "country": "Turkey",
+    "venue": "Turkish-German University",
+    "coordinates": {
+      "lat": 41.1428,
+      "lng": 29.1001
+    },
+    "date": "06/2022",
+    "importance": 6,
+    "highlighted": false
+  },
+  {
+    "slug": "tgu-perfect-gpa",
+    "title": "First student ever to graduate from TGU with Perfect GPA",
+    "city": "Beykoz",
+    "country": "Turkey",
+    "venue": "Turkish-German University",
+    "coordinates": {
+      "lat": 41.1428,
+      "lng": 29.1001
+    },
+    "date": "06/2022",
+    "importance": 9,
+    "highlighted": true
+  }
+]

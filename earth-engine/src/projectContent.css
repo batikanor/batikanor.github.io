@@ -1,0 +1,85 @@
+/* Author's complete portfolio stories, displayed inside the map detail sheet. */
+.project-story-header { padding-right: 28px; }
+.project-story-date {
+  margin: 0 0 8px; color: #e6c995; font-size: 10px; font-weight: 700;
+  letter-spacing: .09em;
+}
+.detail .project-story-title {
+  margin: 0 0 9px; color: #fffaf1; font: 600 clamp(21px, 2vw, 29px)/1.2 'DM Sans', system-ui, sans-serif;
+  text-wrap: balance;
+}
+.project-story-place {
+  margin: 0 0 17px; color: #d7dedb; font-size: 11px; line-height: 1.5;
+}
+.project-story-summary {
+  margin: 0 0 19px; padding: 12px 14px; border-left: 2px solid #e1c28d;
+  background: #ffffff0b;
+}
+.project-story-summary h3, .project-story-links h3, .project-repository h3 {
+  margin: 0 0 7px; color: #f3d6a8; font-size: 11px; font-weight: 700;
+}
+.project-story-summary p { margin: 0; color: #e5ebe8; font-size: 13px; line-height: 1.6; }
+.project-story-copy { color: #e4ebe7; font-size: 13px; line-height: 1.63; overflow-wrap: anywhere; }
+.project-story-copy p { margin: 0 0 15px; }
+.project-story-copy .project-copy-heading {
+  margin: 24px 0 12px; color: #fff8ec; font-size: 15px; line-height: 1.4;
+}
+.project-story-copy .project-copy-bullet { padding-left: 13px; text-indent: -13px; }
+.project-story-copy a, .project-story-links a, .project-repository a,
+.project-media-actions a { color: #f2d39e; text-underline-offset: 3px; }
+.project-story-copy a:hover, .project-story-links a:hover,
+.project-repository a:hover, .project-media-actions a:hover { color: #fff4df; }
+
+.project-media {
+  width: 100%; max-width: 100%; margin: 20px 0 24px;
+  padding: 0; overflow: hidden;
+}
+.project-media-caption { margin: 0 0 8px; color: #f5f0e4; font-size: 12px; line-height: 1.45; }
+.project-media-image {
+  display: block; width: 100%; max-height: min(70vh, 850px); object-fit: contain;
+  border-radius: 4px; background: #040a0c;
+}
+.project-media-frame {
+  display: block; width: 100%; height: 300px; border: 1px solid #eee1c860;
+  border-radius: 4px; background: #071317;
+}
+.project-media-s .project-media-frame { height: 200px; }
+.project-media-l .project-media-frame { height: 500px; }
+.project-media-xl .project-media-frame { height: 700px; }
+.project-media-expanded .project-media-frame { height: min(80vh, 850px); }
+.project-media-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 7px; font-size: 10px; }
+.project-media-sizes { display: inline-flex; gap: 3px; }
+.project-media-actions button {
+  min-height: 36px; min-width: 36px; padding: 5px 9px; border: 1px solid #e8c99580;
+  border-radius: 3px; background: #ffffff13; color: #f5ede0; font-size: 10px;
+}
+.project-media-actions button:hover { background: #d9bb8d; color: #14262a; }
+.project-media-actions button[aria-pressed="true"] { background: #d9bb8d; color: #14262a; }
+.project-media-credit { margin: 6px 0 0; color: #bbc9c5; font-size: 10px; line-height: 1.45; }
+.project-story-links, .project-repository { margin: 21px 0; padding-top: 16px; border-top: 1px solid #ece5d33d; }
+.project-story-copy-link {
+  margin: 5px 0 10px; padding: 8px 10px; border: 1px solid #e8c995a0;
+  border-radius: 3px; background: #d9bb8d; color: #14262a;
+  font-size: 10px; font-weight: 700;
+}
+.project-story-copy-link:hover { background: #f0d3a4; }
+.project-story-links ul { margin: 0; padding-left: 19px; }
+.project-story-links li { margin: 0 0 8px; font-size: 12px; line-height: 1.4; overflow-wrap: anywhere; }
+.project-story-technologies { display: flex; flex-wrap: wrap; gap: 6px; margin: 18px 0 0; padding: 0; list-style: none; }
+.project-story-technologies li {
+  padding: 5px 8px; border: 1px solid #e8c99570; border-radius: 99px;
+  color: #f3e7d2; background: #d9bb8d19; font-size: 10px;
+}
+.project-repository-actions { display: flex; flex-wrap: wrap; gap: 11px; margin-bottom: 12px; font-size: 11px; }
+.project-repository-chart { display: block; width: 100%; height: auto; background: #fff; border-radius: 3px; }
+
+@media (max-width: 760px) {
+  .detail .project-story-title { font-size: 21px; }
+  .project-story-summary p, .project-story-copy { font-size: 12px; }
+  .project-media-frame { height: 250px; }
+  .project-media[data-mobile-size="S"] .project-media-frame { height: 200px; }
+  .project-media[data-mobile-size="L"] .project-media-frame { height: 350px; }
+  .project-media[data-mobile-size="XL"] .project-media-frame { height: 450px; }
+  .project-media-expanded .project-media-frame { height: min(72vh, 700px); }
+  .project-media-actions button { min-height: 44px; min-width: 44px; }
+}

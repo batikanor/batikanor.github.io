@@ -1,0 +1,610 @@
+import * as maplibregl from 'maplibre-gl';
+import 'maplibre-gl/dist/maplibre-gl.css';
+import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
+maplibregl.setWorkerUrl(workerUrl);
+import './style.css';
+import achievements from './data/achievements.json';
+import {earthStyle, BAVARIA_TRIAL_BOUNDS, PUBLIC_RELEASE} from './sources.js';
+import {createCarLayer} from './carLayer.js';
+import {createBavariaBuildingLayer} from './buildingLayer.js';
+import {createHeroVenueLayer, HERO_VENUE_EVENT, HERO_VENUE_LOCATION} from './heroVenueLayer.js';
+import {createDrivingState, drivingInputFromKeys, stepDriving} from './drivingPhysics.js';
+import {stepPosition, distanceMetres} from './geo.js';
+import {sortAchievementsNewestFirst, getChronologyState, stepChronology} from './chronology.js';
+import {markerLevelForZoom, MARKER_ZOOM, geographicCentroid, declutterMarkers} from './markerPolicy.js';
+import {portfolioLinks} from './portfolioData.js';
+import {getProject, renderProjectContent} from './projectContent.js';
+import {readPortfolioRoute, portfolioUrl} from './portfolioRoute.js';
+import './projectContent.css';
+import {createCvView} from './cvView.js';
+import {bindCvDownload} from './cvDownload.js';
+import {installExportControls} from './exportControls.js';
+
+const $ = (id) => document.getElementById(id);
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const status = (message) => { $('status').textContent = message; };
+const cvView=createCvView({root:$('cv-view-root'),onProjectLink:slug=>{
+  const projectEvent=orderedAchievements.find(event=>event.slug===slug);
+  if(projectEvent)selectEvent(projectEvent,{showDetail:true});
+}});
+const orderedAchievements=sortAchievementsNewestFirst(achievements);
+const knownSlugs=new Set(orderedAchievements.map(event=>event.slug));
+const initialRoute=readPortfolioRoute(window.location.href,knownSlugs);
+const cities = Object.values(achievements.reduce((all, event) => {
+  const key = `${event.city}|${event.country}`;
+  const city = all[key] ??= {key, city:event.city, country:event.country, events:[], lng:0, lat:0};
+  city.events.push(event);
+  city.lng += event.coordinates.lng;
+  city.lat += event.coordinates.lat;
+  return all;
+}, {})).map(city => ({...city,lng:city.lng/city.events.length,lat:city.lat/city.events.length})).sort((a,b)=>b.events.length-a.events.length || a.city.localeCompare(b.city));
+const countries=Object.values(cities.reduce((all,city)=>{
+  const group=all[city.country]??={name:city.country,cities:[],lng:0,lat:0,count:0};
+  group.cities.push(city);group.lng+=city.lng;group.lat+=city.lat;group.count+=city.events.length;return all;
+},{})).map(c=>({...c,lng:c.lng/c.cities.length,lat:c.lat/c.cities.length}));
+const byCity = new Map(cities.map(x=>[x.key,x]));
+const initialCamera = {center:[12,27],zoom:1.85,pitch:0,bearing:0};
+const DETAIL_MAX_ZOOM=21.35;
+const hasBavariaDetail = ([lng,lat]) => lng>=BAVARIA_TRIAL_BOUNDS[0] && lng<=BAVARIA_TRIAL_BOUNDS[2]
+  && lat>=BAVARIA_TRIAL_BOUNDS[1] && lat<=BAVARIA_TRIAL_BOUNDS[3];
+
+const map = new maplibregl.Map({
+  container:'map',
+  style:earthStyle(),
+  center:initialCamera.center,
+  zoom:initialCamera.zoom,
+  pitch:initialCamera.pitch,
+  bearing:initialCamera.bearing,
+  minZoom:1.3,
+  maxZoom:DETAIL_MAX_ZOOM,
+  maxPitch:82,
+  renderWorldCopies:false,
+  canvasContextAttributes:{antialias:true},
+  attributionControl:false
+});
+map.addControl(new maplibregl.ScaleControl({unit:'metric',maxWidth:120}),'bottom-left');
+const scaleElement=document.querySelector('.maplibregl-ctrl-scale');
+if(scaleElement)$('settings-scale').append(scaleElement);
+
+let activeCity = null;
+let activeEvent = null;
+let imagery = PUBLIC_RELEASE ? 'esa' : 'eox';
+if(PUBLIC_RELEASE){
+  document.querySelector('[data-imagery="eox"]')?.remove();
+  document.querySelector('[data-imagery="esa"]').setAttribute('aria-pressed','true');
+  $('imagery-credit').innerHTML='<a href="https://esa-worldcover.org/en/data-access">© ESA WorldCover project 2021</a> / Contains modified Copernicus Sentinel data (2021) processed by ESA WorldCover consortium · <a href="https://science.nasa.gov/earth/earth-observatory/blue-marble-next-generation/base-map/">NASA Blue Marble underlay</a>';
+}
+let terrainOn = true;
+let creditedImagery = null;
+function syncTerrain(){
+  // At street-level drive zoom, MapLibre's terrain projection can show a black
+  // ground plane on short mobile canvases. The local campus is essentially
+  // flat, so pause the DEM while driving and honour the user's preference again
+  // on exit. Both the car and radar then query the same flat map surface.
+  const show=terrainOn&&!drive.active;
+  map.setTerrain(show?{source:'terrain',exaggeration:1}:null);
+  map.setLayoutProperty('terrain-hillshade','visibility',show?'visible':'none');
+  $('terrain-toggle').setAttribute('aria-pressed',String(terrainOn));
+  $('terrain-state').textContent=terrainOn?(drive.active?'PAUSED':'ON'):'OFF';
+}
+// Two honest camera framings of the same 4.34 m car. No model-scale change.
+// The close chase helps the vehicle read; the overview keeps the installation
+// and its real spatial relationship visible.
+const DRIVE_CAMERAS=Object.freeze({
+  chase:Object.freeze({zoom:21.05,pitch:60,lookahead:3.8}),
+  overview:Object.freeze({zoom:20.15,pitch:68,lookahead:8})
+});
+// A phone turned sideways has too little vertical canvas for the desktop
+// chase: the physically scaled car falls below the map and attribution. Keep
+// the same car and heading, but pull back and shorten the look-ahead. A centre
+// behind the car would put MapLibre's terrain camera below the DEM here.
+const SHORT_LANDSCAPE_DRIVE_CAMERAS=Object.freeze({
+  chase:Object.freeze({zoom:20.45,pitch:60,lookahead:.5}),
+  overview:Object.freeze({zoom:19.95,pitch:62,lookahead:4})
+});
+function driveCamera(){
+  const shortLandscape=window.innerHeight<=500&&window.innerWidth>window.innerHeight*1.3;
+  return (shortLandscape?SHORT_LANDSCAPE_DRIVE_CAMERAS:DRIVE_CAMERAS)[drive.cameraMode];
+}
+const drive = {active:false,position:[11.5761,48.1372],heading:0,speed:0,keys:new Set(),last:0,cameraMode:'chase'};
+let physicsState = null;
+// Approximate, manually inspected ground-level start for the Garching demo.
+// This is *not* a road graph or an assertion that every venue coordinate is drivable.
+const driveStarts = new Map([
+  ['european-defense-tech-2025-munich',{position:[11.666954,48.262269],heading:225}]
+]);
+const carLayer = createCarLayer(()=>drive);
+const bavariaBuildings = createBavariaBuildingLayer();
+const heroVenue = createHeroVenueLayer({onScan:({phase})=>{
+  const button=$('scan-button');
+  button.classList.toggle('active',phase==='scanning'||phase==='contact');
+  button.querySelector('span').textContent=phase==='scanning'?'SCANNING':phase==='contact'?'CONTACT':'SCAN RADAR';
+  if(phase==='scanning')status('Protective Radar · the dish sweeps the surrounding airspace.');
+  else if(phase==='contact')status('Protective Radar · one contact detected; the quiet warning shield rises.');
+  else if(phase==='complete')status('Protective Radar · scan complete. Activate it again to replay.');
+}});
+const markers = [];
+
+function safeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function keyOf(e){return `${e.city}|${e.country}`;}
+
+function renderJourney(){
+  const state=getChronologyState(orderedAchievements,activeEvent?.slug??null);
+  const event=state.current??orderedAchievements[0];
+  if(!event)return;
+  const ordinal=state.index<0?1:state.index+1;
+  $('journey-meta').textContent=`${String(ordinal).padStart(2,'0')} / ${orderedAchievements.length} · ${event.date} · ${event.city}`;
+  const title=getProject(event.slug)?.title??event.title;
+  $('journey-title').textContent=title;
+  $('journey-current').title=`${title} — open details`;
+  $('journey-previous').disabled=!state.previous;
+  $('journey-next').disabled=state.index<0?false:!state.next;
+}
+renderJourney();
+$('journey-previous').addEventListener('click',()=>{
+  const event=stepChronology(orderedAchievements,activeEvent?.slug??null,'previous');
+  if(event)selectEvent(event,{showDetail:true});
+});
+$('journey-next').addEventListener('click',()=>{
+  const event=stepChronology(orderedAchievements,activeEvent?.slug??null,'next');
+  if(event)selectEvent(event,{showDetail:true});
+});
+$('journey-current').addEventListener('click',()=>{
+  const event=activeEvent??orderedAchievements[0];
+  // The centre card doubles as an explicit refocus, even after free panning.
+  selectEvent(event,{showDetail:true});
+});
+
+$('cv-download').href=portfolioLinks.cvPdf;
+bindCvDownload($('cv-download'));
+$('cv-link').addEventListener('click',()=>{
+  closePopovers();
+  const url=portfolioUrl(window.location.href,{eventSlug:activeEvent?.slug,view:'cv'});
+  window.history.pushState(null,'',url);
+  cvView.open();
+});
+$('cv-view').addEventListener('close',()=>{
+  if(readPortfolioRoute(window.location.href,knownSlugs).view==='cv'){
+    const url=portfolioUrl(window.location.href,{eventSlug:activeEvent?.slug});
+    window.history.replaceState(null,'',url);
+  }
+});
+installExportControls({announce: status});
+function closePopovers(){
+  for(const [panelId,toggleId] of [['portfolio-panel','portfolio-toggle'],['settings-panel','settings-toggle']]){
+    $(panelId).hidden=true;$(toggleId).setAttribute('aria-expanded','false');
+  }
+}
+function togglePopover(panelId,toggleId){
+  const wasOpen=!$(panelId).hidden;
+  closePopovers();
+  $(panelId).hidden=wasOpen;
+  $(toggleId).setAttribute('aria-expanded',String(!wasOpen));
+}
+$('portfolio-toggle').addEventListener('click',()=>togglePopover('portfolio-panel','portfolio-toggle'));
+$('settings-toggle').addEventListener('click',()=>togglePopover('settings-panel','settings-toggle'));
+document.addEventListener('pointerdown',event=>{
+  if(!event.target.closest('.top-popover,.topbar-actions'))closePopovers();
+});
+const creditsObserver=new ResizeObserver(()=>{
+  const height=$('sources').getBoundingClientRect().height;
+  if(height)$('app').style.setProperty('--credits-height',`${Math.ceil(height)}px`);
+});
+creditsObserver.observe($('sources'));
+
+function updateCredits(){
+  const bounds=map.getBounds();
+  const center=map.getCenter();
+  // Show the attribution conservatively whenever a Bavaria tile could intersect
+  // the viewport; the camera center may be outside while an edge tile is shown.
+  const bavaria=imagery!=='nasa'&&map.getZoom()>=12
+    &&bounds.getEast()>=BAVARIA_TRIAL_BOUNDS[0]&&bounds.getWest()<=BAVARIA_TRIAL_BOUNDS[2]
+    &&bounds.getNorth()>=BAVARIA_TRIAL_BOUNDS[1]&&bounds.getSouth()<=BAVARIA_TRIAL_BOUNDS[3];
+  $('bavaria-credit').hidden=!bavaria;
+  const nearGarching=Math.abs(center.lng-11.666954)<=0.023&&Math.abs(center.lat-48.262269)<=0.017;
+  $('buildings-credit').hidden=!(bavaria&&nearGarching&&map.getZoom()>=15.5&&map.getZoom()<18.5);
+  if(creditedImagery!==imagery){
+    $('imagery-credit').innerHTML=imagery==='eox'
+      ? '<a href="https://cloudless.eox.at">EOxCloudless</a> by EOX IT Services GmbH (Contains modified Copernicus Sentinel data 2024) · <a href="https://cloudless.eox.at/license-non-commercial">CC BY-NC-SA 4.0</a>'
+      : imagery==='esa'
+        ? '<a href="https://esa-worldcover.org/en/data-access">© ESA WorldCover project 2021</a> / Contains modified Copernicus Sentinel data (2021) processed by ESA WorldCover consortium · <a href="https://science.nasa.gov/earth/earth-observatory/blue-marble-next-generation/base-map/">NASA Blue Marble underlay</a>'
+        : '<a href="https://science.nasa.gov/earth/earth-observatory/blue-marble-next-generation/base-map/">NASA Earth Observatory · Blue Marble Next Generation</a>';
+    creditedImagery=imagery;
+  }
+}
+
+function fly(target) {
+  map.stop();
+  // MapLibre's globe+terrain DEM sampler cannot always project a distant
+  // destination from a street-level camera. The resulting Infinity tile
+  // coordinate aborts flyTo (notably Garching → WORLD). Back out locally
+  // before the geographic flight instead of asking one flight to span z20→z2.
+  const nextLng=Array.isArray(target.center)?target.center[0]:target.center?.lng;
+  if(map.getZoom()>17 && (target.zoom<15 || Math.abs(map.getCenter().lng-nextLng)>5)){
+    map.jumpTo({center:map.getCenter(),zoom:13.8,pitch:0,bearing:map.getBearing()});
+  }
+  if (prefersReducedMotion) {map.jumpTo(target);return;}
+  try {map.flyTo({...target,essential:true,duration:2400,curve:1.25});}
+  catch(error){
+    // A failed animation must not strand the visitor on an unresponsive map.
+    console.warn('Map flight fell back to a direct camera change:',error);
+    map.jumpTo(target);
+  }
+}
+function finishDrive() {
+  if (!drive.active) return;
+  drive.active=false; drive.keys.clear(); drive.speed=0; physicsState=null;
+  syncTerrain();
+  map.setLayoutProperty('achievement-halo','visibility','visible');
+  map.setLayoutProperty('achievement-points','visibility','visible');
+  $('drive-hud').hidden=true;
+  $('app').classList.remove('drive-active');
+  $('drive-button').classList.remove('active');
+  $('drive-button').querySelector('span').textContent='DRIVE';
+  map.dragPan.enable();map.scrollZoom.enable();map.dragRotate.enable();map.touchZoomRotate.enable();
+  status('Drive paused. Drag, zoom or choose another destination.');
+  updateScanAvailability();
+  map.triggerRepaint();
+}
+function updateDriveCameraButton(){
+  const close=drive.cameraMode==='chase';
+  const button=$('drive-camera-toggle');
+  button.querySelector('span').textContent=close?'CLOSE CHASE':'SITE OVERVIEW';
+  button.setAttribute('aria-pressed',String(close));
+  button.setAttribute('aria-label',close
+    ?'Close chase camera active. Switch to site overview. Shortcut C.'
+    :'Site overview camera active. Switch to close chase. Shortcut C.');
+}
+function toggleDriveCamera(){
+  if(!drive.active)return;
+  drive.cameraMode=drive.cameraMode==='chase'?'overview':'chase';
+  updateDriveCameraButton();
+  status(drive.cameraMode==='chase'
+    ?'Close chase camera · the car remains 4.34 metres long; press C for the site overview.'
+    :'Site overview camera · the installation and drive area in context; press C for close chase.');
+}
+function selectCity(city) {
+  if(!city)return;
+  const newest=orderedAchievements.find(event=>keyOf(event)===city.key);
+  if(newest)selectEvent(newest,{showDetail:true});
+}
+function detailMapOffset(){
+  if(window.innerWidth<=760){
+    if(window.innerHeight<=560&&window.innerWidth>window.innerHeight*1.3)return [175,0];
+    return [0,-Math.min(window.innerHeight*.29,290)];
+  }
+  return [-Math.min(260,window.innerWidth*.21),0];
+}
+function selectEvent(event,{showDetail=false,historyMode='push',view=null}={}) {
+  if(!event)return;
+  finishDrive();activeEvent=event;activeCity=byCity.get(keyOf(event));
+  if(historyMode!=='none'){
+    const projectUrl=portfolioUrl(window.location.href,{eventSlug:event.slug,view});
+    window.history[historyMode==='replace'?'replaceState':'pushState'](null,'',projectUrl);
+  }
+  if(imagery==='nasa')applyImagery('esa');
+  closePopovers();
+  const isHero=event.slug===HERO_VENUE_EVENT;
+  const localImage=hasBavariaDetail([event.coordinates.lng,event.coordinates.lat]);
+  heroVenue.setActive(isHero);$('scan-button').hidden=!isHero;
+  const drivable=driveStarts.has(event.slug);
+  $('drive-button').hidden=!drivable;$('drive-button').disabled=!drivable;
+  $('drive-button').title=drivable?'Start the curated Garching driving demo':'Driving prototype currently available at Garching only';
+  renderJourney();
+  // Never enlarge the global Sentinel mosaic several zoom levels beyond its
+  // native z14 ceiling. Other cities need their own orthophoto chapter first.
+  fly({center:isHero?HERO_VENUE_LOCATION:[event.coordinates.lng,event.coordinates.lat],zoom:isHero?20.23:localImage?16.4:13.8,pitch:isHero?68:localImage?67:55,bearing:isHero?285:-18,...(showDetail?{offset:detailMapOffset()}:{})});
+  showEventDetail(event);
+  $('detail').hidden=!showDetail;
+  status(`${getProject(event.slug)?.title??event.title} · ${event.venue} · ${event.coordinates.lat.toFixed(5)}°, ${event.coordinates.lng.toFixed(5)}°`);
+}
+function showEventDetail(event) {
+  const root=$('detail');
+  const isHero=event.slug===HERO_VENUE_EVENT;
+  root.replaceChildren();
+  const close=document.createElement('button');
+  close.type='button';close.className='close-detail';close.setAttribute('aria-label','Close project details');close.textContent='×';
+  root.append(close);
+  const content=document.createElement('div');
+  content.className='project-content-host';
+  root.append(content);
+  const project=renderProjectContent(content,event.slug,{onProjectLink:slug=>{
+    const linked=orderedAchievements.find(candidate=>candidate.slug===slug);
+    if(linked)selectEvent(linked,{showDetail:true});
+  }});
+  if(!project){
+    const fallback=document.createElement('p');
+    fallback.textContent='Project content is unavailable.';
+    content.append(fallback);
+  }
+  if(isHero){
+    const controls=document.createElement('div');
+    controls.className='venue-views';controls.setAttribute('aria-label','Map views');
+    controls.innerHTML='<button data-venue-view="campus" aria-pressed="false">3D CAMPUS</button><button data-venue-view="radar" aria-pressed="true">INSTALLATION</button>';
+    root.insertBefore(controls,content);
+  }
+  root.scrollTop=0;
+  bindDetail(root);
+}
+function bindDetail(root){
+  root.querySelector('.close-detail').addEventListener('click',()=>root.hidden=true);
+  root.querySelectorAll('[data-venue-view]').forEach(el=>el.addEventListener('click',()=>goHeroView(el.dataset.venueView)));
+}
+
+function goHeroView(view){
+  if(activeEvent?.slug!==HERO_VENUE_EVENT)return;
+  finishDrive();
+  const isCampus=view==='campus';
+  const offset=$('detail').hidden?{}:{offset:detailMapOffset()};
+  fly(isCampus
+    ?{center:[11.666954,48.262269],zoom:16.25,pitch:62,bearing:285,...offset}
+    :{center:HERO_VENUE_LOCATION,zoom:20.23,pitch:68,bearing:285,...offset});
+  document.querySelectorAll('[data-venue-view]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.venueView===view)));
+  status(isCampus
+    ?'Garching campus · real Bavarian LoD2 volumes with official aerial-photo roof textures. Select Installation to approach.'
+    :'Protective Radar · a metre-scale field object on official orthophoto.');
+}
+
+function activateScan(){
+  if(!canScan()){
+    status(map.getZoom()<19.5
+      ? 'Choose the Installation view and approach the radar before scanning.'
+      :drive.active
+        ? 'Return within 35 m of the Garching installation before scanning.'
+        : 'Center the camera near the Garching installation before scanning.');
+    return;
+  }
+  if(!heroVenue.triggerScan())status('The installation is not ready to scan yet.');
+}
+
+function canScan(){
+  if(activeEvent?.slug!==HERO_VENUE_EVENT||map.getZoom()<19.5)return false;
+  const location=drive.active?drive.position:[map.getCenter().lng,map.getCenter().lat];
+  return distanceMetres(location,HERO_VENUE_LOCATION)<=(drive.active?35:75);
+}
+function updateScanAvailability(){
+  const available=canScan();
+  const button=$('scan-button');
+  if(button.disabled===available)button.disabled=!available;
+  const hint=available
+    ?'Activate the Protective Radar installation'
+    :map.getZoom()<19.5?'Approach the installation to scan'
+      :drive.active?'Drive back within 35 m of the installation to scan':'Move the camera near the installation to scan';
+  if(button.title!==hint)button.title=hint;
+}
+
+function makeMarker({location,label,count,type,cityKey,onClick}) {
+  const el=document.createElement('button');el.type='button';el.className=`map-marker ${type}`;
+  el.innerHTML=`<span class="marker-core"></span><span class="marker-label">${safeHtml(label)}</span>${count>1?`<span class="marker-count">${count}</span>`:''}`;
+  el.title=label;
+  el.addEventListener('click',onClick);
+  const marker=new maplibregl.Marker({element:el,anchor:'center'}).setLngLat(location);
+  markers.push({marker,el,type,location,label,count,cityKey,attached:false});
+}
+function initializeMarkers(){
+  const eastAsia=cities.filter(c=>c.city==='Hong Kong'||c.city==='Nara');
+  const europe=cities.filter(c=>!eastAsia.includes(c));
+  for(const [group,label,zoom] of [[europe,'EUROPE',4.55],[eastAsia,'EAST ASIA',4.15]]){
+    const center=geographicCentroid(group);
+    makeMarker({location:center,label,count:group.reduce((n,c)=>n+c.events.length,0),type:'region',
+      onClick:()=>fly({center,zoom,pitch:25,bearing:0})});
+  }
+  for(const country of countries){
+    const center=geographicCentroid(country.cities);
+    const lngs=country.cities.map(city=>city.lng);
+    const lats=country.cities.map(city=>city.lat);
+    const bounds=[[Math.min(...lngs),Math.min(...lats)],[Math.max(...lngs),Math.max(...lats)]];
+    makeMarker({location:center,label:country.name.toUpperCase(),count:country.count,type:'country',
+      onClick:()=>{
+        const fitted=map.cameraForBounds(bounds,{padding:{top:100,bottom:185,left:95,right:95},maxZoom:7});
+        fly({center:fitted?.center??center,zoom:Math.max(MARKER_ZOOM.countryToCity,fitted?.zoom??MARKER_ZOOM.countryToCity),pitch:0,bearing:0});
+      }});
+  }
+  for(const city of cities)makeMarker({location:[city.lng,city.lat],label:city.city.toUpperCase(),count:city.events.length,type:'city',cityKey:city.key,onClick:()=>selectCity(city)});
+  updateMarkerVisibility();
+}
+function updateMarkerVisibility(){
+  const level=markerLevelForZoom(map.getZoom());
+  const bounds=map.getBounds();
+  let acceptedCityIds=null;
+  if(level==='city'){
+    const candidates=markers.filter(item=>item.type==='city'&&bounds.contains(item.location)).map(item=>{
+      const point=map.project(item.location);
+      return {id:item.cityKey,x:point.x,y:point.y,
+        width:Math.max(94,item.label.length*8+45),height:34,
+        priority:activeCity?.key===item.cityKey?1000:item.count};
+    }).filter(candidate=>Number.isFinite(candidate.x)&&Number.isFinite(candidate.y));
+    acceptedCityIds=new Set(declutterMarkers(candidates,{padding:8}).map(candidate=>candidate.id));
+  }
+  for(const item of markers){
+    const shouldAttach=item.type===level&&bounds.contains(item.location)
+      &&(level!=='city'||acceptedCityIds.has(item.cityKey));
+    // Do not leave hidden far-away DOM markers attached: MapLibre can sample DEM
+    // outside its valid tile while projecting them during a high-zoom drive.
+    if(shouldAttach&&!item.attached){item.marker.addTo(map);item.attached=true;}
+    else if(!shouldAttach&&item.attached){item.marker.remove();item.attached=false;}
+    item.el.classList.toggle('selected',item.cityKey===activeCity?.key);
+  }
+}
+
+function initializeEventLayers(){
+  const geo={type:'FeatureCollection',features:achievements.map(e=>({type:'Feature',geometry:{type:'Point',coordinates:[e.coordinates.lng,e.coordinates.lat]},properties:{slug:e.slug,title:e.title}}))};
+  map.addSource('achievements',{type:'geojson',data:geo});
+  map.addLayer({id:'achievement-halo',type:'circle',source:'achievements',minzoom:MARKER_ZOOM.cityToAchievement,paint:{'circle-radius':['interpolate',['linear'],['zoom'],10,7,16,15],'circle-color':'#f4d298','circle-opacity':0.17,'circle-blur':0.25}},'earth-engine-car');
+  map.addLayer({id:'achievement-points',type:'circle',source:'achievements',minzoom:MARKER_ZOOM.cityToAchievement,paint:{'circle-radius':['interpolate',['linear'],['zoom'],10,3,16,6],'circle-color':'#ead6af','circle-stroke-color':'#222d31','circle-stroke-width':2,'circle-opacity':0.98}},'earth-engine-car');
+  map.on('mouseenter','achievement-points',()=>{map.getCanvas().style.cursor='pointer'});
+  map.on('mouseleave','achievement-points',()=>{map.getCanvas().style.cursor=''});
+  map.on('click','achievement-points',(e)=>{
+    const hits=[...new Set(map.queryRenderedFeatures(e.point,{layers:['achievement-points']}).map(f=>f.properties?.slug).filter(Boolean))];
+    if(hits.length){
+      const event=orderedAchievements.find(candidate=>hits.includes(candidate.slug));
+      if(event)selectEvent(event,{showDetail:true});
+    }
+  });
+}
+
+function showWholeEarth({historyMode='push'}={}){
+  finishDrive();activeCity=null;$('detail').hidden=true;
+  $('drive-button').hidden=true;$('drive-button').disabled=true;
+  heroVenue.setActive(false);$('scan-button').hidden=true;
+  closePopovers();fly(initialCamera);status('Whole Earth. The chronology remains on the selected achievement.');
+  if(historyMode!=='none'){
+    const url=portfolioUrl(window.location.href,{eventSlug:activeEvent?.slug,view:'world'});
+    window.history[historyMode==='replace'?'replaceState':'pushState'](null,'',url);
+  }
+}
+$('world-button').addEventListener('click',()=>showWholeEarth());
+function applyImagery(next){
+  if(PUBLIC_RELEASE&&next==='eox')return;
+  if(next==='nasa')finishDrive();
+  imagery=next;
+  map.setMaxZoom(imagery==='nasa'?8:DETAIL_MAX_ZOOM);
+  if(!PUBLIC_RELEASE)map.setLayoutProperty('sentinel-imagery','visibility',imagery==='eox'?'visible':'none');
+  map.setLayoutProperty('esa-imagery','visibility',imagery==='esa'?'visible':'none');
+  map.setLayoutProperty('nasa-imagery','visibility',imagery==='nasa'||imagery==='esa'?'visible':'none');
+  map.setLayoutProperty('bavaria-imagery','visibility',imagery!=='nasa'?'visible':'none');
+  document.querySelectorAll('[data-imagery]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.imagery===imagery)));
+  updateCredits();
+  if(imagery==='nasa'&&map.getZoom()>8)fly({center:map.getCenter(),zoom:8,pitch:50,bearing:map.getBearing()});
+  status(imagery==='eox'
+    ?'EOX Sentinel‑2 2024 · 10 m source, local research only under non-commercial license.'
+    :imagery==='esa'
+      ?'ESA WorldCover 2021 · open 10 m Sentinel composite over land, NASA underlay.'
+      :'NASA Blue Marble 2004 · global overview only, detail capped at about 500 m/pixel.');
+}
+document.querySelectorAll('[data-imagery]').forEach(button=>button.addEventListener('click',()=>applyImagery(button.dataset.imagery)));
+$('terrain-toggle').addEventListener('click',()=>{
+  terrainOn=!terrainOn;syncTerrain();
+});
+$('zoom-in').addEventListener('click',()=>map.zoomIn());
+$('zoom-out').addEventListener('click',()=>map.zoomOut());
+$('drive-button').addEventListener('click',()=>drive.active?finishDrive():startDrive());
+$('drive-camera-toggle').addEventListener('click',toggleDriveCamera);
+$('scan-button').addEventListener('click',activateScan);
+
+function startDrive(){
+  const e=activeEvent;
+  if(!e||!driveStarts.has(e.slug))return;
+  if(imagery==='nasa')applyImagery('esa');
+  const start=driveStarts.get(e.slug);
+  drive.position=start?.position.slice()??[e.coordinates.lng,e.coordinates.lat];
+  drive.heading=start?.heading??0;drive.speed=0;drive.active=true;drive.last=performance.now();drive.geofenceWarned=false;
+  syncTerrain();
+  drive.cameraMode='chase';updateDriveCameraButton();
+  physicsState=createDrivingState({position:drive.position,heading:drive.heading,origin:drive.position});
+  drive.cameraHeading=drive.heading;
+  const camera=driveCamera();
+  drive.cameraCenter=stepPosition(drive.position,drive.heading,camera.lookahead);
+  drive.cameraZoom=camera.zoom;drive.cameraPitch=camera.pitch;
+  map.setLayoutProperty('achievement-halo','visibility','none');
+  map.setLayoutProperty('achievement-points','visibility','none');
+  $('app').classList.add('drive-active');
+  $('drive-hud').hidden=false;$('drive-button').classList.add('active');$('drive-button').querySelector('span').textContent='EXIT DRIVE';
+  map.dragPan.disable();map.scrollZoom.disable();map.dragRotate.disable();map.touchZoomRotate.disable();
+  fly({center:drive.cameraCenter,zoom:camera.zoom,pitch:camera.pitch,bearing:drive.cameraHeading});
+  status('Local drive: real metre-scale vehicle. Close-range imagery and road assets remain a production art/data task.');
+  updateScanAvailability();
+  requestAnimationFrame(tickDrive);
+}
+function tickDrive(now){
+  if(!drive.active)return;
+  const before=physicsState;
+  physicsState=stepDriving(physicsState,drivingInputFromKeys(drive.keys),(now-drive.last)/1000);
+  drive.last=now;
+  drive.position=physicsState.position;drive.heading=physicsState.heading;drive.speed=physicsState.speed;
+  updateScanAvailability();
+  const camera=driveCamera();
+  const cameraTarget=stepPosition(drive.position,drive.heading,camera.lookahead);
+  const cameraAlpha=1-Math.exp(-physicsState.integratedSeconds*5);
+  drive.cameraCenter=[
+    drive.cameraCenter[0]+(cameraTarget[0]-drive.cameraCenter[0])*cameraAlpha,
+    drive.cameraCenter[1]+(cameraTarget[1]-drive.cameraCenter[1])*cameraAlpha
+  ];
+  const angleDelta=((drive.heading-drive.cameraHeading+540)%360)-180;
+  drive.cameraHeading=(drive.cameraHeading+angleDelta*cameraAlpha+360)%360;
+  drive.cameraZoom+=(camera.zoom-drive.cameraZoom)*cameraAlpha;
+  drive.cameraPitch+=(camera.pitch-drive.cameraPitch)*cameraAlpha;
+  $('speed').textContent=String(Math.round(Math.abs(drive.speed)*3.6));
+  if(physicsState.geofenceLimited&&!drive.geofenceWarned){
+    drive.geofenceWarned=true;
+    status('Local drive boundary ahead. Steer inward or reverse to stay inside the curated chapter.');
+  }
+  const cameraSettling=Math.abs(cameraTarget[0]-drive.cameraCenter[0])>1e-9
+    ||Math.abs(cameraTarget[1]-drive.cameraCenter[1])>1e-9||Math.abs(angleDelta)>0.005
+    ||Math.abs(camera.zoom-drive.cameraZoom)>0.001||Math.abs(camera.pitch-drive.cameraPitch)>0.01;
+  if(before.position[0]!==drive.position[0]||before.position[1]!==drive.position[1]||before.heading!==drive.heading||cameraSettling){
+    map.jumpTo({center:drive.cameraCenter,zoom:drive.cameraZoom,pitch:drive.cameraPitch,bearing:drive.cameraHeading});
+    map.triggerRepaint();
+  }
+  requestAnimationFrame(tickDrive);
+}
+window.addEventListener('keydown',e=>{
+  const key=e.key.toLowerCase();
+  if(e.key==='Escape'){
+    finishDrive();closePopovers();$('detail').hidden=true;
+  }
+  if(drive.active&&key==='c'&&!e.repeat&&!e.metaKey&&!e.ctrlKey&&!e.altKey
+    &&!(e.target instanceof HTMLInputElement)&&!(e.target instanceof HTMLTextAreaElement)){
+    toggleDriveCamera();e.preventDefault();return;
+  }
+  if(drive.active&&['w','a','s','d','arrowup','arrowdown','arrowleft','arrowright'].includes(key)){
+    drive.keys.add(key);e.preventDefault();
+  }
+});
+window.addEventListener('keyup',e=>drive.keys.delete(e.key.toLowerCase()));
+window.addEventListener('blur',()=>drive.keys.clear());
+for(const button of document.querySelectorAll('[data-drive-key]')){
+  const key=button.dataset.driveKey;
+  button.addEventListener('pointerdown',e=>{drive.keys.add(key);button.setPointerCapture(e.pointerId);e.preventDefault();});
+  const release=()=>drive.keys.delete(key);
+  button.addEventListener('pointerup',release);
+  button.addEventListener('pointercancel',release);
+  button.addEventListener('lostpointercapture',release);
+}
+
+let mapReady=false;
+map.on('style.load',()=>{
+  map.setProjection({type:'globe'});
+  map.addLayer(bavariaBuildings);
+  map.addLayer(carLayer);
+  map.addLayer(heroVenue);
+  initializeEventLayers();
+  initializeMarkers();
+  mapReady=true;
+  const event=orderedAchievements.find(candidate=>candidate.slug===initialRoute.eventSlug)??orderedAchievements[0];
+  selectEvent(event,{showDetail:!initialRoute.view,historyMode:'replace',view:initialRoute.view});
+  if(initialRoute.view==='world')showWholeEarth({historyMode:'none'});
+  if(initialRoute.view==='cv'){
+    cvView.open();
+    if(initialRoute.downloadCv)$('cv-download').click();
+  }
+});
+function restorePortfolioRoute(){
+  if(!mapReady)return;
+  const route=readPortfolioRoute(window.location.href,knownSlugs);
+  const event=orderedAchievements.find(candidate=>candidate.slug===route.eventSlug)??orderedAchievements[0];
+  if(route.view==='cv'){
+    selectEvent(event,{showDetail:false,historyMode:'none'});
+    if(!cvView.isOpen())cvView.open();
+  }else{
+    if(cvView.isOpen())cvView.close();
+    selectEvent(event,{showDetail:route.view!=='world',historyMode:'none'});
+    if(route.view==='world')showWholeEarth({historyMode:'none'});
+  }
+}
+window.addEventListener('popstate',restorePortfolioRoute);
+window.addEventListener('hashchange',restorePortfolioRoute);
+map.on('zoom',()=>{
+  updateMarkerVisibility();
+  updateCredits();
+  updateScanAvailability();
+});
+map.on('move',()=>{updateScanAvailability();updateMarkerVisibility();});
+map.on('moveend',updateCredits);
+let lastError=0;
+map.on('error',e=>{
+  const now=Date.now();if(now-lastError<2000)return;lastError=now;
+  console.warn('Earth tile/render issue:',e.error||e);
+  status('A terrain or imagery tile did not load. Check the network; other tiles continue to render.');
+});
+window.__earthEngine={map,cities,achievements,selectCity,selectEvent,drive,heroVenue};

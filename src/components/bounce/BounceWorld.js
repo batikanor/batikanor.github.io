@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { CAT_OPTIONS, createCatAvatarSet } from "../cats/catAvatars";
@@ -828,7 +827,7 @@ export default function BounceWorld() {
       ref={mountRef}
     >
       <div className={styles.grain} aria-hidden="true" />
-      <Link href="/" className={styles.home}>← Main menu</Link>
+      <a href="/" className={styles.home}>← Main menu</a>
       <ExperienceThemePicker
         className={styles.themePicker}
         theme={experienceTheme}

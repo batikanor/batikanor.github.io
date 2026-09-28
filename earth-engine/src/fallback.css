@@ -1,0 +1,49 @@
+.fallback-mode #map {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 105px 28px 115px;
+  background:
+    radial-gradient(ellipse at 18% 10%, #2d4c4a6e, transparent 42%),
+    linear-gradient(145deg, #14292c 0%, #09191e 65%, #0a151a 100%);
+}
+.fallback-mode .vignette,
+.fallback-mode .sources,
+.fallback-mode .context-actions,
+.fallback-mode .drive-hud { display: none !important; }
+.fallback-mode .journey { bottom: 14px; }
+.fallback-mode .socials { bottom: 25px; }
+.fallback-content { width: calc(100% - min(520px, 42vw) - 48px); max-width: 800px; margin: 0 auto 0 0; }
+.fallback-heading { padding: 0 0 23px; }
+.fallback-eyebrow { margin: 0 0 12px; color: #eccf9b; font-size: 10px; font-weight: 700; letter-spacing: .17em; }
+.fallback-heading h1 { margin: 0 0 10px; font: 500 clamp(36px, 4vw, 58px)/1.05 'Playfair Display', Georgia, serif; }
+.fallback-heading > p:last-child { max-width: 590px; margin: 0; color: #d8e2df; font-size: 13px; line-height: 1.6; }
+.fallback-achievements { list-style: none; margin: 0; padding: 0; border-top: 1px solid #f2e4c275; }
+.fallback-achievements li { margin: 0; padding: 0; border-bottom: 1px solid #f2e4c244; }
+.fallback-achievement {
+  display: flex; align-items: flex-start; gap: 14px; width: 100%; min-height: 70px;
+  padding: 15px 10px; border: 0; background: transparent; color: #f7f4ed; text-align: left;
+}
+.fallback-achievement:hover,
+.fallback-achievement:focus-visible,
+.fallback-achievement[aria-current="true"] { background: #e9c8901c; }
+.fallback-number { min-width: 23px; padding-top: 3px; color: #e8c995; font-size: 11px; font-weight: 700; }
+.fallback-row-content { display: grid; gap: 5px; min-width: 0; flex: 1; }
+.fallback-row-content strong { font-size: 14px; line-height: 1.3; font-weight: 600; }
+.fallback-row-content small { color: #c1d0cd; font-size: 11px; line-height: 1.3; }
+.fallback-open { color: #e8c995; font-size: 17px; }
+.bootstrap-error {
+  position: fixed; z-index: 20; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  width: min(460px, calc(100vw - 30px)); padding: 25px; border: 1px solid #e8c995;
+  background: #0d1d22; color: #fff; line-height: 1.5;
+}
+@media (max-width: 900px) { .fallback-mode .socials { display: none; } }
+@media (max-width: 760px) {
+  .fallback-mode #map { padding: calc(var(--mobile-safe-top) + 72px) var(--mobile-left) 92px; }
+  .fallback-content { width: 100%; max-width: 680px; }
+  .fallback-heading h1 { font-size: 40px; }
+  .fallback-heading > p:last-child { font-size: 12px; }
+  .fallback-achievement { min-height: 66px; }
+  .fallback-row-content strong { font-size: 13px; }
+  .fallback-mode .journey { bottom: calc(10px + env(safe-area-inset-bottom, 0px)); }
+  .fallback-mode .detail { bottom: calc(79px + env(safe-area-inset-bottom, 0px)); }
+}

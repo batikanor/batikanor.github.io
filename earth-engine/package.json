@@ -1,0 +1,24 @@
+{
+  "name": "@batikan/earth-engine-spike",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "vite build",
+    "preview": "vite preview --host 127.0.0.1",
+    "verify": "node scripts/verify.mjs && node scripts/verify-bavaria-lod2.mjs && node --test scripts/drivingPhysics.test.mjs scripts/chronology.test.mjs scripts/markerPolicy.test.mjs scripts/projectContent.test.mjs scripts/exportProjectsPdf.test.mjs scripts/portfolioRoute.test.mjs scripts/cvDownload.test.mjs",
+    "test:drive": "node --test scripts/drivingPhysics.test.mjs",
+    "benchmark:drive": "node --test --test-name-pattern='100,000 deterministic physics steps' scripts/drivingPhysics.test.mjs"
+  },
+  "dependencies": {
+    "jspdf": "^4.2.1",
+    "maplibre-gl": "^6.11.2",
+    "pdfjs-dist": "^6.3.289",
+    "qrcode": "^1.5.4",
+    "three": "^0.180.0"
+  },
+  "devDependencies": {
+    "vite": "^8.0.0"
+  }
+}

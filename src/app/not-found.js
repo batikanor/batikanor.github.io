@@ -1,5 +1,4 @@
 import React from 'react';
-import Link from 'next/link';
 
 const NotFoundPage = () => {
   return (
@@ -41,12 +40,9 @@ const NotFoundPage = () => {
           </a>.
         </p>
 
-        {/* Link without <a> tag */}
-        <Link href="/" passHref>
-          <button className="bg-gray-700 text-white px-6 py-3 rounded hover:bg-gray-600">
-            Go to Homepage
-          </button>
-        </Link>
+        <a href="/" className="inline-block bg-gray-700 text-white px-6 py-3 rounded hover:bg-gray-600">
+          Go to Homepage
+        </a>
 
 
       </div>

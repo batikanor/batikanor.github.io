@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { CAT_OPTIONS, createCatAvatarSet } from "../cats/catAvatars";
@@ -1048,9 +1047,9 @@ export default function ExploreProjectsWorld() {
       ref={mountRef}
     >
       <div className={styles.vignette} aria-hidden="true" />
-      <Link href="/" className={styles.homeLink}>
+      <a href="/" className={styles.homeLink}>
         ← Go back to main menu
-      </Link>
+      </a>
 
       <div className={styles.worldModeSwitch} aria-label="World visualization">
         <button

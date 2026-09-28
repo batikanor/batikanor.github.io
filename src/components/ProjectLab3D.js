@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { contestsAndActivities } from "../data/contestsAndActivities";
@@ -733,9 +732,9 @@ export default function ProjectLab3D({ embedded = false }) {
 
       {!embedded && (
         <div className={styles.topBar}>
-          <Link href="/" className={styles.homeLink}>
+          <a href="/" className={styles.homeLink}>
             <span aria-hidden="true">←</span> Go back to main menu
-          </Link>
+          </a>
         </div>
       )}
       <ExperienceThemePicker
@@ -833,9 +832,9 @@ export default function ProjectLab3D({ embedded = false }) {
           )}
 
           <div className={styles.monitorActions}>
-            <Link href={`/projects#${selectedProject.slug}`}>
+            <a href={`/?event=${encodeURIComponent(selectedProject.slug)}`}>
               Open the full project entry <span aria-hidden="true">↗</span>
-            </Link>
+            </a>
             {selectedProject.links?.slice(0, 3).map((link) => (
               <a
                 key={link.url}

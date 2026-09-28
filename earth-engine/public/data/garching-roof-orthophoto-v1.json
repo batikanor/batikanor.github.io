@@ -1,0 +1,27 @@
+{
+  "asset": "garching-roof-orthophoto-v1.webp",
+  "source": "Bayerische Vermessungsverwaltung, Digitales Orthophoto DOP20 / WMTS Luftbild Bayern",
+  "source_url": "https://wmtsod1.bayernwolke.de/wmts/by_dop/smerc/{z}/{x}/{y}",
+  "source_grid": "smerc / EPSG:3857",
+  "source_tile_zoom": 18,
+  "source_tile_bounds_xyxy": [
+    139560,
+    90830,
+    139574,
+    90844
+  ],
+  "source_tile_count": 225,
+  "source_ordered_jpeg_sha256": "be9232b4ca72fab686bea064a950fab53db76541844f941e830ebc9d7397b867",
+  "source_accessed_utc_date": "2026-09-27",
+  "width": 3840,
+  "height": 3840,
+  "origin_lonlat": [
+    11.666954,
+    48.262269
+  ],
+  "derived_changes": "Stitched source DOP20 WMTS JPEG tiles into one roof-only WebP atlas at z18 (about 40 cm/pixel); mapped onto separately licensed official LoD2 roof geometry. No artificial roof features added.",
+  "license": "CC BY 4.0 — attribution and modification notice required",
+  "credit": "Geobasisdaten: Bayerische Vermessungsverwaltung – www.geodaten.bayern.de (Daten verändert), Lizenz: CC BY 4.0",
+  "bytes": 2393350,
+  "sha256": "8b9bd6cb492c16b9b44109597f752aed3af24dbec130c9bdee55b5c5313679f2"
+}

@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="robots" content="noindex,nofollow" />
+  <meta name="theme-color" content="#10191c" />
+  <meta name="description" content="A geographically real Earth, streamed at the scale of an achievement journey." />
+  <title>Batıkan — Hacker · Developer · Entrepreneur</title>
+</head>
+<body>
+  <div id="app">
+    <main id="map" aria-label="Interactive Earth map"></main>
+    <div class="vignette" aria-hidden="true"></div>
+
+    <header class="topbar">
+      <h1 class="sr-only">Batıkan — Hacker · Developer · Entrepreneur</h1>
+      <button id="world-button" class="wordmark" type="button" title="Return to the whole Earth" aria-label="Show the whole Earth">
+        <span class="wordmark-dot" aria-hidden="true"></span><span class="wordmark-copy"><strong>Batıkan</strong><small>Hacker · Developer · Entrepreneur</small></span>
+      </button>
+      <div class="topbar-actions">
+        <button id="portfolio-toggle" class="topbar-button" type="button" aria-expanded="false" aria-controls="portfolio-panel">CV / PDF</button>
+        <button id="settings-toggle" class="settings-wheel" type="button" aria-label="Map settings" title="Map settings" aria-expanded="false" aria-controls="settings-panel">⚙</button>
+      </div>
+    </header>
+
+    <div id="portfolio-panel" class="top-popover portfolio-popover" hidden>
+      <div class="popover-heading">CV &amp; DOWNLOADS</div>
+      <button id="cv-link" class="popover-action" type="button">View CV <span>↗</span></button>
+      <div class="popover-divider"></div>
+      <a id="cv-download" target="_blank" rel="noopener noreferrer">Download CV PDF <span>↓</span></a>
+      <details id="pdf-export-options" class="pdf-export-options">
+        <summary>Configure PDF export</summary>
+        <label class="pdf-export-check"><input id="pdf-include-images" type="checkbox" checked /><span>Include images in PDF <small>takes time, increases size</small></span></label>
+        <div id="pdf-image-options" class="pdf-export-range">
+          <label for="pdf-image-scale">Image size <output id="pdf-image-scale-value" for="pdf-image-scale">100%</output></label>
+          <input id="pdf-image-scale" type="range" min="0.2" max="1" step="0.1" value="1" />
+        </div>
+        <label class="pdf-export-check"><input id="pdf-compress" type="checkbox" checked /><span>Compress PDF</span></label>
+        <div id="pdf-compression-options" class="pdf-export-range">
+          <label for="pdf-compression-strength">Compression strength <output id="pdf-compression-value" for="pdf-compression-strength">10%</output></label>
+          <input id="pdf-compression-strength" type="range" min="0.1" max="0.9" step="0.1" value="0.1" />
+        </div>
+        <div class="pdf-export-preview" hidden><img id="pdf-image-preview" alt="Sample achievement photo at selected PDF settings" /><small id="pdf-preview-size"></small></div>
+        <p class="pdf-export-note">Public Drive image previews are included when available. Video and slide originals remain clickable references and QR links.</p>
+      </details>
+      <button id="projects-download" class="popover-action" type="button">Download summary of achievements <span>↓</span></button>
+      <p id="export-status" class="export-status" role="status" hidden></p>
+      <progress id="export-progress" class="export-progress" value="0" max="32" aria-label="PDF export progress" hidden></progress>
+      <div class="popover-divider"></div>
+      <div class="popover-socials" aria-label="Contact and profiles">
+        <a href="https://github.com/batikanor" target="_blank" rel="noopener noreferrer">GitHub</a>
+        <a href="https://linkedin.com/in/batikanor" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+        <a href="mailto:batikanor@gmail.com">Email</a>
+      </div>
+    </div>
+
+    <div id="settings-panel" class="top-popover settings-popover" hidden>
+      <div class="popover-heading">MAP SETTINGS</div>
+      <div class="settings-label">IMAGERY</div>
+      <div class="settings-options" role="group" aria-label="Imagery source">
+        <button data-imagery="eox" type="button" aria-pressed="true">EOX 2024 <small>local study</small></button>
+        <button data-imagery="esa" type="button" aria-pressed="false">ESA 2021 <small>open data</small></button>
+        <button data-imagery="nasa" type="button" aria-pressed="false">NASA 2004 <small>overview</small></button>
+      </div>
+      <button id="terrain-toggle" class="settings-row" type="button" aria-pressed="true"><span>3D terrain</span><strong id="terrain-state">ON</strong></button>
+      <div class="settings-row settings-zoom"><span>Zoom</span><div><button id="zoom-out" type="button" aria-label="Zoom out">−</button><button id="zoom-in" type="button" aria-label="Zoom in">+</button></div></div>
+      <div class="settings-row scale-row"><span>Map scale</span><div id="settings-scale"></div></div>
+    </div>
+
+    <div id="detail" class="detail" hidden role="region" aria-label="Project details"></div>
+    <div id="cv-view-root"></div>
+
+    <nav id="journey" class="journey" aria-label="Achievement chronology">
+      <button id="journey-previous" class="journey-arrow" type="button" aria-label="Previous, newer achievement" title="Newer achievement">←</button>
+      <button id="journey-current" class="journey-current" type="button" aria-label="Open current achievement details">
+        <span id="journey-meta">LATEST / 01 OF 32</span>
+        <strong id="journey-title">Loading achievements…</strong>
+      </button>
+      <button id="journey-next" class="journey-arrow" type="button" aria-label="Next, older achievement" title="Older achievement">→</button>
+    </nav>
+
+    <div class="context-actions" aria-label="Achievement actions">
+      <button id="drive-button" type="button" title="Start a local drive" hidden disabled>⌁ <span>DRIVE</span></button>
+      <button id="scan-button" type="button" title="Activate the Protective Radar installation" hidden disabled>◉ <span>SCAN RADAR</span></button>
+    </div>
+    <nav class="socials" aria-label="Contact and profiles">
+      <a href="https://github.com/batikanor" target="_blank" rel="noopener noreferrer">GitHub</a>
+      <a href="https://linkedin.com/in/batikanor" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+      <a href="mailto:batikanor@gmail.com">Email</a>
+    </nav>
+    <div id="status" class="sr-only" aria-live="polite">Initializing streamed Earth…</div>
+    <div class="drive-hud" id="drive-hud" hidden><div class="eyebrow">LOCAL DRIVE / PHYSICAL METERS</div><strong id="speed">0</strong><span>km/h</span><p>W/S move · A/D steer · C camera · Esc exit</p><div class="drive-controls" aria-label="Touch driving controls"><button data-drive-key="a" aria-label="Steer left">←</button><button data-drive-key="w" aria-label="Accelerate">↑</button><button data-drive-key="s" aria-label="Brake and reverse">↓</button><button data-drive-key="d" aria-label="Steer right">→</button></div><button id="drive-camera-toggle" class="drive-camera-switch" type="button" aria-pressed="true" aria-label="Close chase camera active. Switch to site overview. Shortcut C.">◉ CAMERA / <span>CLOSE CHASE</span><kbd>C</kbd></button></div>
+
+    <div class="sources" id="sources" aria-label="Map data sources">
+      <span id="imagery-credit"><a href="https://cloudless.eox.at">EOxCloudless</a> by EOX IT Services GmbH (Contains modified Copernicus Sentinel data 2024) · <a href="https://cloudless.eox.at/license-non-commercial">CC BY-NC-SA 4.0</a></span>
+      <span id="bavaria-credit" hidden>Geobasisdaten: Bayerische Vermessungsverwaltung – <a href="https://www.geodaten.bayern.de/">www.geodaten.bayern.de</a> (Daten verändert), Lizenz: <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a></span>
+      <span id="buildings-credit" hidden>Buildings: Bavarian LoD2 open data (262 real roof/wall models near Garching)</span>
+      <span>Relief: <a href="https://mapterhorn.com/attribution/">© Mapterhorn</a></span>
+    </div>
+  </div>
+  <script type="module" src="/src/bootstrap.js"></script>
+</body>
+</html>
