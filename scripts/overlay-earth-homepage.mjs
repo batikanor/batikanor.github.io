@@ -57,6 +57,27 @@ for (const file of assetFiles.filter(name => name.endsWith('.js'))) {
 
 let html = await readFile(join(earth, 'index.html'), 'utf8');
 assert(html.includes('name="robots" content="noindex,nofollow"'), 'Earth preview indexing guard changed unexpectedly');
+// GitHub Pages gives HTML a short but nonzero cache lifetime. If that HTML
+// points straight to a fingerprinted Vite entry, a second deployment can
+// remove the old entry before a returning visitor's HTML cache expires. Keep
+// the HTML bootstrap stable and ask for a fresh, tiny manifest at each load.
+const entryTag = /<script type="module" crossorigin src="(\/assets\/index-[A-Za-z0-9_-]+\.js)"><\/script>/;
+const entryMatch = html.match(entryTag);
+assert(entryMatch && await exists(join(earth, entryMatch[1].slice(1))),
+  'Could not resolve the public Earth entry bundle');
+html = html.replace(entryTag, `<script type="module">
+  try {
+    const response = await fetch('/assets/earth-current.json?t=' + Date.now(), {cache: 'no-store'});
+    if (!response.ok) throw new Error('Earth release manifest unavailable');
+    const {entry} = await response.json();
+    if (!/^\\/assets\\/index-[A-Za-z0-9_-]+\\.js$/.test(entry)) throw new Error('Invalid Earth release entry');
+    await import(entry);
+  } catch (error) {
+    console.error('Earth portfolio could not start.', error);
+    const status = document.getElementById('status');
+    if (status) status.textContent = 'Map could not start. Please reload the page.';
+  }
+</script>`);
 html = html.replace('name="robots" content="noindex,nofollow"', 'name="robots" content="index,follow"');
 const eoxButton = /<button data-imagery="eox"[^>]*>[^<]*(?:<small>[^<]*<\/small>)?<\/button>\s*/;
 assert(eoxButton.test(html), 'Could not remove EOX switch from public homepage');
@@ -82,6 +103,8 @@ for (const directory of ['assets', 'data', 'fonts', 'photos', 'certificates', 'o
   const from = join(earth, directory);
   if (await exists(from)) await mergeDirectory(from, join(out, directory));
 }
+await writeFile(join(out, 'assets', 'earth-current.json'),
+  JSON.stringify({entry: entryMatch[1]}) + '\n');
 await writeFile(join(out, 'index.html'), html);
 await writeFile(join(out, 'robots.txt'), 'User-agent: *\nAllow: /\nSitemap: https://batikanor.com/sitemap.xml\n');
 await writeFile(join(out, 'sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?>
