@@ -69,14 +69,17 @@ echo 'Staging-only Caddy vhost installed.'
 REMOTE
 
 for attempt in 1 2 3 4 5 6; do
-  if curl -fsSI --max-time 15 "https://$DOMAIN/" >/dev/null; then break; fi
+  # The workstation or home router may retain a negative DNS response for
+  # nearly an hour even after both authoritative Namecheap servers update.
+  # Resolve explicitly only for this validation: TLS still verifies $DOMAIN.
+  if curl --resolve "$DOMAIN:443:$IP" -fsSI --max-time 15 "https://$DOMAIN/" >/dev/null; then break; fi
   if [[ "$attempt" == 6 ]]; then
     echo "Caddy reloaded but $DOMAIN is not yet reachable over HTTPS; check ACME/DNS." >&2
     exit 1
   fi
   sleep 10
 done
-curl -fsSI --max-time 15 "https://$DOMAIN/" | grep -i 'x-robots-tag: noindex'
+curl --resolve "$DOMAIN:443:$IP" -fsSI --max-time 15 "https://$DOMAIN/" | grep -i 'x-robots-tag: noindex'
 curl -fsSI --max-time 15 https://maptheory.org/ >/dev/null
 curl -fsSI --max-time 15 https://gralobe.maptheory.org/ >/dev/null
 curl -fsSI --max-time 15 https://spacecottbus.com/ >/dev/null
