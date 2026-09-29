@@ -7,9 +7,15 @@ GitHub Pages, pushes `main`, changes production DNS, or restarts MapTheory.**
 
 The old `earth-staging.157.180.20.129.sslip.io` hostname is only a technical
 fallback: imagery providers reject that browser origin. Use
-`https://staging.batikanor.com/` for design sign-off. As of 29 September 2026,
-Namecheap DNS lacks the `staging` record; a signed-in domain administrator must
-add **A host `staging` → `157.180.20.129`**. Leave apex/`www` unchanged.
+`https://staging.batikanor.com/` for design sign-off. On 30 September 2026 we
+added only the Namecheap **A host `staging` → `157.180.20.129`** and activated a
+separate staging Caddy vhost. Apex/`www` remain unchanged. Local recursive DNS
+may temporarily retain the earlier negative answer even when the authoritative
+Namecheap servers and public resolvers already return the new record.
+
+The first intro release is `20260929T215955Z-140f715048-041eff`; the previous
+staging release is `20260928T1644Z-rome-perf` for rollback. This describes the
+staging server only, not a production release.
 
 ## Prepare and publish
 
