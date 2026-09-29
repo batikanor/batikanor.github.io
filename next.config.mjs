@@ -33,7 +33,8 @@ const nextConfig = {
    * Optional: Set assetPrefix if needed for hosting assets (incase we want to have static assets in public folder)
    */
   assetPrefix:
-    process.env.NODE_ENV === "production" ? "https://www.batikanor.com/" : "",
+    process.env.NODE_ENV === "production" && process.env.EARTH_DEPLOY_TARGET !== "staging"
+      ? "https://www.batikanor.com/" : "",
 
   /**
    * Enable trailing slashes in exported URLs.

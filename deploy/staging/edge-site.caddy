@@ -1,0 +1,12 @@
+# Dedicated preview hostname. The existing sslip.io site remains in its own
+# fragment, and batikanor.com continues to be served by GitHub Pages.
+staging.batikanor.com {
+    encode zstd gzip
+    header {
+        X-Robots-Tag "noindex, nofollow, noarchive"
+        X-Content-Type-Options "nosniff"
+        Referrer-Policy "same-origin"
+        -Server
+    }
+    reverse_proxy batikanor-earth-staging-web:8080
+}

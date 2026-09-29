@@ -13,8 +13,58 @@
   <link rel="dns-prefetch" href="//wmtsod1.bayernwolke.de" />
   <link rel="dns-prefetch" href="//gdi.berlin.de" />
   <title>Batıkan — Hacker · Developer · Entrepreneur</title>
+  <script>
+    // Paint the entry screen immediately, without requesting any map modules or tiles.
+    try {
+      const url = new URL(location.href);
+      const path = url.pathname.replace(/\/+$/, '') || '/';
+      if ((path === '/' || path === '/index.html') && !url.searchParams.has('event')
+        && !url.searchParams.has('view') && !url.searchParams.has('download') && !url.hash) {
+        document.documentElement.classList.add('intro-active');
+      }
+    } catch { /* Bootstrap validates the route again. */ }
+  </script>
 </head>
 <body>
+  <section id="intro-screen" class="intro-screen" data-variant="editorial" aria-labelledby="intro-title">
+    <div class="intro-backdrop" aria-hidden="true"></div>
+    <div class="intro-frame">
+      <header class="intro-header">
+        <div class="intro-brand"><span class="intro-brand-dot" aria-hidden="true"></span><span><strong>Batıkan</strong><small>Hacker · Developer · Entrepreneur</small></span></div>
+        <div class="intro-variants" role="group" aria-label="Choose an introduction layout">
+          <span class="intro-variants-label">PREVIEW LAYOUT</span>
+          <button type="button" data-intro-variant="editorial" aria-pressed="true">01 <span>Editorial</span></button>
+          <button type="button" data-intro-variant="dossier" aria-pressed="false">02 <span>Dossier</span></button>
+        </div>
+      </header>
+      <div class="intro-content">
+        <div class="intro-primary">
+          <p class="intro-eyebrow"><span>PORTFOLIO</span><span class="intro-eyebrow-line" aria-hidden="true"></span><span>INTRODUCTION</span></p>
+          <h1 id="intro-title">Hi, I’m Batıkan.</h1>
+          <p class="intro-lede">I’ve won prizes in <strong>30+ competitions</strong>. I’ve also <strong>served on juries and mentored teams several times</strong>.</p>
+        </div>
+        <div class="intro-ledger" aria-label="About my work">
+          <div class="intro-ledger-heading"><span>ABOUT MY WORK</span><span>01 / 03</span></div>
+          <div class="intro-fact"><span class="intro-fact-index">01</span><div><span class="intro-fact-label">FIELDS</span><p>Space tech, biotech, energy, AI and finance.</p></div></div>
+          <div class="intro-fact"><span class="intro-fact-index">02</span><div><span class="intro-fact-label">CURRENTLY</span><p>Full-stack developer at an M&amp;A boutique based in Germany.</p></div></div>
+          <div class="intro-fact"><span class="intro-fact-index">03</span><div><span class="intro-fact-label">OPEN TO</span><p>I’m an entrepreneur, open to great ideas and great people.</p></div></div>
+        </div>
+      </div>
+      <footer class="intro-footer">
+        <div class="intro-footer-links"><a href="/?view=cv">View CV ↗</a><a href="mailto:batikanor@gmail.com">Contact ↗</a></div>
+        <p id="intro-load-status" class="intro-load-status" role="status" aria-live="polite">Explore the achievements on the map.</p>
+        <button id="intro-enter" class="intro-enter" type="button"><span class="intro-enter-label">Enter the map</span><span class="intro-enter-arrow" aria-hidden="true">↗</span></button>
+        <a id="intro-fallback-link" class="intro-enter" href="/?view=list" hidden>Open achievement list <span class="intro-enter-arrow" aria-hidden="true">↗</span></a>
+      </footer>
+    </div>
+  </section>
+  <script>
+    // Match a shared variant URL before the entry module hydrates the controls.
+    if (document.documentElement.classList.contains('intro-active')
+      && new URLSearchParams(location.search).get('intro') === '2') {
+      document.getElementById('intro-screen').dataset.variant = 'dossier';
+    }
+  </script>
   <div id="app">
     <main id="map" aria-label="Interactive Earth map"></main>
     <div class="vignette" aria-hidden="true"></div>

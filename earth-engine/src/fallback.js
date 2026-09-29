@@ -5,6 +5,7 @@ import achievements from './data/achievements.json';
 import {sortAchievementsNewestFirst, getChronologyState, stepChronology} from './chronology.js';
 import {getProject, renderProjectContent} from './projectContent.js';
 import {readPortfolioRoute, portfolioUrl} from './portfolioRoute.js';
+import {shouldShowIntro, shouldInitializeFallbackNeutral} from './introGate.js';
 import {createCvView} from './cvView.js';
 import {bindCvDownload} from './cvDownload.js';
 import {installExportControls} from './exportControls.js';
@@ -95,7 +96,7 @@ export function startFallback() {
     $('journey-previous').disabled = !state.previous;
     $('journey-next').disabled = !state.next;
     for (const [slug, button] of rows) {
-      if (slug === event.slug) button.setAttribute('aria-current', 'true');
+      if (slug === active?.slug) button.setAttribute('aria-current', 'true');
       else button.removeAttribute('aria-current');
     }
   }
@@ -121,6 +122,12 @@ export function startFallback() {
     if (openDetail) showDetail(event);
     else $('detail').hidden = true;
     status(`${getProject(event.slug)?.title ?? event.title}. Map unavailable; ${openDetail ? 'project details open' : 'chronology available'}.`);
+  }
+  function showNeutralList() {
+    active = null;
+    $('detail').hidden = true;
+    renderJourney();
+    status('Achievement list ready. Choose an achievement to begin.');
   }
 
   $('journey-previous').addEventListener('click', () => select(stepChronology(ordered, active?.slug, 'previous')));
@@ -154,8 +161,11 @@ export function startFallback() {
   });
   const restoreRoute = () => {
     const route = readPortfolioRoute(location.href, knownSlugs);
-    const event = bySlug.get(route.eventSlug) ?? ordered[0];
-    select(event, {historyMode: 'none', showDetail: route.view !== 'cv' && route.view !== 'world'});
+    if (shouldShowIntro(location.href)) showNeutralList();
+    else {
+      const event = bySlug.get(route.eventSlug) ?? ordered[0];
+      select(event, {historyMode: 'none', showDetail: route.view !== 'cv' && route.view !== 'world'});
+    }
     if (route.view === 'cv' && !cvView.isOpen()) cvView.open();
     else if (route.view !== 'cv' && cvView.isOpen()) cvView.close();
     if (route.view === 'world') $('map').scrollTo({top: 0, behavior: 'smooth'});
@@ -164,9 +174,15 @@ export function startFallback() {
   window.addEventListener('hashchange', restoreRoute);
 
   const initialRoute = readPortfolioRoute(location.href, knownSlugs);
-  select(bySlug.get(initialRoute.eventSlug) ?? ordered[0], {
-    historyMode: 'replace', showDetail: initialRoute.view !== 'cv', view: initialRoute.view
-  });
+  // The fallback is prepared behind the homepage introduction on browsers
+  // without WebGL. Do not rewrite `/` to the latest event or open its popup.
+  if (shouldInitializeFallbackNeutral(location.href, document.documentElement.classList.contains('intro-active'))) {
+    showNeutralList();
+  } else {
+    select(bySlug.get(initialRoute.eventSlug) ?? ordered[0], {
+      historyMode: 'replace', showDetail: initialRoute.view !== 'cv', view: initialRoute.view
+    });
+  }
   if (initialRoute.view === 'cv') {
     cvView.open();
     if (initialRoute.downloadCv) $('cv-download').click();

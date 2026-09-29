@@ -17,6 +17,7 @@ import {markerLevelForZoom, MARKER_ZOOM, geographicCentroid, declutterMarkers} f
 import {portfolioLinks} from './portfolioData.js';
 import {getProject, renderProjectContent} from './projectContent.js';
 import {readPortfolioRoute, portfolioUrl} from './portfolioRoute.js';
+import {shouldShowIntro} from './introGate.js';
 import {initialMapCamera, ISOMETRIC_CAMERA, COTTBUS_HANGAR_CAMERA, preferLocalStart} from './initialCamera.js';
 import './projectContent.css';
 import {createCvView} from './cvView.js';
@@ -108,7 +109,9 @@ const constrainedNavigation=preferLocalStart({deviceMemory:navigator.deviceMemor
   coarsePointer:window.matchMedia('(pointer: coarse)').matches,
   reducedMotion:prefersReducedMotion});
 const bootstrapCamera = initialMapCamera(initialRoute, orderedAchievements, initialCamera, {
-  fastStart:constrainedNavigation,
+  // The entered homepage starts on the world, not on the newest competition.
+  // Explicit achievement deep links still get their direct local camera.
+  fastStart:false,
   isometricEventSlugs:ISOMETRIC_EVENT_REGIONS
 });
 
@@ -755,18 +758,31 @@ map.on('style.load',()=>{
   initializeEventLayers();
   initializeMarkers();
   mapReady=true;
-  const event=orderedAchievements.find(candidate=>candidate.slug===initialRoute.eventSlug)??orderedAchievements[0];
+  const event=orderedAchievements.find(candidate=>candidate.slug===initialRoute.eventSlug)
+    ??(initialRoute.view?orderedAchievements[0]:null);
   const cvRoute=initialRoute.view==='cv';
-  selectEvent(event,{showDetail:!initialRoute.view,historyMode:'replace',view:initialRoute.view,skipFly:cvRoute});
+  if(event)selectEvent(event,{showDetail:!initialRoute.view,historyMode:'replace',view:initialRoute.view,skipFly:cvRoute});
+  else status('Whole Earth. Choose an achievement to begin.');
   if(initialRoute.view==='world')showWholeEarth({historyMode:'none'});
   if(initialRoute.view==='cv'){
     openCvView({mapFocusSkipped:true});
     if(initialRoute.downloadCv)$('cv-download').click();
   }
+  const signalReady=()=>window.dispatchEvent(new Event('earth-ready'));
+  if(map.loaded())signalReady();
+  else map.once('load',signalReady);
 });
 function restorePortfolioRoute(){
   if(!mapReady)return;
   const route=readPortfolioRoute(window.location.href,knownSlugs);
+  if(shouldShowIntro(window.location.href)){
+    refocusAfterCv=false;
+    if(cvView.isOpen())cvView.close();
+    activeEvent=null;activeCity=null;renderJourney();
+    showWholeEarth({historyMode:'none'});
+    status('Whole Earth. Choose an achievement to begin.');
+    return;
+  }
   const event=orderedAchievements.find(candidate=>candidate.slug===route.eventSlug)??orderedAchievements[0];
   if(route.view==='cv'){
     selectEvent(event,{showDetail:false,historyMode:'none',skipFly:true});

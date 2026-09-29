@@ -4,12 +4,20 @@
  * public certificates, and the custom-domain CNAME must keep working.
  */
 import {createHash} from 'node:crypto';
-import {readFile, readdir, mkdir, writeFile, copyFile, stat} from 'node:fs/promises';
+import {readFile, readdir, mkdir, writeFile, copyFile, cp, rm, stat} from 'node:fs/promises';
 import {dirname, join, resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const out = join(root, 'out');
+// The default remains the GitHub Pages release. Staging is a separate copy of
+// the same Next export, so preparing a preview cannot overwrite the artifact
+// used by the production workflow or its CNAME.
+const target = process.env.EARTH_DEPLOY_TARGET || 'production';
+const assert = (condition, message) => { if (!condition) throw new Error(message); };
+assert(target === 'production' || target === 'staging', `Unknown Earth deployment target: ${target}`);
+const staging = target === 'staging';
+const baseOut = join(root, 'out');
+const out = staging ? join(root, 'staging-dist') : baseOut;
 const earth = join(root, 'earth-engine', 'dist');
 const preserved = [
   'CNAME', 'favicon.ico',
@@ -23,9 +31,6 @@ async function sha256(file) {
 }
 async function exists(file) {
   try { await stat(file); return true; } catch { return false; }
-}
-function assert(condition, message) {
-  if (!condition) throw new Error(message);
 }
 async function mergeDirectory(source, destination) {
   await mkdir(destination, {recursive: true});
@@ -46,6 +51,11 @@ async function mergeDirectory(source, destination) {
   }
 }
 
+if (staging) {
+  assert(await exists(baseOut), 'Build the Next.js static export into out/ before preparing staging');
+  await rm(out, {recursive: true, force: true});
+  await cp(baseOut, out, {recursive: true});
+}
 for (const item of preserved) assert(await exists(join(out, item)), `Missing legacy output before overlay: ${item}`);
 const checksums = new Map(await Promise.all(preserved.map(async item => [item, await sha256(join(out, item))])));
 const assetFiles = await readdir(join(earth, 'assets'));
@@ -78,7 +88,7 @@ html = html.replace(entryTag, `<script type="module">
     if (status) status.textContent = 'Map could not start. Please reload the page.';
   }
 </script>`);
-html = html.replace('name="robots" content="noindex,nofollow"', 'name="robots" content="index,follow"');
+if (!staging) html = html.replace('name="robots" content="noindex,nofollow"', 'name="robots" content="index,follow"');
 const eoxButton = /<button data-imagery="eox"[^>]*>[^<]*(?:<small>[^<]*<\/small>)?<\/button>\s*/;
 assert(eoxButton.test(html), 'Could not remove EOX switch from public homepage');
 html = html.replace(eoxButton, '');
@@ -88,16 +98,18 @@ const credit = /<span id="imagery-credit">[\s\S]*?<\/span>/;
 assert(credit.test(html), 'Could not replace the initial EOX credit');
 html = html.replace(credit,
   '<span id="imagery-credit"><a href="https://esa-worldcover.org/en/data-access">© ESA WorldCover project 2021</a> / Contains modified Copernicus Sentinel data (2021) processed by ESA WorldCover consortium · <a href="https://science.nasa.gov/earth/earth-observatory/blue-marble-next-generation/base-map/">NASA Blue Marble underlay</a></span>');
-html = html.replace('</head>', `  <link rel="canonical" href="https://batikanor.com/" />
+html = html.replace('</head>', `  <link rel="canonical" href="https://${staging ? 'staging.' : ''}batikanor.com/" />
   <link rel="icon" href="/favicon.ico" sizes="any" />
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://batikanor.com/" />
+  <meta property="og:url" content="https://${staging ? 'staging.' : ''}batikanor.com/" />
   <meta property="og:title" content="Batıkan — Hacker · Developer · Entrepreneur" />
   <meta property="og:description" content="Portfolio showcasing the projects and work of Batıkan Bora Ormancı." />
 </head>`);
 html = html.replace('A geographically real Earth, streamed at the scale of an achievement journey.',
   'Portfolio showcasing the projects and work of Batıkan Bora Ormancı.');
-assert(!html.includes('noindex') && !html.includes('data-imagery="eox"'), 'Public homepage is still preview-only');
+assert(!html.includes('data-imagery="eox"'), 'Non-commercial EOX control survived the build');
+assert(staging ? html.includes('name="robots" content="noindex,nofollow"') : !html.includes('noindex'),
+  `Incorrect robots policy for ${target}`);
 
 for (const directory of ['assets', 'data', 'fonts', 'photos', 'certificates', 'other']) {
   const from = join(earth, directory);
@@ -106,14 +118,20 @@ for (const directory of ['assets', 'data', 'fonts', 'photos', 'certificates', 'o
 await writeFile(join(out, 'assets', 'earth-current.json'),
   JSON.stringify({entry: entryMatch[1]}) + '\n');
 await writeFile(join(out, 'index.html'), html);
-await writeFile(join(out, 'robots.txt'), 'User-agent: *\nAllow: /\nSitemap: https://batikanor.com/sitemap.xml\n');
-await writeFile(join(out, 'sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?>
+if (staging) {
+  await writeFile(join(out, 'robots.txt'), 'User-agent: *\nDisallow: /\n');
+  await rm(join(out, 'sitemap.xml'), {force: true});
+} else {
+  await writeFile(join(out, 'robots.txt'), 'User-agent: *\nAllow: /\nSitemap: https://batikanor.com/sitemap.xml\n');
+  await writeFile(join(out, 'sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>https://batikanor.com/</loc></url>
   <url><loc>https://batikanor.com/projects/</loc></url>
   <url><loc>https://batikanor.com/cv/</loc></url>
 </urlset>\n`);
+}
 for (const [item, before] of checksums) {
   assert(await sha256(join(out, item)) === before, `Legacy output changed during overlay: ${item}`);
 }
-console.log(`Overlayed public Earth homepage and ${assetFiles.length} built assets without changing ${preserved.length} legacy routes/files.`);
+if (staging) await rm(join(out, 'CNAME'));
+console.log(`Overlayed ${target} Earth homepage and ${assetFiles.length} built assets without changing ${preserved.length - (staging ? 1 : 0)} legacy routes/files.`);
