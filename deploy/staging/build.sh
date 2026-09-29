@@ -11,7 +11,10 @@ BRANCH="$(git branch --show-current)"
   exit 1
 }
 
-EARTH_DEPLOY_TARGET=staging pnpm build
+# This checkout shares an installed node_modules directory with the primary
+# repository. `pnpm build` attempts an install first and rejects that symlink;
+# npm runs the existing build script without mutating dependencies.
+EARTH_DEPLOY_TARGET=staging npm run build
 npm --prefix earth-engine run verify
 VITE_PUBLIC_RELEASE=true npm --prefix earth-engine run build
 EARTH_DEPLOY_TARGET=staging node scripts/overlay-earth-homepage.mjs

@@ -7,7 +7,7 @@ set -euo pipefail
   exit 2
 }
 RELEASE="$2"
-[[ "$RELEASE" =~ ^[0-9]{8}T[0-9]{6}Z-[0-9a-f]{10}-[0-9a-f]{6}$ ]] || {
+[[ "$RELEASE" =~ ^[0-9]{8}T[0-9]{6}Z-[A-Za-z0-9-]{1,64}$ ]] || {
   echo "Invalid staging release ID." >&2
   exit 2
 }
@@ -19,7 +19,7 @@ ssh -i "$KEY" -o IdentitiesOnly=yes -o BatchMode=yes -o StrictHostKeyChecking=ye
   -o ConnectTimeout=15 deploy@157.180.20.129 bash -s -- "$RELEASE" <<'REMOTE'
 set -euo pipefail
 release="$1"
-[[ "$release" =~ ^[0-9]{8}T[0-9]{6}Z-[0-9a-f]{10}-[0-9a-f]{6}$ ]] || exit 2
+[[ "$release" =~ ^[0-9]{8}T[0-9]{6}Z-[A-Za-z0-9-]{1,64}$ ]] || exit 2
 base=/srv/apps/batikanor-staging/releases
 exec 9>/srv/apps/batikanor-staging/.deploy.lock
 flock -n 9 || { echo 'Another staging deployment is active.' >&2; exit 1; }
