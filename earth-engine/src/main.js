@@ -18,12 +18,15 @@ import {portfolioLinks} from './portfolioData.js';
 import {getProject, renderProjectContent} from './projectContent.js';
 import {readPortfolioRoute, portfolioUrl} from './portfolioRoute.js';
 import {shouldShowIntro} from './introGate.js';
+import {finishIntro, hideIntroForDeepLink, introHistoryVisible, waitForIntroEntry} from './intro.js';
 import {initialMapCamera, ISOMETRIC_CAMERA, COTTBUS_HANGAR_CAMERA, preferLocalStart} from './initialCamera.js';
 import './projectContent.css';
 import {createCvView} from './cvView.js';
 import {bindCvDownload} from './cvDownload.js';
 import {installExportControls} from './exportControls.js';
 import {createDetailPanel} from './detailPanel.js';
+import {createJourneyExplorer} from './journeyExplorer.js';
+import './journeyExplorer.css';
 
 const $ = (id) => document.getElementById(id);
 const detailPanel = createDetailPanel($('detail'), {onGeometrySettled: keepCurrentEventVisible});
@@ -212,6 +215,7 @@ const heroVenue = createHeroVenueLayer({onScan:({phase})=>{
   else if(phase==='complete')status('Protective Radar · scan complete. Activate it again to replay.');
 }});
 const markers = [];
+let journeyExplorer = null;
 
 function safeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function keyOf(e){return `${e.city}|${e.country}`;}
@@ -227,6 +231,7 @@ function renderJourney(){
   $('journey-current').title=`${title} — open details`;
   $('journey-previous').disabled=!state.previous;
   $('journey-next').disabled=state.index<0?false:!state.next;
+  journeyExplorer?.sync();
 }
 renderJourney();
 $('journey-previous').addEventListener('click',()=>{
@@ -241,6 +246,12 @@ $('journey-current').addEventListener('click',()=>{
   const event=activeEvent??orderedAchievements[0];
   // The centre card doubles as an explicit refocus, even after free panning.
   selectEvent(event,{showDetail:true});
+});
+journeyExplorer=createJourneyExplorer({
+  events:orderedAchievements,
+  getTitle:event=>getProject(event.slug)?.title??event.title,
+  onSelect:event=>selectEvent(event,{showDetail:true,chronologyNavigation:true}),
+  getActiveSlug:()=>activeEvent?.slug??null
 });
 
 $('cv-download').href=portfolioLinks.cvPdf;
@@ -627,6 +638,20 @@ function showWholeEarth({historyMode='push'}={}){
   }
 }
 $('world-button').addEventListener('click',()=>showWholeEarth());
+function showIntroduction({historyMode='push'}={}) {
+  const url=portfolioUrl(window.location.href,{eventSlug:null,view:null});
+  if(!mapReady){window.location.assign(url.href);return;}
+  if(cvView.isOpen())cvView.close();
+  if(historyMode!=='none'){
+    window.history[historyMode==='replace'?'replaceState':'pushState']({earthIntroVisible:true},'',url);
+  }
+  journeyExplorer?.close({restoreFocus:false});
+  activeEvent=null;activeCity=null;renderJourney();
+  showWholeEarth({historyMode:'none'});
+  status('Introduction. Press Enter to return to the map.');
+  void waitForIntroEntry().then(finishIntro);
+}
+$('home-button').addEventListener('click',()=>showIntroduction());
 function applyImagery(next){
   if(PUBLIC_RELEASE&&next==='eox')return;
   if(next==='nasa')finishDrive();
@@ -774,15 +799,19 @@ map.on('style.load',()=>{
 });
 function restorePortfolioRoute(){
   if(!mapReady)return;
+  journeyExplorer?.close({restoreFocus:true});
   const route=readPortfolioRoute(window.location.href,knownSlugs);
   if(shouldShowIntro(window.location.href)){
     refocusAfterCv=false;
     if(cvView.isOpen())cvView.close();
     activeEvent=null;activeCity=null;renderJourney();
     showWholeEarth({historyMode:'none'});
+    if(introHistoryVisible())void waitForIntroEntry().then(finishIntro);
+    else hideIntroForDeepLink();
     status('Whole Earth. Choose an achievement to begin.');
     return;
   }
+  hideIntroForDeepLink();
   const event=orderedAchievements.find(candidate=>candidate.slug===route.eventSlug)??orderedAchievements[0];
   if(route.view==='cv'){
     selectEvent(event,{showDetail:false,historyMode:'none',skipFly:true});

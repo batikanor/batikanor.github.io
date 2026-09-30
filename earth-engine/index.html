@@ -71,6 +71,7 @@
       <div class="topbar-actions">
         <button id="portfolio-toggle" class="topbar-button" type="button" aria-expanded="false" aria-controls="portfolio-panel">CV / PDF</button>
         <button id="settings-toggle" class="settings-wheel" type="button" aria-label="Map settings" title="Map settings" aria-expanded="false" aria-controls="settings-panel">⚙</button>
+        <button id="home-button" class="home-button" type="button" aria-label="Return to introduction" title="Return to introduction"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1Z" /></svg></button>
       </div>
     </header>
 
@@ -128,7 +129,16 @@
         <span id="journey-meta">LATEST / 01 OF 32</span>
         <strong id="journey-title">Loading achievements…</strong>
       </button>
+      <button id="journey-explore" class="journey-explore" type="button" aria-label="Explore all achievements" aria-expanded="false" aria-controls="journey-explorer" title="Explore all achievements">⌃ All 32</button>
       <button id="journey-next" class="journey-arrow" type="button" aria-label="Next, older achievement" title="Older achievement">→</button>
+      <section id="journey-explorer" class="journey-explorer" aria-label="Explore achievements" hidden>
+        <div class="explorer-head"><strong>Achievements</strong><button id="explorer-close" type="button" aria-label="Close achievement explorer">×</button></div>
+        <label class="sr-only" for="explorer-search">Search achievements</label>
+        <input id="explorer-search" type="search" autocomplete="off" placeholder="Title, year, city…" />
+        <span id="explorer-count">32</span>
+        <ol id="explorer-list" class="explorer-list" aria-label="Achievements, newest first"></ol>
+        <p id="explorer-empty" class="explorer-empty" hidden>No matching achievements.</p>
+      </section>
     </nav>
 
     <div class="context-actions" aria-label="Achievement actions">

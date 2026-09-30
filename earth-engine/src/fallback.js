@@ -6,10 +6,13 @@ import {sortAchievementsNewestFirst, getChronologyState, stepChronology} from '.
 import {getProject, renderProjectContent} from './projectContent.js';
 import {readPortfolioRoute, portfolioUrl} from './portfolioRoute.js';
 import {shouldShowIntro, shouldInitializeFallbackNeutral} from './introGate.js';
+import {finishIntro, hideIntroForDeepLink, introHistoryVisible, waitForIntroEntry} from './intro.js';
 import {createCvView} from './cvView.js';
 import {bindCvDownload} from './cvDownload.js';
 import {installExportControls} from './exportControls.js';
 import {createDetailPanel} from './detailPanel.js';
+import {createJourneyExplorer} from './journeyExplorer.js';
+import './journeyExplorer.css';
 
 const $ = id => document.getElementById(id);
 const ordered = sortAchievementsNewestFirst(achievements);
@@ -50,6 +53,7 @@ export function startFallback() {
   list.className = 'fallback-achievements';
   list.setAttribute('aria-label', 'Achievements, newest first');
   const rows = new Map();
+  let journeyExplorer = null;
   ordered.forEach((event, index) => {
     const item = document.createElement('li');
     const button = document.createElement('button');
@@ -99,6 +103,7 @@ export function startFallback() {
       if (slug === active?.slug) button.setAttribute('aria-current', 'true');
       else button.removeAttribute('aria-current');
     }
+    journeyExplorer?.sync();
   }
   function showDetail(event) {
     const root = $('detail');
@@ -133,11 +138,26 @@ export function startFallback() {
   $('journey-previous').addEventListener('click', () => select(stepChronology(ordered, active?.slug, 'previous')));
   $('journey-next').addEventListener('click', () => select(stepChronology(ordered, active?.slug, 'next')));
   $('journey-current').addEventListener('click', () => select(active ?? ordered[0]));
+  journeyExplorer = createJourneyExplorer({
+    events: ordered,
+    getTitle: event => getProject(event.slug)?.title ?? event.title,
+    onSelect: event => select(event),
+    getActiveSlug: () => active?.slug ?? null
+  });
   $('world-button').addEventListener('click', () => {
     $('detail').hidden = true;
     $('map').scrollTo({top: 0, behavior: 'smooth'});
     closePopovers();
     status('Showing all achievements in chronological order.');
+  });
+  $('home-button').addEventListener('click', () => {
+    if (cvView.isOpen()) cvView.close();
+    journeyExplorer?.close({restoreFocus: false});
+    const url = portfolioUrl(location.href, {eventSlug: null, view: null});
+    history.pushState({earthIntroVisible: true}, '', url);
+    showNeutralList();
+    closePopovers();
+    void waitForIntroEntry().then(finishIntro);
   });
   $('portfolio-toggle').addEventListener('click', () => {
     const opening = $('portfolio-panel').hidden;
@@ -160,9 +180,14 @@ export function startFallback() {
     if (event.key === 'Escape') { closePopovers(); $('detail').hidden = true; }
   });
   const restoreRoute = () => {
+    journeyExplorer?.close({restoreFocus: true});
     const route = readPortfolioRoute(location.href, knownSlugs);
-    if (shouldShowIntro(location.href)) showNeutralList();
-    else {
+    if (shouldShowIntro(location.href)) {
+      showNeutralList();
+      if (introHistoryVisible()) void waitForIntroEntry().then(finishIntro);
+      else hideIntroForDeepLink();
+    } else {
+      hideIntroForDeepLink();
       const event = bySlug.get(route.eventSlug) ?? ordered[0];
       select(event, {historyMode: 'none', showDetail: route.view !== 'cv' && route.view !== 'world'});
     }

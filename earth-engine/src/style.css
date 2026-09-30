@@ -30,7 +30,7 @@ a { color: inherit; }
   pointer-events: none;
 }
 .topbar > * { pointer-events: auto; }
-.wordmark, .topbar-button, .settings-wheel {
+.wordmark, .topbar-button, .settings-wheel, .home-button {
   min-height: 42px; border: 1px solid #e9e2d3a8; border-radius: 3px;
   background: #0d1d22ed; color: #fff; box-shadow: 0 6px 28px #03111650;
   backdrop-filter: blur(10px);
@@ -46,7 +46,9 @@ a { color: inherit; }
 .topbar-actions { display: flex; gap: 8px; }
 .topbar-button { padding: 0 15px; font-size: 10px; font-weight: 700; letter-spacing: .11em; }
 .settings-wheel { width: 42px; padding: 0; font-size: 24px; line-height: 1; }
-.wordmark:hover, .topbar-button:hover, .settings-wheel:hover,
+.home-button { display: grid; width: 42px; padding: 0; place-items: center; }
+.home-button svg { display: block; width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.wordmark:hover, .topbar-button:hover, .settings-wheel:hover, .home-button:hover,
 .topbar-button[aria-expanded="true"], .settings-wheel[aria-expanded="true"] { background: #d9bb8d; color: #102126; border-color: #f7d8a9; }
 .wordmark:hover small, .wordmark:focus-visible small { color: #102126; }
 
@@ -139,7 +141,7 @@ a { color: inherit; }
 .journey button { border: 0; background: transparent; color: #fff; }
 .journey-arrow { font-size: 23px; font-weight: 400; }
 .journey-arrow:first-child { border-right: 1px solid #f0e5d43b; }
-.journey-arrow:last-child { border-left: 1px solid #f0e5d43b; }
+#journey-next { border-left: 1px solid #f0e5d43b; }
 .journey-arrow:hover:not(:disabled), .journey-current:hover { background: #d6bc9030; }
 .journey-arrow:disabled { opacity: .28; }
 .journey-current { min-width: 0; text-align: left; padding: 9px 14px; }
@@ -150,7 +152,7 @@ a { color: inherit; }
 }
 .journey-current strong {
   display: block; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-  font-family: 'Playfair Display', Georgia, serif; font-size: 17px; font-weight: 500; line-height: 1.2;
+  font-family: 'Playfair Display', Georgia, serif; font-size: 15px; font-weight: 500; line-height: 1.2;
 }
 .drive-active .journey { display: none; }
 
@@ -322,13 +324,14 @@ a { color: inherit; }
     --mobile-right: calc(12px + env(safe-area-inset-right, 0px));
   }
   .topbar { top: var(--mobile-safe-top); left: var(--mobile-left); right: var(--mobile-right); gap: 8px; }
-  .wordmark, .topbar-button, .settings-wheel { min-height: 44px; }
+  .wordmark, .topbar-button, .settings-wheel, .home-button { min-height: 44px; }
   .wordmark { gap: 6px; padding: 5px 8px; }
   .wordmark strong { font-size: 12px; }
   .wordmark small { font-size: 8px; letter-spacing: 0; }
   .topbar-actions { gap: 5px; }
   .topbar-button { padding: 0 8px; font-size: 9px; letter-spacing: .02em; }
   .settings-wheel { width: 44px; font-size: 22px; }
+  .home-button { width: 44px; }
   .top-popover {
     top: calc(var(--mobile-safe-top) + 53px); right: var(--mobile-right);
     width: min(282px, calc(100vw - var(--mobile-left) - var(--mobile-right)));
@@ -338,7 +341,7 @@ a { color: inherit; }
   .journey { bottom: calc(var(--credits-height) + 8px); min-height: 60px; grid-template-columns: 44px minmax(0,1fr) 44px; }
   .journey-current { padding: 8px 10px; }
   .journey-current span { font-size: 8px; }
-  .journey-current strong { font-size: 13px; }
+  .journey-current strong { font-size: 12px; }
   .journey-arrow { font-size: 20px; }
   .context-actions { left: var(--mobile-left); bottom: calc(var(--credits-height) + 77px); }
   .context-actions button { min-height: 44px; padding: 6px 8px; }
@@ -368,6 +371,9 @@ a { color: inherit; }
   .drive-controls button { width: 44px; height: 44px; }
   .drive-camera-switch { min-height: 40px; margin-top: 5px; padding: 5px 7px; font-size: 8px; }
   .marker-label { font-size: 11px; }
+}
+@media (max-width: 360px) {
+  .wordmark small { display: none; }
 }
 
 @media (max-width: 390px) {
