@@ -9,7 +9,6 @@ const MAX_DETAIL_CHARS=190;
 const GOLD='#e3c084';
 const INK='#112227';
 const PAPER='#f5f3eb';
-const TITLE_FONT='Georgia, "Times New Roman", serif';
 const BODY_FONT='Arial, Helvetica, sans-serif';
 const clamp=(n,min,max)=>Math.max(min,Math.min(max,n));
 const assert=(condition,message)=>{if(!condition)throw new TypeError(message);};
@@ -66,8 +65,7 @@ export function selectAchievementSignContent(project) {
   const preferred=project.slug==='salzburg-tourism-2024'
     ?candidates.find(text=>/^(?:1\)\s+)?You use a Muse 2 headband\b/.test(text)):null;
   const detailedSource=preferred??candidates.find(text=>!text.startsWith(summary))??candidates[0]??(short||title);
-  // Long original titles need more lines on the same fixed physical panel.
-  const detail=sourceExcerpt(detailedSource,title.length>65?160:MAX_DETAIL_CHARS);
+  const detail=sourceExcerpt(detailedSource,MAX_DETAIL_CHARS);
   return Object.freeze({slug:project.slug,title,summary,detail,source:'portfolio-authored',summarySource,detailSource:candidates.length?'longDescription':short?'shortDescription':'title',
     summaryTruncated:summary.length<(short||paragraphs[0]||title).length,detailTruncated:detail.length<detailedSource.length});
 }
@@ -94,7 +92,7 @@ function textLayout(context,text,{family,size,minSize,width,maxHeight,lineFactor
   return {font:`${fontSize}px ${family}`,fontSize,lines,lineHeight,height:lines.length*lineHeight};
 }
 
-function createPanelCanvas(content,text,{canvasFactory,document:doc,truncated=false,mirrorU=true}) {
+function createPanelCanvas(text,{canvasFactory,document:doc,truncated=false,mirrorU=true}) {
   const canvas=canvasFactory?canvasFactory(PANEL_WIDTH_PX,PANEL_HEIGHT_PX):doc?.createElement('canvas');
   assert(canvas && typeof canvas.getContext==='function','Achievement signs require a native 2D canvas');
   let texture=null;
@@ -105,11 +103,10 @@ function createPanelCanvas(content,text,{canvasFactory,document:doc,truncated=fa
   context.strokeStyle=GOLD;context.lineWidth=5;context.strokeRect(12,12,canvas.width-24,canvas.height-24);
   context.fillStyle=GOLD;context.fillRect(66,58,88,5);
   context.textBaseline='top';context.textAlign='left';
-  const title=textLayout(context,content.title,{family:TITLE_FONT,size:54,minSize:42,width:892,maxHeight:232});
-  context.font=title.font;context.fillStyle=PAPER;
-  title.lines.forEach((line,i)=>context.fillText(line,66,90+i*title.lineHeight));
-  const bodyY=90+title.height+24;
-  const body=textLayout(context,`${text}${truncated?'…':''}`,{family:BODY_FONT,size:56,minSize:42,width:892,maxHeight:canvas.height-bodyY-56});
+  // The navigator and project popup already identify this achievement.
+  // Spend the entire sign on the authored explanation, not a repeated title.
+  const bodyY=90;
+  const body=textLayout(context,`${text}${truncated?'…':''}`,{family:BODY_FONT,size:64,minSize:44,width:892,maxHeight:canvas.height-bodyY-56});
   context.font=body.font;context.fillStyle=PAPER;
   body.lines.forEach((line,i)=>context.fillText(line,66,bodyY+i*body.lineHeight));
   texture=new THREE.CanvasTexture(canvas);texture.colorSpace=THREE.SRGBColorSpace;
@@ -118,7 +115,7 @@ function createPanelCanvas(content,text,{canvasFactory,document:doc,truncated=fa
   // retain CanvasTexture's normal Y flip so native text stays upright.
   if(mirrorU){texture.repeat.x=-1;texture.offset.x=1;}
   texture.generateMipmaps=false;texture.minFilter=THREE.LinearFilter;texture.magFilter=THREE.LinearFilter;
-  return {texture,layout:{titleFontSize:title.fontSize,bodyFontSize:body.fontSize,bodyLines:body.lines.length,
+  return {texture,layout:{bodyFontSize:body.fontSize,bodyLines:body.lines.length,
     overflow:bodyY+body.height>canvas.height-36}};
   } catch(error) {
     texture?.dispose();if(texture)texture.image=null;
@@ -145,7 +142,7 @@ export function createAchievementSigns(project,{canvasFactory=null,document:doc=
   const positions=[[-7,2.7,-8],[7,2.7,-8]];
   try {
   for(let i=0;i<2;i++) {
-    const {texture,layout}=createPanelCanvas(content,i===0?content.summary:content.detail,{canvasFactory,document:doc,
+    const {texture,layout}=createPanelCanvas(i===0?content.summary:content.detail,{canvasFactory,document:doc,
       truncated:i===0?content.summaryTruncated:content.detailTruncated,mirrorU});
     textures.push(texture);
     const material=new THREE.MeshBasicMaterial({color:0xffffff,map:texture,side:THREE.FrontSide,

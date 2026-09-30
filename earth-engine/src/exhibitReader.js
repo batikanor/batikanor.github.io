@@ -31,9 +31,8 @@ export function createExhibitReader({map,getScene,getEvent,canRead,onOpenProject
     if(!canRead()||getEvent()?.slug!==content.slug)return;
     map.stop(); // A quick tap during inspection must not dismiss the reader on the next animation frame.
     popup?.remove();
-    const root=document.createElement('article');root.className='exhibit-excerpt';
-    const title=document.createElement('h2');title.textContent=content.title;title.tabIndex=-1;root.append(title);
-    const excerpt=document.createElement('p');excerpt.textContent=(index===0?content.summary:content.detail)+((index===0?content.summaryTruncated:content.detailTruncated)?'…':'');root.append(excerpt);
+    const root=document.createElement('article');root.className='exhibit-excerpt';root.setAttribute('aria-label',content.title);
+    const excerpt=document.createElement('p');excerpt.tabIndex=-1;excerpt.textContent=(index===0?content.summary:content.detail)+((index===0?content.summaryTruncated:content.detailTruncated)?'…':'');root.append(excerpt);
     const open=document.createElement('button');open.type='button';open.textContent='Open full project';
     open.addEventListener('click',()=>{if(getEvent()?.slug!==content.slug||!canRead()){clear();return;}popup?.remove();popup=null;onOpenProject(content.slug);});root.append(open);
     const canvas=map.getContainer(),width=canvas.clientWidth,height=canvas.clientHeight;
@@ -44,7 +43,7 @@ export function createExhibitReader({map,getScene,getEvent,canRead,onOpenProject
       footerTop:Math.min(height,...footerRects.map(rect=>rect.top-canvasRect.top))};
     const {top,bottom}=exhibitPopupInsets(viewport,viewport);
     popup=new maplibregl.Popup({className:'exhibit-excerpt-popup',closeButton:true,closeOnClick:false,closeOnMove:true,
-      anchor:'center',maxWidth:`${Math.min(340,width-32)}px`,offset:[0,-22],focusAfterOpen:true})
+      anchor:'center',maxWidth:`${Math.min(340,width-32)}px`,offset:[0,-22],focusAfterOpen:false})
       .setLngLat(coordinate).setDOMContent(root).addTo(map);
     const element=popup.getElement(),body=element.querySelector('.maplibregl-popup-content');
     body.style.maxHeight=`${Math.max(1,height-top-bottom)}px`;
@@ -56,7 +55,7 @@ export function createExhibitReader({map,getScene,getEvent,canRead,onOpenProject
     // Public APIs, measured once on opening. No per-frame DOM readback.
     popup.setOffset(exhibitPopupOffset(map.project(coordinate),element.getBoundingClientRect(),viewport));
     // Keep initial keyboard focus visible even when a landscape reader scrolls.
-    title.focus({preventScroll:true});
+    excerpt.focus({preventScroll:true});
   }
   function sync(){
     const scene=getScene(),event=getEvent();

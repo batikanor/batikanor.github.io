@@ -24,7 +24,7 @@ function release(group){
 }
 const tesla=contestsAndActivities.find(project=>project.slug==='tesla-gigathon-2026');
 
-test('all 32 signs use authored portfolio titles and literal source excerpts, with no inferred exhibition names',()=>{
+test('all 32 signs retain authored titles as metadata and literal source excerpts, with no inferred exhibition names',()=>{
   assert.equal(contestsAndActivities.length,32);
   for(const project of contestsAndActivities){
     const content=selectAchievementSignContent(project);
@@ -45,13 +45,24 @@ test('Tesla text is exact existing title, description and first original explana
   assert.equal(content.detail,'I teamed up with people I met for the first time, as I have in many other competitions I won in the past, and we won 1st place at this supply chain and logistics-focused competition.');
 });
 
+test('long achievement titles never reduce the original detail excerpt budget',()=>{
+  const longDescription='A precise original explanation of the project architecture and its implementation choices with several meaningful components, real inputs, careful validation and useful outputs for the people who use this project.';
+  const project={slug:'source-budget-regression',title:'An original achievement title long enough to exceed the old sixty-five-character restriction',
+    shortDescription:'A separate original project summary.',longDescription};
+  const content=selectAchievementSignContent(project);
+  assert.equal(content.detail,longDescription.slice(0,190).slice(0,longDescription.slice(0,190).lastIndexOf(' ')));
+  assert.ok(content.detail.length>160);assert.ok(content.detail.length<=190);
+  assert.equal(content.detail,selectAchievementSignContent({...project,title:'Short original title'}).detail);
+  assert.ok(authoredSignProse(longDescription).includes(content.detail));
+});
+
 test('plain source extraction excludes embeds/media/code and retains real linked prose without its URL',()=>{
   const original='**Original title**\n\nI built [a real tool](https://example.org/tool_(v2)) using `Python`.\n\n{{gdrive_embed[0]}}\n\n![Photograph](https://example.org/photo.jpg)\n\n```js\nnot prose\n```\n\n<iframe src="https://example.org/">Embedded text</iframe>\n\nOriginal final sentence.';
   assert.equal(authoredSignProse(original),'Original title\n\nI built a real tool using Python.\n\nOriginal final sentence.');
   assert.throws(()=>selectAchievementSignContent({slug:'invented'}),/authored/);
 });
 
-test('canvas native fonts and scene resources stay bounded to two active panels without network or extra title canvases',()=>{
+test('excerpt-only canvas fonts and scene resources stay bounded to two active panels without network or title rendering',()=>{
   const fixture=canvasFixture();const group=createAchievementSigns(tesla,{canvasFactory:fixture.canvasFactory});
   assert.equal(fixture.canvases.length,2);assert.equal(group.userData.textures.length,2);
   assert.equal(group.userData.texturePixels,1_310_720);assert.equal(group.userData.textureBytes,5_242_880);
@@ -61,7 +72,10 @@ test('canvas native fonts and scene resources stay bounded to two active panels 
   for(const canvas of fixture.canvases){
     assert.equal(canvas.width,1024);assert.equal(canvas.height,640);
     const textCalls=canvas.context.calls.filter(call=>call.kind==='text');
-    assert.ok(textCalls.some(call=>call.font.includes('Georgia')));assert.ok(textCalls.some(call=>call.font.includes('Arial')));
+    assert.ok(textCalls.length>0);assert.ok(textCalls.every(call=>call.font.includes('Arial')));
+    assert.ok(textCalls.every(call=>!call.font.includes('Georgia')));
+    assert.equal(textCalls[0].y,90);
+    assert.ok(textCalls.every(call=>parseInt(call.font,10)>=44&&parseInt(call.font,10)<=64));
     assert.ok(textCalls.every(call=>call.fill==='#f5f3eb'));
     assert.equal(canvas.context.calls.find(call=>call.kind==='fillRect').fill,'#112227');
   }
@@ -81,9 +95,14 @@ test('all authored text fits the capped native canvases without silently droppin
     const fixture=canvasFixture(),group=createAchievementSigns(project,{canvasFactory:fixture.canvasFactory});
     for(const [index,panel] of group.userData.panels.entries()){
       assert.equal(panel.layout.overflow,false,`${project.slug}: panel${index} overflow`);
-      const text=fixture.canvases[index].context.calls.filter(call=>call.kind==='text').map(call=>call.text).join(' ');
-      assert.ok(text.includes(group.userData.content.title),`${project.slug}: original title clipped`);
-      assert.ok(text.includes(panel.text),`${project.slug}: original excerpt clipped`);
+      const textCalls=fixture.canvases[index].context.calls.filter(call=>call.kind==='text');
+      const text=textCalls.map(call=>call.text).join(' ');
+      const truncated=index===0?group.userData.content.summaryTruncated:group.userData.content.detailTruncated;
+      assert.equal(text,panel.text+(truncated?'…':''),`${project.slug}: only the original excerpt should be drawn`);
+      assert.ok(!text.includes(group.userData.content.title),`${project.slug}: title repeated on sign`);
+      assert.equal(textCalls[0].y,90);
+      assert.ok(panel.layout.bodyFontSize>=44&&panel.layout.bodyFontSize<=64);
+      assert.ok(textCalls.every(call=>call.y+Math.ceil(parseInt(call.font,10)*1.17)<=fixture.canvases[index].height-56),`${project.slug}: excerpt crosses bottom padding`);
     }
     release(group);
   }

@@ -49,7 +49,10 @@ test('entry, original popup, drive and distant states need no marker or popup al
 });
 
 test('reader source escapes authored copy with textContent, preserves original source flags and guards stale interactions',()=>{
-  assert.match(readerSource,/title\.textContent=content\.title/);
+  assert.match(readerSource,/root\.setAttribute\('aria-label',content\.title\)/);
+  assert.ok(!readerSource.includes("createElement('h2')"));
+  assert.ok(!readerSource.includes('title.textContent=content.title'));
+  assert.ok(!readerSource.includes('root.append(title)'));
   assert.match(readerSource,/excerpt\.textContent=.*content\.summary:content\.detail/);
   assert.match(readerSource,/content\.summaryTruncated:content\.detailTruncated/);
   assert.ok(!readerSource.includes('.innerHTML'));
@@ -65,7 +68,7 @@ test('source wiring retains one pair of accessible markers, clears ownership and
   assert.match(readerSource,/popup\?\.remove\(\);popup=null;key=null/);
   assert.match(readerSource,/button\.setAttribute\('aria-label'/);
   assert.match(readerSource,/anchor:'top',offset:\[0,10\]/);
-  assert.match(readerSource,/focusAfterOpen:true/);
+  assert.match(readerSource,/focusAfterOpen:false/);
   assert.match(css,/\.exhibit-sign-reader\s*\{[^}]*min-height:\s*44px/);
   assert.match(css,/\.exhibit-excerpt-popup\s*\{[^}]*max-width:\s*calc\(100vw - 40px\)/);
 });
@@ -104,7 +107,9 @@ test('left and right sign popups stay fully on-screen on portrait phones and sho
   }
   assert.match(readerSource,/anchor:'center'/);assert.match(readerSource,/closeOnMove:true/);
   assert.match(readerSource,/popup\.setOffset\(exhibitPopupOffset/);
-  assert.match(readerSource,/title\.tabIndex=-1/);assert.match(readerSource,/title\.focus\(\{preventScroll:true\}\)/);
+  assert.match(readerSource,/excerpt\.tabIndex=-1/);assert.match(readerSource,/excerpt\.focus\(\{preventScroll:true\}\)/);
+  assert.ok(readerSource.indexOf('excerpt.focus({preventScroll:true})')>readerSource.indexOf('popup.setOffset(exhibitPopupOffset'),
+    'excerpt receives initial focus only after the reader is fitted to its viewport');
 });
 
 

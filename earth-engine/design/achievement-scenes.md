@@ -186,8 +186,11 @@ satellites and recycling each have their own recognizable instruments. These
 are illustrative miniatures, not claimed replicas of a confidential prototype.
 
 Two native-font1024×640physical panels use literal excerpts of existing
-`shortDescription`/`longDescription` and the original title. Word-boundary
-truncation is visibly marked with an ellipsis; source strings are never rewritten.
+`shortDescription`/`longDescription` only. The original title remains in the
+project popup and chronology; signs/readers retain it only as metadata and accessible
+labels, not repeated visible headings. Detail excerpts use the same 190-character
+budget regardless of title length. Word-boundary truncation is visibly marked
+with an ellipsis; source strings are never rewritten.
 Only the active exhibit receives the two canvases (5,242,880decodedbytes).
 They fade in nearzoom17and within220m; camera-facing heads move without
 redrawing canvases, whilst poles remainfixed. Sign geometry is92triangles
