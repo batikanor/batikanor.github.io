@@ -8,20 +8,55 @@ export function exhibitInspectionCamera(center,width) {
     pitch:54,bearing:42,offset:[0,-32]};
 }
 
+/** Include the actual header/credits/navigation geometry, measured once on open. */
+export function exhibitPopupInsets({width,height},{headerBottom=0,footerTop=height}={}) {
+  return {top:Math.max(72,headerBottom+8),
+    bottom:Math.max(width<=600?156:(height<=500?132:112),height-footerTop+8)};
+}
+
+/** Fit either sign's reader within the canvas, clear of header and chronology. */
+export function exhibitPopupOffset(point,card,{width,height,...chrome}) {
+  const {top,bottom}=exhibitPopupInsets({width,height},chrome),inset=16;
+  const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
+  const x=clamp(point.x,inset+card.width/2,width-inset-card.width/2);
+  const y=clamp(point.y-22,top+card.height/2,height-bottom-card.height/2);
+  return [x-point.x,y-point.y];
+}
+
 /** One pair of accessible touch targets, allocated only close to one exhibit. */
 export function createExhibitReader({map,getScene,getEvent,canRead,onOpenProject}) {
   let markers=[],popup=null,key=null;
   function clear(){markers.forEach(marker=>marker.remove());markers=[];popup?.remove();popup=null;key=null;}
   function showPanel(index,content,coordinate) {
     if(!canRead()||getEvent()?.slug!==content.slug)return;
+    map.stop(); // A quick tap during inspection must not dismiss the reader on the next animation frame.
     popup?.remove();
     const root=document.createElement('article');root.className='exhibit-excerpt';
-    const title=document.createElement('h2');title.textContent=content.title;root.append(title);
+    const title=document.createElement('h2');title.textContent=content.title;title.tabIndex=-1;root.append(title);
     const excerpt=document.createElement('p');excerpt.textContent=(index===0?content.summary:content.detail)+((index===0?content.summaryTruncated:content.detailTruncated)?'…':'');root.append(excerpt);
     const open=document.createElement('button');open.type='button';open.textContent='Open full project';
     open.addEventListener('click',()=>{if(getEvent()?.slug!==content.slug||!canRead()){clear();return;}popup?.remove();popup=null;onOpenProject(content.slug);});root.append(open);
-    popup=new maplibregl.Popup({className:'exhibit-excerpt-popup',closeButton:true,closeOnClick:false,
-      maxWidth:'340px',offset:22,focusAfterOpen:true}).setLngLat(coordinate).setDOMContent(root).addTo(map);
+    const canvas=map.getContainer(),width=canvas.clientWidth,height=canvas.clientHeight;
+    const canvasRect=canvas.getBoundingClientRect(),header=document.querySelector('.topbar')?.getBoundingClientRect();
+    const footerRects=[...document.querySelectorAll('#journey,#journey-explore,.context-actions,.sources')]
+      .map(element=>element.getBoundingClientRect()).filter(rect=>rect.width>0&&rect.height>0);
+    const viewport={width,height,headerBottom:header?header.bottom-canvasRect.top:0,
+      footerTop:Math.min(height,...footerRects.map(rect=>rect.top-canvasRect.top))};
+    const {top,bottom}=exhibitPopupInsets(viewport,viewport);
+    popup=new maplibregl.Popup({className:'exhibit-excerpt-popup',closeButton:true,closeOnClick:false,closeOnMove:true,
+      anchor:'center',maxWidth:`${Math.min(340,width-32)}px`,offset:[0,-22],focusAfterOpen:true})
+      .setLngLat(coordinate).setDOMContent(root).addTo(map);
+    const element=popup.getElement(),body=element.querySelector('.maplibregl-popup-content');
+    body.style.maxHeight=`${Math.max(1,height-top-bottom)}px`;
+    body.style.overflowY='hidden';
+    const bodyStyle=getComputedStyle(body),bodyInsets=['paddingTop','paddingBottom','borderTopWidth','borderBottomWidth']
+      .reduce((sum,key)=>sum+(Number.parseFloat(bodyStyle[key])||0),0);
+    root.style.maxHeight=`${Math.max(1,height-top-bottom-bodyInsets)}px`;
+    root.style.overflowY='auto'; // Scroll prose, never the close button.
+    // Public APIs, measured once on opening. No per-frame DOM readback.
+    popup.setOffset(exhibitPopupOffset(map.project(coordinate),element.getBoundingClientRect(),viewport));
+    // Keep initial keyboard focus visible even when a landscape reader scrolls.
+    title.focus({preventScroll:true});
   }
   function sync(){
     const scene=getScene(),event=getEvent();

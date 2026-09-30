@@ -413,3 +413,4 @@ a { color: inherit; }
 
 .reader-label-compact { display: none; }
 @media(max-width:600px) { .reader-label-wide { display: none; } .reader-label-compact { display: inline; } .exhibit-sign-reader { min-width: 44px; width: 44px; padding: 4px; } }
+.exhibit-excerpt-popup.maplibregl-popup-anchor-center .maplibregl-popup-tip { display: none; }

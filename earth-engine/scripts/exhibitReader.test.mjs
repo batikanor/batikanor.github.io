@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {test} from 'node:test';
 import {contestsAndActivities} from '../src/data/contestsAndActivities.js';
-import {createExhibitReader,exhibitInspectionCamera} from '../src/exhibitReader.js';
+import {createExhibitReader,exhibitInspectionCamera,exhibitPopupOffset,exhibitPopupInsets} from '../src/exhibitReader.js';
 import {selectAchievementSignContent} from '../src/achievementSigns.js';
 
 const source=name=>readFileSync(new URL(`../src/${name}`,import.meta.url),'utf8');
@@ -90,4 +90,38 @@ test('scene lifetime integrates authored signs once and traverses all nested GPU
   assert.match(sceneSource,/for\(const texture of object\.userData\.textures\?\?\[\]\)textures\.add\(texture\)/);
   assert.match(sceneSource,/texture\.dispose\(\);texture\.image=null/);
   assert.match(sceneSource,/getSignContent\(\)/);assert.match(sceneSource,/getSignPositions\(\)/);
+});
+
+
+test('left and right sign popups stay fully on-screen on portrait phones and short landscape canvases',()=>{
+  for(const [width,height] of [[320,844],[390,844],[844,390],[1920,873]]){
+    const card={width:Math.min(340,width-32),height:Math.min(315,height-72-(width<=600?156:(height<=500?132:112)))};
+    for(const x of [20,width*.5,width*.81,width-20])for(const y of [45,height*.5,height-30]){
+      const point={x,y},[dx,dy]=exhibitPopupOffset(point,card,{width,height});
+      assert.ok(point.x+dx-card.width/2>=15.99);assert.ok(point.x+dx+card.width/2<=width-15.99);
+      assert.ok(point.y+dy-card.height/2>=71.99);assert.ok(point.y+dy+card.height/2<=height-(width<=600?156:(height<=500?132:112))+.01);
+    }
+  }
+  assert.match(readerSource,/anchor:'center'/);assert.match(readerSource,/closeOnMove:true/);
+  assert.match(readerSource,/popup\.setOffset\(exhibitPopupOffset/);
+  assert.match(readerSource,/title\.tabIndex=-1/);assert.match(readerSource,/title\.focus\(\{preventScroll:true\}\)/);
+});
+
+
+test('reader reserves dynamically sized header, attribution and explorer tab space on narrow phones',()=>{
+  for(const viewport of [{width:320,height:568,headerBottom:68,footerTop:360},
+    {width:390,height:844,headerBottom:55,footerTop:638},
+    {width:844,height:390,headerBottom:69,footerTop:251}]){
+    const {top,bottom}=exhibitPopupInsets(viewport,viewport);
+    assert.ok(top>=viewport.headerBottom+8);assert.ok(viewport.height-bottom<=viewport.footerTop-8);
+    const card={width:Math.min(340,viewport.width-32),height:viewport.height-top-bottom};
+    for(const point of [{x:20,y:50},{x:viewport.width-20,y:viewport.height-20}]){
+      const [dx,dy]=exhibitPopupOffset(point,card,viewport);
+      assert.ok(point.y+dy-card.height/2>=top-.01);
+      assert.ok(point.y+dy+card.height/2<=viewport.footerTop-7.99);
+    }
+  }
+  assert.match(readerSource,/querySelectorAll\('#journey,#journey-explore,\.context-actions,\.sources'\)/);
+  assert.match(readerSource,/height-top-bottom/);
+  assert.match(readerSource,/root\.style\.overflowY='auto'/);assert.match(readerSource,/body\.style\.overflowY='hidden'/);
 });
