@@ -13,9 +13,22 @@ separate staging Caddy vhost. Apex/`www` remain unchanged. Local recursive DNS
 may temporarily retain the earlier negative answer even when the authoritative
 Namecheap servers and public resolvers already return the new record.
 
-The current dossier intro release is `20260930T065530Z-2985445d5b-f29a3b`;
-the previous staging release is `20260929T215955Z-140f715048-041eff` for
-rollback. This describes the staging server only, not a production release.
+The current explorer/Home release is `20260930T080937Z-e8ea00ff16-3112f8`;
+the previous staging release is `20260930T065530Z-2985445d5b-f29a3b`
+for rollback. This describes the staging server only, not a production release.
+
+Two achievement-index treatments are available for design review:
+
+- [Raised “All 32” tab](https://staging.batikanor.com/?explore=tab) (default)
+- [Compact ellipsis](https://staging.batikanor.com/?explore=more)
+
+Both open the same searchable, newest-first index of the 32 authored
+achievements and keep the selected variant as visitors open stories. Home,
+immediately right of the settings wheel, returns to the dossier without a page
+reload. The map already initializes and requests its initial globe tiles behind
+the introduction; it remains warm on a Home/Enter round trip. Preloading every
+high-zoom destination on the intro would consume substantial bandwidth and
+evict useful tile cache entries, so this release deliberately avoids that.
 
 ## Prepare and publish
 
