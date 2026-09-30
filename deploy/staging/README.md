@@ -13,9 +13,9 @@ separate staging Caddy vhost. Apex/`www` remain unchanged. Local recursive DNS
 may temporarily retain the earlier negative answer even when the authoritative
 Namecheap servers and public resolvers already return the new record.
 
-The first intro release is `20260929T215955Z-140f715048-041eff`; the previous
-staging release is `20260928T1644Z-rome-perf` for rollback. This describes the
-staging server only, not a production release.
+The current dossier intro release is `20260930T065530Z-2985445d5b-f29a3b`;
+the previous staging release is `20260929T215955Z-140f715048-041eff` for
+rollback. This describes the staging server only, not a production release.
 
 ## Prepare and publish
 
