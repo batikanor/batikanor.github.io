@@ -159,6 +159,73 @@ test('factory rejects duplicate or imaginary region descriptors before GL alloca
   assert.throws(() => layer.setFocus('not-a-real-chapter'), /Unknown/);
 });
 
+test('speculative prefetch is deduplicated, compressed-only and disabled with city detail', async () => {
+  const originalFetch = globalThis.fetch;
+  const originalNavigator = Object.getOwnPropertyDescriptor(globalThis, 'navigator');
+  if (typeof navigator === 'undefined') {
+    Object.defineProperty(globalThis, 'navigator', {configurable: true, value: {}});
+  }
+  const originalConnection = Object.getOwnPropertyDescriptor(navigator, 'connection');
+  const region = {id: 'nearby', origin: [11.5758, 48.1453], radiusM: 250,
+    meshUrl: '/data/nearby.bin'};
+  const layer = createIsometricRegionLayer({regions: [region]});
+  const requests = [];
+  try {
+    globalThis.fetch = async (url, {signal}) => {
+      requests.push({url, signal});
+      return new Response(new Uint8Array([1, 2, 3]));
+    };
+    assert.equal(layer.prefetch('nearby'), false, 'map must exist first');
+    layer.map = {triggerRepaint() {}};
+    layer.destroyed = false;
+    layer.maxTextureSize = 4096;
+    assert.equal(layer.prefetch('missing'), false);
+    Object.defineProperty(navigator, 'connection', {
+      configurable: true, value: {saveData: true, effectiveType: '4g'},
+    });
+    assert.equal(layer.prefetch('nearby'), false, 'respect save-data before a request starts');
+    delete navigator.connection;
+    assert.equal(layer.prefetch('nearby'), true);
+    assert.equal(layer.prefetch('nearby'), true);
+    assert.equal(requests.length, 1, 'one compressed transfer, no mesh decode or GPU allocation');
+    layer.setEnabled(false);
+    assert.equal(layer.prefetch('nearby'), false);
+  } finally {
+    globalThis.fetch = originalFetch;
+    if (originalConnection) Object.defineProperty(navigator, 'connection', originalConnection);
+    else delete navigator.connection;
+    if (originalNavigator) Object.defineProperty(globalThis, 'navigator', originalNavigator);
+    else delete globalThis.navigator;
+  }
+});
+
+test('transient mesh recovery is bounded and cancelled when detail is disabled', async () => {
+  const region = {id: 'nearby', origin: [11.5758, 48.1453], radiusM: 250,
+    meshUrl: '/data/nearby.bin'};
+  const layer = createIsometricRegionLayer({regions: [region], recoveryDelayMs: 0});
+  layer.map = {triggerRepaint() {}};
+  layer.destroyed = false;
+  let evaluations = 0;
+  layer.evaluate = () => { evaluations++; };
+  layer.scheduleRecovery(region, {retryable: false});
+  await new Promise(resolve => setTimeout(resolve, 5));
+  assert.equal(evaluations, 0, 'missing/invalid assets are not retried');
+  layer.scheduleRecovery(region, {retryable: true});
+  await new Promise(resolve => setTimeout(resolve, 5));
+  assert.equal(evaluations, 1);
+  layer.scheduleRecovery(region, {retryable: true});
+  await new Promise(resolve => setTimeout(resolve, 5));
+  assert.equal(evaluations, 1, 'one delayed recovery maximum');
+  const second = createIsometricRegionLayer({regions: [region], recoveryDelayMs: 0});
+  second.map = {triggerRepaint() {}};
+  second.destroyed = false;
+  second.evaluate = () => { evaluations++; };
+  second.scheduleRecovery(region, new TypeError('network interrupted'));
+  second.setEnabled(false);
+  await new Promise(resolve => setTimeout(resolve, 5));
+  assert.equal(evaluations, 1, 'detail toggle cancels recovery');
+});
+
 test('local ground imagery must be bounded, local and mobile-sized', () => {
   const region = {origin: [14.3315, 51.7734]};
   const metadata = {

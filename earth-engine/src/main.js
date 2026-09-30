@@ -4,7 +4,7 @@ import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
 maplibregl.setWorkerUrl(workerUrl);
 import './style.css';
 import achievements from './data/achievements.json';
-import {earthStyle, BAVARIA_TRIAL_BOUNDS, BERLIN_TRUEDOP_BOUNDS, PUBLIC_RELEASE} from './sources.js';
+import {earthStyle, BAVARIA_TRIAL_BOUNDS, BERLIN_TRUEDOP_BOUNDS, ESA_TILE, PUBLIC_RELEASE} from './sources.js';
 import {createCarLayer} from './carLayer.js';
 import {createBavariaBuildingLayer} from './buildingLayer.js';
 import {createIsometricRegionLayer} from './isometricRegionLayer.js';
@@ -19,7 +19,7 @@ import {getProject, renderProjectContent} from './projectContent.js';
 import {readPortfolioRoute, portfolioUrl} from './portfolioRoute.js';
 import {shouldShowIntro} from './introGate.js';
 import {finishIntro, hideIntroForDeepLink, introHistoryVisible, waitForIntroEntry} from './intro.js';
-import {initialMapCamera, ISOMETRIC_CAMERA, COTTBUS_HANGAR_CAMERA, preferLocalStart} from './initialCamera.js';
+import {initialMapCamera, ISOMETRIC_CAMERA, COTTBUS_HANGAR_CAMERA} from './initialCamera.js';
 import './projectContent.css';
 import {createCvView} from './cvView.js';
 import {bindCvDownload} from './cvDownload.js';
@@ -27,6 +27,9 @@ import {installExportControls} from './exportControls.js';
 import {createDetailPanel} from './detailPanel.js';
 import {createJourneyExplorer} from './journeyExplorer.js';
 import './journeyExplorer.css';
+import {createTileWarmup, warmupProfile, introOverviewPlan, adjacentOverviewPlan, overviewCover, overviewTileAt, DETAIL_ZOOM} from './tileWarmup.js';
+import {createMapTransition} from './mapTransition.js';
+import './mapTransition.css';
 
 const $ = (id) => document.getElementById(id);
 const detailPanel = createDetailPanel($('detail'), {onGeometrySettled: keepCurrentEventVisible});
@@ -107,10 +110,6 @@ const ISOMETRIC_EVENT_REGIONS = new Map([
   ['decarbon-days-climathon-2025','cottbus-climathon-2025'],
   ['decarbon-days-climathon-2026','cottbus-climathon-2026']
 ]);
-const constrainedNavigation=preferLocalStart({deviceMemory:navigator.deviceMemory,
-  saveData:navigator.connection?.saveData,
-  coarsePointer:window.matchMedia('(pointer: coarse)').matches,
-  reducedMotion:prefersReducedMotion});
 const bootstrapCamera = initialMapCamera(initialRoute, orderedAchievements, initialCamera, {
   // The entered homepage starts on the world, not on the newest competition.
   // Explicit achievement deep links still get their direct local camera.
@@ -130,6 +129,9 @@ const map = new maplibregl.Map({
   maxPitch:82,
   renderWorldCopies:false,
   canvasContextAttributes:{antialias:true},
+  // Keep an in-flight lower-zoom tile as a temporary parent instead of
+  // canceling it during a camera approach and revealing empty squares.
+  cancelPendingTileRequestsWhileZooming:false,
   attributionControl:false
 });
 map.addControl(new maplibregl.ScaleControl({unit:'metric',maxWidth:120}),'bottom-left');
@@ -139,6 +141,13 @@ if(scaleElement)$('settings-scale').append(scaleElement);
 let activeCity = null;
 let activeEvent = null;
 let imagery = PUBLIC_RELEASE ? 'esa' : 'eox';
+const tileWarmup = createTileWarmup({template:ESA_TILE,profile:warmupProfile({
+  saveData:navigator.connection?.saveData,
+  effectiveType:navigator.connection?.effectiveType,
+  deviceMemory:navigator.deviceMemory,
+  coarsePointer:window.matchMedia('(pointer: coarse)').matches
+})});
+const mapTransition = createMapTransition(map, {container:$('app'),detailSource:()=>imagery==='eox'?'sentinel':imagery==='nasa'?null:'esa'});
 if(PUBLIC_RELEASE){
   document.querySelector('[data-imagery="eox"]')?.remove();
   document.querySelector('[data-imagery="esa"]').setAttribute('aria-pressed','true');
@@ -220,6 +229,34 @@ let journeyExplorer = null;
 function safeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function keyOf(e){return `${e.city}|${e.country}`;}
 
+function warmEntryDestinations() {
+  if(!tileWarmup.profile.enabled)return;
+  const plan=introOverviewPlan(orderedAchievements,{mobile:tileWarmup.profile.mobile});
+  void tileWarmup.warm(plan).then(()=>{
+    // Only one likely nearby chapter, and only compressed files after imagery
+    // has had the network. The chapter module itself enforces memory/network
+    // limits and does no GPU decoding until actually selected.
+    if(tileWarmup.profile.mobile||!cityDetailOn||!document.documentElement.classList.contains('intro-active'))return;
+    const firstChapter=orderedAchievements.slice(0,4).map(event=>ISOMETRIC_EVENT_REGIONS.get(event.slug)).find(Boolean);
+    if(firstChapter)isometricRegions.prefetch?.(firstChapter);
+  });
+}
+
+function warmAdjacentDestinations(event) {
+  if(!tileWarmup.profile.enabled)return;
+  const index=orderedAchievements.findIndex(candidate=>candidate.slug===event.slug);
+  // Let the current destination's visible imagery use the connection first;
+  // then prepare the one-step chronology choices in the HTTP cache.
+  setTimeout(()=>{
+    if(activeEvent?.slug!==event.slug)return;
+    void tileWarmup.warm(adjacentOverviewPlan(orderedAchievements,index,{mobile:tileWarmup.profile.mobile}));
+    if(!tileWarmup.profile.mobile&&cityDetailOn){
+      const nextChapterId=ISOMETRIC_EVENT_REGIONS.get(orderedAchievements[index+1]?.slug);
+      if(nextChapterId)isometricRegions.prefetch?.(nextChapterId);
+    }
+  },1000);
+}
+
 function renderJourney(){
   const state=getChronologyState(orderedAchievements,activeEvent?.slug??null);
   const event=state.current??orderedAchievements[0];
@@ -253,6 +290,24 @@ journeyExplorer=createJourneyExplorer({
   onSelect:event=>selectEvent(event,{showDetail:true,chronologyNavigation:true}),
   getActiveSlug:()=>activeEvent?.slug??null
 });
+if(tileWarmup.profile.enabled&&!tileWarmup.profile.mobile){
+  let previewTimer;
+  const previewExplorerEvent=event=>{
+    const button=event.target.closest?.('.explorer-event');
+    if(!button)return;
+    const selected=orderedAchievements.find(item=>item.slug===button.dataset.eventSlug);
+    if(!selected)return;
+    clearTimeout(previewTimer);
+    previewTimer=setTimeout(()=>{
+      if(!$('journey-explorer').hidden)void tileWarmup.warm([
+        ...overviewCover(selected.coordinates),overviewTileAt(selected.coordinates,DETAIL_ZOOM)
+      ],{maxBytes:750_000});
+    },180);
+  };
+  $('explorer-list').addEventListener('pointerover',previewExplorerEvent);
+  $('explorer-list').addEventListener('focusin',previewExplorerEvent);
+  $('journey-explorer').addEventListener('pointerleave',()=>clearTimeout(previewTimer));
+}
 
 $('cv-download').href=portfolioLinks.cvPdf;
 bindCvDownload($('cv-download'));
@@ -334,12 +389,18 @@ function fly(target,{chronologyNavigation=false}={}) {
   const current=map.getCenter();
   const nextCenter=Array.isArray(target.center)
     ? target.center : [target.center?.lng,target.center?.lat];
-  const crossCity=chronologyNavigation&&nextCenter.every(Number.isFinite)
+  const crossCity=target.zoom>=10&&nextCenter.every(Number.isFinite)
     &&distanceMetres([current.lng,current.lat],nextCenter)>35_000;
-  // The chronology is a navigation control, not a forced 2.4 s tour through
-  // every intervening raster/DEM zoom level. On constrained devices, a direct
-  // cross-city jump avoids downloading tiles that will immediately be discarded.
-  if(crossCity&&constrainedNavigation){map.jumpTo(target);return;}
+  // A long flyTo streams hundreds of never-viewed intermediate raster/DEM
+  // tiles and reveals an empty patchwork for cross-continent moves. Jump
+  // directly once an overview tile is ready, with a bounded frame handoff.
+  if(crossCity){
+    return mapTransition.jump(target,activeEvent?.city??'destination').catch(error=>{
+      console.warn('Map handoff fell back to a direct camera change:',error);
+      map.jumpTo(target);
+    });
+  }
+  mapTransition.cancel();
   // MapLibre's globe+terrain DEM sampler cannot always project a distant
   // destination from a street-level camera. The resulting Infinity tile
   // coordinate aborts flyTo (notably Garching → WORLD). Back out locally
@@ -349,7 +410,7 @@ function fly(target,{chronologyNavigation=false}={}) {
     map.jumpTo({center:map.getCenter(),zoom:13.8,pitch:0,bearing:map.getBearing()});
   }
   if (prefersReducedMotion) {map.jumpTo(target);return;}
-  const duration=chronologyNavigation?(crossCity?1400:900):2400;
+  const duration=chronologyNavigation?900:1600;
   try {map.flyTo({...target,essential:true,duration,curve:1.25});}
   catch(error){
     // A failed animation must not strand the visitor on an unresponsive map.
@@ -469,16 +530,20 @@ function selectEvent(event,{showDetail=false,historyMode='push',view=null,skipFl
   // Never enlarge the global Sentinel mosaic several zoom levels beyond its
   // native z14 ceiling. Other cities need their own orthophoto chapter first.
   if(!skipFly){
-  fly({center:isHero?HERO_VENUE_LOCATION:[event.coordinates.lng,event.coordinates.lat],
+  const flight=fly({center:isHero?HERO_VENUE_LOCATION:[event.coordinates.lng,event.coordinates.lat],
     zoom:isHero?20.23:isometricView?chapterCamera.zoom:romeView?17.45:localImage?16.4:13.8,
     pitch:isHero?68:isometricView?chapterCamera.pitch:romeView?55:localImage?67:55,
     bearing:isHero?285:isometricView?chapterCamera.bearing:romeView?38:-18,
       ...(showDetail?{offset:detailMapOffset()}:{})},{chronologyNavigation});
-    if(restoreReliefAfterArrival)resumeTerrainAfterFlight();
+    if(restoreReliefAfterArrival){
+      if(flight?.then)void flight.then(resumeTerrainAfterFlight);
+      else resumeTerrainAfterFlight();
+    }
     showEventDetail(event);
   }else if(restoreReliefAfterArrival)resumeTerrainAfterFlight();
   $('detail').hidden=!showDetail;
   status(`${getProject(event.slug)?.title??event.title} · ${event.venue} · ${event.coordinates.lat.toFixed(5)}°, ${event.coordinates.lng.toFixed(5)}°`);
+  warmAdjacentDestinations(event);
 }
 function showEventDetail(event) {
   const root=$('detail');
@@ -648,6 +713,7 @@ function showIntroduction({historyMode='push'}={}) {
   journeyExplorer?.close({restoreFocus:false});
   activeEvent=null;activeCity=null;renderJourney();
   showWholeEarth({historyMode:'none'});
+  warmEntryDestinations();
   status('Introduction. Press Enter to return to the map.');
   void waitForIntroEntry().then(finishIntro);
 }
@@ -658,6 +724,7 @@ function applyImagery(next){
   imagery=next;
   map.setMaxZoom(imagery==='nasa'?8:DETAIL_MAX_ZOOM);
   if(!PUBLIC_RELEASE)map.setLayoutProperty('sentinel-imagery','visibility',imagery==='eox'?'visible':'none');
+  map.setLayoutProperty('esa-overview-imagery','visibility',imagery==='esa'?'visible':'none');
   map.setLayoutProperty('esa-imagery','visibility',imagery==='esa'?'visible':'none');
   map.setLayoutProperty('nasa-imagery','visibility',imagery==='nasa'||imagery==='esa'?'visible':'none');
   map.setLayoutProperty('bavaria-imagery','visibility',imagery!=='nasa'?'visible':'none');
@@ -796,6 +863,10 @@ map.on('style.load',()=>{
   const signalReady=()=>window.dispatchEvent(new Event('earth-ready'));
   if(map.loaded())signalReady();
   else map.once('load',signalReady);
+  if(shouldShowIntro(window.location.href)){
+    if(map.loaded())warmEntryDestinations();
+    else map.once('load',warmEntryDestinations);
+  }
 });
 function restorePortfolioRoute(){
   if(!mapReady)return;
@@ -838,4 +909,5 @@ map.on('error',e=>{
   console.warn('Earth tile/render issue:',e.error||e);
   status('A terrain or imagery tile did not load. Check the network; other tiles continue to render.');
 });
-window.__earthEngine={map,cities,achievements,selectCity,selectEvent,drive,heroVenue,isometricRegions,romeVenue};
+window.__earthEngine={map,cities,achievements,selectCity,selectEvent,drive,heroVenue,isometricRegions,romeVenue,
+  tileWarmupStats:()=>tileWarmup.stats()};

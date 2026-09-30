@@ -48,6 +48,16 @@ canonical/OG URL at staging, and excludes the non-commercial EOX switch. The
 normal production workflow still invokes the overlay without
 `EARTH_DEPLOY_TARGET` and retains its existing indexable/CNAME behavior.
 
+The overlay also generates lightweight `/achievements/<slug>/` reading pages
+for all 32 authored achievements. They use the same title, summary, full
+description, captions, media URLs and source links as the map; local photos
+appear inline, while external Drive/video media are linked instead of loaded
+as heavy iframes. They provide crawlable and no-JavaScript access without
+adding a second project list to the interactive map. The production sitemap
+lists every article, CV and projects; staging has **no sitemap** and every
+exported HTML page is verified `noindex`. The HTML-only pages have independent
+canonical and structured-data URLs and can be opened on the map with one link.
+
 After local desktop/mobile QA, publish **only** the staging artifact:
 
 ```sh
@@ -95,8 +105,10 @@ Do these on the real `staging.batikanor.com` origin, not the `sslip.io` alias:
 3. Navigate achievements, resize/drag a popup, open CV and projects routes,
    download the CV and configure/export the achievements PDF. Test phone and
    desktop layouts. Check `/sui/` and a certificate/media URL as regressions.
-4. Check `curl -I https://staging.batikanor.com/` for a valid certificate and
-   `X-Robots-Tag: noindex`; `robots.txt` must disallow `/`; `CNAME` must be 404.
+4. Check `curl -I https://staging.batikanor.com/` and a representative
+   `/achievements/<slug>/` page for a valid certificate and
+   `X-Robots-Tag: noindex`; its HTML must also include `noindex` and its
+   staging canonical. `robots.txt` must disallow `/`; `CNAME` must be 404.
 5. Check `https://batikanor.com/` and `https://www.batikanor.com/` still serve
    the unchanged production site. Do not promote this branch to `main` until
    explicitly requested.

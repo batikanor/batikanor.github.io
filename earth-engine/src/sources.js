@@ -32,7 +32,13 @@ export function earthStyle() {
     name: 'Earth Engine imagery + terrain prototype',
     sources: {
       ...(!PUBLIC_RELEASE ? {sentinel: {type: 'raster', tiles: [EOX_TILE], tileSize: 256, minzoom: 0, maxzoom: 14, attribution: EOX_ATTRIBUTION}} : {}),
-      esa: {type: 'raster', tiles: [ESA_TILE], tileSize: 256, minzoom: 6, maxzoom: 14, attribution: ESA_ATTRIBUTION},
+      // Keep a small, cacheable overview pyramid resident beneath the detailed
+      // tiles. NASA's global mosaic is intentionally retained for the poles,
+      // but its no-store response cannot warm the next destination. Without a
+      // separate overview source a cross-continent jump waits for dozens of
+      // z14 PNGs and briefly shows an empty/patchwork map.
+      'esa-overview': {type: 'raster', tiles: [ESA_TILE], tileSize: 256, minzoom: 6, maxzoom: 11, attribution: ESA_ATTRIBUTION},
+      esa: {type: 'raster', tiles: [ESA_TILE], tileSize: 256, minzoom: 12, maxzoom: 14, attribution: ESA_ATTRIBUTION},
       nasa: {type: 'raster', tiles: [NASA_TILE], tileSize: 256, minzoom: 0, maxzoom: 8, attribution: NASA_ATTRIBUTION},
       bavaria: {type: 'raster', tiles: [BAVARIA_TILE], tileSize: 256, minzoom: 12, maxzoom: 19, bounds: BAVARIA_TRIAL_BOUNDS, attribution: BAVARIA_ATTRIBUTION},
       berlin: {type: 'raster', tiles: [BERLIN_TRUEDOP_WMS], tileSize: 256, minzoom: 16, maxzoom: 19, bounds: BERLIN_TRUEDOP_BOUNDS, attribution: BERLIN_ATTRIBUTION},
@@ -46,7 +52,8 @@ export function earthStyle() {
     layers: [
       {id: 'nasa-imagery', type: 'raster', source: 'nasa', layout: {visibility: PUBLIC_RELEASE ? 'visible' : 'none'}, paint: {'raster-fade-duration': 400}},
       ...(!PUBLIC_RELEASE ? [{id: 'sentinel-imagery', type: 'raster', source: 'sentinel', paint: {'raster-fade-duration': 400, 'raster-saturation': -0.04, 'raster-contrast': 0.035}}] : []),
-      {id: 'esa-imagery', type: 'raster', source: 'esa', layout: {visibility: PUBLIC_RELEASE ? 'visible' : 'none'}, minzoom: 6, paint: {'raster-fade-duration': 400, 'raster-saturation': 0.06, 'raster-contrast': 0.075, 'raster-brightness-max': 1}},
+      {id: 'esa-overview-imagery', type: 'raster', source: 'esa-overview', layout: {visibility: PUBLIC_RELEASE ? 'visible' : 'none'}, minzoom: 6, paint: {'raster-fade-duration': 180, 'raster-saturation': 0.06, 'raster-contrast': 0.075, 'raster-brightness-max': 1}},
+      {id: 'esa-imagery', type: 'raster', source: 'esa', layout: {visibility: PUBLIC_RELEASE ? 'visible' : 'none'}, minzoom: 12, paint: {'raster-fade-duration': 180, 'raster-saturation': 0.06, 'raster-contrast': 0.075, 'raster-brightness-max': 1}},
       {id: 'bavaria-imagery', type: 'raster', source: 'bavaria', minzoom: 12, paint: {'raster-fade-duration': 250}},
       {id: 'berlin-imagery', type: 'raster', source: 'berlin', minzoom: 16, paint: {'raster-fade-duration': 250}},
       {id: 'terrain-hillshade', type: 'hillshade', source: 'hillshade', minzoom: 5, paint: {'hillshade-exaggeration': 0.23, 'hillshade-shadow-color': '#10222b', 'hillshade-highlight-color': '#f4f0e1', 'hillshade-accent-color': '#879891'}}

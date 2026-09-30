@@ -211,3 +211,45 @@ test('leaving Rome aborts an in-flight predictive fetch before any layer is adde
     globalThis.fetch = originalFetch;
   }
 });
+
+test('Rome chapter recovers once after a transient manifest outage without another click', async () => {
+  const originalFetch = globalThis.fetch;
+  const originalWarn = console.warn;
+  const manifestBytes = await readFile(file('rome-ostiense-v1.json'));
+  const manifest = JSON.parse(manifestBytes.toString('utf8'));
+  const imageBytes = await readFile(file(manifest.ground.products['1600'].asset));
+  const geometryBytes = await readFile(file(manifest.buildings.asset));
+  const assets = new Map([
+    ['rome-ostiense-v1.json', manifestBytes],
+    [manifest.ground.products['1600'].asset, imageBytes],
+    [manifest.buildings.asset, geometryBytes],
+  ]);
+  const map = fakeMap();
+  map.center = {lng: 12.4791336, lat: 41.8678291};
+  map.zoom = 17.45;
+  const chapter = createRomeVenueChapter({baseUrl: '/', recoveryDelayMs: 0});
+  let manifestAttempts = 0;
+  try {
+    console.warn = () => {};
+    globalThis.fetch = async url => {
+      const name = url.split('/').pop();
+      if (name === 'rome-ostiense-v1.json' && manifestAttempts++ < 3) {
+        return new Response(null, {status: 503});
+      }
+      const bytes = assets.get(name);
+      return bytes ? new Response(bytes) : new Response(null, {status: 404});
+    };
+    chapter.onAdd(map);
+    chapter.setFocus('ethrome-2025');
+    const deadline = Date.now() + 1500;
+    while (!chapter.isVisible() && Date.now() < deadline) {
+      await new Promise(resolve => setTimeout(resolve, 15));
+    }
+    assert.equal(chapter.isVisible(), true);
+    assert.equal(manifestAttempts, 4, 'initial 3 attempts then one delayed recovery');
+  } finally {
+    chapter.destroy();
+    globalThis.fetch = originalFetch;
+    console.warn = originalWarn;
+  }
+});

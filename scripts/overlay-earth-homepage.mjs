@@ -7,6 +7,7 @@ import {createHash} from 'node:crypto';
 import {readFile, readdir, mkdir, writeFile, copyFile, cp, rm, stat} from 'node:fs/promises';
 import {dirname, join, resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
+import {renderNoScriptIndex, renderSitemap, writeAchievementPages} from './achievement-seo.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 // The default remains the GitHub Pages release. Staging is a separate copy of
@@ -103,10 +104,33 @@ html = html.replace('</head>', `  <link rel="canonical" href="https://${staging 
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://${staging ? 'staging.' : ''}batikanor.com/" />
   <meta property="og:title" content="Batıkan — Hacker · Developer · Entrepreneur" />
-  <meta property="og:description" content="Portfolio showcasing the projects and work of Batıkan Bora Ormancı." />
+  <meta property="og:description" content="Batıkan Bora Ormancı’s portfolio: competition wins, projects, software work and an interactive Earth map." />
+  <meta property="og:image" content="https://${staging ? 'staging.' : ''}batikanor.com/seo/batikan-social.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Batıkan — Hacker · Developer · Entrepreneur" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <script type="application/ld+json">${JSON.stringify({
+    '@context': 'https://schema.org', '@graph': [{
+      '@type': 'WebSite', '@id': `https://${staging ? 'staging.' : ''}batikanor.com/#website`,
+      url: `https://${staging ? 'staging.' : ''}batikanor.com/`,
+      name: 'Batıkan — Hacker · Developer · Entrepreneur'
+    }, {
+      '@type': 'ProfilePage', '@id': `https://${staging ? 'staging.' : ''}batikanor.com/#profile`,
+      url: `https://${staging ? 'staging.' : ''}batikanor.com/`,
+      name: 'Batıkan — Hacker · Developer · Entrepreneur',
+      isPartOf: {'@id': `https://${staging ? 'staging.' : ''}batikanor.com/#website`},
+      mainEntity: {
+        '@type': 'Person', name: 'Batıkan Bora Ormancı',
+        url: `https://${staging ? 'staging.' : ''}batikanor.com/`,
+        sameAs: ['https://github.com/batikanor', 'https://linkedin.com/in/batikanor']
+      }
+    }]
+  }).replace(/</g, '\\u003c')}</script>
 </head>`);
 html = html.replace('A geographically real Earth, streamed at the scale of an achievement journey.',
-  'Portfolio showcasing the projects and work of Batıkan Bora Ormancı.');
+  'Batıkan Bora Ormancı’s portfolio: competition wins, projects, software work and an interactive Earth map.');
+html = html.replace('</body>', `${renderNoScriptIndex()}\n</body>`);
 assert(!html.includes('data-imagery="eox"'), 'Non-commercial EOX control survived the build');
 assert(staging ? html.includes('name="robots" content="noindex,nofollow"') : !html.includes('noindex'),
   `Incorrect robots policy for ${target}`);
@@ -118,17 +142,13 @@ for (const directory of ['assets', 'data', 'fonts', 'photos', 'certificates', 'o
 await writeFile(join(out, 'assets', 'earth-current.json'),
   JSON.stringify({entry: entryMatch[1]}) + '\n');
 await writeFile(join(out, 'index.html'), html);
+await writeAchievementPages(out, {staging});
 if (staging) {
   await writeFile(join(out, 'robots.txt'), 'User-agent: *\nDisallow: /\n');
   await rm(join(out, 'sitemap.xml'), {force: true});
 } else {
   await writeFile(join(out, 'robots.txt'), 'User-agent: *\nAllow: /\nSitemap: https://batikanor.com/sitemap.xml\n');
-  await writeFile(join(out, 'sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://batikanor.com/</loc></url>
-  <url><loc>https://batikanor.com/projects/</loc></url>
-  <url><loc>https://batikanor.com/cv/</loc></url>
-</urlset>\n`);
+  await writeFile(join(out, 'sitemap.xml'), renderSitemap());
 }
 for (const [item, before] of checksums) {
   assert(await sha256(join(out, item)) === before, `Legacy output changed during overlay: ${item}`);

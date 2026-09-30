@@ -29,6 +29,7 @@ grep -Fq 'name="robots" content="noindex,nofollow"' "$SITE/index.html"
 grep -Fq 'rel="canonical" href="https://staging.batikanor.com/"' "$SITE/index.html"
 grep -Fq 'Disallow: /' "$SITE/robots.txt"
 for route in cv projects sui; do test -f "$SITE/$route/index.html"; done
+node scripts/verify-seo-artifact.mjs staging
 
 HOST='deploy@157.180.20.129'
 KEY="$HOME/.ssh/maptheory-hetzner/id_ed25519"
@@ -75,6 +76,9 @@ test "$(sha256sum "$site/index.html" | cut -d' ' -f1)" = "$expected_sha"
 grep -Fq 'name="robots" content="noindex,nofollow"' "$site/index.html"
 grep -Fq 'Disallow: /' "$site/robots.txt"
 for route in cv projects sui; do test -f "$site/$route/index.html"; done
+test -f "$site/achievements/tesla-gigathon-2026/index.html"
+grep -Fq 'name="robots" content="noindex,nofollow"' "$site/achievements/tesla-gigathon-2026/index.html"
+grep -Fq 'rel="canonical" href="https://staging.batikanor.com/achievements/tesla-gigathon-2026/"' "$site/achievements/tesla-gigathon-2026/index.html"
 
 # Keep prior fingerprinted assets for an already-open preview page. The current
 # manifest in the new release is never overwritten.
@@ -110,6 +114,7 @@ link="$base/releases/.current-$release"
 ln -s "$release" "$link"
 mv -Tf "$link" "$base/releases/current"
 docker exec batikanor-earth-staging-web test -f /releases/current/index.html
+docker exec batikanor-earth-staging-web test -f /releases/current/achievements/tesla-gigathon-2026/index.html
 echo "staging release: $release"
 echo "previous release: $previous"
 REMOTE

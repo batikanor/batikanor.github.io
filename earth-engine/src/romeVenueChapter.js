@@ -12,6 +12,8 @@ const MAX_METADATA_BYTES = 8_000;
 const MAX_GEOMETRY_BYTES = 110_000;
 const MAX_IMAGE_BYTES = 850_000;
 const FETCH_RETRIES = 2;
+const RECOVERY_DELAY_MS = 1500;
+const MAX_RECOVERY_ATTEMPTS = 1;
 const LAYERS = [`${ID}-footprints`, `${ID}-massing`, `${ID}-ground`];
 
 function lowBandwidthDevice() {
@@ -99,13 +101,37 @@ function validateBuildings(collection, metadata) {
  * during the camera flight. A superseding focus cancels pending fetches. The
  * public project popup and its media remain entirely owned by main.js.
  */
-export function createRomeVenueChapter({baseUrl = import.meta.env?.BASE_URL ?? '/', onChange = null} = {}) {
+export function createRomeVenueChapter({baseUrl = import.meta.env?.BASE_URL ?? '/', onChange = null,
+  recoveryDelayMs = RECOVERY_DELAY_MS} = {}) {
+  if (!Number.isFinite(recoveryDelayMs) || recoveryDelayMs < 0) {
+    throw new Error('Rome recovery delay must be nonnegative');
+  }
   let map = null;
   let focused = false;
   let enabled = true;
   let active = null;
   let hasLayers = false;
   let objectUrl = null;
+  let recoveryTimer = null;
+  let recoveryAttempts = 0;
+
+  function cancelRecovery() {
+    if (recoveryTimer != null) clearTimeout(recoveryTimer);
+    recoveryTimer = null;
+  }
+
+  function recover(error) {
+    if (!(error?.retryable === true || error instanceof TypeError)
+      || !focused || !enabled || !map || recoveryAttempts >= MAX_RECOVERY_ATTEMPTS) return;
+    recoveryAttempts++;
+    cancelRecovery();
+    recoveryTimer = setTimeout(() => {
+      recoveryTimer = null;
+      if (!focused || !enabled || !map) return;
+      prepare();
+      evaluate();
+    }, recoveryDelayMs);
+  }
 
   const report = () => onChange?.({visible: hasLayers});
   const dataUrl = name => `${baseUrl}data/${name}`;
@@ -196,11 +222,13 @@ export function createRomeVenueChapter({baseUrl = import.meta.env?.BASE_URL ?? '
       // Keep at most one validated, compressed chapter warm until moveend.
       // Completing the fetch during a flight must not strand the active entry.
       entry.data = {metadata, imageBlob, buildings};
+      recoveryAttempts = 0;
       mount(entry);
     } catch (error) {
       if (entry.abort.signal.aborted || active !== entry) return;
       console.warn('Rome isometric miniature unavailable; geographic map remains usable.', error);
       release();
+      recover(error);
     }
   }
 
@@ -226,16 +254,21 @@ export function createRomeVenueChapter({baseUrl = import.meta.env?.BASE_URL ?? '
       evaluate();
     },
     setFocus(slug) {
-      focused = slug === 'ethrome-2025';
+      const nextFocused = slug === 'ethrome-2025';
+      if (focused !== nextFocused) {
+        cancelRecovery();
+        recoveryAttempts = 0;
+      }
+      focused = nextFocused;
       if (!focused) release();
       else { prepare(); evaluate(); }
     },
     setEnabled(value) {
       enabled = !!value;
-      if (!enabled) release();
+      if (!enabled) { cancelRecovery(); recoveryAttempts = 0; release(); }
       else { prepare(); evaluate(); }
     },
     isVisible() { return hasLayers; },
-    destroy() { if (map) map.off('moveend', evaluate); release(); map = null; },
+    destroy() { cancelRecovery(); if (map) map.off('moveend', evaluate); release(); map = null; },
   };
 }

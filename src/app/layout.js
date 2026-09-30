@@ -18,16 +18,31 @@ const geistMono = localFont({
   weight: "100 900",
 });
 
+const staging = process.env.EARTH_DEPLOY_TARGET === "staging";
+
 export const metadata = {
-  title: "BatikanoR | Portfolio of Batıkan Bora Ormancı",
+  metadataBase: new URL(staging ? "https://staging.batikanor.com" : "https://batikanor.com"),
+  title: "Batıkan — Hacker · Developer · Entrepreneur",
   description:
     "Portfolio showcasing the projects and work of Batıkan Bora Ormancı.",
-  viewport: {
-    width: "device-width",
-    initialScale: 1,
-    maximumScale: 1,
-    userScalable: false,
+  robots: staging
+    ? { index: false, follow: false, googleBot: { index: false, follow: false } }
+    : { index: true, follow: true },
+  openGraph: {
+    type: "website",
+    siteName: "Batıkan Bora Ormancı",
+    title: "Batıkan — Hacker · Developer · Entrepreneur",
+    description: "Portfolio showcasing the projects and work of Batıkan Bora Ormancı.",
+    images: [{ url: "/seo/batikan-social.png", width: 1200, height: 630, alt: "Batıkan — Hacker · Developer · Entrepreneur" }],
   },
+  twitter: { card: "summary_large_image" },
+};
+
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
 };
 
 export default function RootLayout({ children }) {

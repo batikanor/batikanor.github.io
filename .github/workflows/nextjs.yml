@@ -88,6 +88,8 @@ jobs:
           npm --prefix earth-engine run verify
           npm --prefix earth-engine run build
           node scripts/overlay-earth-homepage.mjs
+          node --test tests/achievementSeo.test.mjs
+          node scripts/verify-seo-artifact.mjs production
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

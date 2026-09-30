@@ -19,6 +19,8 @@ const RENDER_RADIUS_PADDING_M = 550;
 // are still released when a visitor leaves a city.
 const MAX_WARM_CHAPTERS = 3;
 const FETCH_RETRIES = 2;
+const RECOVERY_DELAY_MS = 1500;
+const MAX_RECOVERY_ATTEMPTS = 1;
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
@@ -189,6 +191,16 @@ function lowMemoryDevice() {
     : typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches;
 }
 
+/** Speculation is optional; an explicitly selected chapter always loads. */
+function canPrefetchChapter() {
+  const connection = typeof navigator === 'undefined' ? undefined : navigator.connection;
+  return !lowMemoryDevice() && !/^(slow-2g|2g|3g)$/.test(connection?.effectiveType ?? '');
+}
+
+function isTransientAssetError(error) {
+  return error?.retryable === true || error instanceof TypeError;
+}
+
 function atlasFitsBudget(metadata, maxTextureSize, budgetBytes) {
   return metadata && Number.isInteger(metadata.width) && Number.isInteger(metadata.height)
     && metadata.width > 0 && metadata.height > 0
@@ -284,14 +296,23 @@ export function validateReducedAtlas(full, reduced) {
  * use this method to fly the camera; the host can ease to ~60° pitch and
  * 40–45° bearing at ~z17.3, retaining normal controls and labels.
  */
-export function createIsometricRegionLayer({regions, onChange = null} = {}) {
+export function createIsometricRegionLayer({regions, onChange = null,
+  recoveryDelayMs = RECOVERY_DELAY_MS} = {}) {
   assert(Array.isArray(regions) && regions.length > 0, 'Isometric layer needs one or more actual-data regions');
   assert(onChange == null || typeof onChange === 'function', 'Isometric onChange must be a callback');
+  assert(Number.isFinite(recoveryDelayMs) && recoveryDelayMs >= 0,
+    'Isometric recovery delay must be nonnegative');
   const chapters = regions.map(normalizeRegion);
   assert(new Set(chapters.map(region => region.id)).size === chapters.length, 'Duplicate isometric region id');
   let focusId = null;
   let enabled = true;
+  let recoveryTimer = null;
+  const recoveryAttempts = new Map();
   const warm = new Map();
+  const cancelRecovery = () => {
+    if (recoveryTimer != null) clearTimeout(recoveryTimer);
+    recoveryTimer = null;
+  };
   const discardWarm = (id, {onlyPending = false} = {}) => {
     const entry = warm.get(id);
     if (!entry || onlyPending && entry.settled) return;
@@ -320,6 +341,8 @@ export function createIsometricRegionLayer({regions, onChange = null} = {}) {
       enabled = !!next;
       if (!this.map) return;
       if (!enabled) {
+        cancelRecovery();
+        recoveryAttempts.clear();
         this.releaseActive();
         for (const id of [...warm.keys()]) discardWarm(id);
         this.map.triggerRepaint();
@@ -331,6 +354,8 @@ export function createIsometricRegionLayer({regions, onChange = null} = {}) {
       const changed = focusId !== id;
       focusId = id;
       if (changed) {
+        cancelRecovery();
+        recoveryAttempts.clear();
         if (this.active && this.active.region.id !== id) this.releaseActive();
         // A rapid chronology click should not leave the previous city
         // downloading during the new flight. Completed entries remain warm.
@@ -343,6 +368,13 @@ export function createIsometricRegionLayer({regions, onChange = null} = {}) {
       // A null focus normally precedes a flight to a non-chapter event. Do
       // not immediately reactivate the city we are in before that flight.
       if (id && !this.map.isMoving()) this.evaluate();
+    },
+    /** Warm only compressed bytes for one likely next chapter, not GPU textures. */
+    prefetch(id) {
+      const region = chapters.find(candidate => candidate.id === id);
+      if (!region || !enabled || !this.map || this.destroyed || !canPrefetchChapter()) return false;
+      this.prepareRegion(region);
+      return true;
     },
     getActiveRegionId() { return this.active?.region.id ?? null; },
     getActiveAttribution() { return this.active?.region.credit ?? null; },
@@ -458,6 +490,21 @@ export function createIsometricRegionLayer({regions, onChange = null} = {}) {
       void this.loadRegion(active, prepared);
       if (region.groundImage) void this.loadGroundImage(active, prepared);
     },
+    scheduleRecovery(region, error) {
+      if (!isTransientAssetError(error) || this.destroyed || !enabled || !this.map) return;
+      const attempts = recoveryAttempts.get(region.id) ?? 0;
+      if (attempts >= MAX_RECOVERY_ATTEMPTS) return;
+      recoveryAttempts.set(region.id, attempts + 1);
+      // Keep a single bounded recovery pending. Changing destination, turning
+      // detail off, or removing the custom layer cancels it immediately.
+      cancelRecovery();
+      const scheduledFocus = focusId;
+      recoveryTimer = setTimeout(() => {
+        recoveryTimer = null;
+        if (this.destroyed || !enabled || focusId !== scheduledFocus) return;
+        this.evaluate();
+      }, recoveryDelayMs);
+    },
     async loadRegion(active, prepared) {
       try {
         const buffer = await prepared.meshPromise;
@@ -468,13 +515,17 @@ export function createIsometricRegionLayer({regions, onChange = null} = {}) {
         const wall = makeMesh(positions.subarray(roofCount * 3, (roofCount + wallCount) * 3), 0xc5c3ba, 0.96);
         active.meshes = [roof, wall];
         this.scene.add(roof, wall);
+        recoveryAttempts.delete(active.region.id);
         this.map.triggerRepaint();
         notifyChange(this);
         if (active.region.roofAtlas) void this.loadRoofAtlas(active, prepared);
       } catch (error) {
         if (prepared.abort.signal.aborted || this.destroyed || this.active !== active) return;
         console.warn(`${active.region.id} official isometric buildings unavailable; satellite map remains visible.`, error);
+        const region = active.region;
         this.releaseActive();
+        discardWarm(region.id);
+        this.scheduleRecovery(region, error);
       }
     },
     async loadRoofAtlas(active, prepared) {
@@ -581,6 +632,8 @@ export function createIsometricRegionLayer({regions, onChange = null} = {}) {
     },
     onRemove() {
       this.destroyed = true;
+      cancelRecovery();
+      recoveryAttempts.clear();
       this.map?.off('moveend', this.onMoveEnd);
       this.releaseActive();
       for (const id of [...warm.keys()]) discardWarm(id);

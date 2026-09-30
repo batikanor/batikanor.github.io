@@ -7,7 +7,7 @@
     "dev": "vite --host 127.0.0.1",
     "build": "vite build",
     "preview": "vite preview --host 127.0.0.1",
-    "verify": "node scripts/verify.mjs && node scripts/verify-bavaria-lod2.mjs && node --test scripts/drivingPhysics.test.mjs scripts/chronology.test.mjs scripts/markerPolicy.test.mjs scripts/projectContent.test.mjs scripts/exportProjectsPdf.test.mjs scripts/portfolioRoute.test.mjs scripts/introGate.test.mjs scripts/journeyExplorer.test.mjs scripts/cvDownload.test.mjs scripts/isometricRegionLayer.test.mjs scripts/cottbus-isometric.test.mjs scripts/romeVenueChapter.test.mjs scripts/detailPanel.test.mjs",
+    "verify": "node scripts/verify.mjs && node scripts/verify-bavaria-lod2.mjs && node --test scripts/drivingPhysics.test.mjs scripts/chronology.test.mjs scripts/markerPolicy.test.mjs scripts/projectContent.test.mjs scripts/exportProjectsPdf.test.mjs scripts/portfolioRoute.test.mjs scripts/introGate.test.mjs scripts/journeyExplorer.test.mjs scripts/cvDownload.test.mjs scripts/isometricRegionLayer.test.mjs scripts/cottbus-isometric.test.mjs scripts/romeVenueChapter.test.mjs scripts/detailPanel.test.mjs scripts/tileWarmup.test.mjs",
     "test:drive": "node --test scripts/drivingPhysics.test.mjs",
     "benchmark:drive": "node --test --test-name-pattern='100,000 deterministic physics steps' scripts/drivingPhysics.test.mjs"
   },

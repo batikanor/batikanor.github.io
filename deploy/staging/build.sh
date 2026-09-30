@@ -18,6 +18,7 @@ EARTH_DEPLOY_TARGET=staging npm run build
 npm --prefix earth-engine run verify
 VITE_PUBLIC_RELEASE=true npm --prefix earth-engine run build
 EARTH_DEPLOY_TARGET=staging node scripts/overlay-earth-homepage.mjs
+node scripts/verify-seo-artifact.mjs staging
 
 test -f staging-dist/index.html
 test -f staging-dist/assets/earth-current.json

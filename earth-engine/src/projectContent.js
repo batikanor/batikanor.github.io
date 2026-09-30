@@ -10,6 +10,50 @@ import {contestsAndActivities} from './data/contestsAndActivities.js';
 const projectsBySlug = new Map(contestsAndActivities.map(project => [project.slug, project]));
 const mediaPlaceholder = /\{\{(image|embed|gdrive_embed)\[(\d+)\]\}\}/g;
 const directImage = /\.(?:avif|gif|jpe?g|png|webp)(?:[?#].*)?$/i;
+let mediaObserver = null;
+
+// Native iframe loading="lazy" can still start Google Drive viewers more than
+// a screen away. These compete with map tiles and chapter assets as a visitor
+// changes destinations. Keep every authored embed in the story, but connect
+// its remote viewer only shortly before it becomes visible. Plain images keep
+// native lazy loading, so their natural dimensions do not collapse the story.
+function scheduleMedia(container) {
+  const media = container.querySelectorAll('iframe[data-deferred-src]');
+  // The detail panel replaces its scroll container for every destination.
+  // Disconnect even when the next story has no embeds, so an old story can
+  // never start a remote viewer after the user has already moved on.
+  mediaObserver?.disconnect();
+  mediaObserver = null;
+  if (!media.length) return;
+  const activate = item => {
+    const loading = item.parentElement?.querySelector('.project-media-loading');
+    item.src = item.dataset.deferredSrc;
+    delete item.dataset.deferredSrc;
+    // Third-party viewers can leave the iframe blank (or never fire a useful
+    // load event). Don't cover a late preview forever; retain the original
+    // media link below as a reliable escape hatch.
+    setTimeout(() => {
+      if (!item.isConnected || !loading?.isConnected) return;
+      loading.textContent = 'Preview is slow · Open original below';
+      loading.classList.add('is-slow');
+    }, 10_000);
+  };
+  if (typeof IntersectionObserver === 'undefined') {
+    for (const item of media) activate(item);
+    return;
+  }
+  const observer = new IntersectionObserver(entries => {
+    for (const entry of entries) {
+      const item = entry.target;
+      if (!entry.isIntersecting && item.isConnected) continue;
+      observer.unobserve(item);
+      if (!item.isConnected || !item.dataset.deferredSrc) continue;
+      activate(item);
+    }
+  }, {root: container.closest('.detail-scroll'), rootMargin: '180px 0px', threshold: 0});
+  mediaObserver = observer;
+  for (const item of media) observer.observe(item);
+}
 
 export function getProject(slug) {
   return projectsBySlug.get(slug) ?? null;
@@ -146,12 +190,19 @@ function appendMedia(parent, project, kind, index, options) {
     figure.append(image);
   } else {
     const frame = element('iframe', 'project-media-frame');
-    frame.src = embedUrl(url);
+    frame.dataset.deferredSrc = embedUrl(url);
     frame.title = media.abovePhotoCaption || `${project.title} — embedded media ${index + 1}`;
     frame.loading = 'lazy';
     frame.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
     frame.allowFullscreen = true;
-    figure.append(frame);
+    const stage = element('div', 'project-media-stage');
+    const loading = element('span', 'project-media-loading', 'Loading media…');
+    loading.setAttribute('aria-hidden', 'true');
+    frame.addEventListener('load', () => {
+      if (frame.hasAttribute('src')) loading.remove();
+    });
+    stage.append(frame, loading);
+    figure.append(stage);
     const mediaActions = element('div', 'project-media-actions');
     const sizes = element('div', 'project-media-sizes');
     sizes.setAttribute('role', 'group');
@@ -307,5 +358,6 @@ export function renderProjectContent(container, slug, options = {}) {
     fragment.append(technologies);
   }
   container.replaceChildren(fragment);
+  scheduleMedia(container);
   return project;
 }

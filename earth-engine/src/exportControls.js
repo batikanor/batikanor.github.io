@@ -17,9 +17,8 @@ export function installExportControls({announce = () => {}} = {}) {
   const compressionValue = $('pdf-compression-value');
   const preview = $('pdf-image-preview');
   const previewSize = $('pdf-preview-size');
-  const sample = new Image();
-  sample.decoding = 'async';
-  sample.src = '/photos/tesla-gigathon/tesla-gigathon-2026-first-place-prize.jpg';
+  const options = $('pdf-export-options');
+  let sample = null;
   let previewUrl = null;
   let previewSerial = 0;
 
@@ -32,11 +31,18 @@ export function installExportControls({announce = () => {}} = {}) {
 
   async function renderPreview() {
     const serial = ++previewSerial;
-    if (!includeImages.checked) {
+    if (!options.open || !includeImages.checked) {
       preview.closest('.pdf-export-preview').hidden = true;
       return;
     }
     try {
+      // A 516 KB photo and canvas decode have no reason to compete with the
+      // homepage map/intro. Only touch them after export options are opened.
+      if (!sample) {
+        sample = new Image();
+        sample.decoding = 'async';
+        sample.src = '/photos/tesla-gigathon/tesla-gigathon-2026-first-place-prize.jpg';
+      }
       await sample.decode();
       if (serial !== previewSerial) return;
       const canvas = document.createElement('canvas');
@@ -59,8 +65,18 @@ export function installExportControls({announce = () => {}} = {}) {
   for (const control of [includeImages, imageScale, compressPdf, compressionStrength]) {
     control.addEventListener('input', () => { renderControls(); void renderPreview(); });
   }
+  options.addEventListener('toggle', () => {
+    if (options.open) void renderPreview();
+    else {
+      previewSerial++;
+      preview.closest('.pdf-export-preview').hidden = true;
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+      previewUrl = null;
+      preview.removeAttribute('src');
+      sample = null;
+    }
+  });
   renderControls();
-  void renderPreview();
 
   button.addEventListener('click', async () => {
     button.disabled = true;
