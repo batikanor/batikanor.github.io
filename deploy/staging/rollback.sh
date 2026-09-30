@@ -15,8 +15,12 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 BRANCH="$(git -C "$ROOT" branch --show-current)"
 [[ "$BRANCH" == staging/* ]] || { echo "Use a staging branch to roll back staging." >&2; exit 1; }
 KEY="$HOME/.ssh/maptheory-hetzner/id_ed25519"
-ssh -i "$KEY" -o IdentitiesOnly=yes -o BatchMode=yes -o StrictHostKeyChecking=yes \
-  -o ConnectTimeout=15 deploy@157.180.20.129 bash -s -- "$RELEASE" <<'REMOTE'
+SSH_OPTIONS=(-i "$KEY" -o IdentitiesOnly=yes -o BatchMode=yes -o StrictHostKeyChecking=yes -o ConnectTimeout=15)
+if [[ -n "${STAGING_SSH_JUMP:-}" ]]; then
+  [[ "$STAGING_SSH_JUMP" =~ ^[A-Za-z0-9_.@-]+$ ]] || { echo "Invalid staging SSH jump host." >&2; exit 2; }
+  SSH_OPTIONS+=(-J "$STAGING_SSH_JUMP")
+fi
+ssh "${SSH_OPTIONS[@]}" deploy@157.180.20.129 bash -s -- "$RELEASE" <<'REMOTE'
 set -euo pipefail
 release="$1"
 [[ "$release" =~ ^[0-9]{8}T[0-9]{6}Z-[A-Za-z0-9-]{1,64}$ ]] || exit 2

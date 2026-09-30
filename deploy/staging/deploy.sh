@@ -34,8 +34,17 @@ node scripts/verify-seo-artifact.mjs staging
 HOST='deploy@157.180.20.129'
 KEY="$HOME/.ssh/maptheory-hetzner/id_ed25519"
 [[ -f "$KEY" ]] || { echo "Staging SSH identity is unavailable." >&2; exit 1; }
-SSH=(ssh -i "$KEY" -o IdentitiesOnly=yes -o BatchMode=yes -o StrictHostKeyChecking=yes -o ConnectTimeout=15)
-SCP=(scp -i "$KEY" -o IdentitiesOnly=yes -o BatchMode=yes -o StrictHostKeyChecking=yes)
+SSH_OPTIONS=(-i "$KEY" -o IdentitiesOnly=yes -o BatchMode=yes -o StrictHostKeyChecking=yes -o ConnectTimeout=15)
+RSYNC_SSH="ssh -i $KEY -o IdentitiesOnly=yes -o BatchMode=yes -o StrictHostKeyChecking=yes -o ConnectTimeout=15"
+# When a travel network cannot reach Hetzner's SSH port directly, route over
+# an already-authorized bastion without copying the private key to that host.
+if [[ -n "${STAGING_SSH_JUMP:-}" ]]; then
+  [[ "$STAGING_SSH_JUMP" =~ ^[A-Za-z0-9_.@-]+$ ]] || { echo "Invalid staging SSH jump host." >&2; exit 2; }
+  SSH_OPTIONS+=(-J "$STAGING_SSH_JUMP")
+  RSYNC_SSH+=" -J $STAGING_SSH_JUMP"
+fi
+SSH=(ssh "${SSH_OPTIONS[@]}")
+SCP=(scp "${SSH_OPTIONS[@]}")
 STAMP="$(date -u +%Y%m%dT%H%M%SZ)"
 REV="$(git rev-parse --short=10 HEAD)"
 NONCE="$(openssl rand -hex 3)"
@@ -53,7 +62,7 @@ test ! -e "$base/releases/$release"
 mkdir "$base/releases/$release"
 REMOTE
 
-rsync -az --delete -e "ssh -i $KEY -o IdentitiesOnly=yes -o BatchMode=yes -o StrictHostKeyChecking=yes -o ConnectTimeout=15" \
+rsync -az --delete -e "$RSYNC_SSH" \
   "$SITE/" "$HOST:$BASE/releases/$RELEASE/"
 "${SCP[@]}" "$ROOT/deploy/staging/Caddyfile" "$HOST:$BASE/Caddyfile.candidate-$RELEASE"
 

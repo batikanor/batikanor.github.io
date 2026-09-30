@@ -26,9 +26,10 @@ Both open the same searchable, newest-first index of the 32 authored
 achievements and keep the selected variant as visitors open stories. Home,
 immediately right of the settings wheel, returns to the dossier without a page
 reload. The map already initializes and requests its initial globe tiles behind
-the introduction; it remains warm on a Home/Enter round trip. Preloading every
-high-zoom destination on the intro would consume substantial bandwidth and
-evict useful tile cache entries, so this release deliberately avoids that.
+the introduction; it remains warm on a Home/Enter round trip. A small, bounded
+set of destination overview tiles is now warmed during the dossier. Preloading
+every high-zoom destination would consume substantial bandwidth and evict
+useful tile cache entries, so this release deliberately avoids that.
 
 ## Prepare and publish
 
@@ -64,6 +65,11 @@ After local desktop/mobile QA, publish **only** the staging artifact:
 cd /Users/batikanor2/Documents/development/personal-git/batikanor.github.io-workspace/batikanor-earth-release
 ./deploy/staging/deploy.sh --publish
 ```
+
+If SSH port 22 is unreachable from the current network but an already trusted
+SSH jump host can reach Hetzner, use `STAGING_SSH_JUMP=roof-ms-a2` with that
+same publish command. The private key stays on the local machine. The same
+optional variable works for `rollback.sh`.
 
 The script requires a `staging/*` branch and explicit `--publish`, uploads to a
 new `/srv/apps/batikanor-staging/releases/<timestamp>-<commit>-<nonce>` path,
