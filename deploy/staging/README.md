@@ -72,8 +72,9 @@ sites afterward. The edge adds `X-Robots-Tag: noindex, nofollow, noarchive`.
 
 Do these on the real `staging.batikanor.com` origin, not the `sslip.io` alias:
 
-1. Inspect the full-screen intro at mobile and desktop widths. Both variants
-   should be usable; **Enter the map** must be the only automatic transition.
+1. Inspect the single full-screen dossier introduction at mobile and desktop
+   widths. **Enter** must be the only transition to the map. Old `?intro=1`
+   and `?intro=2` links should show this same design, not a layout switcher.
    Deep links such as `/?event=decarbon-days-climathon-2025` must still open
    the correct story directly.
 2. Confirm the globe imagery and selected Cottbus/Berlin/Munich 3D chapters

@@ -13,13 +13,3 @@ export function shouldShowIntro(href) {
 export function shouldInitializeFallbackNeutral(href, introActive) {
   return !!introActive && shouldShowIntro(href);
 }
-
-export function readIntroVariant(href) {
-  return new URL(href).searchParams.get('intro') === '2' ? 'dossier' : 'editorial';
-}
-
-export function introVariantUrl(href, variant) {
-  const url = new URL(href);
-  url.searchParams.set('intro', variant === 'dossier' ? '2' : '1');
-  return url;
-}

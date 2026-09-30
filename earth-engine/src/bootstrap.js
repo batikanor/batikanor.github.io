@@ -55,7 +55,7 @@ async function start() {
     return;
   }
 
-  // Paint the small introduction first, then prepare the map beneath its
+  // Paint the introduction first, then prepare the map beneath its
   // opaque surface. It never dismisses itself: Enter is the only transition.
   const entered = waitForIntroEntry();
   const firstMapFrame = new Promise(resolve => {
@@ -70,7 +70,9 @@ async function start() {
   });
   const destinationPromise = startPortfolio().catch(error => {
     console.error('Portfolio could not start.', error);
-    document.getElementById('intro-load-status').textContent = 'The map could not load. The achievement list is still available.';
+    const introStatus = document.getElementById('intro-load-status');
+    introStatus.textContent = 'The map could not load. The achievement list is still available.';
+    introStatus.classList.add('is-error');
     document.getElementById('intro-enter').hidden = true;
     document.getElementById('intro-fallback-link').hidden = false;
     return 'error';

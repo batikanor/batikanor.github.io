@@ -26,45 +26,39 @@
   </script>
 </head>
 <body>
-  <section id="intro-screen" class="intro-screen" data-variant="editorial" aria-labelledby="intro-title">
+  <section id="intro-screen" class="intro-screen" aria-labelledby="intro-title">
     <div class="intro-backdrop" aria-hidden="true"></div>
     <div class="intro-frame">
       <header class="intro-header">
-        <div class="intro-brand"><span class="intro-brand-dot" aria-hidden="true"></span><span><strong>Batıkan</strong><small>Hacker · Developer · Entrepreneur</small></span></div>
-        <div class="intro-variants" role="group" aria-label="Choose an introduction layout">
-          <span class="intro-variants-label">PREVIEW LAYOUT</span>
-          <button type="button" data-intro-variant="editorial" aria-pressed="true">01 <span>Editorial</span></button>
-          <button type="button" data-intro-variant="dossier" aria-pressed="false">02 <span>Dossier</span></button>
-        </div>
+        <div class="intro-brand"><strong>Batıkan</strong><small>Hacker · Developer · Entrepreneur</small></div>
       </header>
       <div class="intro-content">
         <div class="intro-primary">
-          <p class="intro-eyebrow"><span>PORTFOLIO</span><span class="intro-eyebrow-line" aria-hidden="true"></span><span>INTRODUCTION</span></p>
           <h1 id="intro-title">Hi, I’m Batıkan.</h1>
-          <p class="intro-lede">I’ve won prizes in <strong>30+ competitions</strong>. I’ve also <strong>served on juries and mentored teams several times</strong>.</p>
         </div>
-        <div class="intro-ledger" aria-label="About my work">
-          <div class="intro-ledger-heading"><span>ABOUT MY WORK</span><span>01 / 03</span></div>
-          <div class="intro-fact"><span class="intro-fact-index">01</span><div><span class="intro-fact-label">FIELDS</span><p>Space tech, biotech, energy, AI and finance.</p></div></div>
-          <div class="intro-fact"><span class="intro-fact-index">02</span><div><span class="intro-fact-label">CURRENTLY</span><p>Full-stack developer at an M&amp;A boutique based in Germany.</p></div></div>
-          <div class="intro-fact"><span class="intro-fact-index">03</span><div><span class="intro-fact-label">OPEN TO</span><p>I’m an entrepreneur, open to great ideas and great people.</p></div></div>
+        <div class="intro-facts-panel">
+          <ul class="intro-facts-list">
+            <li class="intro-fact-prizes">I’ve won prizes in <strong>30+ competitions</strong>.</li>
+            <li class="intro-fact-jury">I’ve acted as a <strong>juror and mentor</strong> several times.</li>
+            <li class="intro-fact-fields">I’ve worked in:
+              <ul class="intro-sector-list">
+                <li>Software</li><li>Tooling</li><li>Space tech</li><li>Biotech</li>
+                <li>Energy</li><li>Finance</li><li>AI</li>
+              </ul>
+            </li>
+            <li class="intro-fact-current">Currently, I’m a <strong>full-stack developer</strong> at an M&amp;A boutique based in Germany.</li>
+            <li class="intro-fact-open">I’m an <strong>entrepreneur</strong>, open to great ideas and great people.</li>
+          </ul>
         </div>
       </div>
       <footer class="intro-footer">
         <div class="intro-footer-links"><a href="/?view=cv">View CV ↗</a><a href="mailto:batikanor@gmail.com">Contact ↗</a></div>
-        <p id="intro-load-status" class="intro-load-status" role="status" aria-live="polite">Explore the achievements on the map.</p>
-        <button id="intro-enter" class="intro-enter" type="button"><span class="intro-enter-label">Enter the map</span><span class="intro-enter-arrow" aria-hidden="true">↗</span></button>
+        <p id="intro-load-status" class="intro-load-status" role="status" aria-live="polite"></p>
+        <button id="intro-enter" class="intro-enter" type="button"><span class="intro-enter-label">Enter</span><span class="intro-enter-arrow" aria-hidden="true">↗</span></button>
         <a id="intro-fallback-link" class="intro-enter" href="/?view=list" hidden>Open achievement list <span class="intro-enter-arrow" aria-hidden="true">↗</span></a>
       </footer>
     </div>
   </section>
-  <script>
-    // Match a shared variant URL before the entry module hydrates the controls.
-    if (document.documentElement.classList.contains('intro-active')
-      && new URLSearchParams(location.search).get('intro') === '2') {
-      document.getElementById('intro-screen').dataset.variant = 'dossier';
-    }
-  </script>
   <div id="app">
     <main id="map" aria-label="Interactive Earth map"></main>
     <div class="vignette" aria-hidden="true"></div>
