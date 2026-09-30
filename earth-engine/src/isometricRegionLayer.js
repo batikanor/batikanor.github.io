@@ -168,6 +168,16 @@ export function chooseIsometricRegion(regions, camera, focusId = null) {
   return candidates[0]?.region ?? null;
 }
 
+function disposeRoofTexture(texture) {
+  if(!texture)return;
+  texture.dispose();
+  // These pixels are owned by this chapter loader, unlike the borrowed image
+  // used by achievementSceneLayer. Release bitmap/native-image decode storage.
+  if(typeof texture.image?.close==='function')texture.image.close();
+  else if(typeof texture.image?.src==='string')texture.image.src='';
+  texture.image=null;
+}
+
 function makeMesh(positionArray, colour, roughness) {
   const geometry = new THREE.BufferGeometry();
   geometry.setAttribute('position', new THREE.BufferAttribute(positionArray, 3));
@@ -288,8 +298,12 @@ export function validateReducedAtlas(full, reduced) {
  * {id, origin:[lon,lat], radiusM, meshUrl,
  *  roofAtlas?:{imageUrl,metadataUrl}, groundImage?:{imageUrl,metadataUrl},
  *  credit?, minZoom?, maxZoom?}
- * Optional `onChange({regionId,credit,loaded,textured})` fires on activation,
- * resource upgrade and teardown so the host can refresh its attribution.
+ * Optional `onChange({regionId,credit,loaded,geometryLoaded,textured,qualityReady,
+ * atlasState})` fires on activation, resource upgrade and teardown. `loaded`
+ * means usable visual quality, not merely a parsed mesh. For photo chapters,
+ * pending/failed imagery leaves opaque massing hidden and the aerial map intact.
+ * `hasTexturedContext(id?)` / `hasRenderableContext(id?)` / `getStats()` let the
+ * host retain fallback photography and geometry until this quality gate passes.
  *
  * `setFocus(id|null)` optionally links the current portfolio achievement to
  * its own chapter. Null allows whichever region is nearest the camera. Do not
@@ -297,9 +311,11 @@ export function validateReducedAtlas(full, reduced) {
  * 40–45° bearing at ~z17.3, retaining normal controls and labels.
  */
 export function createIsometricRegionLayer({regions, onChange = null,
-  recoveryDelayMs = RECOVERY_DELAY_MS} = {}) {
+  recoveryDelayMs = RECOVERY_DELAY_MS,
+  textureLoader = url => new THREE.TextureLoader().loadAsync(url)} = {}) {
   assert(Array.isArray(regions) && regions.length > 0, 'Isometric layer needs one or more actual-data regions');
   assert(onChange == null || typeof onChange === 'function', 'Isometric onChange must be a callback');
+  assert(typeof textureLoader==='function','Isometric texture loader must be a function');
   assert(Number.isFinite(recoveryDelayMs) && recoveryDelayMs >= 0,
     'Isometric recovery delay must be nonnegative');
   const chapters = regions.map(normalizeRegion);
@@ -307,6 +323,8 @@ export function createIsometricRegionLayer({regions, onChange = null,
   let focusId = null;
   let enabled = true;
   let recoveryTimer = null;
+  let atlasDecodeTail=Promise.resolve();
+  let atlasDecoding=0;
   const recoveryAttempts = new Map();
   const warm = new Map();
   const cancelRecovery = () => {
@@ -325,8 +343,11 @@ export function createIsometricRegionLayer({regions, onChange = null,
       onChange({
         regionId: layer.getActiveRegionId(),
         credit: layer.getActiveAttribution(),
-        loaded: !!layer.active?.meshes,
-        textured: !!layer.active?.texture,
+        loaded: layer.hasRenderableContext(),
+        geometryLoaded: !!layer.active?.meshes,
+        textured: layer.hasTexturedContext(),
+        qualityReady: layer.hasRenderableContext(),
+        atlasState: layer.getStats().atlasState,
       });
     } catch (error) {
       console.warn('Isometric region update callback failed.', error);
@@ -377,6 +398,27 @@ export function createIsometricRegionLayer({regions, onChange = null,
       return true;
     },
     getActiveRegionId() { return this.active?.region.id ?? null; },
+    /** Real texture accepted on the current chapter, never plain gray massing. */
+    hasTexturedContext(id=null) {
+      const active=this.active;
+      return !!(enabled && active?.meshes && active.texture && active.atlasState==='ready'
+        && (id==null || active.region.id===id) && active.meshes.every(mesh=>mesh.visible));
+    },
+    /** Untextured source geometry is valid only for chapters authored without a photo atlas. */
+    hasRenderableContext(id=null) {
+      const active=this.active;
+      return !!(enabled && active?.meshes && (id==null || active.region.id===id)
+        && active.meshes.every(mesh=>mesh.visible)
+        && (!active.region.roofAtlas || this.hasTexturedContext(id)));
+    },
+    getStats() {
+      const active=this.active;
+      return {regionId:active?.region.id??null,enabled,
+        geometryLoaded:!!active?.meshes,textured:this.hasTexturedContext(),
+        qualityReady:this.hasRenderableContext(),ready:this.hasRenderableContext(),
+        atlasState:active?.atlasState??'inactive',activeRoofTextures:active?.texture?1:0,
+        atlasDecoding};
+    },
     getActiveAttribution() { return this.active?.region.credit ?? null; },
     onAdd(map, gl) {
       this.map = map;
@@ -483,7 +525,8 @@ export function createIsometricRegionLayer({regions, onChange = null,
         .makeTranslation(merc.x, merc.y, merc.z)
         .multiply(new THREE.Matrix4().makeRotationX(Math.PI / 2))
         .multiply(new THREE.Matrix4().makeScale(scale, scale, scale));
-      const active = {region, model, meshes: null, texture: null, buffer: null, groundObjectUrl: null};
+      const active = {region, model, meshes: null, texture: null, buffer: null, groundObjectUrl: null,
+        atlasState:region.roofAtlas?'pending':'not-required'};
       this.active = active;
       notifyChange(this);
       const prepared = this.prepareRegion(region);
@@ -514,11 +557,16 @@ export function createIsometricRegionLayer({regions, onChange = null,
         const roof = makeMesh(positions.subarray(0, roofCount * 3), 0x969a98, 0.95);
         const wall = makeMesh(positions.subarray(roofCount * 3, (roofCount + wallCount) * 3), 0xc5c3ba, 0.96);
         active.meshes = [roof, wall];
-        this.scene.add(roof, wall);
+        // Photos remain the visual fallback. A missing/pending atlas must not
+        // cover sharp ground imagery with featureless opaque gray roofs/walls.
+        const visible=!active.region.roofAtlas;
+        roof.visible=wall.visible=visible;
+        active.atlasState=visible?'not-required':'pending';
+        if(visible)this.scene.add(roof, wall);
         recoveryAttempts.delete(active.region.id);
         this.map.triggerRepaint();
         notifyChange(this);
-        if (active.region.roofAtlas) void this.loadRoofAtlas(active, prepared);
+        if (active.region.roofAtlas) active.roofTask=this.loadRoofAtlas(active, prepared);
       } catch (error) {
         if (prepared.abort.signal.aborted || this.destroyed || this.active !== active) return;
         console.warn(`${active.region.id} official isometric buildings unavailable; satellite map remains visible.`, error);
@@ -532,19 +580,24 @@ export function createIsometricRegionLayer({regions, onChange = null,
       let texture = null;
       try {
         const atlas = await prepared.atlasPromise;
-        if (!atlas) return;
-        if (this.destroyed || this.active !== active) return;
+        if (prepared.abort.signal.aborted || this.destroyed || this.active !== active) return;
+        if (!atlas) {active.atlasState='unavailable';notifyChange(this);return;}
         const roof = active.meshes?.[0];
         if (!roof) return;
         const uv = roofUvForAtlas(roof.geometry.getAttribute('position').array,
           active.region.origin, atlas.metadata);
-        const objectUrl = URL.createObjectURL(atlas.imageBlob);
-        try {
-          texture = await new THREE.TextureLoader().loadAsync(objectUrl);
-        } finally {
-          URL.revokeObjectURL(objectUrl);
-        }
-        if (this.destroyed || this.active !== active) return;
+        // HTML-image decode is not abortable. Serialize selected-atlas work,
+        // skip queued stale chapters and immediately dispose late completions.
+        const task=atlasDecodeTail.then(async()=>{
+          if(prepared.abort.signal.aborted || this.destroyed || this.active!==active)return null;
+          atlasDecoding++;
+          const objectUrl=URL.createObjectURL(atlas.imageBlob);
+          try {return await textureLoader(objectUrl);}
+          finally {URL.revokeObjectURL(objectUrl);atlasDecoding--;}
+        });
+        atlasDecodeTail=task.then(()=>undefined,()=>undefined);
+        texture=await task;
+        if (!texture || prepared.abort.signal.aborted || this.destroyed || this.active !== active) return;
         if (texture.image.width !== atlas.chosen.width || texture.image.height !== atlas.chosen.height) {
           throw new Error('Roof image dimensions differ from its georeferenced atlas metadata');
         }
@@ -553,19 +606,24 @@ export function createIsometricRegionLayer({regions, onChange = null,
         texture.anisotropy = Math.min(atlas.memoryConstrained ? 2 : 8,
           this.renderer.capabilities.getMaxAnisotropy());
         const material = new THREE.MeshBasicMaterial({
-          map: texture, side: THREE.DoubleSide,
+          color:0xffffff,map: texture, side: THREE.DoubleSide,toneMapped:false,
           polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -1,
         });
         roof.material.dispose();
         roof.material = material;
-        active.texture = texture;
+        active.texture = texture;active.atlasState='ready';
+        active.meshes.forEach(mesh=>{mesh.visible=true;this.scene.add(mesh);});
         this.map.triggerRepaint();
         notifyChange(this);
       } catch (error) {
         if (prepared.abort.signal.aborted || this.destroyed || this.active !== active) return;
-        console.warn(`${active.region.id} georeferenced roof texture unavailable; official LoD2 geometry remains.`, error);
+        active.atlasState='error';
+        console.warn(`${active.region.id} georeferenced roof texture unavailable; aerial photography remains visible and untextured massing stays hidden.`, error);
+        notifyChange(this);
       } finally {
-        if (texture && texture !== active.texture) texture.dispose();
+        if (texture && texture !== active.texture) {
+          disposeRoofTexture(texture);
+        }
       }
     },
     async loadGroundImage(active, prepared) {
@@ -603,7 +661,7 @@ export function createIsometricRegionLayer({regions, onChange = null,
     },
     render(gl, args) {
       const active = this.active;
-      if (!enabled || !active?.meshes || !this.map || !args.defaultProjectionData?.mainMatrix
+      if (!this.hasRenderableContext() || !active?.meshes || !this.map || !args.defaultProjectionData?.mainMatrix
         || args.defaultProjectionData.projectionTransition > 0) return;
       if (focusId && focusId !== active.region.id) return;
       const center = this.map.getCenter();
@@ -626,8 +684,10 @@ export function createIsometricRegionLayer({regions, onChange = null,
         mesh.geometry.dispose();
         mesh.material.dispose();
       }
-      active.texture?.dispose();
-      active.buffer = null;
+      if(active.texture){
+        disposeRoofTexture(active.texture);active.texture=null;
+      }
+      active.buffer = null;active.meshes=null;active.roofTask=null;
       notifyChange(this);
     },
     onRemove() {

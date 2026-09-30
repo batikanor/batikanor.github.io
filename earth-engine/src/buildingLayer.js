@@ -5,9 +5,10 @@ import * as maplibregl from 'maplibre-gl';
 // scripts/build-bavaria-lod2.py. A local official DOP20 aerial-photo atlas is
 // projected onto those roof planes; façades remain untextured standardized
 // LoD2 surfaces, not photogrammetry or invented windows.
-const ASSET_URL = `${import.meta.env.BASE_URL}data/garching-lod2-v1.bin`;
-const ROOF_TEXTURE_URL = `${import.meta.env.BASE_URL}data/garching-roof-orthophoto-v1.webp`;
-const ROOF_TEXTURE_META_URL = `${import.meta.env.BASE_URL}data/garching-roof-orthophoto-v1.json`;
+const BASE_URL = import.meta.env?.BASE_URL ?? '/';
+const ASSET_URL = `${BASE_URL}data/garching-lod2-v1.bin`;
+const ROOF_TEXTURE_URL = `${BASE_URL}data/garching-roof-orthophoto-v1.webp`;
+const ROOF_TEXTURE_META_URL = `${BASE_URL}data/garching-roof-orthophoto-v1.json`;
 const MAGIC = 'BLD2';
 const GARCHING = [11.666954, 48.262269];
 const EARTH_CIRCUMFERENCE_M = 40075016.68557849;
@@ -17,19 +18,53 @@ const EARTH_CIRCUMFERENCE_M = 40075016.68557849;
 // a textured/collision-ready campus asset exists. The cut is intentional.
 const MIN_CONTEXT_ZOOM = 15.5;
 const MAX_CONTEXT_ZOOM = 18.5;
+const MAX_MESH_BYTES = 2_000_000;
+const MAX_ATLAS_BYTES = 3_000_000;
+
+export function isBavariaContextCamera({center, zoom}) {
+  const lng = Array.isArray(center) ? center[0] : center?.lng;
+  const lat = Array.isArray(center) ? center[1] : center?.lat;
+  return Number.isFinite(zoom) && zoom >= MIN_CONTEXT_ZOOM && zoom < MAX_CONTEXT_ZOOM
+    && Number.isFinite(lng) && Number.isFinite(lat)
+    && Math.abs(lng - GARCHING[0]) <= .023 && Math.abs(lat - GARCHING[1]) <= .017;
+}
+
+function lowMemoryDevice() {
+  const memory = globalThis.navigator?.deviceMemory;
+  return !!globalThis.navigator?.connection?.saveData
+    || (Number.isFinite(memory) ? memory <= 4
+      : globalThis.matchMedia?.('(pointer: coarse)')?.matches === true);
+}
+
+/** No 75 MiB roof texture on phones; photographic ground remains unobstructed. */
+export function bavariaRoofAtlasFitsBudget(metadata, {maxTextureSize, lowMemory = false}) {
+  return !lowMemory && Number.isFinite(maxTextureSize) && maxTextureSize >= 3840
+    && metadata?.width === 3840 && metadata?.height === 3840
+    && Number.isInteger(metadata.bytes) && metadata.bytes > 0 && metadata.bytes <= MAX_ATLAS_BYTES
+    && metadata.width * metadata.height * 4 * 4 / 3 <= 96_000_000;
+}
 
 function readMesh(buffer) {
+  if (!(buffer instanceof ArrayBuffer) || buffer.byteLength < 40 || buffer.byteLength > MAX_MESH_BYTES) {
+    throw new Error('Bavarian LoD2 asset exceeds its bounded mesh budget');
+  }
   const header = new DataView(buffer);
   const magic = String.fromCharCode(...new Uint8Array(buffer, 0, 4));
   if (magic !== MAGIC || header.getUint32(4, true) !== 1) throw new Error('Unknown Bavarian LoD2 asset format');
   const roofCount = header.getUint32(8, true);
   const wallCount = header.getUint32(12, true);
+  if (!roofCount || !wallCount || roofCount % 3 || wallCount % 3) throw new Error('Invalid Bavarian LoD2 triangles');
   const origin = [header.getFloat64(24, true), header.getFloat64(32, true)];
   if (Math.abs(origin[0] - GARCHING[0]) > 1e-6 || Math.abs(origin[1] - GARCHING[1]) > 1e-6) {
     throw new Error('Bavarian LoD2 venue origin does not match the current layer');
   }
   const floats = new Float32Array(buffer, 40);
   if (floats.length !== (roofCount + wallCount) * 3) throw new Error('Truncated Bavarian LoD2 asset');
+  for (let index = 0; index < floats.length; index += 3) {
+    if (!Number.isFinite(floats[index]) || !Number.isFinite(floats[index + 1]) || !Number.isFinite(floats[index + 2])
+      || Math.abs(floats[index]) > 1000 || Math.abs(floats[index + 2]) > 1000
+      || floats[index + 1] < 400 || floats[index + 1] > 600) throw new Error('Invalid surveyed Bavarian LoD2 vertex');
+  }
   const make = (offset, count, color, roughness) => {
     const geometry = new THREE.BufferGeometry();
     // The view is kept alive by the fetched ArrayBuffer held in the layer.
@@ -39,7 +74,12 @@ function readMesh(buffer) {
       color, roughness, metalness: 0, side: THREE.DoubleSide,
       polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -1,
     });
-    return new THREE.Mesh(geometry, material);
+    const mesh = new THREE.Mesh(geometry, material);
+    mesh.frustumCulled = false;
+    // Do not obscure the actual aerial roof with an opaque gray placeholder.
+    // The source geometry becomes visible only after its photograph is accepted.
+    mesh.visible = false;
+    return mesh;
   };
   return {
     roof: make(0, roofCount, 0x898f8d, 0.91),
@@ -83,131 +123,179 @@ function roofUvAttribute(positions, metadata) {
  * LoD2 roof/wall surfaces around the Garching drive venue. Add after the
  * style loads; it deliberately fetches nothing outside this local chapter.
  */
-export function createBavariaBuildingLayer() {
+export function createBavariaBuildingLayer({onChange = null, fetcher = globalThis.fetch,
+  rendererFactory = null, textureLoaderFactory = () => new THREE.TextureLoader(),
+  lowMemory = lowMemoryDevice} = {}) {
+  let enabled = true;
+  let generation = 0;
+  const notify = layer => {
+    if (typeof onChange !== 'function') return;
+    try {onChange(layer.getStats());}
+    catch (error) {console.warn('Bavaria context update callback failed.', error);}
+  };
+  async function fetchAsset(url, signal, maxBytes, kind) {
+    const response = await fetcher(url, {signal, cache:'force-cache'});
+    if (!response.ok) throw new Error(`Bavaria asset HTTP ${response.status}`);
+    if (Number(response.headers.get('content-length')) > maxBytes) throw new Error('Bavaria asset exceeds transfer budget');
+    const value = kind === 'buffer' ? await response.arrayBuffer()
+      : kind === 'json' ? await response.text() : await response.blob();
+    const bytes = kind === 'buffer' ? value.byteLength
+      : kind === 'json' ? new TextEncoder().encode(value).byteLength : value.size;
+    if (bytes > maxBytes) throw new Error('Bavaria asset exceeds transfer budget');
+    return kind === 'json' ? JSON.parse(value) : value;
+  }
   return {
-    id: 'earth-engine-garching-lod2',
-    type: 'custom',
-    renderingMode: '3d',
+    id: 'earth-engine-garching-lod2', type: 'custom', renderingMode: '3d',
+    isEligible() {
+      return !!this.map && isBavariaContextCamera({center:this.map.getCenter(), zoom:this.map.getZoom()});
+    },
+    getLoaded() {return enabled && !!this.loaded && !!this.roofTexture && this.isEligible();},
+    getStats() {
+      return {enabled, loaded:this.getLoaded(), geometryReady:!!this.loaded, textured:!!this.roofTexture,
+        loading:!!this.loading, textureLoading:!!this.textureLoading,
+        meshBytes:this.buffer?.byteLength ?? 0,
+        textureBytes:this.roofTexture ? 3840 * 3840 * 4 * 4 / 3 : 0};
+    },
+    setEnabled(value) {
+      enabled = !!value;
+      if (!enabled) this.releaseActive();
+      else this.evaluate();
+      this.map?.triggerRepaint();
+    },
+    releaseActive() {
+      generation++;
+      this.abort?.abort();
+      this.abort = null;
+      const hadResources = this.loaded || this.loading || this.textureLoading || this.roofTexture;
+      for (const mesh of this.meshes ?? []) {
+        this.scene?.remove(mesh); mesh.geometry.dispose(); mesh.material.dispose();
+      }
+      this.roofTexture?.dispose();
+      this.roofTexture = null;
+      this.meshes = null;
+      this.buffer = null;
+      this.loaded = this.loading = this.textureLoading = this.failed = false;
+      if (hadResources) {notify(this); this.map?.triggerRepaint();}
+    },
+    releaseOutsideRegion() {
+      if (!enabled || !this.isEligible()) {
+        if (this.loaded || this.loading || this.textureLoading || this.abort) this.releaseActive();
+        return true;
+      }
+      return false;
+    },
+    evaluate() {
+      if (this.destroyed || !this.map || this.releaseOutsideRegion() || this.map.isMoving()) return;
+      if (!this.loaded && !this.loading && !this.failed) void this.load();
+    },
     onAdd(map, gl) {
       this.map = map;
+      this.destroyed = false;
+      this.loaded = this.loading = this.textureLoading = this.failed = false;
       this.camera = new THREE.Camera();
       this.scene = new THREE.Scene();
-      this.scene.add(new THREE.AmbientLight(0xe6e8e2, 0.82));
+      this.scene.add(new THREE.AmbientLight(0xe6e8e2, .82));
       const sun = new THREE.DirectionalLight(0xfff3e1, 1.35);
-      sun.position.set(-180, 500, -90);
-      this.scene.add(sun);
-      this.renderer = new THREE.WebGLRenderer({canvas: map.getCanvas(), context: gl, antialias: true});
+      sun.position.set(-180, 500, -90); this.scene.add(sun);
+      this.renderer = rendererFactory ? rendererFactory(map, gl)
+        : new THREE.WebGLRenderer({canvas:map.getCanvas(), context:gl, antialias:true});
       this.renderer.autoClear = false;
       this.maximumTextureSize = gl.getParameter(gl.MAX_TEXTURE_SIZE);
-      this.loaded = false;
-      this.loading = false;
-      this.textureLoading = false;
-      this.failed = false;
-      this.destroyed = false;
-      this.onMoveEnd = () => {
-        const zoom = map.getZoom();
-        const center = map.getCenter();
-        if (zoom >= MIN_CONTEXT_ZOOM && zoom < MAX_CONTEXT_ZOOM
-          && Math.abs(center.lng - GARCHING[0]) <= 0.023
-          && Math.abs(center.lat - GARCHING[1]) <= 0.017) this.load();
-      };
-      map.on('moveend', this.onMoveEnd);
+      this.onMoveEnd = () => this.evaluate();
+      // Release as soon as the camera leaves; load only at its settled framing.
+      this.onMove = () => this.releaseOutsideRegion();
+      map.on('move', this.onMove); map.on('moveend', this.onMoveEnd);
+      this.evaluate();
     },
     async load() {
-      if (this.loading || this.loaded || this.failed || this.destroyed) return;
-      this.loading = true;
+      if (!enabled || this.loading || this.loaded || this.failed || this.destroyed
+        || !this.isEligible() || this.map.isMoving()) return;
+      const token = generation;
+      const abort = this.abort = new AbortController();
+      this.loading = true; notify(this);
       try {
-        const response = await fetch(ASSET_URL);
-        if (!response.ok) throw new Error(`LoD2 fetch failed: ${response.status}`);
-        this.buffer = await response.arrayBuffer();
-        if (this.destroyed) return;
-        const {roof, wall} = readMesh(this.buffer);
-        this.scene.add(roof, wall);
-        this.meshes = [roof, wall];
-        this.loaded = true;
-        this.map.triggerRepaint();
-        // Context geometry arrives first. The larger atlas is a second lazy
-        // request, so failed/slow image loading never removes real buildings.
-        this.loadRoofTexture();
+        const buffer = await fetchAsset(ASSET_URL, abort.signal, MAX_MESH_BYTES, 'buffer');
+        if (abort.signal.aborted || this.destroyed || token !== generation || !this.isEligible()) return;
+        const {roof, wall} = readMesh(buffer);
+        this.buffer = buffer; this.meshes = [roof, wall]; this.scene.add(roof, wall);
+        this.loaded = true; notify(this); this.map.triggerRepaint();
+        // Geometry may be prepared independently, but an untextured mass must
+        // never mask the higher-fidelity ground image or signal quality readiness.
+        void this.loadRoofTexture(token, abort);
       } catch (error) {
-        this.failed = true;
-        console.warn('Official Bavaria LoD2 buildings unavailable; orthophoto remains visible.', error);
+        if (!abort.signal.aborted && !this.destroyed && token === generation) {
+          this.failed = true;
+          console.warn('Official Bavaria LoD2 buildings unavailable; orthophoto remains visible.', error);
+        }
       } finally {
-        this.loading = false;
+        if (token === generation) {this.loading = false; notify(this);}
       }
     },
-    async loadRoofTexture() {
-      if (this.textureLoading || this.destroyed || this.maximumTextureSize < 3840) return;
-      this.textureLoading = true;
+    async loadRoofTexture(token = generation, abort = this.abort) {
+      const constrained = typeof lowMemory === 'function' ? lowMemory() : !!lowMemory;
+      if (constrained || this.textureLoading || this.destroyed || !enabled
+        || !this.loaded || !abort || abort.signal.aborted || this.maximumTextureSize < 3840) return;
+      this.textureLoading = true; notify(this);
+      const meshes = this.meshes;
       let texture;
+      let objectUrl;
+      const current = () => !abort.signal.aborted && !this.destroyed && enabled
+        && token === generation && this.meshes === meshes && this.isEligible();
       try {
-        const [response, loaded] = await Promise.all([
-          fetch(ROOF_TEXTURE_META_URL),
-          new THREE.TextureLoader().loadAsync(ROOF_TEXTURE_URL),
-        ]);
-        texture = loaded;
-        if (!response.ok) throw new Error(`DOP20 atlas metadata fetch failed: ${response.status}`);
-        const metadata = await response.json();
-        if (this.destroyed) return;
-        const roof = this.meshes?.[0];
-        if (!roof) return;
-        roof.geometry.setAttribute('uv', roofUvAttribute(roof.geometry.getAttribute('position'), metadata));
+        const metadata = await fetchAsset(ROOF_TEXTURE_META_URL, abort.signal, 16_000, 'json');
+        if (!current() || !bavariaRoofAtlasFitsBudget(metadata,
+          {maxTextureSize:this.maximumTextureSize, lowMemory:constrained})) return;
+        // Validate the source alignment before allocating/decoding the atlas.
+        const roof = meshes[0];
+        const uv = roofUvAttribute(roof.geometry.getAttribute('position'), metadata);
+        const blob = await fetchAsset(ROOF_TEXTURE_URL, abort.signal, MAX_ATLAS_BYTES, 'blob');
+        if (!current()) return;
+        if (blob.size !== metadata.bytes) throw new Error('Bavarian roof image bytes differ from metadata');
+        objectUrl = URL.createObjectURL(blob);
+        texture = await textureLoaderFactory().loadAsync(objectUrl);
+        if (!current()) return;
+        if (texture.image.width !== metadata.width || texture.image.height !== metadata.height) {
+          throw new Error('Bavarian roof image dimensions differ from metadata');
+        }
+        roof.geometry.setAttribute('uv', uv);
         texture.colorSpace = THREE.SRGBColorSpace;
         texture.anisotropy = Math.min(8, this.renderer.capabilities.getMaxAnisotropy());
-        // The orthophoto contains its actual sun/shadows; BasicMaterial avoids
-        // brightening it a second time under the 3D scene's ambient lights.
-        const material = new THREE.MeshBasicMaterial({
-          map: texture, side: THREE.DoubleSide,
-          polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -1,
-        });
-        roof.material.dispose();
-        roof.material = material;
+        const material = new THREE.MeshBasicMaterial({map:texture, side:THREE.DoubleSide,
+          polygonOffset:true, polygonOffsetFactor:-1, polygonOffsetUnits:-1});
+        roof.material.dispose(); roof.material = material;
         this.roofTexture = texture;
-        this.map.triggerRepaint();
+        // Install the real source-aligned roof and reveal both source surfaces
+        // atomically; pending, unavailable or failed atlases remain invisible.
+        for (const mesh of meshes) mesh.visible = true;
+        notify(this); this.map.triggerRepaint();
       } catch (error) {
-        console.warn('Bavarian roof orthophoto unavailable; LoD2 geometry remains visible.', error);
+        if (current()) console.warn('Bavarian roof orthophoto unavailable; photographic ground remains unobstructed.', error);
       } finally {
+        if (objectUrl) URL.revokeObjectURL(objectUrl);
         if (texture && texture !== this.roofTexture) texture.dispose();
-        this.textureLoading = false;
+        if (token === generation) {this.textureLoading = false; notify(this);}
       }
     },
     render(gl, args) {
-      const zoom = this.map.getZoom();
-      if (zoom < MIN_CONTEXT_ZOOM || zoom >= MAX_CONTEXT_ZOOM || args.defaultProjectionData?.projectionTransition > 0) return;
-      const center = this.map.getCenter();
-      if (Math.abs(center.lng - GARCHING[0]) > 0.023 || Math.abs(center.lat - GARCHING[1]) > 0.017) return;
-      // A cinematic fly-through to the hero briefly crosses this zoom band.
-      // Do not download 758 KB of contextual geometry if the final camera is
-      // already heading to a close-up where the untextured layer is hidden.
-      if (!this.loaded) {
-        if (!this.failed && !this.map.isMoving()) this.load();
-        return;
-      }
-
+      if (!enabled || this.destroyed || !this.map
+        || this.releaseOutsideRegion() || !this.getLoaded()
+        || !args.defaultProjectionData?.mainMatrix
+        || args.defaultProjectionData.projectionTransition > 0) return;
+      // Surveyed vertices retain absolute source elevation. Do not flatten the
+      // DEM behind this chapter without also normalizing its model heights.
       const merc = maplibregl.MercatorCoordinate.fromLngLat(GARCHING, 0);
       const scale = merc.meterInMercatorCoordinateUnits();
-      // Local asset axes: +x east, +y up, +z north. MapLibre Mercator axes:
-      // +x east, +y south, +z up. Rx(+90°) maps the local basis exactly.
-      const local = new THREE.Matrix4()
-        .makeTranslation(merc.x, merc.y, merc.z)
+      const local = new THREE.Matrix4().makeTranslation(merc.x, merc.y, merc.z)
         .multiply(new THREE.Matrix4().makeRotationX(Math.PI / 2))
         .multiply(new THREE.Matrix4().makeScale(scale, scale, scale));
-      this.camera.projectionMatrix = new THREE.Matrix4()
-        .fromArray(args.defaultProjectionData.mainMatrix)
-        .multiply(local);
-      this.renderer.resetState();
-      this.renderer.render(this.scene, this.camera);
+      this.camera.projectionMatrix.fromArray(args.defaultProjectionData.mainMatrix).multiply(local);
+      this.renderer.resetState(); this.renderer.render(this.scene, this.camera);
     },
     onRemove() {
       this.destroyed = true;
-      this.map?.off('moveend', this.onMoveEnd);
-      for (const mesh of this.meshes ?? []) {
-        mesh.geometry.dispose();
-        mesh.material.dispose();
-      }
-      this.roofTexture?.dispose();
-      this.renderer?.dispose();
-      this.buffer = null;
+      this.map?.off('move', this.onMove); this.map?.off('moveend', this.onMoveEnd);
+      this.releaseActive(); this.renderer?.dispose();
+      this.renderer = this.scene = this.camera = this.map = null;
     },
   };
 }

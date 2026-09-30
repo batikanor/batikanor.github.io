@@ -125,6 +125,14 @@ origin returned HTTP 400. A browser check is still required after DNS/HTTPS.
 
 ## Roll back
 
+Staging releases are immutable snapshots. Uploads checksum and hard-link
+unchanged files from the captured previous release (`--link-dest`, without
+preserving export timestamps), and inherit older fingerprinted assets by
+hard link. Never upload with `--inplace` or edit a published asset in place:
+its inode may be shared by several rollback snapshots. Failed uploads remove
+only their own unpublished directory; the active release remains untouched.
+The upload refuses to start with less than 1 GiB of free server storage.
+
 Use the **previous release ID printed by `deploy.sh`**:
 
 ```sh

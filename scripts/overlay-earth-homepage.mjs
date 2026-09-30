@@ -76,12 +76,23 @@ const entryTag = /<script type="module" crossorigin src="(\/assets\/index-[A-Za-
 const entryMatch = html.match(entryTag);
 assert(entryMatch && await exists(join(earth, entryMatch[1].slice(1))),
   'Could not resolve the public Earth entry bundle');
+const entryScript=await readFile(join(earth,entryMatch[1].slice(1)),'utf8');
+const mapEntryMatch=entryScript.match(/\.\/(main-[A-Za-z0-9_-]+\.js)/);
+assert(mapEntryMatch&&await exists(join(earth,'assets',mapEntryMatch[1])), 'Could not resolve current map runtime');
 html = html.replace(entryTag, `<script type="module">
   try {
     const response = await fetch('/assets/earth-current.json?t=' + Date.now(), {cache: 'no-store'});
     if (!response.ok) throw new Error('Earth release manifest unavailable');
-    const {entry} = await response.json();
+    const {entry, mapEntry} = await response.json();
     if (!/^\\/assets\\/index-[A-Za-z0-9_-]+\\.js$/.test(entry)) throw new Error('Invalid Earth release entry');
+    // Start the large map download alongside the small bootstrap, not after
+    // it. CV/list routes deliberately avoid this speculative runtime work.
+    const view = new URLSearchParams(location.search).get('view');
+    if (view !== 'cv' && view !== 'list' && /^\\/assets\\/main-[A-Za-z0-9_-]+\\.js$/.test(mapEntry || '')) {
+      const preload = document.createElement('link');
+      preload.rel = 'modulepreload'; preload.href = mapEntry; preload.crossOrigin = 'anonymous';
+      document.head.append(preload);
+    }
     await import(entry);
   } catch (error) {
     console.error('Earth portfolio could not start.', error);
@@ -139,8 +150,11 @@ for (const directory of ['assets', 'data', 'fonts', 'photos', 'certificates', 'o
   const from = join(earth, directory);
   if (await exists(from)) await mergeDirectory(from, join(out, directory));
 }
+// Root-scoped, Earth-only cache worker. Never intercepts shell/navigation HTML.
+assert(await exists(join(earth,'earth-cache-sw.js')),'Earth cache worker missing from build');
+await copyFile(join(earth,'earth-cache-sw.js'),join(out,'earth-cache-sw.js'));
 await writeFile(join(out, 'assets', 'earth-current.json'),
-  JSON.stringify({entry: entryMatch[1]}) + '\n');
+  JSON.stringify({entry: entryMatch[1],mapEntry:`/assets/${mapEntryMatch[1]}`}) + '\n');
 await writeFile(join(out, 'index.html'), html);
 await writeAchievementPages(out, {staging});
 if (staging) {

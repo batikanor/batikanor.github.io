@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import {readFileSync, statSync} from 'node:fs';
 import {createHash} from 'node:crypto';
 import {test} from 'node:test';
+import * as THREE from 'three';
 import {
   chooseIsometricRegion,
   chooseRoofAtlasVersion,
@@ -243,4 +244,120 @@ test('local ground imagery must be bounded, local and mobile-sized', () => {
     metadata.coordinates[0], metadata.coordinates[2], metadata.coordinates[1], metadata.coordinates[3],
   ]}, region), /corners/);
   assert.throws(() => validateGroundImageMetadata({...metadata, origin_lonlat: [14.326, 51.767]}, region), /origin/);
+});
+
+function deferred(){let resolve,reject;const promise=new Promise((a,b)=>{resolve=a;reject=b;});return {promise,resolve,reject};}
+function atlasPayload(){return {metadata:atlas,chosen:atlas,imageBlob:new Blob(['source-photo'],{type:'image/webp'}),memoryConstrained:false};}
+function officialFixture({withPhoto=true,textureLoader=null,onChange=null,id='quality-chapter'}={}) {
+  const region={id,origin,radiusM:250,minZoom:15.5,maxZoom:20.25,meshUrl:'/data/actual.bin',
+    ...(withPhoto?{roofAtlas:{metadataUrl:'/data/actual-photo.json',imageUrl:'/data/actual-photo.webp'}}:{})};
+  const map={repaints:0,getCenter:()=>({lng:origin[0],lat:origin[1]}),getZoom:()=>17,
+    isMoving:()=>false,triggerRepaint(){this.repaints++;},getLayer:()=>null,getSource:()=>null};
+  const renderer={renders:0,resets:0,capabilities:{getMaxAnisotropy:()=>8},
+    resetState(){this.resets++;},render(){this.renders++;}};
+  const load=textureLoader??(async()=>new THREE.Texture({width:atlas.width,height:atlas.height,src:'decoded-source-photo'}));
+  const layer=createIsometricRegionLayer({regions:[region],onChange,textureLoader:load});
+  layer.map=map;layer.renderer=renderer;layer.scene=new THREE.Scene();layer.camera=new THREE.Camera();
+  layer.destroyed=false;layer.maxTextureSize=4096;
+  const active={region,model:new THREE.Matrix4(),meshes:null,texture:null,buffer:null,groundObjectUrl:null,
+    atlasState:withPhoto?'pending':'not-required'};layer.active=active;
+  const photo=deferred();
+  const prepared={meshPromise:Promise.resolve(fixture),atlasPromise:photo.promise,abort:new AbortController()};
+  return {layer,active,prepared,photo,map,renderer};
+}
+const projectionArgs={defaultProjectionData:{mainMatrix:[1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1],projectionTransition:0}};
+
+test('official photo chapters never render opaque gray roofs or walls while the atlas is pending',async()=>{
+  const changes=[],fx=officialFixture({onChange:event=>changes.push(event)});
+  await fx.layer.loadRegion(fx.active,fx.prepared);
+  assert.equal(fx.layer.getStats().geometryLoaded,true);assert.equal(fx.layer.getStats().qualityReady,false);
+  assert.equal(fx.layer.getStats().atlasState,'pending');assert.equal(fx.layer.hasTexturedContext(),false);
+  assert.equal(fx.layer.hasRenderableContext(),false);
+  assert.ok(fx.active.meshes.every(mesh=>mesh.visible===false));
+  assert.equal(fx.layer.scene.children.filter(object=>object.isMesh).length,0,'ground photograph remains unobscured');
+  fx.layer.render({},projectionArgs);assert.equal(fx.renderer.renders,0);
+  assert.equal(changes.at(-1).loaded,false);assert.equal(changes.at(-1).geometryLoaded,true);
+  fx.photo.resolve(null);await fx.active.roofTask;
+  assert.equal(fx.layer.getStats().atlasState,'unavailable');assert.equal(fx.layer.hasRenderableContext(),false);
+  fx.layer.releaseActive();
+});
+
+test('accepted official roof photography atomically reveals the surveyed meshes and signals quality readiness',async()=>{
+  const changes=[],fx=officialFixture({onChange:event=>changes.push(event)});
+  await fx.layer.loadRegion(fx.active,fx.prepared);fx.photo.resolve(atlasPayload());await fx.active.roofTask;
+  assert.equal(fx.layer.hasTexturedContext(),true);assert.equal(fx.layer.hasRenderableContext(),true);
+  assert.equal(fx.layer.hasTexturedContext('quality-chapter'),true);assert.equal(fx.layer.hasTexturedContext('elsewhere'),false);
+  assert.equal(fx.layer.getStats().atlasState,'ready');assert.equal(fx.layer.getStats().activeRoofTextures,1);
+  assert.equal(fx.layer.scene.children.filter(object=>object.isMesh).length,2);
+  assert.ok(fx.active.meshes.every(mesh=>mesh.visible));
+  const roof=fx.active.meshes[0];assert.equal(roof.material.map,fx.active.texture);
+  assert.equal(roof.material.color.getHex(),0xffffff);assert.equal(roof.material.toneMapped,false,'source photo is not darkened by custom lighting');
+  assert.equal(roof.geometry.getAttribute('uv').count,roof.geometry.getAttribute('position').count);
+  assert.equal(changes.at(-1).loaded,true);assert.equal(changes.at(-1).qualityReady,true);assert.equal(changes.at(-1).textured,true);
+  fx.layer.render({},projectionArgs);assert.equal(fx.renderer.renders,1);
+  const texture=fx.active.texture,image=texture.image;let textureDisposals=0;
+  texture.addEventListener('dispose',()=>textureDisposals++);fx.layer.releaseActive();
+  assert.equal(textureDisposals,1);assert.equal(texture.image,null);assert.equal(image.src,'');
+  assert.equal(fx.layer.hasTexturedContext(),false);assert.equal(fx.layer.getStats().activeRoofTextures,0);
+  assert.equal(changes.at(-1).qualityReady,false);
+});
+
+test('failed or invalid roof photography never reveals plain gray official massing',async()=>{
+  const originalWarn=console.warn;console.warn=()=>{};
+  try {
+    const transport=officialFixture();await transport.layer.loadRegion(transport.active,transport.prepared);
+    transport.photo.reject(new TypeError('photo unavailable'));await transport.active.roofTask;
+    assert.equal(transport.layer.getStats().atlasState,'error');assert.equal(transport.layer.hasRenderableContext(),false);
+    assert.equal(transport.layer.scene.children.filter(object=>object.isMesh).length,0);transport.layer.releaseActive();
+    let disposed=0;const badTexture=new THREE.Texture({width:17,height:19,src:'invalid-photo'});
+    badTexture.addEventListener('dispose',()=>disposed++);
+    const malformed=officialFixture({textureLoader:async()=>badTexture});
+    await malformed.layer.loadRegion(malformed.active,malformed.prepared);malformed.photo.resolve(atlasPayload());await malformed.active.roofTask;
+    assert.equal(malformed.layer.getStats().atlasState,'error');assert.equal(malformed.layer.getStats().activeRoofTextures,0);
+    assert.ok(malformed.active.meshes.every(mesh=>!mesh.visible));assert.equal(disposed,1);assert.equal(badTexture.image,null);
+    malformed.layer.releaseActive();
+  } finally {console.warn=originalWarn;}
+});
+
+test('author-authenticated geometry-only chapters remain supported without falsely claiming photographic detail',async()=>{
+  const fx=officialFixture({withPhoto:false});await fx.layer.loadRegion(fx.active,fx.prepared);
+  assert.equal(fx.layer.getStats().atlasState,'not-required');assert.equal(fx.layer.hasRenderableContext(),true);
+  assert.equal(fx.layer.hasTexturedContext(),false);assert.equal(fx.layer.getStats().activeRoofTextures,0);
+  assert.equal(fx.layer.scene.children.filter(object=>object.isMesh).length,2);
+  fx.layer.render({},projectionArgs);assert.equal(fx.renderer.renders,1);fx.layer.releaseActive();
+});
+
+test('late atlas decode after departure is disposed and cannot reveal or retain a previous city',async()=>{
+  const decoder=deferred();let starts=0,disposals=0;
+  const fx=officialFixture({textureLoader:()=>{starts++;return decoder.promise;}});
+  await fx.layer.loadRegion(fx.active,fx.prepared);fx.photo.resolve(atlasPayload());
+  await new Promise(resolve=>setTimeout(resolve,0));assert.equal(starts,1);assert.equal(fx.layer.getStats().atlasDecoding,1);
+  const task=fx.active.roofTask;fx.layer.releaseActive();
+  const late=new THREE.Texture({width:atlas.width,height:atlas.height,src:'late-photo'});
+  late.addEventListener('dispose',()=>disposals++);decoder.resolve(late);await task;
+  assert.equal(disposals,1);assert.equal(late.image,null);assert.equal(fx.layer.scene.children.length,0);
+  assert.equal(fx.layer.getStats().activeRoofTextures,0);assert.equal(fx.layer.getStats().atlasDecoding,0);
+  assert.equal(fx.layer.getStats().regionId,null);
+});
+
+test('rapid official navigation serializes non-abortable decodes and skips stale queued cities',async()=>{
+  const firstDecode=deferred();let starts=0,running=0,maximum=0;
+  const fx=officialFixture({textureLoader:async()=>{
+    starts++;running++;maximum=Math.max(maximum,running);
+    try {return starts===1?await firstDecode.promise:new THREE.Texture({width:atlas.width,height:atlas.height});}
+    finally {running--;}
+  }});
+  await fx.layer.loadRegion(fx.active,fx.prepared);fx.photo.resolve(atlasPayload());
+  await new Promise(resolve=>setTimeout(resolve,0));const firstTask=fx.active.roofTask;
+  fx.layer.releaseActive();
+  const createNext=id=>({region:{...fx.active.region,id},model:new THREE.Matrix4(),meshes:null,texture:null,buffer:null,groundObjectUrl:null,atlasState:'pending'});
+  const second=createNext('queued-city'),third=createNext('current-city');
+  fx.layer.active=second;await fx.layer.loadRegion(second,{...fx.prepared,atlasPromise:Promise.resolve(atlasPayload())});const secondTask=second.roofTask;
+  fx.layer.releaseActive();fx.layer.active=third;
+  await fx.layer.loadRegion(third,{...fx.prepared,atlasPromise:Promise.resolve(atlasPayload())});const thirdTask=third.roofTask;
+  firstDecode.resolve(new THREE.Texture({width:atlas.width,height:atlas.height}));
+  await Promise.all([firstTask,secondTask,thirdTask]);
+  assert.equal(maximum,1);assert.equal(starts,2,'superseded queued city is not decoded');
+  assert.equal(fx.layer.hasTexturedContext('current-city'),true);assert.equal(fx.layer.getStats().activeRoofTextures,1);
+  assert.equal(fx.layer.scene.children.filter(object=>object.isMesh).length,2);fx.layer.releaseActive();
 });

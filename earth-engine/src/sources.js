@@ -45,6 +45,7 @@ export function earthStyle() {
       // Mapterhorn has real z16 DEM tiles here but z17+ returns 404. Overzoom
       // its 1 m-class z16 sample instead of making dozens of missing requests.
       terrain: {type: 'raster-dem', url: MAPTERHORN_TILEJSON, encoding: 'terrarium', maxzoom: 16, attribution: TERRAIN_ATTRIBUTION},
+      'terrain-coarse': {type: 'raster-dem', url: MAPTERHORN_TILEJSON, encoding: 'terrarium', maxzoom: 12, attribution: TERRAIN_ATTRIBUTION},
       // MapLibre recommends independent DEM source instances for hillshade
       // and the 3D terrain mesh to preserve visual quality while zooming.
       hillshade: {type: 'raster-dem', url: MAPTERHORN_TILEJSON, encoding: 'terrarium', maxzoom: 16, attribution: TERRAIN_ATTRIBUTION}
@@ -56,7 +57,7 @@ export function earthStyle() {
       {id: 'esa-imagery', type: 'raster', source: 'esa', layout: {visibility: PUBLIC_RELEASE ? 'visible' : 'none'}, minzoom: 12, paint: {'raster-fade-duration': 180, 'raster-saturation': 0.06, 'raster-contrast': 0.075, 'raster-brightness-max': 1}},
       {id: 'bavaria-imagery', type: 'raster', source: 'bavaria', minzoom: 12, paint: {'raster-fade-duration': 250}},
       {id: 'berlin-imagery', type: 'raster', source: 'berlin', minzoom: 16, paint: {'raster-fade-duration': 250}},
-      {id: 'terrain-hillshade', type: 'hillshade', source: 'hillshade', minzoom: 5, paint: {'hillshade-exaggeration': 0.23, 'hillshade-shadow-color': '#10222b', 'hillshade-highlight-color': '#f4f0e1', 'hillshade-accent-color': '#879891'}}
+      {id: 'terrain-hillshade', type: 'hillshade', source: 'hillshade', minzoom: 5, maxzoom: 12, paint: {'hillshade-exaggeration': 0.23, 'hillshade-shadow-color': '#10222b', 'hillshade-highlight-color': '#f4f0e1', 'hillshade-accent-color': '#879891'}}
     ],
     terrain: {source: 'terrain', exaggeration: 1},
     sky: {'sky-color': '#b2d3de', 'horizon-color': '#e8d9c6', 'fog-color': '#b2d3de', 'sky-horizon-blend': 0.4, 'horizon-fog-blend': 0.25, 'fog-ground-blend': 0.25}

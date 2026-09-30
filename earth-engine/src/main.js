@@ -27,9 +27,17 @@ import {installExportControls} from './exportControls.js';
 import {createDetailPanel} from './detailPanel.js';
 import {createJourneyExplorer} from './journeyExplorer.js';
 import './journeyExplorer.css';
-import {createTileWarmup, warmupProfile, introOverviewPlan, adjacentOverviewPlan, overviewCover, overviewTileAt, DETAIL_ZOOM} from './tileWarmup.js';
+import {createTileWarmup, warmupProfile, overviewCover, overviewTileAt, tileUrl} from './tileWarmup.js';
 import {createMapTransition} from './mapTransition.js';
 import './mapTransition.css';
+import {arrivalResourceUrl, resolveArrivalRequest, arrivalAssetBudget, arrivalLandingManifest} from './arrivalImagery.js';
+import {createArrivalLandingLayer} from './arrivalLandingLayer.js';
+import {createAchievementSceneLayer} from './achievementSceneLayer.js';
+import {ACHIEVEMENT_SCENE_CAMERA} from './achievementSceneData.js';
+import {createExhibitReader, exhibitInspectionCamera} from './exhibitReader.js';
+import {createPersistentCache, MAPTERHORN_CACHE_TILE} from './persistentCache.js';
+import {terrainPolicy} from './terrainPolicy.js';
+import {destinationPatch,destinationLandingManifest,validateDestinationLandings,destinationCamera,qualityPlanForEvent,allQualityPreparationPlan,destinationAssetBudget} from './destinationImagery.js';
 
 const $ = (id) => document.getElementById(id);
 const detailPanel = createDetailPanel($('detail'), {onGeometrySettled: keepCurrentEventVisible});
@@ -57,29 +65,37 @@ const countries=Object.values(cities.reduce((all,city)=>{
 const byCity = new Map(cities.map(x=>[x.key,x]));
 const initialCamera = {center:[12,27],zoom:1.85,pitch:0,bearing:0};
 const DETAIL_MAX_ZOOM=21.35;
-const hasBavariaDetail = ([lng,lat]) => lng>=BAVARIA_TRIAL_BOUNDS[0] && lng<=BAVARIA_TRIAL_BOUNDS[2]
-  && lat>=BAVARIA_TRIAL_BOUNDS[1] && lat<=BAVARIA_TRIAL_BOUNDS[3];
 // Small real-data pockets rather than a fabricated miniature world. Every
 // chapter has official LoD2 roofs/walls and a source-aligned 20 cm photo
-// atlas. Other achievements keep the existing satellite/terrain journey.
+// atlas. Other achievements use mapped footprint/tree context and clearly
+// illustrative project objects over the same factual satellite imagery.
 const chapterUrl = name => `${import.meta.env.BASE_URL}data/${name}`;
 const cottbusUrl = name => `${import.meta.env.BASE_URL}assets/isometric/${name}`;
 const ISOMETRIC_CHAPTERS = [
   {
+    id:'tesla-gigafactory',origin:[13.79215,52.3951],radiusM:500,
+    meshUrl:cottbusUrl('tesla-gigafactory-lod2-v1.bin'),
+    roofAtlas:{imageUrl:cottbusUrl('tesla-gigafactory-roof-truedop20-v1.webp'),metadataUrl:cottbusUrl('tesla-gigafactory-roof-truedop20-v1.json')},
+    credit:'© GeoBasis-DE/LGB · Brandenburg LoD2 and TrueDOP20 (2023 imagery, data modified), dl-de/by-2-0'
+  },
+  {
     id:'munich-siemens',origin:[11.5758,48.1453],radiusM:250,
     meshUrl:chapterUrl('munich-siemens-lod2-v1.bin'),
+    groundImage:{imageUrl:chapterUrl('munich-siemens-ground-preview-v1.webp'),metadataUrl:chapterUrl('munich-siemens-ground-preview-v1.json')},
     roofAtlas:{imageUrl:chapterUrl('munich-siemens-roof-dop20-v1.webp'),metadataUrl:chapterUrl('munich-siemens-roof-dop20-v1.json')},
     credit:'Bayerische Vermessungsverwaltung · LoD2 buildings and DOP20 imagery (modified), CC BY 4.0'
   },
   {
     id:'munich-google',origin:[11.5802,48.1392],radiusM:250,
     meshUrl:chapterUrl('munich-google-lod2-v1.bin'),
+    groundImage:{imageUrl:chapterUrl('munich-google-ground-preview-v1.webp'),metadataUrl:chapterUrl('munich-google-ground-preview-v1.json')},
     roofAtlas:{imageUrl:chapterUrl('munich-google-roof-dop20-v1.webp'),metadataUrl:chapterUrl('munich-google-roof-dop20-v1.json')},
     credit:'Bayerische Vermessungsverwaltung · LoD2 buildings and DOP20 imagery (modified), CC BY 4.0'
   },
   {
     id:'berlin-library',origin:[13.3708,52.5074],radiusM:250,
     meshUrl:chapterUrl('berlin-library-lod2-v1.bin'),
+    groundImage:{imageUrl:chapterUrl('berlin-library-ground-preview-v1.webp'),metadataUrl:chapterUrl('berlin-library-ground-preview-v1.json')},
     roofAtlas:{imageUrl:chapterUrl('berlin-library-roof-truedop20-v1.webp'),metadataUrl:chapterUrl('berlin-library-roof-truedop20-v1.json')},
     credit:'Geoportal Berlin · LoD2 buildings and TrueDOP 2026 imagery (modified), dl-de-zero-2.0'
   },
@@ -104,22 +120,49 @@ const ISOMETRIC_CHAPTERS = [
   })
 ];
 const ISOMETRIC_EVENT_REGIONS = new Map([
+  ['tesla-gigathon-2026','tesla-gigafactory'],
   ['masters-thesis','munich-siemens'],
   ['bayer-ai-2024','munich-google'],
   ['real-coin-map-2025','berlin-library'],
   ['decarbon-days-climathon-2025','cottbus-climathon-2025'],
   ['decarbon-days-climathon-2026','cottbus-climathon-2026']
 ]);
+const reducedPhotoTier=Number.isFinite(navigator.deviceMemory)&&navigator.deviceMemory<=2;
+const qualityCameraOverrides=new Map(orderedAchievements.map(event=>[event.slug,destinationCamera(event,{reduced:reducedPhotoTier})]));
+// Preserve genuine native 20 cm local chapters, not enlarged Sentinel pixels.
+qualityCameraOverrides.set('decarbon-days-climathon-2025',COTTBUS_HANGAR_CAMERA);
+qualityCameraOverrides.set(HERO_VENUE_EVENT,{center:HERO_VENUE_LOCATION,zoom:20.23,pitch:68,bearing:285});
 const bootstrapCamera = initialMapCamera(initialRoute, orderedAchievements, initialCamera, {
   // The entered homepage starts on the world, not on the newest competition.
   // Explicit achievement deep links still get their direct local camera.
   fastStart:false,
-  isometricEventSlugs:ISOMETRIC_EVENT_REGIONS
+  isometricEventSlugs:ISOMETRIC_EVENT_REGIONS,
+  sceneEventSlugs:new Set(orderedAchievements.map(event=>event.slug)),
+  sceneCamera:ACHIEVEMENT_SCENE_CAMERA,
+  eventCameraOverrides:qualityCameraOverrides
 });
+const preparationProfile = warmupProfile({
+  saveData:navigator.connection?.saveData,
+  effectiveType:navigator.connection?.effectiveType,
+  deviceMemory:navigator.deviceMemory,
+  coarsePointer:window.matchMedia('(pointer: coarse)').matches
+});
+// Encoded official aerial photographs, not hidden GPU maps. The active
+// destination alone is decoded at native resolution; low-data visitors opt out
+// of speculative transfers, never of quality for the place they choose.
+const arrivalProfile = {...preparationProfile,
+  concurrency:preparationProfile.enabled ? (preparationProfile.mobile ? 2 : 4) : 0,
+  sessionByteLimit:preparationProfile.mobile ? 28_000_000 : 64_000_000,
+  batchByteLimit:preparationProfile.mobile ? 28_000_000 : 64_000_000};
+const persistentCache = createPersistentCache({version:import.meta.url});
 
+const startupStyle=earthStyle();
+if(initialRoute.eventSlug&&!ISOMETRIC_EVENT_REGIONS.has(initialRoute.eventSlug)&&initialRoute.eventSlug!==HERO_VENUE_EVENT){
+  delete startupStyle.terrain; // No needless high-zoom DEM on a flat venue deep link.
+}
 const map = new maplibregl.Map({
   container:'map',
-  style:earthStyle(),
+  style:startupStyle,
   center:bootstrapCamera.center,
   zoom:bootstrapCamera.zoom,
   pitch:bootstrapCamera.pitch,
@@ -132,6 +175,10 @@ const map = new maplibregl.Map({
   // Keep an in-flight lower-zoom tile as a temporary parent instead of
   // canceling it during a camera approach and revealing empty squares.
   cancelPendingTileRequestsWhileZooming:false,
+  maxTileCacheSize:preparationProfile.mobile ? 40 : 96,
+  maxTileCacheZoomLevels:preparationProfile.mobile ? 2 : 3,
+  pixelRatio:Math.min(window.devicePixelRatio || 1,2),
+  transformRequest:url=>({url:resolveArrivalRequest(url)}),
   attributionControl:false
 });
 map.addControl(new maplibregl.ScaleControl({unit:'metric',maxWidth:120}),'bottom-left');
@@ -141,13 +188,19 @@ if(scaleElement)$('settings-scale').append(scaleElement);
 let activeCity = null;
 let activeEvent = null;
 let imagery = PUBLIC_RELEASE ? 'esa' : 'eox';
-const tileWarmup = createTileWarmup({template:ESA_TILE,profile:warmupProfile({
-  saveData:navigator.connection?.saveData,
-  effectiveType:navigator.connection?.effectiveType,
-  deviceMemory:navigator.deviceMemory,
-  coarsePointer:window.matchMedia('(pointer: coarse)').matches
-})});
-const mapTransition = createMapTransition(map, {container:$('app'),detailSource:()=>imagery==='eox'?'sentinel':imagery==='nasa'?null:'esa'});
+const tileWarmup = createTileWarmup({template:ESA_TILE,profile:arrivalProfile,
+  urlForTile:tile=>arrivalResourceUrl(tile)??ESA_TILE.replaceAll('{z}',String(tile.z)).replaceAll('{x}',String(tile.x)).replaceAll('{y}',String(tile.y))});
+const arrivalLanding=createArrivalLandingLayer({manifest:arrivalLandingManifest,baseUrl:import.meta.env.BASE_URL});
+arrivalLanding.setEnabled(imagery==='esa');
+const mapTransition = createMapTransition(map, {container:$('app'),detailSource:()=>imagery==='eox'?'sentinel':imagery==='nasa'?null:'esa',
+  arrivalReady:()=>destinationQualityReady(),
+  qualityRequired:()=>imagery==='esa'&&!!activeEvent&&!!destinationPatch(activeEvent.slug),
+  onQualityTimeout:()=>{
+    // A provider/decode failure is not permission to expose giant Sentinel
+    // pixels. Keep navigation usable with an honest wide fallback instead.
+    if(activeEvent&&!destinationQualityReady())map.easeTo({zoom:13.8,pitch:43,duration:0,animate:false});
+  },
+  arrivalTiles:()=>imagery==='esa'&&activeEvent?[overviewTileAt(activeEvent.coordinates,11),overviewTileAt(activeEvent.coordinates,14)]:[]});
 if(PUBLIC_RELEASE){
   document.querySelector('[data-imagery="eox"]')?.remove();
   document.querySelector('[data-imagery="esa"]').setAttribute('aria-pressed','true');
@@ -161,17 +214,24 @@ let terrainOn = true;
 let terrainPausedForRome = false;
 let terrainResumeToken = 0;
 let cityDetailOn = true;
+let venueSceneSelected = false;
 let creditedImagery = null;
+let terrainRenderingKey;
 function syncTerrain(){
   // At street-level drive zoom, MapLibre's terrain projection can show a black
   // ground plane on short mobile canvases. The local campus is essentially
   // flat, so pause the DEM while driving and honour the user's preference again
   // on exit. Both the car and radar then query the same flat map surface.
-  const show=terrainOn&&!drive.active&&!terrainPausedForRome;
-  map.setTerrain(show?{source:'terrain',exaggeration:1}:null);
-  map.setLayoutProperty('terrain-hillshade','visibility',show?'visible':'none');
+  const surveyedVenue=ISOMETRIC_EVENT_REGIONS.has(activeEvent?.slug)||activeEvent?.slug===HERO_VENUE_EVENT;
+  const policy=terrainPolicy({enabled:terrainOn,driving:drive.active,
+    localScene:venueSceneSelected&&cityDetailOn&&!surveyedVenue,zoom:map.getZoom(),
+    eventSlug:venueSceneSelected?activeEvent?.slug:null});
+  const show=policy.showTerrain&&!terrainPausedForRome;
+  const key=show?policy.source:null;
+  if(terrainRenderingKey!==key){map.setTerrain(show?{source:key,exaggeration:1}:null);terrainRenderingKey=key;}
+  map.setLayoutProperty('terrain-hillshade','visibility',show&&policy.hillshadeVisible?'visible':'none');
   $('terrain-toggle').setAttribute('aria-pressed',String(terrainOn));
-  $('terrain-state').textContent=terrainOn?(drive.active||terrainPausedForRome?'PAUSED':'ON'):'OFF';
+  $('terrain-state').textContent=terrainOn?(policy.paused||terrainPausedForRome?'PAUSED':'ON'):'OFF';
 }
 function resumeTerrainAfterFlight(){
   const token=++terrainResumeToken;
@@ -212,9 +272,36 @@ const driveStarts = new Map([
   ['european-defense-tech-2025-munich',{position:[11.666954,48.262269],heading:225}]
 ]);
 const carLayer = createCarLayer(()=>drive);
-const bavariaBuildings = createBavariaBuildingLayer();
-const isometricRegions = createIsometricRegionLayer({regions:ISOMETRIC_CHAPTERS,onChange:()=>updateCredits()});
-const romeVenue = createRomeVenueChapter({onChange:()=>updateCredits()});
+const bavariaBuildings = createBavariaBuildingLayer({onChange:()=>{syncSceneContext();updateCredits();}});
+const isometricRegions = createIsometricRegionLayer({regions:ISOMETRIC_CHAPTERS,onChange:()=>{syncSceneContext();updateCredits();}});
+const romeVenue = createRomeVenueChapter({onChange:()=>{syncSceneContext();updateCredits();}});
+// Unified photo-textured OSM roofs supersede Rome's older opaque flat massing.
+// The original Rome data and media stay intact, but are not double-rendered.
+romeVenue.setEnabled(false);
+let exhibitReader=null;
+const achievementScenes = createAchievementSceneLayer({achievements:orderedAchievements,onChange:()=>{updateCredits();exhibitReader?.sync();}});
+const orthophoto=createArrivalLandingLayer({
+  manifest:destinationLandingManifest({reduced:reducedPhotoTier}),
+  manifestValidator:validateDestinationLandings,maxImageBytes:4_000_000,minZoom:13,
+  baseUrl:import.meta.env.BASE_URL,
+  onChange:()=>updateCredits(),
+  onImageReady:({slug,image,metadata})=>{
+    if(activeEvent?.slug===slug&&!ISOMETRIC_EVENT_REGIONS.has(slug)&&slug!==HERO_VENUE_EVENT)
+      achievementScenes.setRoofImagery(slug,{image,metadata});
+  },
+  onBeforeImageRelease:()=>achievementScenes.setRoofImagery(null,null)
+});
+function destinationQualityReady(){
+  if(imagery!=='esa'||!activeEvent)return false;
+  if(!destinationPatch(activeEvent.slug))return arrivalLanding.isReadyFor(activeEvent.slug);
+  const chapterId=cityDetailOn?ISOMETRIC_EVENT_REGIONS.get(activeEvent.slug):null;
+  return orthophoto.isReadyFor(activeEvent.slug)&&(!chapterId||isometricRegions.hasTexturedContext(chapterId));
+}
+function syncSceneContext(){
+  const chapterId=ISOMETRIC_EVENT_REGIONS.get(activeEvent?.slug);
+  const chapterReady=!!chapterId&&isometricRegions.hasTexturedContext(chapterId);
+  achievementScenes.setOfficialContext(chapterReady||activeEvent?.slug===HERO_VENUE_EVENT);
+}
 const heroVenue = createHeroVenueLayer({onScan:({phase})=>{
   const button=$('scan-button');
   button.classList.toggle('active',phase==='scanning'||phase==='contact');
@@ -223,6 +310,23 @@ const heroVenue = createHeroVenueLayer({onScan:({phase})=>{
   else if(phase==='contact')status('Protective Radar · one contact detected; the quiet warning shield rises.');
   else if(phase==='complete')status('Protective Radar · scan complete. Activate it again to replay.');
 }});
+exhibitReader=createExhibitReader({map,
+  getScene:()=>activeEvent?.slug===HERO_VENUE_EVENT?heroVenue:achievementScenes,
+  getEvent:()=>activeEvent,
+  canRead:()=>venueSceneSelected&&imagery==='esa'&&cityDetailOn&&!drive.active&&$('detail').hidden&&!cvView.isOpen(),
+  onOpenProject:slug=>{const event=orderedAchievements.find(event=>event.slug===slug);if(event){showEventDetail(event);$('detail').hidden=false;exhibitReader.clear();}}
+});
+function inspectExhibit(){
+  if(!activeEvent||!venueSceneSelected)return;
+  finishDrive();closePopovers();$('detail').hidden=true;
+  if(imagery!=='esa')applyImagery('esa');
+  if(!cityDetailOn)$('city-detail-toggle').click();
+  const focus=activeEvent.slug===HERO_VENUE_EVENT?HERO_VENUE_LOCATION:achievementScenes.getExhibitFocus();
+  if(!focus)return;
+  mapTransition.cancel();map.stop();map.easeTo({...exhibitInspectionCamera(focus,$('map').clientWidth),duration:prefersReducedMotion?0:650});
+  status('Project exhibit. Approach the signs, or select Read excerpt to read the original explanation.');
+}
+$('inspect-exhibit').addEventListener('click',inspectExhibit);
 const markers = [];
 let journeyExplorer = null;
 
@@ -230,32 +334,51 @@ function safeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&
 function keyOf(e){return `${e.city}|${e.country}`;}
 
 function warmEntryDestinations() {
+  // One small, compressed offline geography database covers all 32, even on
+  // Save Data. It is needed content, not speculative high-resolution imagery.
+  void achievementScenes.prepareAll();
   if(!tileWarmup.profile.enabled)return;
-  const plan=introOverviewPlan(orderedAchievements,{mobile:tileWarmup.profile.mobile});
-  void tileWarmup.warm(plan).then(()=>{
-    // Only one likely nearby chapter, and only compressed files after imagery
-    // has had the network. The chapter module itself enforces memory/network
-    // limits and does no GPU decoding until actually selected.
-    if(tileWarmup.profile.mobile||!cityDetailOn||!document.documentElement.classList.contains('intro-active'))return;
-    const firstChapter=orderedAchievements.slice(0,4).map(event=>ISOMETRIC_EVENT_REGIONS.get(event.slug)).find(Boolean);
-    if(firstChapter)isometricRegions.prefetch?.(firstChapter);
-  });
+  const plan=allQualityPreparationPlan(orderedAchievements,{mobile:tileWarmup.profile.mobile});
+  void tileWarmup.warm(plan).then(()=>persistentCache.prefetch(plan.map(arrivalResourceUrl).filter(Boolean),{priority:'idle'}));
+  void persistentCache.prefetch(regionalPreparationUrls(),{priority:'idle'});
+}
+function regionalPreparationUrls(regionId=null){
+  const regions=regionId?ISOMETRIC_CHAPTERS.filter(region=>region.id===regionId):ISOMETRIC_CHAPTERS;
+  const assets=regions.flatMap(region=>[
+    region.meshUrl,region.roofAtlas?.metadataUrl,
+    region.roofAtlas?.imageUrl?.replace(/\.webp$/,preparationProfile.mobile?'-half.webp':'.webp'),
+    ...(preparationProfile.mobile?[region.roofAtlas?.metadataUrl?.replace(/\.json$/,'-half.json')]:[]),
+    region.groundImage?.imageUrl,region.groundImage?.metadataUrl
+  ].filter(Boolean));
+  const dem=regions.flatMap(region=>[13,16].flatMap(zoom=>overviewCover({lng:region.origin[0],lat:region.origin[1]},zoom)
+    .map(tile=>tileUrl(MAPTERHORN_CACHE_TILE,tile))));
+  // Warm encoded campus bytes as well, not its ~75 MiB decoded full atlas.
+  // Phones preserve the aerial photograph rather than covering it with
+  // gray geometry when that expensive campus atlas is intentionally skipped.
+  const campus=regionId?[]:[chapterUrl('garching-lod2-v1.bin'),
+    ...(!preparationProfile.mobile?[chapterUrl('garching-roof-orthophoto-v1.json'),chapterUrl('garching-roof-orthophoto-v1.webp')]:[]),
+    ...[13,16].flatMap(zoom=>overviewCover({lng:11.667,lat:48.262},zoom).map(tile=>tileUrl(MAPTERHORN_CACHE_TILE,tile)))];
+  return [...assets,...dem,...campus];
 }
 
+let adjacentWarmTimer;
 function warmAdjacentDestinations(event) {
   if(!tileWarmup.profile.enabled)return;
   const index=orderedAchievements.findIndex(candidate=>candidate.slug===event.slug);
-  // Let the current destination's visible imagery use the connection first;
-  // then prepare the one-step chronology choices in the HTTP cache.
-  setTimeout(()=>{
+  // Upgrade the chosen venue without erasing preparation of other stops.
+  void tileWarmup.warm(qualityPlanForEvent(event.slug),{priority:100,maxBytes:4_000_000});
+  clearTimeout(adjacentWarmTimer);
+  adjacentWarmTimer=setTimeout(()=>{
     if(activeEvent?.slug!==event.slug)return;
-    void tileWarmup.warm(adjacentOverviewPlan(orderedAchievements,index,{mobile:tileWarmup.profile.mobile}));
+    void tileWarmup.warm([orderedAchievements[index+1],orderedAchievements[index-1]]
+      .filter(Boolean).flatMap(item=>qualityPlanForEvent(item.slug)),{priority:30,maxBytes:7_000_000});
     if(!tileWarmup.profile.mobile&&cityDetailOn){
       const nextChapterId=ISOMETRIC_EVENT_REGIONS.get(orderedAchievements[index+1]?.slug);
       if(nextChapterId)isometricRegions.prefetch?.(nextChapterId);
     }
-  },1000);
+  },250);
 }
+document.addEventListener('visibilitychange',()=>document.hidden?tileWarmup.pause():tileWarmup.resume());
 
 function renderJourney(){
   const state=getChronologyState(orderedAchievements,activeEvent?.slug??null);
@@ -299,9 +422,7 @@ if(tileWarmup.profile.enabled&&!tileWarmup.profile.mobile){
     if(!selected)return;
     clearTimeout(previewTimer);
     previewTimer=setTimeout(()=>{
-      if(!$('journey-explorer').hidden)void tileWarmup.warm([
-        ...overviewCover(selected.coordinates),overviewTileAt(selected.coordinates,DETAIL_ZOOM)
-      ],{maxBytes:750_000});
+      if(!$('journey-explorer').hidden)void tileWarmup.warm(qualityPlanForEvent(selected.slug),{maxBytes:4_000_000,priority:50});
     },180);
   };
   $('explorer-list').addEventListener('pointerover',previewExplorerEvent);
@@ -318,7 +439,7 @@ let refocusAfterCv=false;
 function openCvView({mapFocusSkipped=false}={}){
   refocusAfterCv=mapFocusSkipped||map.isMoving();
   if(map.isMoving())map.stop();
-  cvView.open();
+  exhibitReader?.clear();cvView.open();
 }
 $('cv-link').addEventListener('click',()=>{
   closePopovers();
@@ -362,6 +483,25 @@ creditsObserver.observe($('sources'));
 
 function updateCredits(){
   const bounds=map.getBounds();
+  const photo=activeEvent&&venueSceneSelected&&imagery==='esa'&&orthophoto?.getStats().activeSources
+    &&map.getZoom()>=13?destinationPatch(activeEvent.slug):null;
+  const photoCredit=$('destination-photo-credit');
+  if(photoCredit){
+    photoCredit.hidden=!photo;
+    if(photo&&photoCredit.dataset.source!==photo.id){
+      photoCredit.dataset.source=photo.id;
+      const link=document.createElement('a');link.href=photo.source.url;
+      link.textContent=photo.source.attribution;
+      const licence=document.createElement('a');licence.href=photo.source.licenseUrl??photo.source.url;
+      licence.textContent='Licence';licence.title=photo.source.license;
+      photoCredit.replaceChildren(link,document.createTextNode(' · '),licence);
+    }
+  }
+  const logo=$('destination-photo-logo');
+  if(logo){
+    logo.hidden=!photo?.source.requiresLogo;
+    if(photo?.source.requiresLogo)logo.src=`${import.meta.env.BASE_URL}${photo.source.logoUrl}`;
+  }
   // Show the attribution conservatively whenever a Bavaria tile could intersect
   // the viewport; the camera center may be outside while an edge tile is shown.
   const bavaria=imagery!=='nasa'&&map.getZoom()>=12
@@ -372,15 +512,17 @@ function updateCredits(){
     &&bounds.getEast()>=BERLIN_TRUEDOP_BOUNDS[0]&&bounds.getWest()<=BERLIN_TRUEDOP_BOUNDS[2]
     &&bounds.getNorth()>=BERLIN_TRUEDOP_BOUNDS[1]&&bounds.getSouth()<=BERLIN_TRUEDOP_BOUNDS[3];
   $('berlin-credit').hidden=!berlin;
-  $('cottbus-credit').hidden=!isometricRegions.getActiveRegionId()?.startsWith('cottbus-');
+  $('cottbus-credit').hidden=!isometricRegions.getActiveRegionId()?.startsWith('cottbus-')&&isometricRegions.getActiveRegionId()!=='tesla-gigafactory';
   $('rome-credit').hidden=!romeVenue.isVisible();
-  if(creditedImagery!==imagery){
+  $('achievement-scene-credit').hidden=!venueSceneSelected||!cityDetailOn||map.getZoom()<15;
+  const creditKey=`${imagery}:${!!photo}`;
+  if(creditedImagery!==creditKey){
     $('imagery-credit').innerHTML=imagery==='eox'
       ? '<a href="https://cloudless.eox.at">EOxCloudless</a> by EOX IT Services GmbH (Contains modified Copernicus Sentinel data 2024) · <a href="https://cloudless.eox.at/license-non-commercial">CC BY-NC-SA 4.0</a>'
       : imagery==='esa'
-        ? '<a href="https://esa-worldcover.org/en/data-access">© ESA WorldCover project 2021</a> / Contains modified Copernicus Sentinel data (2021) processed by ESA WorldCover consortium · <a href="https://science.nasa.gov/earth/earth-observatory/blue-marble-next-generation/base-map/">NASA Blue Marble underlay</a>'
+        ? photo?'<a href="https://esa-worldcover.org/en/data-access">ESA WorldCover 2021 · modified Copernicus Sentinel data</a> · <a href="https://science.nasa.gov/earth/earth-observatory/blue-marble-next-generation/base-map/">NASA Blue Marble</a>':'<a href="https://esa-worldcover.org/en/data-access">© ESA WorldCover project 2021</a> / Contains modified Copernicus Sentinel data (2021) processed by ESA WorldCover consortium · <a href="https://science.nasa.gov/earth/earth-observatory/blue-marble-next-generation/base-map/">NASA Blue Marble underlay</a>'
         : '<a href="https://science.nasa.gov/earth/earth-observatory/blue-marble-next-generation/base-map/">NASA Earth Observatory · Blue Marble Next Generation</a>';
-    creditedImagery=imagery;
+    creditedImagery=creditKey;
   }
 }
 
@@ -394,7 +536,9 @@ function fly(target,{chronologyNavigation=false}={}) {
   // A long flyTo streams hundreds of never-viewed intermediate raster/DEM
   // tiles and reveals an empty patchwork for cross-continent moves. Jump
   // directly once an overview tile is ready, with a bounded frame handoff.
-  if(crossCity){
+  const qualityArrival=target.zoom>=13&&imagery==='esa'&&!!activeEvent
+    &&!!destinationPatch(activeEvent.slug)&&!destinationQualityReady();
+  if(crossCity||qualityArrival){
     return mapTransition.jump(target,activeEvent?.city??'destination').catch(error=>{
       console.warn('Map handoff fell back to a direct camera change:',error);
       map.jumpTo(target);
@@ -491,7 +635,8 @@ function keepCurrentEventVisible(){
   const focus=activeEvent.slug===HERO_VENUE_EVENT
     ? document.querySelector('[data-venue-view="campus"][aria-pressed="true"]')
       ? [11.666954,48.262269] : HERO_VENUE_LOCATION
-    : [activeEvent.coordinates.lng,activeEvent.coordinates.lat];
+    : destinationPatch(activeEvent.slug)?.camera?.center??(cityDetailOn&&!ISOMETRIC_EVENT_REGIONS.has(activeEvent.slug)&&activeEvent.slug!=='ethrome-2025'
+      ? achievementScenes.getExhibitFocus() : null)??[activeEvent.coordinates.lng,activeEvent.coordinates.lat];
   const point=map.project(focus);
   const mapRect=$('map').getBoundingClientRect();
   const panelRect=$('detail').getBoundingClientRect();
@@ -502,7 +647,13 @@ function keepCurrentEventVisible(){
 }
 function selectEvent(event,{showDetail=false,historyMode='push',view=null,skipFly=false,chronologyNavigation=false}={}) {
   if(!event)return;
+  exhibitReader.clear();
   finishDrive();activeEvent=event;activeCity=byCity.get(keyOf(event));
+  venueSceneSelected=true;
+  achievementScenes.setFocus(event.slug===HERO_VENUE_EVENT?null:event.slug);
+  const covered=!!destinationPatch(event.slug);
+  arrivalLanding.setFocus(covered?null:event.slug);
+  orthophoto.setFocus(covered?event.slug:null);
   const pauseRome=event.slug==='ethrome-2025';
   terrainResumeToken++;
   const restoreReliefAfterArrival=!pauseRome&&terrainPausedForRome;
@@ -515,25 +666,25 @@ function selectEvent(event,{showDetail=false,historyMode='push',view=null,skipFl
   closePopovers();
   const isHero=event.slug===HERO_VENUE_EVENT;
   const chapterId=ISOMETRIC_EVENT_REGIONS.get(event.slug)??null;
-  const chapterCamera=event.slug==='decarbon-days-climathon-2025'
-    ? COTTBUS_HANGAR_CAMERA : ISOMETRIC_CAMERA;
+  const qualityCamera=qualityCameraOverrides.get(event.slug);
+  // A nearby chapter is not necessarily this venue. Avoid overlapping
+  // surveyed geometry and differently estimated OSM roofs at other stops.
+  isometricRegions.setEnabled(cityDetailOn&&!!chapterId);
   isometricRegions.setFocus(chapterId);
-  romeVenue.setFocus(event.slug);
-  const isometricView=cityDetailOn&&!!chapterId;
-  const romeView=cityDetailOn&&event.slug==='ethrome-2025';
-  const localImage=hasBavariaDetail([event.coordinates.lng,event.coordinates.lat]);
+  if(chapterId)void persistentCache.prefetch(regionalPreparationUrls(chapterId),{priority:'urgent'});
+  romeVenue.setFocus(null);
+  syncSceneContext();
+  syncTerrain();
   heroVenue.setActive(isHero);$('scan-button').hidden=!isHero;
+  $('inspect-exhibit').hidden=false;
   const drivable=driveStarts.has(event.slug);
   $('drive-button').hidden=!drivable;$('drive-button').disabled=!drivable;
   $('drive-button').title=drivable?'Start the curated Garching driving demo':'Driving prototype currently available at Garching only';
   renderJourney();
-  // Never enlarge the global Sentinel mosaic several zoom levels beyond its
-  // native z14 ceiling. Other cities need their own orthophoto chapter first.
+  // Native sampling sets the framing. Genuine surveyed 20 cm chapters can
+  // be closer; a 10 m fallback must never masquerade as street-level imagery.
   if(!skipFly){
-  const flight=fly({center:isHero?HERO_VENUE_LOCATION:[event.coordinates.lng,event.coordinates.lat],
-    zoom:isHero?20.23:isometricView?chapterCamera.zoom:romeView?17.45:localImage?16.4:13.8,
-    pitch:isHero?68:isometricView?chapterCamera.pitch:romeView?55:localImage?67:55,
-    bearing:isHero?285:isometricView?chapterCamera.bearing:romeView?38:-18,
+  const flight=fly({center:[event.coordinates.lng,event.coordinates.lat],...qualityCamera,
       ...(showDetail?{offset:detailMapOffset()}:{})},{chronologyNavigation});
     if(restoreReliefAfterArrival){
       if(flight?.then)void flight.then(resumeTerrainAfterFlight);
@@ -568,6 +719,8 @@ function showEventDetail(event) {
     scroll.insertBefore(controls,content);
   }
   scroll.scrollTop=0;
+  const inspect=document.createElement('button');inspect.type='button';inspect.className='inspect-project-exhibit';inspect.textContent='Inspect 3D exhibit';
+  inspect.addEventListener('click',inspectExhibit);scroll.insertBefore(inspect,content);
   bindDetail(root);
 }
 function bindDetail(root){
@@ -687,13 +840,20 @@ function initializeEventLayers(){
 }
 
 function showWholeEarth({historyMode='push'}={}){
+  exhibitReader.clear();$('inspect-exhibit').hidden=true;
   finishDrive();activeCity=null;$('detail').hidden=true;
+  venueSceneSelected=false;
+  achievementScenes.setFocus(null);
+  arrivalLanding.setFocus(null);
+  orthophoto.setFocus(null);
   terrainResumeToken++;
   const restoreReliefAfterArrival=terrainPausedForRome;
   isometricRegions.setFocus(null);
+  isometricRegions.setEnabled(cityDetailOn);
   romeVenue.setFocus(null);
   $('drive-button').hidden=true;$('drive-button').disabled=true;
   heroVenue.setActive(false);$('scan-button').hidden=true;
+  syncTerrain();
   closePopovers();fly(initialCamera);
   if(restoreReliefAfterArrival)resumeTerrainAfterFlight();
   status('Whole Earth. The chronology remains on the selected achievement.');
@@ -722,6 +882,8 @@ function applyImagery(next){
   if(PUBLIC_RELEASE&&next==='eox')return;
   if(next==='nasa')finishDrive();
   imagery=next;
+  arrivalLanding.setEnabled(imagery==='esa');
+  orthophoto.setEnabled(imagery==='esa');
   map.setMaxZoom(imagery==='nasa'?8:DETAIL_MAX_ZOOM);
   if(!PUBLIC_RELEASE)map.setLayoutProperty('sentinel-imagery','visibility',imagery==='eox'?'visible':'none');
   map.setLayoutProperty('esa-overview-imagery','visibility',imagery==='esa'?'visible':'none');
@@ -730,7 +892,7 @@ function applyImagery(next){
   map.setLayoutProperty('bavaria-imagery','visibility',imagery!=='nasa'?'visible':'none');
   map.setLayoutProperty('berlin-imagery','visibility',imagery!=='nasa'?'visible':'none');
   document.querySelectorAll('[data-imagery]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.imagery===imagery)));
-  updateCredits();
+  updateCredits();exhibitReader.sync();
   if(imagery==='nasa'&&map.getZoom()>8)fly({center:map.getCenter(),zoom:8,pitch:50,bearing:map.getBearing()});
   status(imagery==='eox'
     ?'EOX Sentinel‑2 2024 · 10 m source, local research only under non-commercial license.'
@@ -744,13 +906,17 @@ $('terrain-toggle').addEventListener('click',()=>{
 });
 $('city-detail-toggle').addEventListener('click',()=>{
   cityDetailOn=!cityDetailOn;
-  isometricRegions.setEnabled(cityDetailOn);
-  romeVenue.setEnabled(cityDetailOn);
+  isometricRegions.setEnabled(cityDetailOn&&(!venueSceneSelected||ISOMETRIC_EVENT_REGIONS.has(activeEvent?.slug)));
+  bavariaBuildings.setEnabled(cityDetailOn);
+  romeVenue.setEnabled(false);
+  achievementScenes.setEnabled(cityDetailOn);
+  syncTerrain();
   $('city-detail-toggle').setAttribute('aria-pressed',String(cityDetailOn));
   $('city-detail-state').textContent=cityDetailOn?'ON':'OFF';
+  exhibitReader.sync();
   updateCredits();
   status(cityDetailOn
-    ?'City detail enabled: official LoD2 in Munich, Berlin and Cottbus; source-audited illustrative venue massing in Rome.'
+    ?'3D at every achievement: mapped footprints and trees, sourced local chapters, and illustrative project exhibits.'
     :'3D city detail hidden; the real aerial imagery remains.');
 });
 $('zoom-in').addEventListener('click',()=>map.zoomIn());
@@ -818,7 +984,7 @@ function tickDrive(now){
 window.addEventListener('keydown',e=>{
   const key=e.key.toLowerCase();
   if(e.key==='Escape'){
-    finishDrive();closePopovers();$('detail').hidden=true;
+    finishDrive();closePopovers();$('detail').hidden=true;exhibitReader.clear();
   }
   if(drive.active&&key==='c'&&!e.repeat&&!e.metaKey&&!e.ctrlKey&&!e.altKey
     &&!(e.target instanceof HTMLInputElement)&&!(e.target instanceof HTMLTextAreaElement)){
@@ -840,10 +1006,15 @@ for(const button of document.querySelectorAll('[data-drive-key]')){
 }
 
 let mapReady=false;
+// Start now, not after an unrelated NASA/globe/DEM load waterfall.
+warmEntryDestinations();
 map.on('style.load',()=>{
   map.setProjection({type:'globe'});
+  arrivalLanding.onAdd(map);
+  orthophoto.onAdd(map);
   map.addLayer(bavariaBuildings);
   map.addLayer(isometricRegions);
+  map.addLayer(achievementScenes);
   map.addLayer(carLayer);
   map.addLayer(heroVenue);
   romeVenue.onAdd(map);
@@ -897,17 +1068,21 @@ function restorePortfolioRoute(){
 window.addEventListener('popstate',restorePortfolioRoute);
 window.addEventListener('hashchange',restorePortfolioRoute);
 map.on('zoom',()=>{
+  if(mapReady)syncTerrain();
   updateMarkerVisibility();
   updateCredits();
   updateScanAvailability();
 });
 map.on('move',()=>{updateScanAvailability();updateMarkerVisibility();});
 map.on('moveend',updateCredits);
+map.on('move',()=>exhibitReader.sync());
+new MutationObserver(()=>exhibitReader.sync()).observe($('detail'),{attributes:true,attributeFilter:['hidden']});
 let lastError=0;
 map.on('error',e=>{
   const now=Date.now();if(now-lastError<2000)return;lastError=now;
   console.warn('Earth tile/render issue:',e.error||e);
   status('A terrain or imagery tile did not load. Check the network; other tiles continue to render.');
 });
-window.__earthEngine={map,cities,achievements,selectCity,selectEvent,drive,heroVenue,isometricRegions,romeVenue,
-  tileWarmupStats:()=>tileWarmup.stats()};
+window.__earthEngine={map,cities,achievements,selectCity,selectEvent,drive,heroVenue,isometricRegions,romeVenue,achievementScenes,bavariaBuildings,arrivalLanding,orthophoto,
+  destinationQualityReady,destinationAssetBudget,
+  tileWarmupStats:()=>tileWarmup.stats(),arrivalAssetBudget,persistentCacheStats:()=>persistentCache.stats()};

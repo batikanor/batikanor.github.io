@@ -52,17 +52,51 @@ RELEASE="$STAMP-$REV-$NONCE"
 BASE='/srv/apps/batikanor-staging'
 INDEX_SHA="$(shasum -a 256 "$SITE/index.html" | awk '{print $1}')"
 
-"${SSH[@]}" "$HOST" bash -s -- "$RELEASE" <<'REMOTE'
+LINK_BASE="$("${SSH[@]}" "$HOST" bash -s -- "$RELEASE" <<'REMOTE'
 set -euo pipefail
 release="$1"
 [[ "$release" =~ ^[0-9]{8}T[0-9]{6}Z-[0-9a-f]{10}-[0-9a-f]{6}$ ]] || exit 2
 base=/srv/apps/batikanor-staging
 test -d "$base/releases"
 test ! -e "$base/releases/$release"
+# Leave a server-wide safety margin; never switch the live symlink on a full disk.
+available="$(df -Pk "$base" | awk 'NR==2 {print $4}')"
+[[ "$available" =~ ^[0-9]+$ && "$available" -ge 1048576 ]] || {
+  echo 'Staging upload requires at least 1 GiB of free server storage.' >&2
+  exit 1
+}
 mkdir "$base/releases/$release"
+if [[ -L "$base/releases/current" ]]; then readlink -f "$base/releases/current"; fi
 REMOTE
+ )"
 
-rsync -az --delete -e "$RSYNC_SSH" \
+cleanup_failed_upload() {
+  status=$?
+  [[ "$status" -eq 0 ]] && return
+  # This release was created by this invocation. Preserve it if the atomic
+  # switch succeeded, even if a subsequent connection/output check failed.
+  "${SSH[@]}" "$HOST" bash -s -- "$RELEASE" <<'REMOTE' || true
+set -euo pipefail
+release="$1"
+[[ "$release" =~ ^[0-9]{8}T[0-9]{6}Z-[0-9a-f]{10}-[0-9a-f]{6}$ ]] || exit 2
+base=/srv/apps/batikanor-staging
+[[ "$(readlink "$base/releases/current" 2>/dev/null || true)" == "$release" ]] && exit 0
+rm -rf -- "$base/releases/$release"
+rm -f -- "$base/Caddyfile.candidate-$release"
+REMOTE
+}
+trap cleanup_failed_upload EXIT
+
+LINK_OPTIONS=()
+if [[ -n "$LINK_BASE" ]]; then
+  [[ "$LINK_BASE" == "$BASE/releases/"* && "$LINK_BASE" != *$'\n'* ]] || exit 2
+  LINK_OPTIONS+=(--link-dest="$LINK_BASE")
+fi
+
+# Releases are immutable and share one filesystem. Reuse identical bytes from
+# the current release rather than copy every model/media/dataset on each preview.
+# Checksums matter here: export timestamps need not match prior build timestamps.
+rsync -az --checksum --no-times --delete "${LINK_OPTIONS[@]}" -e "$RSYNC_SSH" \
   "$SITE/" "$HOST:$BASE/releases/$RELEASE/"
 "${SCP[@]}" "$ROOT/deploy/staging/Caddyfile" "$HOST:$BASE/Caddyfile.candidate-$RELEASE"
 
@@ -94,7 +128,7 @@ grep -Fq 'rel="canonical" href="https://staging.batikanor.com/achievements/tesla
 if [[ -L "$base/releases/current" ]]; then
   previous="$(readlink "$base/releases/current")"
   [[ "$previous" != */* && -d "$base/releases/$previous/assets" ]] || exit 1
-  cp -an "$base/releases/$previous/assets/." "$site/assets/"
+  cp -aln "$base/releases/$previous/assets/." "$site/assets/"
 else
   previous='(none)'
 fi

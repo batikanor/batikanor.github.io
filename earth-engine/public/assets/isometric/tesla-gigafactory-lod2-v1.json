@@ -1,0 +1,80 @@
+{
+  "source": "GeoBasis-DE/LGB Brandenburg, 3D-Gebäudemodell LoD2 CityGML",
+  "source_urls": [
+    "https://data.geobasis-bb.de/geobasis/daten/3d_gebaeude/lod2_gml/lod2_33417-5805.zip",
+    "https://data.geobasis-bb.de/geobasis/daten/3d_gebaeude/lod2_gml/lod2_33418-5805.zip",
+    "https://data.geobasis-bb.de/geobasis/daten/3d_gebaeude/lod2_gml/lod2_33417-5806.zip"
+  ],
+  "source_zip_sha256": {
+    "33417-5805": "94c2bd68fb2db3f2a323d8d301ed2278f088921cb6433dfdb90e8bc4f255cf7b",
+    "33418-5805": "7fe15c2ae8b87d22638bb535c7a098674cf0a62db4785f4dc45b3f411f0180a3",
+    "33417-5806": "d55f4f34234bab004b1ae86bfe0aeb25ee3be3b099e2691861e952d2b29c40fb"
+  },
+  "source_crs": "ETRS89_UTM33*DE_DHHN2016_NH",
+  "source_update_date": "2026-01-06",
+  "source_flight_date": null,
+  "source_publication_date": null,
+  "license": "Datenlizenz Deutschland – Namensnennung – Version 2.0",
+  "license_url": "https://www.govdata.de/dl-de/by-2-0",
+  "credit": "© GeoBasis-DE/LGB, dl-de/by-2-0 (Daten geändert)",
+  "event_slug": "tesla-gigathon-2026",
+  "origin_lonlat": [
+    13.79215,
+    52.3951
+  ],
+  "event_coordinates_lonlat": [
+    13.79215,
+    52.391331
+  ],
+  "venue": "Tesla Gigafactory Berlin-Brandenburg",
+  "asset": "tesla-gigafactory-lod2-v1.bin",
+  "origin": [
+    13.79215,
+    52.3951
+  ],
+  "radius_m": 500,
+  "selected_buildings": 23,
+  "building_ids": [
+    "DEBBAL01000cznB4",
+    "DEBBAL01000cy6Wi",
+    "DEBBAL01000db9Mo",
+    "DEBBAL01000db9N8",
+    "DEBBAL01000db9MA",
+    "DEBBAL01000db9N6",
+    "DEBBAL01000db9MS",
+    "DEBBAL01000db9N0",
+    "DEBBAL01000db9MU",
+    "DEBBAL01000db9N2",
+    "DEBBAL01000db9N4",
+    "DEBBAL01000db9Mr",
+    "DEBBAL01000db9MY",
+    "DEBBAL01000db9Mw",
+    "DEBBAL01000db9MW",
+    "DEBBAL01000cy6Wk",
+    "DEBBAL01000db9MG",
+    "DEBBAL01000cy6Vt",
+    "DEBBAL01000db9MN",
+    "DEBBAL01000cy6Vn",
+    "DEBBAL01000db9MH",
+    "DEBBAL01000db9Mm",
+    "DEBBAL01000db9Ml"
+  ],
+  "required_factory_hall_ids": [
+    "DEBBAL01000cy6Wk",
+    "DEBBAL01000cy6Wi",
+    "DEBBAL01000cy6Vt",
+    "DEBBAL01000cy6Vn"
+  ],
+  "main_hall_ground_area_m2": 144673.03,
+  "roof_triangles": 1121,
+  "wall_triangles": 2314,
+  "triangulated_surfaces": 1246,
+  "ground_height_range_m": [
+    38.325,
+    39.834
+  ],
+  "height_datum": "DHHN2016 NH (official source)",
+  "derived_changes": "Full source factory halls plus 500 m campus clip; original CityGML roof/wall vertices triangulated and reprojected to Mercator-local metres; absolute official heights retained; no synthetic facade photography or guessed buildings",
+  "bytes": 123700,
+  "binary_sha256": "4ed8cc4a3c6838cb1674ff358ac5808204569079bd6ddaf0631c7219706216f1"
+}

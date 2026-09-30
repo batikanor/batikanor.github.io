@@ -1,5 +1,9 @@
 :8080 {
     root * /releases/current
+    encode zstd gzip
+
+    @worker path /earth-cache-sw.js
+    header @worker Cache-Control "no-cache"
 
     # The unversioned manifest selects the current fingerprinted JS entry.
     # Never give it the one-year asset TTL.

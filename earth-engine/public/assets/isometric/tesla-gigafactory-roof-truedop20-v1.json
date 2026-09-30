@@ -1,0 +1,48 @@
+{
+  "source": "GeoBasis-DE/LGB Brandenburg, 20 cm RGB TrueDOP",
+  "source_urls": [
+    "https://data.geobasis-bb.de/geobasis/daten/dop/rgb_jpg/dop_33417-5805.zip",
+    "https://data.geobasis-bb.de/geobasis/daten/dop/rgb_jpg/dop_33418-5805.zip",
+    "https://data.geobasis-bb.de/geobasis/daten/dop/rgb_jpg/dop_33417-5806.zip",
+    "https://data.geobasis-bb.de/geobasis/daten/dop/rgb_jpg/dop_33418-5806.zip"
+  ],
+  "source_zip_sha256": {
+    "33417-5805": "21c472b2d05096246ce93492305c3b3ac59fc12f729c724e3bf0be58e5a5aca5",
+    "33418-5805": "d3c9ddf5ba899efdbcab80ab232f127c27a706191894c2cff700fcd588465e99",
+    "33417-5806": "2c7643a7abdbbdc9c806da58fc04295d847c1fda688ba7f4b04932b6ac63c35a",
+    "33418-5806": "92d6e49278dcd362938f0141b8773adf7a7412356abc9e64603fe95fd7497f23"
+  },
+  "source_crs": "EPSG:25833",
+  "source_update_date": null,
+  "source_flight_date": "2023-05-04",
+  "source_publication_date": "2023-12-19",
+  "license": "Datenlizenz Deutschland – Namensnennung – Version 2.0",
+  "license_url": "https://www.govdata.de/dl-de/by-2-0",
+  "credit": "© GeoBasis-DE/LGB, dl-de/by-2-0 (Daten geändert)",
+  "event_slug": "tesla-gigathon-2026",
+  "origin_lonlat": [
+    13.79215,
+    52.3951
+  ],
+  "event_coordinates_lonlat": [
+    13.79215,
+    52.391331
+  ],
+  "venue": "Tesla Gigafactory Berlin-Brandenburg",
+  "source_grid": "Official 20 cm RGB TrueDOP reprojected offline to EPSG:3857 z18",
+  "source_native_metres_per_pixel": 0.2,
+  "effective_metres_per_pixel": 0.3643973606500107,
+  "source_tile_zoom": 18,
+  "source_tile_bounds_xyxy": [
+    141112,
+    86116,
+    141121,
+    86126
+  ],
+  "derived_changes": "Source-aligned Mercator roof atlas sampled at native z18 (~36 cm); no upscaling/invented roof detail; true orthophoto is not facade photography",
+  "asset": "tesla-gigafactory-roof-truedop20-v1.webp",
+  "width": 2560,
+  "height": 2816,
+  "bytes": 1493968,
+  "sha256": "7094280f4a59722b33d1c1a3550cc65d607b8bbfe4d02ac25b4de8b75d605e17"
+}

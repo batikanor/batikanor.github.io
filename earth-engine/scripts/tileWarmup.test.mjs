@@ -73,3 +73,54 @@ test('tile requests use exact source URL, dedupe cached successes and stop at by
   await prefetch.warm(tiles);
   assert.equal(seen.length, 2); // session cap reached
 });
+
+test('new predictions are additive and high-priority arrivals move ahead without cancelling work', async () => {
+  const requests = [];
+  let finishFirst;
+  const prefetch = createTileWarmup({template:'https://example.test/{z}/{x}/{y}.png',
+    profile:{enabled:true,concurrency:1,sessionByteLimit:1_000_000,batchByteLimit:1_000_000},
+    fetcher:async(url,options)=>{
+      requests.push({url,options});
+      if (requests.length === 1) await new Promise(resolve => {finishFirst=resolve;});
+      return {ok:true,headers:{get:()=>'image/webp'},blob:async()=>({size:1000})};
+    }});
+  const first = prefetch.warm([{z:11,x:1,y:1},{z:11,x:2,y:2}]);
+  const next = prefetch.warm([{z:11,x:3,y:3},{z:11,x:1,y:1}],{priority:100});
+  finishFirst();
+  await Promise.all([first,next]);
+  assert.deepEqual(requests.map(request=>request.url),['https://example.test/11/1/1.png','https://example.test/11/3/3.png','https://example.test/11/2/2.png']);
+  assert.ok(requests.every(request=>!request.options.signal.aborted));
+  assert.equal(prefetch.stats().completed,3);
+});
+
+test('hidden-page pause retains queued work, and explicit cancel settles callers', async () => {
+  let requests=0;
+  const prefetch=createTileWarmup({template:'https://example.test/{z}/{x}/{y}.png',
+    profile:{enabled:true,concurrency:1,sessionByteLimit:1_000_000,batchByteLimit:1_000_000},
+    fetcher:async()=>{requests++;return {ok:true,headers:{get:()=>'image/webp'},blob:async()=>({size:1000})};}});
+  prefetch.pause();
+  const queued=prefetch.warm([{z:11,x:1,y:1}]);
+  assert.equal(requests,0);
+  prefetch.resume();
+  await queued;
+  assert.equal(requests,1);
+  prefetch.pause();
+  const cancelled=prefetch.warm([{z:11,x:2,y:2}]);
+  prefetch.cancel();
+  await cancelled;
+  assert.equal(prefetch.stats().queued,0);
+});
+
+test('independent landing images share the bounded priority queue without colliding with raster tiles', async () => {
+  const fetched=[];
+  const warmup=createTileWarmup({template:'https://example.org/{z}/{x}/{y}',
+    urlForTile:item=>item.url??`https://example.org/${overviewTileKey(item)}`,
+    fetcher:async url=>{fetched.push(url);return new Response(new Uint8Array(10),{headers:{'content-type':'image/webp'}});},
+    profile:{enabled:true,concurrency:1,sessionByteLimit:1000,batchByteLimit:1000}});
+  const image={key:'landing/14/100/100',url:'https://example.org/landing.webp'};
+  await warmup.warm([image,{z:14,x:100,y:100},image]);
+  assert.deepEqual(fetched,['https://example.org/landing.webp','https://example.org/14/100/100']);
+  assert.equal(warmup.stats().completed,2);
+  await warmup.warm([image]);
+  assert.equal(fetched.length,2);
+});

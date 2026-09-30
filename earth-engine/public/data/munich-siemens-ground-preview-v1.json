@@ -1,0 +1,49 @@
+{
+  "asset": "munich-siemens-ground-preview-v1.webp",
+  "source": "Bayerische Vermessungsverwaltung / LDBV, Digitales Orthophoto DOP20 RGB",
+  "source_url": "https://wmtsod1.bayernwolke.de/wmts/by_dop/smerc/{z}/{x}/{y}",
+  "source_grid": "smerc / EPSG:3857 XYZ",
+  "source_tile_zoom": 19,
+  "source_tile_bounds_xyxy": [
+    278996,
+    181927,
+    279008,
+    181938
+  ],
+  "source_tile_count": 156,
+  "source_ordered_jpeg_sha256": "74bd12cf2c6be30bfd023e5aaf218d7b835884a8ccc52992a43540acf3526c8c",
+  "source_accessed_utc_date": "2026-09-28",
+  "width": 1536,
+  "height": 1418,
+  "event_slug": "masters-thesis",
+  "origin_lonlat": [
+    11.5758,
+    48.1453
+  ],
+  "derived_changes": "Same official atlas, Lanczos <=1536px ground preview with outer alpha feather; no invented or upscaled geographic detail.",
+  "license": "CC BY 4.0 \u2014 attribution and modification notice required",
+  "license_url": "https://creativecommons.org/licenses/by/4.0/",
+  "credit": "Geobasisdaten: Bayerische Vermessungsverwaltung \u2013 www.geodaten.bayern.de (Daten ver\u00e4ndert), Lizenz: CC BY 4.0",
+  "bytes": 732864,
+  "sha256": "09936cd250945b90fe09444eb29aac06f06b5094827ddb3d62d271c32b0f0ad6",
+  "coordinates": [
+    [
+      11.57135009765625,
+      48.14822130592144
+    ],
+    [
+      11.580276489257812,
+      48.14822130592144
+    ],
+    [
+      11.580276489257812,
+      48.14272340433032
+    ],
+    [
+      11.57135009765625,
+      48.14272340433032
+    ]
+  ],
+  "source_asset": "munich-siemens-roof-dop20-v1.webp",
+  "source_asset_sha256": "86a22537d56fbc51d459a7ea8c224aa30ed238c7d8167cc8222c4f1696f16cae"
+}

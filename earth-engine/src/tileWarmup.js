@@ -16,7 +16,7 @@ export function overviewTileAt({lng, lat}, zoom = OVERVIEW_ZOOM) {
   return {z: zoom, x: Math.floor(x) % n, y: Math.min(n - 1, Math.max(0, Math.floor(y))), fx:x-Math.floor(x), fy:y-Math.floor(y)};
 }
 
-export function overviewTileKey({z, x, y}) { return `${z}/${x}/${y}`; }
+export function overviewTileKey({z, x, y, key}) { return key ?? `${z}/${x}/${y}`; }
 
 /** Center tile plus its nearest horizontal/vertical neighbors: four tiles. */
 export function overviewCover(coordinates, zoom = OVERVIEW_ZOOM) {
@@ -83,60 +83,94 @@ export function tileUrl(template, tile) {
 }
 
 /** Fetches populate the browser HTTP cache; MapLibre then uses the same URLs. */
-export function createTileWarmup({template, fetcher = fetch, profile = warmupProfile()}) {
+export function createTileWarmup({template, urlForTile = tile => tileUrl(template,tile), fetcher = fetch, profile = warmupProfile()}) {
   if (!template || typeof fetcher !== 'function') throw new TypeError('Tile warmup needs a URL template and fetcher');
   const warmed = new Set();
   const controllers = new Set();
-  const metrics = {requests:0, completed:0, bytes:0, failures:0, aborted:0};
+  const jobs = new Map();
+  const metrics = {requests:0, completed:0, bytes:0, failures:0, aborted:0, skipped:0};
   let generation = 0;
+  let running = 0;
+  let paused = false;
+  let sequence = 0;
 
   function cancel() {
     generation++;
     for (const controller of controllers) controller.abort();
     controllers.clear();
+    for (const job of jobs.values()) job.resolve();
+    jobs.clear();
   }
 
-  async function warm(tiles, {maxBytes = profile.batchByteLimit} = {}) {
-    cancel();
-    if (!profile.enabled || !Array.isArray(tiles) || !tiles.length) return {...metrics};
-    const current = generation;
-    const pending = tiles.filter(tile => !warmed.has(overviewTileKey(tile)));
-    let offset = 0;
-    let batchBytes = 0;
-    async function worker() {
-      while (current === generation && offset < pending.length
-        && batchBytes < maxBytes && metrics.bytes < profile.sessionByteLimit) {
-        const tile = pending[offset++];
-        const key = overviewTileKey(tile);
-        const controller = new AbortController();
-        controllers.add(controller);
-        const timeout = setTimeout(() => controller.abort(), 5000);
-        metrics.requests++;
+  function pump() {
+    if (paused || !profile.enabled) return;
+    while (running < profile.concurrency) {
+      const job = [...jobs.values()].filter(item => !item.started)
+        .sort((a,b) => b.priority-a.priority || a.order-b.order)[0];
+      if (!job) return;
+      if (metrics.bytes >= profile.sessionByteLimit || job.batches.every(batch => batch.bytes >= batch.maxBytes)) {
+        jobs.delete(job.key); metrics.skipped++; job.resolve(); continue;
+      }
+      job.started = true;
+      running++;
+      const current = generation;
+      const controller = new AbortController();
+      controllers.add(controller);
+      const timeout = setTimeout(() => controller.abort(), 8000);
+      metrics.requests++;
+      void (async () => {
         try {
-          const response = await fetcher(tileUrl(template, tile), {
+          const response = await fetcher(urlForTile(job.tile), {
             mode:'cors', credentials:'same-origin', cache:'force-cache', priority:'low', signal:controller.signal
           });
-          if (!response.ok || !response.headers.get('content-type')?.startsWith('image/')) {
-            throw new Error(`ESA overview returned ${response.status}`);
-          }
+          if (!response.ok || !response.headers.get('content-type')?.startsWith('image/')) throw new Error(`Imagery returned ${response.status}`);
           const data = await response.blob();
-          if (current !== generation) break;
-          warmed.add(key);
+          if (current !== generation) return;
+          warmed.add(job.key);
           metrics.completed++;
           metrics.bytes += data.size;
-          batchBytes += data.size;
-        } catch (error) {
+          for (const batch of job.batches) batch.bytes += data.size;
+        } catch {
           if (controller.signal.aborted) metrics.aborted++;
           else metrics.failures++;
         } finally {
           clearTimeout(timeout);
           controllers.delete(controller);
+          if (jobs.get(job.key) === job) jobs.delete(job.key);
+          running--;
+          job.resolve();
+          pump();
         }
-      }
+      })();
     }
-    await Promise.all(Array.from({length:Math.min(profile.concurrency, pending.length)}, worker));
+  }
+
+  /** Additive priority queue: hovering must not erase all-destination work. */
+  async function warm(tiles, {maxBytes = profile.batchByteLimit, priority = 0} = {}) {
+    if (!profile.enabled || !Array.isArray(tiles) || !tiles.length) return {...metrics};
+    const batch = {bytes:0,maxBytes};
+    const pending = [];
+    const seen = new Set();
+    for (const tile of tiles) {
+      const key = overviewTileKey(tile);
+      if (warmed.has(key) || seen.has(key)) continue;
+      seen.add(key);
+      let job = jobs.get(key);
+      if (!job) {
+        let resolve;
+        const promise = new Promise(done => {resolve = done;});
+        job = {tile,key,priority,order:sequence++,batches:[],promise,resolve,started:false};
+        jobs.set(key,job);
+      }
+      job.priority = Math.max(job.priority,priority);
+      job.batches.push(batch);
+      pending.push(job.promise);
+    }
+    pump();
+    await Promise.all(pending);
     return {...metrics};
   }
 
-  return {warm, cancel, profile, stats:() => ({...metrics, cachedTiles:warmed.size})};
+  return {warm, cancel, pause:() => {paused=true;}, resume:() => {paused=false;pump();}, profile,
+    stats:() => ({...metrics, cachedTiles:warmed.size, queued:Math.max(0,jobs.size-running), inFlight:running, paused})};
 }

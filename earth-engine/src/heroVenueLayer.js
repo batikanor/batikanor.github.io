@@ -2,6 +2,8 @@ import * as THREE from 'three';
 import * as maplibregl from 'maplibre-gl';
 import {mergeGeometries} from 'three/addons/utils/BufferGeometryUtils.js';
 import {distanceMetres} from './geo.js';
+import {getProject} from './projectContent.js';
+import {createAchievementSigns, updateAchievementSigns, selectAchievementSignContent} from './achievementSigns.js';
 
 // Visually sited on the open lawn adjoining Unternehmertum's paved access area
 // in Bavarian DOP20 imagery, ~19 m from the curated car start. The event's
@@ -15,6 +17,39 @@ const SCAN_DURATION_MS = 4300;
 const SCAN_CONTACT_MS = 1550;
 const RADAR_REST_YAW = THREE.MathUtils.degToRad(75); // Present the dish toward the paved eastern approach.
 const reducedMotion = () => typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+
+/** Dispose all owned resources, including nested sign texture/instance ownership. */
+function disposeOwnedScene(root) {
+  if (!root) return;
+  const geometries = new Set(), materials = new Set(), textures = new Set();
+  root.traverse(object => {
+    if (object.geometry) geometries.add(object.geometry);
+    for (const owned of object.userData.materials ?? []) materials.add(owned);
+    for (const owned of object.userData.textures ?? []) textures.add(owned);
+    for (const mat of Array.isArray(object.material) ? object.material : [object.material]) {
+      if (!mat) continue;
+      materials.add(mat);
+      if (mat.map) textures.add(mat.map);
+      if (mat.bumpMap) textures.add(mat.bumpMap);
+    }
+    if (object.isInstancedMesh) object.dispose();
+  });
+  for (const geometry of geometries) geometry.dispose();
+  for (const mat of materials) mat.dispose();
+  for (const texture of textures) { texture.dispose(); texture.image = null; }
+  root.clear();
+  root.userData = {};
+}
+
+// The existing Hero basis has x=east and z=south. Convert the actual visual
+// positions through public Mercator APIs, rather than borrowing the other
+// achievement layer's x=east/z=north convention.
+function heroLocalCoordinate(position, [east, south]) {
+  const anchor = maplibregl.MercatorCoordinate.fromLngLat(position);
+  const scale = anchor.meterInMercatorCoordinateUnits();
+  const coordinate = new maplibregl.MercatorCoordinate(anchor.x + east * scale, anchor.y + south * scale).toLngLat();
+  return [coordinate.lng, coordinate.lat];
+}
 
 function material(color, metalness, roughness, options = {}) {
   return new THREE.MeshStandardMaterial({color, metalness, roughness, ...options});
@@ -326,21 +361,7 @@ export function buildProtectiveRadar() {
   updateScan(SCAN_DURATION_MS);
 
   function dispose() {
-    const geometries = new Set();
-    const materials = new Set();
-    const textures = new Set();
-    root.traverse(obj => {
-      if (obj.geometry) geometries.add(obj.geometry);
-      const mats = Array.isArray(obj.material) ? obj.material : [obj.material];
-      for (const mat of mats) if (mat) {
-        materials.add(mat);
-        if (mat.map) textures.add(mat.map);
-        if (mat.bumpMap) textures.add(mat.bumpMap);
-      }
-    });
-    for (const g of geometries) g.dispose();
-    for (const m of materials) m.dispose();
-    for (const t of textures) t.dispose();
+    disposeOwnedScene(root);
   }
   return {root, updateScan, dispose};
 }
@@ -352,22 +373,67 @@ export function buildProtectiveRadar() {
  *   venue.setActive(true);        // show only when this venue is selected
  *   venue.triggerScan();          // start a finite, user-initiated interaction
  *   venue.getScanState();         // {phase:'idle'|'scanning'|'contact'|'complete'}
+ *   venue.getSignContent();       // existing authored title/summary/detail, or null
+ *   venue.getSignPositions();     // two native sign locations, or [] when inactive
+ *   venue.getExhibitFocus();      // the illustrative radar siting, never the event pin
  * The layer does not modify the map's camera or DOM. It renders on the map's
  * shared WebGL context and disposes resources when removed.
  */
-export function createHeroVenueLayer({lngLat = HERO_VENUE_LOCATION, onScan = () => {}} = {}) {
+export function createHeroVenueLayer({lngLat = HERO_VENUE_LOCATION, onScan = () => {},
+  rendererFactory = null, signCanvasFactory = null} = {}) {
   const position = [...lngLat];
+  const project = getProject(HERO_VENUE_EVENT);
+  const signContent = selectAchievementSignContent(project);
   let phase = 'idle';
   let scanStart = 0;
   let contactReported = false;
   let visible = false;
   let structure = null;
+  let signs = null;
+  let signsUnavailable = false;
+  let world = null;
+
+  function releaseSigns() {
+    if (!signs) return;
+    world?.remove(signs);
+    disposeOwnedScene(signs);
+    signs = null;
+  }
+
+  function ensureSigns() {
+    if (!visible || !world || signs || signsUnavailable) return;
+    // In non-DOM/headless environments the authored content remains available
+    // without manufacturing a texture. Browser canvas creation is synchronous,
+    // exclusively at activation, never in render or an intro preload loop.
+    if (!signCanvasFactory && !globalThis.document?.createElement) return;
+    try {
+      // Hero already uses the original east/up/south texture basis; the other
+      // achievement court's east/up/north U reversal would mirror our text.
+      signs = createAchievementSigns(project, {canvasFactory: signCanvasFactory, mirrorU: false});
+      // Keep the original radar's projection/lighting intact. Its projection
+      // winding differs from a standalone Three scene, so only the new text
+      // planes need two-sided rasterization. Heads face the public camera,
+      // avoiding mirrored reverse-side text without altering the radar basis.
+      for (const panel of signs.userData.panels) {
+        panel.material.side = THREE.DoubleSide;
+        panel.material.needsUpdate = true;
+      }
+      world.add(signs);
+    } catch (error) {
+      // A browser denying 2D canvas must not prevent the existing radar/story
+      // from working. Reader content still uses the actual authored project.
+      signsUnavailable = true;
+      console.warn('Native project signs unavailable; authored project content remains accessible.', error);
+    }
+  }
   const layer = {
     id: 'earth-engine-hero-venue',
     type: 'custom',
     renderingMode: '3d',
     setActive(next) {
       visible = !!next;
+      if (visible) ensureSigns();
+      else { releaseSigns(); signsUnavailable = false; }
       if (!visible && phase === 'scanning') { phase = 'idle'; onScan({phase}); }
       this.map?.triggerRepaint();
     },
@@ -383,27 +449,45 @@ export function createHeroVenueLayer({lngLat = HERO_VENUE_LOCATION, onScan = () 
       return true;
     },
     getScanState() { return {phase}; },
+    getSignContent() { return visible ? signs?.userData.content ?? signContent : null; },
+    getSignPositions() { return visible ? [-7, 7].map(east => heroLocalCoordinate(position, [east, -8])) : []; },
+    getExhibitFocus() { return visible ? [...position] : null; },
     onAdd(map, gl) {
       this.map = map;
       this.camera = new THREE.Camera();
       this.scene = new THREE.Scene();
+      world = new THREE.Group();
+      this.scene.add(world);
       structure = buildProtectiveRadar();
-      this.scene.add(structure.root);
-      this.scene.add(new THREE.HemisphereLight(0xe7f1ef, 0x606b68, 2.1));
+      world.add(structure.root);
+      const sky = new THREE.HemisphereLight(0xe7f1ef, 0x606b68, 2.1);
+      this.scene.add(sky);
       const sun = new THREE.DirectionalLight(0xfff3dd, 2.35);
       sun.position.set(-20, 55, 18);
       this.scene.add(sun);
       const fill = new THREE.DirectionalLight(0xa4bec5, 0.85);
       fill.position.set(15, 20, -15);
       this.scene.add(fill);
-      this.renderer = new THREE.WebGLRenderer({canvas: map.getCanvas(), context: gl, antialias: true});
+      this.renderer = rendererFactory ? rendererFactory(map, gl)
+        : new THREE.WebGLRenderer({canvas: map.getCanvas(), context: gl, antialias: true});
       this.renderer.autoClear = false;
       this.renderer.outputColorSpace = THREE.SRGBColorSpace;
       this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
       this.renderer.toneMappingExposure = 1.25;
+      ensureSigns();
     },
     render(gl, args) {
-      if (!visible || this.map.getZoom() < 17 || args.defaultProjectionData?.projectionTransition > 0) return;
+      if (!visible || !this.map || !structure || !this.renderer
+        || !args.defaultProjectionData?.mainMatrix || this.map.getZoom() < 17
+        || args.defaultProjectionData.projectionTransition > 0) return;
+      if (signs) {
+        const center = this.map.getCenter();
+        updateAchievementSigns(signs, {zoom: this.map.getZoom(),
+          distanceM: distanceMetres([center.lng, center.lat], position),
+          // Convert public camera bearing to Hero's z=south basis, while the
+          // shared panel implementation uses z=north. Poles remain stationary.
+          bearing: 180 - (this.map.getBearing?.() ?? 42), pitch: this.map.getPitch?.() ?? 54});
+      }
       const now = performance.now();
       if (phase === 'scanning') {
         const elapsed = now - scanStart;
@@ -433,10 +517,17 @@ export function createHeroVenueLayer({lngLat = HERO_VENUE_LOCATION, onScan = () 
       this.renderer.render(this.scene, this.camera);
     },
     onRemove() {
+      releaseSigns();
       structure?.dispose();
+      this.scene?.clear();
       this.renderer?.dispose();
       structure = null;
+      world = null;
+      signsUnavailable = false;
+      visible = false;
+      phase = 'idle';
       this.scene = null;
+      this.camera = null;
       this.renderer = null;
       this.map = null;
     }

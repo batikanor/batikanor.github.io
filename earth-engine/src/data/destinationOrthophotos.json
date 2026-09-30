@@ -1,0 +1,4188 @@
+{
+  "schema": 1,
+  "createdAt": "2026-09-30T21:17:59.859292+00:00",
+  "notes": "Real official aerial imagery; no AI imagery, upscaling, or invented photographic detail. Mobile versions must use a resolution-aware camera.",
+  "events": {
+    "hong-kong-talent-engage-eurotech-healthtech-2026": "hong-kong-114p171838-22p279602",
+    "decarbon-days-climathon-2026": "brandenburg-14p326165-51p767384",
+    "pdm-kill-the-search-bar-2026": "berlin-13p469100-52p506700",
+    "zero-one-hack-supercompute-industrial-2026": "austria-16p403800-48p188200",
+    "huawei-tech-arena-finland-2025": "helsinki-24p943800-60p220500",
+    "real-coin-map-2025": "berlin-13p370800-52p507400",
+    "ethrome-2025": "rome-12p479134-41p867829",
+    "nasa-space-apps-zurich-2025": "switzerland-8p561700-47p452500",
+    "sui-hackathon-poland-2025": "poland-17p038538-51p107883",
+    "decarbon-days-climathon-2025": "brandenburg-14p301040-51p775269",
+    "music-ai-osaka-2025": "japan-135p668200-34p612800",
+    "european-defense-tech-2025-munich": "bavaria-11p667100-48p262500",
+    "tech-berlin-ai-hackathon-2": "berlin-13p404954-52p520008",
+    "huawei-agorize-2024": "bavaria-11p535300-48p178600",
+    "masters-thesis": "bavaria-11p575800-48p145300",
+    "lauzhack-2024": "switzerland-6p566800-46p519100",
+    "salzburg-tourism-2024": "austria-13p044800-47p801400",
+    "zurich-climathon-2024": "switzerland-8p515300-47p388200",
+    "bayer-ai-2024": "bavaria-11p580200-48p139200",
+    "dsag-ideathon-2024": "saxony-12p373100-51p339700",
+    "circular-bsh-2024": "bavaria-11p568000-48p148000",
+    "thuega-2024": "bavaria-11p589200-48p144500",
+    "solana-ideathon-2024": "bavaria-11p567700-48p149700",
+    "six-swisshacks-2024": "switzerland-8p550000-47p366700",
+    "hackupc-2024": "barcelona-2p173400-41p385100",
+    "mdsi-bundesliga-2024": "bavaria-11p567700-48p149700",
+    "draeger-2023": "schleswig-holstein-10p686600-53p865500",
+    "ethmunich-2023": "bavaria-11p582000-48p135100",
+    "msg-karlsruhe-2023": "baden-wuerttemberg-8p403700-49p006900",
+    "tesla-gigathon-2026": "tesla-gigafactory-brandenburg"
+  },
+  "patches": {
+    "brandenburg-14p326165-51p767384": {
+      "url": "assets/destination-orthophotos/ortho-brandenburg-14p326165-51p767384-2048-83faf454a248.webp",
+      "width": 2048,
+      "height": 2048,
+      "bytes": 2061568,
+      "sha256": "83faf454a24868fd06a4424c5ecaca54c454df269aee58cf1bc6b9522f946219",
+      "resolutionM": 0.488281,
+      "decodedRgbaBytes": 16777216,
+      "id": "brandenburg-14p326165-51p767384",
+      "bounds": [
+        14.318907125849021,
+        51.762892200114216,
+        14.333422874150976,
+        51.771875352961025
+      ],
+      "coordinates": [
+        [
+          14.318907125849021,
+          51.771875352961025
+        ],
+        [
+          14.333422874150976,
+          51.771875352961025
+        ],
+        [
+          14.333422874150976,
+          51.762892200114216
+        ],
+        [
+          14.318907125849021,
+          51.762892200114216
+        ]
+      ],
+      "source": {
+        "title": "Brandenburg DOP20",
+        "url": "https://isk.geobasis-bb.de/mapproxy/dop20c/service/wms?service=WMS&request=GetCapabilities",
+        "license": "dl-de/by-2-0",
+        "licenseUrl": "https://www.govdata.de/dl-de/by-2-0",
+        "attribution": "© GeoBasis-DE/LGB · DOP20 (modified) · dl-de/by-2-0",
+        "nativeResolutionM": 0.2
+      },
+      "inputs": [
+        {
+          "url": "https://isk.geobasis-bb.de/mapproxy/dop20c/service/wms?service=WMS&version=1.3.0&request=GetMap&layers=bebb_dop20c&styles=&bbox=1593973.449965690%2C6757366.344775851%2C1595589.335675147%2C6758982.230485308&width=2048&height=2048&format=image%2Fjpeg&crs=EPSG%3A3857",
+          "sha256": "fd8a7281f7d255765fd187ea343514da7180add674faa83f357360a7f79557df",
+          "bytes": 1888900,
+          "input": "brandenburg-01765f332ab8502e9cbffb1ace69794935be2e45c248c998ad47f464b7a6d55c.image"
+        }
+      ],
+      "footprintM": {
+        "width": 1000.0,
+        "height": 1000.0
+      },
+      "mobile": {
+        "url": "assets/destination-orthophotos/ortho-brandenburg-14p326165-51p767384-1024-9e9a3b3f78bd.webp",
+        "width": 1024,
+        "height": 1024,
+        "bytes": 578470,
+        "sha256": "9e9a3b3f78bd641983aaa8829722e9235caa9115796493d810363e40a3885e5b",
+        "resolutionM": 0.976562,
+        "decodedRgbaBytes": 4194304
+      }
+    },
+    "berlin-13p469100-52p506700": {
+      "url": "assets/destination-orthophotos/ortho-berlin-13p469100-52p506700-2048-baa614ff0134.webp",
+      "width": 2048,
+      "height": 2048,
+      "bytes": 1890702,
+      "sha256": "baa614ff01342bd3e234ea047611457790f29ce2b8d32feb1fbf14471463bdc9",
+      "resolutionM": 0.488281,
+      "decodedRgbaBytes": 16777216,
+      "id": "berlin-13p469100-52p506700",
+      "bounds": [
+        13.461720654271259,
+        52.502208194083074,
+        13.47647934572874,
+        52.51119134693071
+      ],
+      "coordinates": [
+        [
+          13.461720654271259,
+          52.51119134693071
+        ],
+        [
+          13.47647934572874,
+          52.51119134693071
+        ],
+        [
+          13.47647934572874,
+          52.502208194083074
+        ],
+        [
+          13.461720654271259,
+          52.502208194083074
+        ]
+      ],
+      "source": {
+        "title": "Berlin TrueDOP 2026",
+        "url": "https://daten.berlin.de/datensaetze/digitale-farbige-trueorthophotos-2026-dop20rgbi-wms-3801a94c",
+        "license": "dl-de-zero-2.0",
+        "licenseUrl": "https://www.govdata.de/dl-de/zero-2-0",
+        "attribution": "© Geoportal Berlin · TrueDOP 2026 (modified) · dl-de-zero-2.0",
+        "nativeResolutionM": 0.2
+      },
+      "inputs": [
+        {
+          "url": "https://gdi.berlin.de/services/wms/truedop_2026?service=WMS&version=1.3.0&request=GetMap&layers=truedop_2026&styles=&bbox=1498551.888434770%2C6891445.529393522%2C1500194.818452592%2C6893088.459411344&width=2048&height=2048&format=image%2Fjpeg&crs=EPSG%3A3857",
+          "sha256": "51b9ee5cddf093af5955fba601aad05257ab99523c98adcea5bb4daec7f11446",
+          "bytes": 1085218,
+          "input": "berlin-b6df02ab7d777175d6522b092c6eb4a3fb047ee6036ef5f299dc873fee8afa2b.image"
+        }
+      ],
+      "footprintM": {
+        "width": 1000.0,
+        "height": 1000.0
+      },
+      "mobile": {
+        "url": "assets/destination-orthophotos/ortho-berlin-13p469100-52p506700-1024-7c2d0e0e12cb.webp",
+        "width": 1024,
+        "height": 1024,
+        "bytes": 559984,
+        "sha256": "7c2d0e0e12cb1119132df22d5671e073bb6c53b6b6b64761b430ec8c59a38ded",
+        "resolutionM": 0.976562,
+        "decodedRgbaBytes": 4194304
+      }
+    },
+    "austria-16p403800-48p188200": {
+      "url": "assets/destination-orthophotos/ortho-austria-16p403800-48p188200-2048-16b2fefcd091.webp",
+      "width": 2048,
+      "height": 2048,
+      "bytes": 1287134,
+      "sha256": "16b2fefcd091870a833e13cc5de460b56e138afcae0fcb45db4612fd733a8c44",
+      "resolutionM": 0.398121,
+      "decodedRgbaBytes": 16777216,
+      "id": "austria-16p403800-48p188200",
+      "bounds": [
+        16.3970947265625,
+        48.18531673866785,
+        16.4080810546875,
+        48.19264105833092
+      ],
+      "coordinates": [
+        [
+          16.3970947265625,
+          48.19264105833092
+        ],
+        [
+          16.4080810546875,
+          48.19264105833092
+        ],
+        [
+          16.4080810546875,
+          48.18531673866785
+        ],
+        [
+          16.3970947265625,
+          48.18531673866785
+        ]
+      ],
+      "source": {
+        "title": "basemap.at Orthofoto",
+        "url": "https://basemap.at/en/orthofoto/",
+        "license": "CC BY 4.0",
+        "licenseUrl": "https://basemap.at/",
+        "attribution": "© basemap.at · Orthofoto (modified) · CC BY 4.0",
+        "nativeResolutionM": 0.3
+      },
+      "inputs": [
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/90915/143012.jpeg",
+          "sha256": "d41c760a9e2e4afdbbb9acc74430b43bfee37e4d99c8db218b8f022d3fdeff87",
+          "bytes": 14035,
+          "input": "austria-594028d44a10ebc8f9dfedb62cf3718e19764ebad8e51c1f5d425243251ba5ca.image",
+          "z": 18,
+          "x": 143012,
+          "y": 90915
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/90915/143013.jpeg",
+          "sha256": "45727e947e7d915a0217df798d86587bf3f2370fee660103b47eeaadeca62ef8",
+          "bytes": 16719,
+          "input": "austria-559297f477d639a0e6d53afa8c409b85b6cbc36a95893e3c06d21f0df0159dca.image",
+          "z": 18,
+          "x": 143013,
+          "y": 90915
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/90915/143014.jpeg",
+          "sha256": "32da79bfd236c6efd386edda7c8846e2e66baf8cd070363d8b47b3235012d1ae",
+          "bytes": 16997,
+          "input": "austria-7e075afad94708811f1d8238a1fab2c84dbbb51f028fc9467d4887f7350da613.image",
+          "z": 18,
+          "x": 143014,
+          "y": 90915
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/90915/143015.jpeg",
+          "sha256": "c09af9749b88035b3d0007163dc6d87c2cc96b272332d253e394f00f0e48770a",
+          "bytes": 16908,
+          "input": "austria-84f9af8e6798ce78236102081caa72475ab35232d6a715382502336b2685fe98.image",
+          "z": 18,
+          "x": 143015,
+          "y": 90915
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/90915/143016.jpeg",
+          "sha256": "18319592894529fe43b5aba92e56cb175907f73b848e352b47f135faaadfd038",
+          "bytes": 14905,
+          "input": "austria-97d9d3b2a1e5b98e08d7d7c38b3307fadaffe8230daaeeb4f3e1586896f2fb93.image",
+          "z": 18,
+          "x": 143016,
+          "y": 90915
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/90915/143017.jpeg",
+          "sha256": "914fba0ae3dcb23cfc3df52148b1fffb9571cc2312fd5e40b018c6b0741c1605",
+          "bytes": 13289,
+          "input": "austria-734adf16f4b85fddf0389f47c5f25ddc2a8458120293aedaae42008e4836eee5.image",
+          "z": 18,
+          "x": 143017,
+          "y": 90915
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/90915/143018.jpeg",
+          "sha256": "8e5335ab074d5cf1d218ad81dc907e876428d96adcb957d08b574523ebf31dfe",
+          "bytes": 13105,
+          "input": "austria-4e2ce52307cb3de8028f73091ab789d1b391a264f15b18cad09e7b889747b493.image",
+          "z": 18,
+          "x": 143018,
+          "y": 90915
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/90915/143019.jpeg",
+          "sha256": "569df6fc408fff2c1556df37f0ebedbd3cd13563ba91a0fe91c98018be638ec8",
+          "bytes": 14957,
+          "input": "austria-bcd0671492065ad727230a24290cb903a41f0dc0480aef39f77fb0617b7f708f.image",
+          "z": 18,
+          "x": 143019,
+          "y": 90915
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/90916/143012.jpeg",
+          "sha256": "0c84473f6506e0f7e9706aa297c5df454eaf8f6c771a6df3bc3774abef113fe5",
+          "bytes": 15195,
+          "input": "austria-21de42bf21020867d83e87b962d9b70a836a87ca1c3cc877dd12eeb8cfcac773.image",
+          "z": 18,
+          "x": 143012,
+          "y": 90916
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/90916/143013.jpeg",
+          "sha256": "10f0204cd448ddb0dc7cf7b03f5cefb34744e9fc010408febb75345a9131f4f8",
+          "bytes": 15008,
+          "input": "austria-69d88e8b01eed5e94a3d55ae0c8aa3f769745d7e1345718b3d434fa090fed676.image",
+          "z": 18,
+          "x": 143013,
+          "y": 90916
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/90916/143014.jpeg",
+          "sha256": "0cdc84bd90771c6d29ab06baf67580018476aed12ef68c03dbc6f2b8b214e17c",
+          "bytes": 16340,
+          "input": "austria-150988a3c579a82ac22d569bdb80ba4333f9392d53da09380a30def0164d3a5a.image",
+          "z": 18,
+          "x": 143014,
+          "y": 90916
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/90916/143015.jpeg",
+          "sha256": "37024648ed7d4818976b31993370886d0b031afa94d2aeda7bfce3bca290ecf2",
+          "bytes": 16348,
+          "input": "austria-b536c37f12d8f11604680a9edfbe6fd75803b0bb2eeebf85430f23f99a047928.image",
+          "z": 18,
+          "x": 143015,
+          "y": 90916
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/90916/143016.jpeg",
+          "sha256": "f70e7eac44175aefb005a7a9be2623849638bb4ab1bd745e3f3339b50f116682",
+          "bytes": 15418,
+          "input": "austria-4b2fa83d94d4bc44f89ad99c9f41526d57e82910b638791707dec0e02da092dc.image",
+          "z": 18,
+          "x": 143016,
+          "y": 90916
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/90916/143017.jpeg",
+          "sha256": "66fa59f5c7de50f0fd9dac00bcaaf9419f4dbe593aba5421048166200d9082e3",
+          "bytes": 12990,
+          "input": "austria-54f00eefd2f96e7c8e1743a1e8db5a6158f4ec67b61ab4586d52d8b755aa4867.image",
+          "z": 18,
+          "x": 143017,
+          "y": 90916
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/90916/143018.jpeg",
+          "sha256": "4932e3efbd6f34da86f09b2eb34f28492f4c61b18087164efef72ab1269fd744",
+          "bytes": 11233,
+          "input": "austria-bfab050d25d097427eeeda0538f1226a26690c934e0881408c8dbe70fd596655.image",
+          "z": 18,
+          "x": 143018,
+          "y": 90916
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/90916/143019.jpeg",
+          "sha256": "1ae86a96aa2b93f5a192566d7a942367ec4348196318269c5a17898856242a11",
+          "bytes": 15057,
+          "input": "austria-a5834c4af7ab0dff169d44867579f74769102153e90b5534c9b5e75de525f010.image",
+          "z": 18,
+          "x": 143019,
+          "y": 90916
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/90917/143012.jpeg",
+          "sha256": "efb9851e48e07b78a0749331a8de07ba3edd21865ffbabf6cf47d427104ef230",
+          "bytes": 15781,
+          "input": "austria-3a1d032748ab105173470369dda7167993281162fc986c620d12b6b6e886889c.image",
+          "z": 18,
+          "x": 143012,
+          "y": 90917
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/90917/143013.jpeg",
+          "sha256": "a16b4661a8bdeabe8f3e56b391ec1b2e58c64a20cbc6f838644a90235cf558e3",
+          "bytes": 13657,
+          "input": "austria-7f67c2d73a484b5bd40cf8d026b8c18dbeb4c177c4521f85cff7c70d6a73d8bf.image",
+          "z": 18,
+          "x": 143013,
+          "y": 90917
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/90917/143014.jpeg",
+          "sha256": "331ad00b808397456b435966a6bef5cabe9bf1561161247642eaef526d41126b",
+          "bytes": 16458,
+          "input": "austria-18e9860012450f7182cee22ac9286dc6c93420fa78ecaafd98d709f7a3b1e24f.image",
+          "z": 18,
+          "x": 143014,
+          "y": 90917
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/90917/143015.jpeg",
+          "sha256": "2df0586660183833904b500b1256dc1d24dc8dec643e81e93c807223bb1c399e",
+          "bytes": 15895,
+          "input": "austria-a5c2fe620b713c2b58ec897355eebc50bace4071d0d44aa164247ced9c739673.image",
+          "z": 18,
+          "x": 143015,
+          "y": 90917
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/90917/143016.jpeg",
+          "sha256": "9205736029e1e233d9fc1e348de56e0a54cd9769ef721eab541c900e32ec2749",
+          "bytes": 15645,
+          "input": "austria-10728971cba6765d30d041d128910ed14eaf4294b4b9c40e22c02a971b253f66.image",
+          "z": 18,
+          "x": 143016,
+          "y": 90917
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/90917/143017.jpeg",
+          "sha256": "2499f63d027f0629aeb3ebe0a1140207543b9c8d52f94e1f173a282d33f6ef0e",
+          "bytes": 14755,
+          "input": "austria-c001ccf852adc03268a5f1002c86ef3635f4f25e45d277c25363462de7062b3d.image",
+          "z": 18,
+          "x": 143017,
+          "y": 90917
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/90917/143018.jpeg",
+          "sha256": "0cab509cef66dc4b4f66202ebd52d3241d0f131d884a4114135a0e2642c1b686",
+          "bytes": 17544,
+          "input": "austria-f1169f993eee104a78a7af4fadf320e928a1a9a2efa314fee7cfabeecb414797.image",
+          "z": 18,
+          "x": 143018,
+          "y": 90917
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/90917/143019.jpeg",
+          "sha256": "78a4a3b1ac0e0d008d49443e34a9a40d021cffea629581e79557e92be548e39f",
+          "bytes": 13468,
+          "input": "austria-2947be7dea61e0ee5e9d15d703c0f0c0d8b26649b60a2be66d3b6ad4974c9a3e.image",
+          "z": 18,
+          "x": 143019,
+          "y": 90917
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/90918/143012.jpeg",
+          "sha256": "0ed0d5a68e734ac9761e41d88961c9deba35d0bce75cf93dac6fc40f69218a68",
+          "bytes": 14794,
+          "input": "austria-1eda1c6ad4ce309a7ceeea525f7ed0353f5e75fee66f5928e243443a15a33817.image",
+          "z": 18,
+          "x": 143012,
+          "y": 90918
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/90918/143013.jpeg",
+          "sha256": "a39d3be0d376e46cb9854393a982a2f55578c2d96be3f8f0475c71e28da17c78",
+          "bytes": 15454,
+          "input": "austria-2d1d8d884d29fac17279cf50c92337b18f9f0eadcba8b9ed3f4aaf430c734720.image",
+          "z": 18,
+          "x": 143013,
+          "y": 90918
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/90918/143014.jpeg",
+          "sha256": "fcb4d35216e4237d980af397d871897686ff87257d02d23875b593b5ad8d14a3",
+          "bytes": 15228,
+          "input": "austria-e12345bae2dc35ebcfabb9cc51d19e4c283d99ec8ad0b19966bf964594ccacb9.image",
+          "z": 18,
+          "x": 143014,
+          "y": 90918
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/90918/143015.jpeg",
+          "sha256": "ca2c6a6a7753d6948291af4614eb36b9a9baf86a33425e32a7c487d321b8ed06",
+          "bytes": 18458,
+          "input": "austria-8f9c4074f333d721a69c65a06f3acb3e8044a120ee9c803f15ae28b1d3bf6104.image",
+          "z": 18,
+          "x": 143015,
+          "y": 90918
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/90918/143016.jpeg",
+          "sha256": "cba4f6929e8eb1851777bbef4c4acb87989430389d06d185e5429ef3d821bfdc",
+          "bytes": 16691,
+          "input": "austria-d4a4cb13ff095d0da3dfd7487eec764037d52bce3d92dc6f56f5ee6b23372c31.image",
+          "z": 18,
+          "x": 143016,
+          "y": 90918
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/90918/143017.jpeg",
+          "sha256": "8563b9cb52ba33e97611c329479ff62df5428feda00c4b2769f7196f9b09d4cf",
+          "bytes": 17233,
+          "input": "austria-379627f3f631e5eab0b6fe42e1cf3a02c4bf191c025ae7fbc18c5f61394f27fd.image",
+          "z": 18,
+          "x": 143017,
+          "y": 90918
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/90918/143018.jpeg",
+          "sha256": "04965d2969140264d908640fe472c2a4e27c29b5456885a7bfeea814df6d56ec",
+          "bytes": 15962,
+          "input": "austria-9638f74afa275bd942be12f789bfb500b0cef696675a13bd4a657d813f74ad23.image",
+          "z": 18,
+          "x": 143018,
+          "y": 90918
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/90918/143019.jpeg",
+          "sha256": "bd579a43152bc0eb958969a504717eea649950ebcf5dcd2fc430c6011cb6c994",
+          "bytes": 14899,
+          "input": "austria-9a9f4fec9f33a63cd942852d4e13e8f2b88942b11d6330b80c36fa0246662c2d.image",
+          "z": 18,
+          "x": 143019,
+          "y": 90918
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/90919/143012.jpeg",
+          "sha256": "6311affc1010a756572ce044c90503f56eaa498ec1d5b56c44b52ab7d09f2ed3",
+          "bytes": 17489,
+          "input": "austria-627ef18f68214d1e04e5cc3d94bd595777a108eab13d088bdbcdbcbd9c99f00d.image",
+          "z": 18,
+          "x": 143012,
+          "y": 90919
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/90919/143013.jpeg",
+          "sha256": "a2314e252f67546e977a1a364a90073cacfad25db6088a3f16d1bbeafb63f32e",
+          "bytes": 15272,
+          "input": "austria-d912ed09871e59ca5539b192a2f72ef37d1f871a730b08446bac4bcc6498b6c0.image",
+          "z": 18,
+          "x": 143013,
+          "y": 90919
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/90919/143014.jpeg",
+          "sha256": "98028df0f0d8bd0eaa97b5dfe62391d7f5db5fe58287fcc50c8167bd8b953e5e",
+          "bytes": 15318,
+          "input": "austria-9ad740443d3f1ed9ef73e68837c6f7959b69e4ecf5349a226fb38cdea361f563.image",
+          "z": 18,
+          "x": 143014,
+          "y": 90919
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/90919/143015.jpeg",
+          "sha256": "ba7fc409234adfc42f778c92e98c3bb9dd2e07affd5cbb8792c1297a61c8c7db",
+          "bytes": 17446,
+          "input": "austria-d5cdaf4bac533a093021fd28a23b0b629e3626bc580d28469bf550a00d7c2fbe.image",
+          "z": 18,
+          "x": 143015,
+          "y": 90919
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/90919/143016.jpeg",
+          "sha256": "e3f437d1229456331341080cb54dd245986e3cda85d41d7887d69378b859c4b7",
+          "bytes": 17032,
+          "input": "austria-3111677d46bfdfe6a6b0c033dc5e79c1a591c457b9520b775157ec487203e320.image",
+          "z": 18,
+          "x": 143016,
+          "y": 90919
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/90919/143017.jpeg",
+          "sha256": "dbb2548122b1a9627b6324e82fe6b79da5f6a0d44bd397b9a9c098f1c2aea0ff",
+          "bytes": 14737,
+          "input": "austria-1fea29aee53e806368d129569404cdbc8cf0241e9f7a9888c21dc1258f1c9dd4.image",
+          "z": 18,
+          "x": 143017,
+          "y": 90919
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/90919/143018.jpeg",
+          "sha256": "1ec1ccffb0d39e9d562b98776539b557832074ce895bd58328de4b8401041a1a",
+          "bytes": 15713,
+          "input": "austria-82aaebcb1bec4ff7b33a9dbfed9595c89c7b36d5efa51bab7b2ae1443f9453dc.image",
+          "z": 18,
+          "x": 143018,
+          "y": 90919
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/90919/143019.jpeg",
+          "sha256": "1f085de42a5dc9acdf08bed9be2cde0bf001df37f0f2c3fc11e50b0ac307fadc",
+          "bytes": 15269,
+          "input": "austria-c3739e6c5b63fb71901fc6228e3f0ccbc26d919f311ef74bb81ccb4e392cb3d8.image",
+          "z": 18,
+          "x": 143019,
+          "y": 90919
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/90920/143012.jpeg",
+          "sha256": "46ed5afcd84e52145257b13e85505560c8477b3e8d6817c8a549d17bde5a4993",
+          "bytes": 17140,
+          "input": "austria-2cc7874a5fa8dbd59d5665e905faf90501d28740af268741b7f294ad853bcf6b.image",
+          "z": 18,
+          "x": 143012,
+          "y": 90920
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/90920/143013.jpeg",
+          "sha256": "3edc66a8ffce78c1571d5c9d9d3119384e4dbde457e60ba8247f759cb183ea25",
+          "bytes": 15533,
+          "input": "austria-c212bc2409ac9039135b7739b75515eec48ecb1a31027d9d1d8461260e5b768c.image",
+          "z": 18,
+          "x": 143013,
+          "y": 90920
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/90920/143014.jpeg",
+          "sha256": "42380bfa82e71530c7d934a379d816ead0bfd5a9decb5e7632b3ca2658a2bd70",
+          "bytes": 14237,
+          "input": "austria-a94134ac866f8a88eed8a19914eaa8d3ea1c04dd6394c8b6889da15a7cf4533e.image",
+          "z": 18,
+          "x": 143014,
+          "y": 90920
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/90920/143015.jpeg",
+          "sha256": "d65c50872b3a7114b178df4819828381ea4c0b3d360f24fdc2b29b123f9c757f",
+          "bytes": 16010,
+          "input": "austria-50d3ee13429653199acdbe51cd4ab61b53916815235acd5d62de1f458c67d8b8.image",
+          "z": 18,
+          "x": 143015,
+          "y": 90920
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/90920/143016.jpeg",
+          "sha256": "8a8e2101739004eb39034a8e1b4d05e32f1558f5608e85152803014404efcf70",
+          "bytes": 14474,
+          "input": "austria-9a88fd2a916bcc108e82596aa823140b8bf30ae9a01f73be574662b08b570887.image",
+          "z": 18,
+          "x": 143016,
+          "y": 90920
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/90920/143017.jpeg",
+          "sha256": "616d690e5d88b5fbec956b4caa9b87be081a368cafd58c492f6baf9c2f7c2e0d",
+          "bytes": 11533,
+          "input": "austria-c0278b84f1019948111945406cb8e6636921cc14139ae94782f9dba9e9dc30c7.image",
+          "z": 18,
+          "x": 143017,
+          "y": 90920
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/90920/143018.jpeg",
+          "sha256": "40f09d3faac847d76be4438b6e702465b875d8167fd318113e2c7d5bd99f0c1d",
+          "bytes": 12243,
+          "input": "austria-a7b3f610f07231d528a1b9bde84c76e08083ba38358c12e8c6c37e9754599443.image",
+          "z": 18,
+          "x": 143018,
+          "y": 90920
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/90920/143019.jpeg",
+          "sha256": "aab8694ddd47ce7154341a4dd37a795c817d0c780849b97900b37776c2975c63",
+          "bytes": 14487,
+          "input": "austria-02f61284dee7bedfcd5ad51f6f93d8c8f433dfdba90caf8f5890af6fda86fe69.image",
+          "z": 18,
+          "x": 143019,
+          "y": 90920
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/90921/143012.jpeg",
+          "sha256": "8af3cebdbfe12b35c64fe823db0e67a4acab1c811935d8c4da830e60a1523901",
+          "bytes": 15475,
+          "input": "austria-b2095c8bd6acd1a0a3f90c10e5d21f727e8865c8985b188c817457ee897d0564.image",
+          "z": 18,
+          "x": 143012,
+          "y": 90921
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/90921/143013.jpeg",
+          "sha256": "a4ead3cf0cce340a72c739cfedc62c15b36de39d8738db62d9d07fa3f675c3d1",
+          "bytes": 14799,
+          "input": "austria-dc2482005d8049c172e715f38c5c5bae402c8ff3442f6e13fc23d57afa525923.image",
+          "z": 18,
+          "x": 143013,
+          "y": 90921
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/90921/143014.jpeg",
+          "sha256": "39df4feff7465e47944c6b7aa3023020d578e480e27f4443f8cd0983f8ee6f45",
+          "bytes": 14120,
+          "input": "austria-f539fab9586c025478f5c21321e4a2ebe3fa49c48f4da002ea86be022c1de1d6.image",
+          "z": 18,
+          "x": 143014,
+          "y": 90921
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/90921/143015.jpeg",
+          "sha256": "993daa2866ce61b155b180b1247d6a8003411761f482d628ae83b0c270d8c3ca",
+          "bytes": 15538,
+          "input": "austria-583c9c9fb3c88a1fb37f2afa564d7aee8ba8c9ef2d5815c5d8542b216babe580.image",
+          "z": 18,
+          "x": 143015,
+          "y": 90921
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/90921/143016.jpeg",
+          "sha256": "4d74e0fb84c13751f9c27bfb3301a67bb46f902ab8921d31df2710676333cdcf",
+          "bytes": 15646,
+          "input": "austria-4e4e7549c3ab34e1e61af8f994b57e47badc5aaec0263ccef573a8589dc94df2.image",
+          "z": 18,
+          "x": 143016,
+          "y": 90921
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/90921/143017.jpeg",
+          "sha256": "3b6fe67f6191385da23256ec31cbc1a21dc427436b2dd804de06fcda3df77702",
+          "bytes": 11862,
+          "input": "austria-00c65671f865eb56d6857c72a795c96db7a625e8d5416cd43cfde0c9ce02a41d.image",
+          "z": 18,
+          "x": 143017,
+          "y": 90921
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/90921/143018.jpeg",
+          "sha256": "56446be170465c284874b61ca161ede107721af886cebcbe33f5516e0e5d1892",
+          "bytes": 13104,
+          "input": "austria-02b51f30e9ae45e5eb66cd875e02199fa0bef784f9b3c960f1e553529446b0cf.image",
+          "z": 18,
+          "x": 143018,
+          "y": 90921
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/90921/143019.jpeg",
+          "sha256": "8de5a8dc55d4d7887cf327810895ccef551c32d7e202300fdbc4e4d3c468c489",
+          "bytes": 14052,
+          "input": "austria-d122076abaed1dcc4c0e914cd4444c6a6fae33d049b48ad54d3a1522b62d9fb9.image",
+          "z": 18,
+          "x": 143019,
+          "y": 90921
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/90922/143012.jpeg",
+          "sha256": "a61cfb46938303a15977e815ef9c09d4d693c06fe98297bd4e82ab5d9d6e34d2",
+          "bytes": 14675,
+          "input": "austria-14705a27acf070a270daf306662c90bc3b09bd829b5059c8526e0d90b53079ec.image",
+          "z": 18,
+          "x": 143012,
+          "y": 90922
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/90922/143013.jpeg",
+          "sha256": "1f55279613b2def04707b8c465b10a34b0d561432cfba4ef475e7e7cd3f9026d",
+          "bytes": 14439,
+          "input": "austria-fc0c8acb231789c0180de5939375166e88a7b9fdf24d5079acca009cfaaa711c.image",
+          "z": 18,
+          "x": 143013,
+          "y": 90922
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/90922/143014.jpeg",
+          "sha256": "ae9b3fdcc0e66cde4456613c965c5c9e33c93fafb75c81854bd2db1f11c52bed",
+          "bytes": 14556,
+          "input": "austria-270a2a27b2087b090cf4116698e314e1078026a00cce7026d90fe62cc4a0a580.image",
+          "z": 18,
+          "x": 143014,
+          "y": 90922
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/90922/143015.jpeg",
+          "sha256": "30e2c09eb0bf9a61caf3ec4e96cd645cb7f872aa33bb8c0db986bed4ac549230",
+          "bytes": 15319,
+          "input": "austria-08f8853b9a49c6eb74e35b0d0d0e1931648799b96ad1cfb457b3d6921e8d2a0d.image",
+          "z": 18,
+          "x": 143015,
+          "y": 90922
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/90922/143016.jpeg",
+          "sha256": "6870806c3290c18a7ac494244de80e0c19bac2d6bcf85f07e461cd022f547eb2",
+          "bytes": 14583,
+          "input": "austria-620d18cce67fafc09676fd5e329d1a98dd55871181528179bdc17a996784798f.image",
+          "z": 18,
+          "x": 143016,
+          "y": 90922
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/90922/143017.jpeg",
+          "sha256": "4ca1cd1504a699a7c8b996d54e656fbda8aea77db355534f84e9b2b5f5ba1d13",
+          "bytes": 15692,
+          "input": "austria-df9858847313a6ba1d2f9ba628df833d583a361261bee14984d40c0aa88e1f87.image",
+          "z": 18,
+          "x": 143017,
+          "y": 90922
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/90922/143018.jpeg",
+          "sha256": "2cbc00d859a3e25e0b238c01c8c5663f25257c812ffb4782af409a3a8ee4d4e1",
+          "bytes": 15257,
+          "input": "austria-8eb40c4063bd059fa859c8fa3826cb536d26340edc0ca7599d99626374d8db0a.image",
+          "z": 18,
+          "x": 143018,
+          "y": 90922
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/90922/143019.jpeg",
+          "sha256": "d325fef060bc0bac4ee2c127eab91efb353a949cd56cef43f486c89cf10e7978",
+          "bytes": 13185,
+          "input": "austria-8aa991a56eac120b0c4bfb1afac2a2e6914a680ef476cbc96812832e84a70d14.image",
+          "z": 18,
+          "x": 143019,
+          "y": 90922
+        }
+      ],
+      "footprintM": {
+        "width": 815.352,
+        "height": 815.352
+      },
+      "mobile": {
+        "url": "assets/destination-orthophotos/ortho-austria-16p403800-48p188200-1024-75bc52ee1d21.webp",
+        "width": 1024,
+        "height": 1024,
+        "bytes": 490726,
+        "sha256": "75bc52ee1d21284a2fa6ce8aef360b86350722f0045e7bcd3073030ef71700c2",
+        "resolutionM": 0.796242,
+        "decodedRgbaBytes": 4194304
+      }
+    },
+    "helsinki-24p943800-60p220500": {
+      "url": "assets/destination-orthophotos/ortho-helsinki-24p943800-60p220500-2048-065efd46fdfe.webp",
+      "width": 2048,
+      "height": 2048,
+      "bytes": 1307030,
+      "sha256": "065efd46fdfedf176da3b4d72480025d617058fcef7b1b489fe9be99ac98c20c",
+      "resolutionM": 0.488281,
+      "decodedRgbaBytes": 16777216,
+      "id": "helsinki-24p943800-60p220500",
+      "bounds": [
+        24.934756498958546,
+        60.2160081159078,
+        24.952843501041457,
+        60.22499126876789
+      ],
+      "coordinates": [
+        [
+          24.934756498958546,
+          60.22499126876789
+        ],
+        [
+          24.952843501041457,
+          60.22499126876789
+        ],
+        [
+          24.952843501041457,
+          60.2160081159078
+        ],
+        [
+          24.934756498958546,
+          60.2160081159078
+        ]
+      ],
+      "source": {
+        "title": "Helsinki orthophotographs 2025",
+        "url": "https://hri.fi/data/en/dataset/helsingin-ortoilmakuvat",
+        "license": "CC BY 4.0",
+        "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+        "attribution": "Source: Orthophotographs of Helsinki · Helsingin kaupunkiympäristön toimiala / Kaupunkimittauspalvelut · HRI · CC BY 4.0 (modified)",
+        "nativeResolutionM": 0.05
+      },
+      "inputs": [
+        {
+          "url": "https://kartta.hel.fi/ws/geoserver/avoindata/wms?service=WMS&version=1.3.0&request=GetMap&layers=avoindata%3AOrtoilmakuva_2025_5cm&styles=&bbox=2775724.396518334%2C8447987.536493000%2C2777737.832380181%2C8450000.972354844&width=2048&height=2048&format=image%2Fjpeg&crs=EPSG%3A3857",
+          "sha256": "f0d9f9050846701634585463b0a753e3c03611f020ce77c7caca51a06942e835",
+          "bytes": 778213,
+          "input": "helsinki-4931dc8b9d91c8b5966c8fe8d6df5aceacc632bb0abe31e57edb66a7a96439c0.image"
+        }
+      ],
+      "footprintM": {
+        "width": 1000.0,
+        "height": 1000.0
+      },
+      "mobile": {
+        "url": "assets/destination-orthophotos/ortho-helsinki-24p943800-60p220500-1024-c47223ca5c2a.webp",
+        "width": 1024,
+        "height": 1024,
+        "bytes": 480864,
+        "sha256": "c47223ca5c2a2b083d9af9d227531c4132eb9af0cce3cf10bbba1bbb1d6a1b41",
+        "resolutionM": 0.976562,
+        "decodedRgbaBytes": 4194304
+      }
+    },
+    "berlin-13p370800-52p507400": {
+      "url": "assets/destination-orthophotos/ortho-berlin-13p370800-52p507400-2048-1884b0822788.webp",
+      "width": 2048,
+      "height": 2048,
+      "bytes": 1742636,
+      "sha256": "1884b0822788fecc2668446f7823893519483005912a1e68990b5688c6ebd367",
+      "resolutionM": 0.488281,
+      "decodedRgbaBytes": 16777216,
+      "id": "berlin-13p370800-52p507400",
+      "bounds": [
+        13.363420536747169,
+        52.50290819407727,
+        13.37817946325283,
+        52.511891346924905
+      ],
+      "coordinates": [
+        [
+          13.363420536747169,
+          52.511891346924905
+        ],
+        [
+          13.37817946325283,
+          52.511891346924905
+        ],
+        [
+          13.37817946325283,
+          52.50290819407727
+        ],
+        [
+          13.363420536747169,
+          52.50290819407727
+        ]
+      ],
+      "source": {
+        "title": "Berlin TrueDOP 2026",
+        "url": "https://daten.berlin.de/datensaetze/digitale-farbige-trueorthophotos-2026-dop20rgbi-wms-3801a94c",
+        "license": "dl-de-zero-2.0",
+        "licenseUrl": "https://www.govdata.de/dl-de/zero-2-0",
+        "attribution": "© Geoportal Berlin · TrueDOP 2026 (modified) · dl-de-zero-2.0",
+        "nativeResolutionM": 0.2
+      },
+      "inputs": [
+        {
+          "url": "https://gdi.berlin.de/services/wms/truedop_2026?service=WMS&version=1.3.0&request=GetMap&layers=truedop_2026&styles=&bbox=1487609.169407069%2C6891573.540423340%2C1489252.125590335%2C6893216.496606606&width=2048&height=2048&format=image%2Fjpeg&crs=EPSG%3A3857",
+          "sha256": "459dda74442f539b65e659a3e0c58fc3ae96d6c8e55c34e663f9b1ad4e642b42",
+          "bytes": 997588,
+          "input": "berlin-b73fb40edf17aca7e950e0cfc1b051312756b2131bc23987dfe8f2f538bbebfb.image"
+        }
+      ],
+      "footprintM": {
+        "width": 1000.0,
+        "height": 1000.0
+      },
+      "mobile": {
+        "url": "assets/destination-orthophotos/ortho-berlin-13p370800-52p507400-1024-883972a3e662.webp",
+        "width": 1024,
+        "height": 1024,
+        "bytes": 520262,
+        "sha256": "883972a3e662e7dc576414e253f02c0f7005df6cd860167a1daed9c8e1734fa6",
+        "resolutionM": 0.976562,
+        "decodedRgbaBytes": 4194304
+      }
+    },
+    "rome-12p479134-41p867829": {
+      "url": "assets/destination-orthophotos/ortho-rome-12p479134-41p867829-2048-8392187b67e2.webp",
+      "width": 2048,
+      "height": 2048,
+      "bytes": 1406860,
+      "sha256": "8392187b67e2b6a2a799fa70aec21298fb877d73babd9a006e0ee3dbe3bf1bab",
+      "resolutionM": 0.488281,
+      "decodedRgbaBytes": 16777216,
+      "id": "rome-12p479134-41p867829",
+      "bounds": [
+        12.473102099536566,
+        41.86333736579477,
+        12.485165100463433,
+        41.87232051863416
+      ],
+      "coordinates": [
+        [
+          12.473102099536566,
+          41.87232051863416
+        ],
+        [
+          12.485165100463433,
+          41.87232051863416
+        ],
+        [
+          12.485165100463433,
+          41.86333736579477
+        ],
+        [
+          12.473102099536566,
+          41.86333736579477
+        ]
+      ],
+      "source": {
+        "title": "Regione Lazio Ortofoto AGEA v. 2020",
+        "url": "https://geoportale.regione.lazio.it/catalogue/csw_to_extra_format/r_lazio:92b0f7e3-3b75-4feb-ac5e-2382/ortofoto-agea-v-2020.html",
+        "license": "CC BY 4.0",
+        "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+        "attribution": "© Regione Lazio · Ortofoto AGEA 2020 (modified) · CC BY 4.0",
+        "nativeResolutionM": 0.2
+      },
+      "inputs": [
+        {
+          "url": "https://geoportale.regione.lazio.it/geoserver/ows?service=WMS&version=1.3.0&request=GetMap&layers=geonode%3A2020_AGEA_25833_COG&styles=&bbox=1388499.374332922%2C5140529.976197901%2C1389842.221453540%2C5141872.823318520&width=2048&height=2048&format=image%2Fjpeg&crs=EPSG%3A3857",
+          "sha256": "0a95171518cde8f335e7918bd05ac9450be0f8762917eea2b7923b3032861ae3",
+          "bytes": 449648,
+          "input": "rome-2fca190e94a9f5512673b463d682e77eac124b386ae512784975b48a8d957536.image"
+        }
+      ],
+      "footprintM": {
+        "width": 1000.0,
+        "height": 1000.0
+      },
+      "mobile": {
+        "url": "assets/destination-orthophotos/ortho-rome-12p479134-41p867829-1024-46ea7439bc8a.webp",
+        "width": 1024,
+        "height": 1024,
+        "bytes": 466200,
+        "sha256": "46ea7439bc8af7c1b83e75269685017547f5328438f3a0a8e9ced467d39dfc53",
+        "resolutionM": 0.976562,
+        "decodedRgbaBytes": 4194304
+      }
+    },
+    "switzerland-8p561700-47p452500": {
+      "url": "assets/destination-orthophotos/ortho-switzerland-8p561700-47p452500-2048-ad44342978c5.webp",
+      "width": 2048,
+      "height": 2048,
+      "bytes": 1246346,
+      "sha256": "ad44342978c52c1f51d6180bccff359add66d4118de64b31ba47c9d7ff34edfa",
+      "resolutionM": 0.488281,
+      "decodedRgbaBytes": 16777216,
+      "id": "switzerland-8p561700-47p452500",
+      "bounds": [
+        8.555057633185164,
+        47.448008231769215,
+        8.568342366814834,
+        47.45699138461213
+      ],
+      "coordinates": [
+        [
+          8.555057633185164,
+          47.45699138461213
+        ],
+        [
+          8.568342366814834,
+          47.45699138461213
+        ],
+        [
+          8.568342366814834,
+          47.448008231769215
+        ],
+        [
+          8.555057633185164,
+          47.448008231769215
+        ]
+      ],
+      "source": {
+        "title": "SWISSIMAGE",
+        "url": "https://www.swisstopo.admin.ch/en/faq-free-geodata",
+        "license": "swisstopo OGD terms",
+        "licenseUrl": "https://www.swisstopo.admin.ch/en/terms-of-use-free-geodata-and-geoservices",
+        "attribution": "© swisstopo · SWISSIMAGE (modified)",
+        "nativeResolutionM": 0.1
+      },
+      "inputs": [
+        {
+          "url": "https://wms.geo.admin.ch/?service=WMS&version=1.3.0&request=GetMap&layers=ch.swisstopo.swissimage&styles=&bbox=952344.659433281%2C6015509.481766948%2C953823.509216260%2C6016988.331549927&width=2048&height=2048&format=image%2Fjpeg&crs=EPSG%3A3857",
+          "sha256": "8f44a0a2873f03d1a4c828a99f2145c1bbd611f17cc728cad7993bb61360f054",
+          "bytes": 1100650,
+          "input": "switzerland-72c2ad8ff23f22b5657bf4247d71daf4209eeab988d7f13bcf63c96f568883bf.image"
+        }
+      ],
+      "footprintM": {
+        "width": 1000.0,
+        "height": 1000.0
+      },
+      "mobile": {
+        "url": "assets/destination-orthophotos/ortho-switzerland-8p561700-47p452500-1024-6c88f7f68062.webp",
+        "width": 1024,
+        "height": 1024,
+        "bytes": 386656,
+        "sha256": "6c88f7f680629f466499f88bfedd0a8f08ed3328d018bb941285cb22d7055658",
+        "resolutionM": 0.976562,
+        "decodedRgbaBytes": 4194304
+      }
+    },
+    "poland-17p038538-51p107883": {
+      "url": "assets/destination-orthophotos/ortho-poland-17p038538-51p107883-2048-781223e6a943.webp",
+      "width": 2048,
+      "height": 2048,
+      "bytes": 1384748,
+      "sha256": "781223e6a9430ef442001669bd6b66244ab8e91a8860b7814a525030452ee941",
+      "resolutionM": 0.488281,
+      "decodedRgbaBytes": 16777216,
+      "id": "poland-17p038538-51p107883",
+      "bounds": [
+        17.031384167623802,
+        51.10339120532985,
+        17.045691832376196,
+        51.112374358175984
+      ],
+      "coordinates": [
+        [
+          17.031384167623802,
+          51.112374358175984
+        ],
+        [
+          17.045691832376196,
+          51.112374358175984
+        ],
+        [
+          17.045691832376196,
+          51.10339120532985
+        ],
+        [
+          17.031384167623802,
+          51.10339120532985
+        ]
+      ],
+      "source": {
+        "title": "GUGiK high-resolution orthophoto",
+        "url": "https://www.geoportal.gov.pl/pl/dane/ortofotomapa-orto/",
+        "license": "Free reuse of Polish public geodata",
+        "licenseUrl": "https://www.geoportal.gov.pl/pl/dane/ortofotomapa-orto/",
+        "attribution": "© Główny Urząd Geodezji i Kartografii · Geoportal.gov.pl · orthophoto (modified)",
+        "nativeResolutionM": 0.1
+      },
+      "inputs": [
+        {
+          "url": "https://mapy.geoportal.gov.pl/wss/service/PZGIK/ORTO/WMS/HighResolution?service=WMS&version=1.3.0&request=GetMap&layers=Raster&styles=&bbox=17.031384168%2C51.103391205%2C17.045691832%2C51.112374358&width=2048&height=2048&format=image%2Fjpeg&crs=CRS%3A84",
+          "sha256": "42705c258fd6b3fa20bc8124d0f7f12e317f5577b309846ea7b929bda0506924",
+          "bytes": 863691,
+          "input": "poland-cd56b465686f710b576c970089ba2334773a5b719d07699a3bf3bf8e68d49b68.image"
+        }
+      ],
+      "footprintM": {
+        "width": 1000.0,
+        "height": 1000.0
+      },
+      "mobile": {
+        "url": "assets/destination-orthophotos/ortho-poland-17p038538-51p107883-1024-820c06cace13.webp",
+        "width": 1024,
+        "height": 1024,
+        "bytes": 498168,
+        "sha256": "820c06cace131227b6f374e715457898d438c7507b570e5247b9c6d5de475794",
+        "resolutionM": 0.976562,
+        "decodedRgbaBytes": 4194304
+      }
+    },
+    "brandenburg-14p301040-51p775269": {
+      "url": "assets/destination-orthophotos/ortho-brandenburg-14p301040-51p775269-2048-1004883fea6a.webp",
+      "width": 2048,
+      "height": 2048,
+      "bytes": 1914500,
+      "sha256": "1004883fea6a482fdde417b694ff20d691ae498d721f2dbf7f6fdde999c9e462",
+      "resolutionM": 0.488281,
+      "decodedRgbaBytes": 16777216,
+      "id": "brandenburg-14p301040-51p775269",
+      "bounds": [
+        14.293781175045122,
+        51.77077758443013,
+        14.308299459634858,
+        51.779760737276945
+      ],
+      "coordinates": [
+        [
+          14.293781175045122,
+          51.779760737276945
+        ],
+        [
+          14.308299459634858,
+          51.779760737276945
+        ],
+        [
+          14.308299459634858,
+          51.77077758443013
+        ],
+        [
+          14.293781175045122,
+          51.77077758443013
+        ]
+      ],
+      "source": {
+        "title": "Brandenburg DOP20",
+        "url": "https://isk.geobasis-bb.de/mapproxy/dop20c/service/wms?service=WMS&request=GetCapabilities",
+        "license": "dl-de/by-2-0",
+        "licenseUrl": "https://www.govdata.de/dl-de/by-2-0",
+        "attribution": "© GeoBasis-DE/LGB · DOP20 (modified) · dl-de/by-2-0",
+        "nativeResolutionM": 0.2
+      },
+      "inputs": [
+        {
+          "url": "https://isk.geobasis-bb.de/mapproxy/dop20c/service/wms?service=WMS&version=1.3.0&request=GetMap&layers=bebb_dop20c&styles=&bbox=1591176.441916503%2C6758784.747100869%2C1592792.609964224%2C6760400.915148592&width=2048&height=2048&format=image%2Fjpeg&crs=EPSG%3A3857",
+          "sha256": "3d4cd0fef739f77f4724e2326899e8b22289e7ded3268cd60eb5b834344675af",
+          "bytes": 1706436,
+          "input": "brandenburg-85c0429306a55cd996cda8db920be0f8f4ae147c9fdf146cb4a49cb148fa4f38.image"
+        }
+      ],
+      "footprintM": {
+        "width": 1000.0,
+        "height": 1000.0
+      },
+      "mobile": {
+        "url": "assets/destination-orthophotos/ortho-brandenburg-14p301040-51p775269-1024-78ffa5161a10.webp",
+        "width": 1024,
+        "height": 1024,
+        "bytes": 521050,
+        "sha256": "78ffa5161a1026ef2ca2625aed4b82d8ec16b1bb606565bb70942f9d613aedc6",
+        "resolutionM": 0.976562,
+        "decodedRgbaBytes": 4194304
+      }
+    },
+    "japan-135p668200-34p612800": {
+      "url": "assets/destination-orthophotos/ortho-japan-135p668200-34p612800-2048-c40dd85cd709.webp",
+      "width": 2048,
+      "height": 2048,
+      "bytes": 1607796,
+      "sha256": "c40dd85cd709ea609be87d396170e64a4cc4e09281321fadd6697d532856656d",
+      "resolutionM": 0.491472,
+      "decodedRgbaBytes": 16777216,
+      "id": "japan-135p668200-34p612800",
+      "bounds": [
+        135.66192626953125,
+        34.60834520731578,
+        135.67291259765625,
+        34.617387052407175
+      ],
+      "coordinates": [
+        [
+          135.66192626953125,
+          34.617387052407175
+        ],
+        [
+          135.67291259765625,
+          34.617387052407175
+        ],
+        [
+          135.67291259765625,
+          34.60834520731578
+        ],
+        [
+          135.66192626953125,
+          34.60834520731578
+        ]
+      ],
+      "source": {
+        "title": "GSI seamless aerial photographs",
+        "url": "https://maps.gsi.go.jp/development/ichiran.html",
+        "license": "Public Data License 1.0",
+        "licenseUrl": "https://www.gsi.go.jp/ENGLISH/page_e30286.html",
+        "attribution": "Created by editing GSI Tiles (seamless aerial photographs) · Geospatial Information Authority of Japan · PDL 1.0",
+        "nativeResolutionM": 0.5
+      },
+      "inputs": [
+        {
+          "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/229858/104174.jpg",
+          "sha256": "656303fc0d7a9508b109e3f9ac65f67334a4678e2565410045c6d4abecce662b",
+          "bytes": 17270,
+          "input": "japan-453743229771fa7268d8ec9d21b96b97ace8f54aea15a62721817c9a65a28b27.image",
+          "z": 18,
+          "x": 229858,
+          "y": 104174
+        },
+        {
+          "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/229859/104174.jpg",
+          "sha256": "12bad279f43bda5bb80f15ff2a4cb7a99014e18979530d14aaf46ae858d87810",
+          "bytes": 16681,
+          "input": "japan-a79f07b97ef980b58ac5542553a6b7a95704d72d5a720aef4015714205e64868.image",
+          "z": 18,
+          "x": 229859,
+          "y": 104174
+        },
+        {
+          "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/229860/104174.jpg",
+          "sha256": "0b90ee19f026400b21d82cba78550eb5f520ea4db775a2a482b3ff0ad2245c5f",
+          "bytes": 17364,
+          "input": "japan-f09de2d7ee1e9a9e3b5305dc9e391435f451d568aeff62254b93ea0a1aaa98df.image",
+          "z": 18,
+          "x": 229860,
+          "y": 104174
+        },
+        {
+          "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/229861/104174.jpg",
+          "sha256": "47ddfebd5a11e822849459dafdc33e5c2b27c223b52edb19338ab77278675949",
+          "bytes": 19283,
+          "input": "japan-0d802eb760a361953b43d32f9489e17e16a90d86da47ba42c9c5c243d947c77f.image",
+          "z": 18,
+          "x": 229861,
+          "y": 104174
+        },
+        {
+          "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/229862/104174.jpg",
+          "sha256": "0f537ff656bed965dda0d238f9415f237d4392d3508debf387f764821e4c3691",
+          "bytes": 19377,
+          "input": "japan-cbe0df0d7c5ebc985ffc1f2058edc836511061a1717e6434b715235759fcebd5.image",
+          "z": 18,
+          "x": 229862,
+          "y": 104174
+        },
+        {
+          "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/229863/104174.jpg",
+          "sha256": "cfe2a76cb5cdf44990cd193147ea46a13ddf1141ba6b664b4354f780ba9f97e4",
+          "bytes": 16345,
+          "input": "japan-1418aebdd69388ef9c304fce038fd12e4c6c7d50efc078067412c1315bd3b85c.image",
+          "z": 18,
+          "x": 229863,
+          "y": 104174
+        },
+        {
+          "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/229864/104174.jpg",
+          "sha256": "cb6b8e4b84facbdcabf70a9b84a742b4621a12089cc423184a1dc719512392ed",
+          "bytes": 17978,
+          "input": "japan-c19339e38da678cd4889db4e95229a39e0111ecb39c8d467d45d02b66449cd07.image",
+          "z": 18,
+          "x": 229864,
+          "y": 104174
+        },
+        {
+          "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/229865/104174.jpg",
+          "sha256": "133e1694f2d5fadfa2567c819e77cce45d750ec94978efe587e9d1fa8b6c3396",
+          "bytes": 16149,
+          "input": "japan-bfcf77588befd1d97763f42252828ff56af89bca9c4a4a17b5e85e61b7d64836.image",
+          "z": 18,
+          "x": 229865,
+          "y": 104174
+        },
+        {
+          "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/229858/104175.jpg",
+          "sha256": "56fd2ee2b74249f7469b197a90644c0c545ee21b426a02c0d64c8d014366ef68",
+          "bytes": 16693,
+          "input": "japan-4579575f77951c3329b1935a9c3309240c435d2d7d9b40293d1d68f4c4770e49.image",
+          "z": 18,
+          "x": 229858,
+          "y": 104175
+        },
+        {
+          "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/229859/104175.jpg",
+          "sha256": "16a73c3a4d7dce5e390aa08b3e38d49a3452b98485755387bba12770bf5024c8",
+          "bytes": 16974,
+          "input": "japan-c2e39648433341f698143cc3509a1257fff6f8151c6e7ee96c32017604695d67.image",
+          "z": 18,
+          "x": 229859,
+          "y": 104175
+        },
+        {
+          "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/229860/104175.jpg",
+          "sha256": "36557979b01fdca721fb6db8919b0c097330d9c09c32cead257c2e3dee96a6a7",
+          "bytes": 16547,
+          "input": "japan-c73b3b1a5e36b451c7af1219339b08f87bcce6226d6c4d814af1756a08d54c9b.image",
+          "z": 18,
+          "x": 229860,
+          "y": 104175
+        },
+        {
+          "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/229861/104175.jpg",
+          "sha256": "e229d0e8c6b1090494a65274455cece3195175eababce23d1e29e60216228b56",
+          "bytes": 18581,
+          "input": "japan-083c0513edeb5059a32ef906c598700702aeeb60548b5b1eb68b0bba971d904d.image",
+          "z": 18,
+          "x": 229861,
+          "y": 104175
+        },
+        {
+          "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/229862/104175.jpg",
+          "sha256": "2bbe38bb1a13a46ac9949b3a6e505bacf5ecf63c8b508a00755e07e74de60b08",
+          "bytes": 16569,
+          "input": "japan-b91a73e6a46f38b5e6ecdd3300edadab3733cf068dad92cfe14a0e585fb0a493.image",
+          "z": 18,
+          "x": 229862,
+          "y": 104175
+        },
+        {
+          "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/229863/104175.jpg",
+          "sha256": "5a72e9c0ba9116e72a3b59b04a917c72fcc4e8a2bb8a6faeacba3fa2aed7bc8d",
+          "bytes": 15957,
+          "input": "japan-62889cb82b1d6d824c6c3b36b3ea4f84528363fc0adca33124f915eb13403325.image",
+          "z": 18,
+          "x": 229863,
+          "y": 104175
+        },
+        {
+          "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/229864/104175.jpg",
+          "sha256": "3ba0ab274cf8ec747e57babb2b8e52f9b47ccafa1ec24c51764ca8401dccd40e",
+          "bytes": 18529,
+          "input": "japan-a2271345b27314d3c0db67b5eedfa259a2839f2949e98e05a40e9bdc59792a2f.image",
+          "z": 18,
+          "x": 229864,
+          "y": 104175
+        },
+        {
+          "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/229865/104175.jpg",
+          "sha256": "d358225f9567daf3322bdd791a9dc3ae7141f204e5807369e351bddcd2c195b2",
+          "bytes": 17206,
+          "input": "japan-93bf18b7798cc9bc074213aea38e23b3a2b89692d1e415ef440efebc4b86b419.image",
+          "z": 18,
+          "x": 229865,
+          "y": 104175
+        },
+        {
+          "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/229858/104176.jpg",
+          "sha256": "382702256a8a6f22354efb65e183c39a518ad95c2d4fc644ffa84c42b30e4917",
+          "bytes": 17437,
+          "input": "japan-bca8375e7b6753f8fa3cfb98d0b13e46ccffc37709c3298a774e01465a34e841.image",
+          "z": 18,
+          "x": 229858,
+          "y": 104176
+        },
+        {
+          "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/229859/104176.jpg",
+          "sha256": "c69a5a554e36a84e71a5a79d08d923ffd9ecd9b31c83b2a14d84f89766c00e9b",
+          "bytes": 15944,
+          "input": "japan-58668bd80cd556cb248c339e600eb6447f06d634b0aec9f274ae2442dc0984f2.image",
+          "z": 18,
+          "x": 229859,
+          "y": 104176
+        },
+        {
+          "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/229860/104176.jpg",
+          "sha256": "f4bf2452e2d95810b13e907328c1460babbcd4b4b65b73c2f0cf89f65137a0a2",
+          "bytes": 16135,
+          "input": "japan-ee6d423e3d34a9cacbaf2927033b8d8ce12a9151ff095d6dce2663742c7e937e.image",
+          "z": 18,
+          "x": 229860,
+          "y": 104176
+        },
+        {
+          "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/229861/104176.jpg",
+          "sha256": "4b763f671606d1d85db9c25f89fe7baaab0b33664078cae3dc6755a5d3cfe980",
+          "bytes": 15967,
+          "input": "japan-8a2d334c193f069db283f66c8282ef3fb497594b08dfcfec6ce57b36ce1c7731.image",
+          "z": 18,
+          "x": 229861,
+          "y": 104176
+        },
+        {
+          "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/229862/104176.jpg",
+          "sha256": "7b70e1544131bfbf18a717f1759e1392704c0f5f6689d548b0e385051472ae82",
+          "bytes": 15748,
+          "input": "japan-87b81885f7750f139ac3a804b75da660159821b241b5afa28f0661e279f22428.image",
+          "z": 18,
+          "x": 229862,
+          "y": 104176
+        },
+        {
+          "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/229863/104176.jpg",
+          "sha256": "7cd1937dcc7e4cc76ac8918ae1e28d83ded6a1c44736270d14524c57e795ff60",
+          "bytes": 16004,
+          "input": "japan-9ee49e28b6a6a9ae6c3c6a406221de51c621df1d3163b0d52c78122f5bd46c9f.image",
+          "z": 18,
+          "x": 229863,
+          "y": 104176
+        },
+        {
+          "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/229864/104176.jpg",
+          "sha256": "068748a495173599b12b7f8b4b29e4c00342d244dbec173f6cd7b859ce26b921",
+          "bytes": 17838,
+          "input": "japan-c1fae9f7898fcc6a11a3ccb43ed633064ec605deade7cb8efad67c4df3febddc.image",
+          "z": 18,
+          "x": 229864,
+          "y": 104176
+        },
+        {
+          "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/229865/104176.jpg",
+          "sha256": "058133d3dfdfed32cd575ce4b789dc3de6897bb7fab20c5cc17c62a4546ff78d",
+          "bytes": 17315,
+          "input": "japan-a1f1ab2ae865e72e03e0a0611eaec6bce0278ad7222f8b9cf77550493c40ebbb.image",
+          "z": 18,
+          "x": 229865,
+          "y": 104176
+        },
+        {
+          "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/229858/104177.jpg",
+          "sha256": "8f39dbbd6b6b4aaf251795a8a4b10c43f917ee8ba9368519838ada832d059bc4",
+          "bytes": 16719,
+          "input": "japan-94f3386fd90f840a44289ce8d7b2c066994adaeecf7333ca2885d9b054dea67a.image",
+          "z": 18,
+          "x": 229858,
+          "y": 104177
+        },
+        {
+          "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/229859/104177.jpg",
+          "sha256": "9d1cf57cd673da563c8021854d2924a28e6420cee6cb83e9bd368a6812a3c657",
+          "bytes": 15133,
+          "input": "japan-58bbbc1759572a1c8e328e68852ca0d32b0afa7d5e4a3841dc84286b34d37383.image",
+          "z": 18,
+          "x": 229859,
+          "y": 104177
+        },
+        {
+          "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/229860/104177.jpg",
+          "sha256": "892f0caa899f4ffedaf445003ad52a699ca3729bc7105a4ff455c48787f6ef91",
+          "bytes": 16032,
+          "input": "japan-75663d700b1fee4040d80d268169b7c24ed9a338a9dabfe1d083f3186f516702.image",
+          "z": 18,
+          "x": 229860,
+          "y": 104177
+        },
+        {
+          "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/229861/104177.jpg",
+          "sha256": "f703e6a95e10a5962b1c39734de96d71f1c5baf5f121eba2846774283763c4ea",
+          "bytes": 19869,
+          "input": "japan-e4ded0ae8aa63976334d40aefbf748483fc5a8a814c010e7e5a11835d06e225b.image",
+          "z": 18,
+          "x": 229861,
+          "y": 104177
+        },
+        {
+          "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/229862/104177.jpg",
+          "sha256": "07d9cd8b56c61a7b0e569801b6ae27fc729eafd4f8c66102984d26cad39173c3",
+          "bytes": 18598,
+          "input": "japan-4d03448d837492d88134f32edb7783a59feff32c7c68f403cf404337f711df1f.image",
+          "z": 18,
+          "x": 229862,
+          "y": 104177
+        },
+        {
+          "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/229863/104177.jpg",
+          "sha256": "7bc232f0da21d395ef4848c8751b3186cd51e1a1dbe8be4b6d542686e85c3448",
+          "bytes": 15555,
+          "input": "japan-e627e3eedf1862c2fa5f56696705c1429b7b43bd48b0a5bf3f1108439e445b98.image",
+          "z": 18,
+          "x": 229863,
+          "y": 104177
+        },
+        {
+          "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/229864/104177.jpg",
+          "sha256": "b740e33b47ea03aaeaff2b4de4bf9c93abcc25c1b5477df89438d2d6c83391a5",
+          "bytes": 15807,
+          "input": "japan-46791f0e455db0909e0290bb08dd6a1bd5476a96494f725ad8a668ccf9644c04.image",
+          "z": 18,
+          "x": 229864,
+          "y": 104177
+        },
+        {
+          "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/229865/104177.jpg",
+          "sha256": "e9d5a935a1939f6cf94c3e5f06a61327c583bb27e09ab8d9793cfff2a1083e1c",
+          "bytes": 17406,
+          "input": "japan-094bc2606c5b7e87be0ea0dd8594d96f7f47d837cd643c354d83e73c22911464.image",
+          "z": 18,
+          "x": 229865,
+          "y": 104177
+        },
+        {
+          "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/229858/104178.jpg",
+          "sha256": "40912b667a20ecd055acaf50b5e474e74823ee3ef618ed80edf93a113eb0fe6b",
+          "bytes": 16275,
+          "input": "japan-106f348bd4ace118d1b1e62585f0feed784dde1badfa55e09919b069aad2a735.image",
+          "z": 18,
+          "x": 229858,
+          "y": 104178
+        },
+        {
+          "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/229859/104178.jpg",
+          "sha256": "7da69f0b9b07184e996466da4018fdc6d305a65d2173c2b05455a92c1536674d",
+          "bytes": 17173,
+          "input": "japan-a99983f1de170c4053ff8c7188ea4eca4f44931d123116c30656a2f05b9dc89d.image",
+          "z": 18,
+          "x": 229859,
+          "y": 104178
+        },
+        {
+          "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/229860/104178.jpg",
+          "sha256": "81297e9bf5e3ce9a843bfd4347ed745f8cd35b8f2104beee38e52b0d4c0d2ea7",
+          "bytes": 13365,
+          "input": "japan-c9dfcc3290e744fe2a88ba2697fc6c3fa6734dbdd3c1365e92bf769496702a8f.image",
+          "z": 18,
+          "x": 229860,
+          "y": 104178
+        },
+        {
+          "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/229861/104178.jpg",
+          "sha256": "3624fb5a035d0f1888452aed7dd88b0db44254ff1a7cf85bf7b036b3d6353e93",
+          "bytes": 18524,
+          "input": "japan-bafe2531812af1ac4ed8df19a9f06a50656c17f07f34b127ef8272cab9a732d4.image",
+          "z": 18,
+          "x": 229861,
+          "y": 104178
+        },
+        {
+          "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/229862/104178.jpg",
+          "sha256": "ece7d52a0c3c93cd38621fd3e8158fe8791db83c1d84329445b52ecb40d0725e",
+          "bytes": 20505,
+          "input": "japan-0155dcc7350dde118dcbb3e2930fe10417b6d3c7525822a66cb9f082f81bd41d.image",
+          "z": 18,
+          "x": 229862,
+          "y": 104178
+        },
+        {
+          "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/229863/104178.jpg",
+          "sha256": "3bae1183c0952290554928c350cf2dc3b7af50fb3aa8a7bdf0a5476f282c48cb",
+          "bytes": 15845,
+          "input": "japan-e0fdd3073dd9b1f711d311c6d9c24a7a28e38caf8039aaa01762299525544f1a.image",
+          "z": 18,
+          "x": 229863,
+          "y": 104178
+        },
+        {
+          "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/229864/104178.jpg",
+          "sha256": "227a19300791013444111d58678a0ccbe7be4734ae175e13cb941eec80e5a89a",
+          "bytes": 15310,
+          "input": "japan-24ea1cf3fd9791ae27b9f292e51c09ad54bb18540613ec51bec15b68a9fd2fbd.image",
+          "z": 18,
+          "x": 229864,
+          "y": 104178
+        },
+        {
+          "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/229865/104178.jpg",
+          "sha256": "7ab9fc340ce08faf5b516395cbfd1ebc4984c90f69e9aa5fa24689159c8b3a7a",
+          "bytes": 15953,
+          "input": "japan-01e906d6e21218179a2aebfb9bf7c582661866d88b06b7478f19533420b94672.image",
+          "z": 18,
+          "x": 229865,
+          "y": 104178
+        },
+        {
+          "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/229858/104179.jpg",
+          "sha256": "af7ba8ebdae2466d9176c896bc66e351afa9f25f79fc5d77a2345a98f5f6a1b4",
+          "bytes": 16230,
+          "input": "japan-3673428d5b2d425f0c56dc4be025d38491973d8bf78182a6d41788c42418fee9.image",
+          "z": 18,
+          "x": 229858,
+          "y": 104179
+        },
+        {
+          "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/229859/104179.jpg",
+          "sha256": "ad45c2569bc7af1a4c2eb1d7d244c74d93e2ab8c78329cb618784d585a38aec5",
+          "bytes": 16252,
+          "input": "japan-35e2d90ba43468e36509550b7e9960a88974917b7331474d1117a9540f8e0106.image",
+          "z": 18,
+          "x": 229859,
+          "y": 104179
+        },
+        {
+          "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/229860/104179.jpg",
+          "sha256": "5ec1d05ff485f9b3bbc5188f39529e774e4b416e6d72cade26742872bc0ad469",
+          "bytes": 13867,
+          "input": "japan-16b9be0d4e22797c2768f8605ce1081313c685b6bf856a69c3f992227c0e052d.image",
+          "z": 18,
+          "x": 229860,
+          "y": 104179
+        },
+        {
+          "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/229861/104179.jpg",
+          "sha256": "474cb2fddccb3af094d627f4e37a5ca41ac2b477400ef92efac5483a4d7939ce",
+          "bytes": 15511,
+          "input": "japan-8b7273c11abe3178fc08300e92ed8878891b8ad2fcd4da0c97ddc4a99e399d30.image",
+          "z": 18,
+          "x": 229861,
+          "y": 104179
+        },
+        {
+          "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/229862/104179.jpg",
+          "sha256": "c2fb1cb517e7d0702092385082a1ba1cd2f8e4e28dd8ed4a0dfa3c0789e36e23",
+          "bytes": 21874,
+          "input": "japan-0594a30cd275c976b05159bea9a07c79e71d5ec920b898c61b68552d152bf02f.image",
+          "z": 18,
+          "x": 229862,
+          "y": 104179
+        },
+        {
+          "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/229863/104179.jpg",
+          "sha256": "0a4dc827062405c4400d7a2bf6a88e3874a30cc696ebc689ccadbdd04c890f2f",
+          "bytes": 15855,
+          "input": "japan-36ed0b242be2304787b97bbba4f16b13bd8f08bf3548189904cafa7fd0e0bd3b.image",
+          "z": 18,
+          "x": 229863,
+          "y": 104179
+        },
+        {
+          "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/229864/104179.jpg",
+          "sha256": "9863f4500106402f037f3b3f02438163ff148e8733c26260c149abf0882889f8",
+          "bytes": 12530,
+          "input": "japan-101bca6dac612838c870084bc2cd9c87afbd7db8c643681f7d37c757283b815f.image",
+          "z": 18,
+          "x": 229864,
+          "y": 104179
+        },
+        {
+          "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/229865/104179.jpg",
+          "sha256": "e3c2e607ca6e6726e3b7086c27f59dd00c629b4c082d5328ec8d70d793b8f842",
+          "bytes": 17753,
+          "input": "japan-6c03a4c2f962c3917b647e0b4958bd755b64e38721b4eb15fcbf4edf9025f70a.image",
+          "z": 18,
+          "x": 229865,
+          "y": 104179
+        },
+        {
+          "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/229858/104180.jpg",
+          "sha256": "4c0b457e29676a0a5ad3f86258e2b556118a6055561c6a11c2cfc4782b2b1719",
+          "bytes": 14452,
+          "input": "japan-5f88d69ef35f5214633484508f755d9f1be56fe8bd132e423e121f0ed1dbaf52.image",
+          "z": 18,
+          "x": 229858,
+          "y": 104180
+        },
+        {
+          "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/229859/104180.jpg",
+          "sha256": "d5db72734d14505dc9ea3d4aac7924c706fc5a8de67cde0866193244dc50d0ee",
+          "bytes": 15911,
+          "input": "japan-abd1bc822e4d46cd449f59276e7a71b92752326ecc581802ff93d25db6f027fd.image",
+          "z": 18,
+          "x": 229859,
+          "y": 104180
+        },
+        {
+          "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/229860/104180.jpg",
+          "sha256": "bb30982c57309eb6cde11e288aec232d40e855b65f2e2b9d0643a1320bc21a49",
+          "bytes": 16614,
+          "input": "japan-25a7b2e578dcc22ef53a9f15b4407c76668147cb6f7b2398f566026b84fd6075.image",
+          "z": 18,
+          "x": 229860,
+          "y": 104180
+        },
+        {
+          "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/229861/104180.jpg",
+          "sha256": "0f477eb372e1e1ef045122ffbc713ccc21091a37a74924d57313d5bb5e41dd4d",
+          "bytes": 14142,
+          "input": "japan-940fb541b7fae619da616f8c720bea83c216402b51956ed9ff394c0f5b3352fd.image",
+          "z": 18,
+          "x": 229861,
+          "y": 104180
+        },
+        {
+          "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/229862/104180.jpg",
+          "sha256": "286ed5f9879c4671d7c47d06a86f9d5af77f056ddc6b0b55d773038ec9c95b6f",
+          "bytes": 21414,
+          "input": "japan-e4a9f414cb6a987d04f397be4bbe45472e61b567b0535d6e81f8f3bd9a6c418e.image",
+          "z": 18,
+          "x": 229862,
+          "y": 104180
+        },
+        {
+          "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/229863/104180.jpg",
+          "sha256": "d78f88c342f406e297795bd68d266728fda1c1f8944ad25ce9ca8007c9fa311f",
+          "bytes": 17743,
+          "input": "japan-cf1e8e3761e3fbd95a3f50228db2c3820752f51d0b28c9d3a315c110ae96d508.image",
+          "z": 18,
+          "x": 229863,
+          "y": 104180
+        },
+        {
+          "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/229864/104180.jpg",
+          "sha256": "409522dd98319babda819573a1112b14996fd8f973e9631ce2f9856d92d72b52",
+          "bytes": 14713,
+          "input": "japan-2a6ccc5f6c8ea64fb5f4cfb58745f4f2e97fe0e840a17b49506843e04b6448e4.image",
+          "z": 18,
+          "x": 229864,
+          "y": 104180
+        },
+        {
+          "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/229865/104180.jpg",
+          "sha256": "286bddcbccf193ace4e6584c73649302a3ed2e1440fde960e0412a0e8cc5d1bb",
+          "bytes": 14666,
+          "input": "japan-672ca178c0aec5fce50189f66bee6dd0a2a6557b7f5edcf5ad01d6c762e228c0.image",
+          "z": 18,
+          "x": 229865,
+          "y": 104180
+        },
+        {
+          "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/229858/104181.jpg",
+          "sha256": "adba16279aad7440829dad182207cfa1852cc778ac7fbb9654c8ea16aaf5d20b",
+          "bytes": 17532,
+          "input": "japan-687ec54bcc13434a533d779fe5e71bdf2da62e4c87693709c0df855bdc915e3f.image",
+          "z": 18,
+          "x": 229858,
+          "y": 104181
+        },
+        {
+          "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/229859/104181.jpg",
+          "sha256": "ea4da644d661b568b313a1377878aa45a8f9693a42f4ebfb99984dfee85946b6",
+          "bytes": 15432,
+          "input": "japan-a0f5c9b4fb82896370f8eae9f8b78b1a405eed795ed93b870e71d34a1cda295a.image",
+          "z": 18,
+          "x": 229859,
+          "y": 104181
+        },
+        {
+          "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/229860/104181.jpg",
+          "sha256": "77ea4870f7397cfeb009b0364d585d3795cd7fef6b3a31214a9eb75f02720af1",
+          "bytes": 16764,
+          "input": "japan-c22ba30efe5b6389f8a17456908cd7f4916567384281bf6b8bb196662120cb7b.image",
+          "z": 18,
+          "x": 229860,
+          "y": 104181
+        },
+        {
+          "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/229861/104181.jpg",
+          "sha256": "9e7ccad1c8b3969e23325481f842662bb89bb39791a0c5e20c73e3a0d81fb7dc",
+          "bytes": 14457,
+          "input": "japan-a2bab02a2d6d295fb2885dfedb92bfafed60667c66b0c314e9289bebf27a7444.image",
+          "z": 18,
+          "x": 229861,
+          "y": 104181
+        },
+        {
+          "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/229862/104181.jpg",
+          "sha256": "b132bd83531da7a961e43c3d14add24a446fb0999605549965549fbcc19f2683",
+          "bytes": 15493,
+          "input": "japan-17ce0415d023bfe18d4f2707af2e2735cd5597184604043006f40e283a1908b7.image",
+          "z": 18,
+          "x": 229862,
+          "y": 104181
+        },
+        {
+          "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/229863/104181.jpg",
+          "sha256": "1b9657ad860093a0495ed86c78860c158ff9476e20cc7fc6711f86fe4c1bc156",
+          "bytes": 17500,
+          "input": "japan-d92f2a8b904653e60d5dd4b4ae6f353f54cf2007b85fb3e5cac4c76c6f118de0.image",
+          "z": 18,
+          "x": 229863,
+          "y": 104181
+        },
+        {
+          "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/229864/104181.jpg",
+          "sha256": "7f36fc8db59b54ddc818b894669244181e3762d11c2e2ef5996f4dc5371bc6b0",
+          "bytes": 16062,
+          "input": "japan-12abfc9ad3bc9d7acfa0c5216a6f218882adcb18cbcdd7d4365f7d697471f51f.image",
+          "z": 18,
+          "x": 229864,
+          "y": 104181
+        },
+        {
+          "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/229865/104181.jpg",
+          "sha256": "2570c33561345ba894bc4f4e8a69474d09e27f3896a405e850715181f61e5615",
+          "bytes": 13377,
+          "input": "japan-3b82bf2f4672e1fee60c11b8229f5b1f84c43f1fd341c4a8f966cd3dcbcfe997.image",
+          "z": 18,
+          "x": 229865,
+          "y": 104181
+        }
+      ],
+      "footprintM": {
+        "width": 1006.534,
+        "height": 1006.534
+      },
+      "mobile": {
+        "url": "assets/destination-orthophotos/ortho-japan-135p668200-34p612800-1024-1aab51268683.webp",
+        "width": 1024,
+        "height": 1024,
+        "bytes": 523830,
+        "sha256": "1aab51268683da6e1f84192e5f152b6953165d9c1885ad5273c84dc7155db4c2",
+        "resolutionM": 0.982944,
+        "decodedRgbaBytes": 4194304
+      }
+    },
+    "bavaria-11p667100-48p262500": {
+      "url": "assets/destination-orthophotos/ortho-bavaria-11p667100-48p262500-2048-a1f35a962cd6.webp",
+      "width": 2048,
+      "height": 2048,
+      "bytes": 1128624,
+      "sha256": "a1f35a962cd69d7ccc274ed39b550964c880072ce04ea715000d60808fc6db36",
+      "resolutionM": 0.488281,
+      "decodedRgbaBytes": 16777216,
+      "id": "bavaria-11p667100-48p262500",
+      "bounds": [
+        11.6603530434134,
+        48.258008226240165,
+        11.6738469565866,
+        48.26699137908371
+      ],
+      "coordinates": [
+        [
+          11.6603530434134,
+          48.26699137908371
+        ],
+        [
+          11.6738469565866,
+          48.26699137908371
+        ],
+        [
+          11.6738469565866,
+          48.258008226240165
+        ],
+        [
+          11.6603530434134,
+          48.258008226240165
+        ]
+      ],
+      "source": {
+        "title": "Bavarian DOP20",
+        "url": "https://geodatenonline.bayern.de/geodatenonline/seiten/wms_dop",
+        "license": "CC BY 4.0",
+        "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+        "attribution": "© Bayerische Vermessungsverwaltung · DOP20 (modified) · CC BY 4.0",
+        "nativeResolutionM": 0.2
+      },
+      "inputs": [
+        {
+          "url": "https://geoservices.bayern.de/od/wms/dop/v1/dop20?service=WMS&version=1.1.1&request=GetMap&layers=by_dop20c&styles=&bbox=1298024.563262578%2C6149886.049721781%2C1299526.698805827%2C6151388.185265031&width=2048&height=2048&format=image%2Fjpeg&srs=EPSG%3A3857",
+          "sha256": "34f943da44aa798e23014e3073f184d2b97ed2cea8b2d69dd1e059818a48d183",
+          "bytes": 724821,
+          "input": "bavaria-a900d33cbb427a3ffad942ba40549a56763a15cedb1c5085a2193da5c1bac1f5.image"
+        }
+      ],
+      "footprintM": {
+        "width": 1000.0,
+        "height": 1000.0
+      },
+      "mobile": {
+        "url": "assets/destination-orthophotos/ortho-bavaria-11p667100-48p262500-1024-edc2ed496e00.webp",
+        "width": 1024,
+        "height": 1024,
+        "bytes": 442482,
+        "sha256": "edc2ed496e00b431ddf7c88feb7d59789ef5ce86585a1f49439a37ffff2bcda5",
+        "resolutionM": 0.976562,
+        "decodedRgbaBytes": 4194304
+      }
+    },
+    "berlin-13p404954-52p520008": {
+      "url": "assets/destination-orthophotos/ortho-berlin-13p404954-52p520008-2048-1d13b022bcf2.webp",
+      "width": 2048,
+      "height": 2048,
+      "bytes": 1677800,
+      "sha256": "1d13b022bcf220e1ce7bb6fa7e353a3717e5252b036c9d3566974d47b7470727",
+      "resolutionM": 0.488281,
+      "decodedRgbaBytes": 16777216,
+      "id": "berlin-13p404954-52p520008",
+      "bounds": [
+        13.397572419140626,
+        52.51551619397265,
+        13.412335580859372,
+        52.5244993468203
+      ],
+      "coordinates": [
+        [
+          13.397572419140626,
+          52.5244993468203
+        ],
+        [
+          13.412335580859372,
+          52.5244993468203
+        ],
+        [
+          13.412335580859372,
+          52.51551619397265
+        ],
+        [
+          13.397572419140626,
+          52.51551619397265
+        ]
+      ],
+      "source": {
+        "title": "Berlin TrueDOP 2026",
+        "url": "https://daten.berlin.de/datensaetze/digitale-farbige-trueorthophotos-2026-dop20rgbi-wms-3801a94c",
+        "license": "dl-de-zero-2.0",
+        "licenseUrl": "https://www.govdata.de/dl-de/zero-2-0",
+        "attribution": "© Geoportal Berlin · TrueDOP 2026 (modified) · dl-de-zero-2.0",
+        "nativeResolutionM": 0.2
+      },
+      "inputs": [
+        {
+          "url": "https://gdi.berlin.de/services/wms/truedop_2026?service=WMS&version=1.3.0&request=GetMap&layers=truedop_2026&styles=&bbox=1491410.939564741%2C6893879.551024003%2C1493054.367209770%2C6895522.978669032&width=2048&height=2048&format=image%2Fjpeg&crs=EPSG%3A3857",
+          "sha256": "90bcfd076ec8368381ba50694d4e4eb30704996e2b0a65cf084afe044671fc80",
+          "bytes": 969910,
+          "input": "berlin-f8dc44c0bba8e34266e58d054d7ae71067c1ad3e9f20af69486b9421aef16a52.image"
+        }
+      ],
+      "footprintM": {
+        "width": 1000.0,
+        "height": 1000.0
+      },
+      "mobile": {
+        "url": "assets/destination-orthophotos/ortho-berlin-13p404954-52p520008-1024-8e8d3ac1c040.webp",
+        "width": 1024,
+        "height": 1024,
+        "bytes": 496528,
+        "sha256": "8e8d3ac1c0403ee433e1c0cd9c6c390fc83b808ae1be300a869287c2bd16e047",
+        "resolutionM": 0.976562,
+        "decodedRgbaBytes": 4194304
+      }
+    },
+    "bavaria-11p535300-48p178600": {
+      "url": "assets/destination-orthophotos/ortho-bavaria-11p535300-48p178600-2048-5e1e26255771.webp",
+      "width": 2048,
+      "height": 2048,
+      "bytes": 1313474,
+      "sha256": "5e1e262557719def21135dcd5295b2ffc43dc21e46db9bd991d6fde3a79ac236",
+      "resolutionM": 0.488281,
+      "decodedRgbaBytes": 16777216,
+      "id": "bavaria-11p535300-48p178600",
+      "bounds": [
+        11.52856409227232,
+        48.17410822682094,
+        11.542035907727675,
+        48.18309137966443
+      ],
+      "coordinates": [
+        [
+          11.52856409227232,
+          48.18309137966443
+        ],
+        [
+          11.542035907727675,
+          48.18309137966443
+        ],
+        [
+          11.542035907727675,
+          48.17410822682094
+        ],
+        [
+          11.52856409227232,
+          48.17410822682094
+        ]
+      ],
+      "source": {
+        "title": "Bavarian DOP20",
+        "url": "https://geodatenonline.bayern.de/geodatenonline/seiten/wms_dop",
+        "license": "CC BY 4.0",
+        "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+        "attribution": "© Bayerische Vermessungsverwaltung · DOP20 (modified) · CC BY 4.0",
+        "nativeResolutionM": 0.2
+      },
+      "inputs": [
+        {
+          "url": "https://geoservices.bayern.de/od/wms/dop/v1/dop20?service=WMS&version=1.1.1&request=GetMap&layers=by_dop20c&styles=&bbox=1283353.884329373%2C6135869.272596644%2C1284853.559965924%2C6137368.948233195&width=2048&height=2048&format=image%2Fjpeg&srs=EPSG%3A3857",
+          "sha256": "026e6941a97ec28f93e5a55a65a83e2aee6684aeef8deee18db72c72276288fe",
+          "bytes": 848240,
+          "input": "bavaria-0af22c880167b731278954cafded8276f79e699bf157deb2f5d2c83f86b31dde.image"
+        }
+      ],
+      "footprintM": {
+        "width": 1000.0,
+        "height": 1000.0
+      },
+      "mobile": {
+        "url": "assets/destination-orthophotos/ortho-bavaria-11p535300-48p178600-1024-b913bdc276eb.webp",
+        "width": 1024,
+        "height": 1024,
+        "bytes": 502398,
+        "sha256": "b913bdc276eb0f8fe4710e601e6aa7e872b98285c10769f2572900bc6db5abfd",
+        "resolutionM": 0.976562,
+        "decodedRgbaBytes": 4194304
+      }
+    },
+    "bavaria-11p575800-48p145300": {
+      "url": "assets/destination-orthophotos/ortho-bavaria-11p575800-48p145300-2048-9886e58edbed.webp",
+      "width": 2048,
+      "height": 2048,
+      "bytes": 1428802,
+      "sha256": "9886e58edbedf4225304b27fa9648789752739bad81f435d23cec790ed112ace",
+      "resolutionM": 0.488281,
+      "decodedRgbaBytes": 16777216,
+      "id": "bavaria-11p575800-48p145300",
+      "bounds": [
+        11.569068463553617,
+        48.140808227050925,
+        11.582531536446382,
+        48.14979137989438
+      ],
+      "coordinates": [
+        [
+          11.569068463553617,
+          48.14979137989438
+        ],
+        [
+          11.582531536446382,
+          48.14979137989438
+        ],
+        [
+          11.582531536446382,
+          48.140808227050925
+        ],
+        [
+          11.569068463553617,
+          48.140808227050925
+        ]
+      ],
+      "source": {
+        "title": "Bavarian DOP20",
+        "url": "https://geodatenonline.bayern.de/geodatenonline/seiten/wms_dop",
+        "license": "CC BY 4.0",
+        "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+        "attribution": "© Bayerische Vermessungsverwaltung · DOP20 (modified) · CC BY 4.0",
+        "nativeResolutionM": 0.2
+      },
+      "inputs": [
+        {
+          "url": "https://geoservices.bayern.de/od/wms/dop/v1/dop20?service=WMS&version=1.1.1&request=GetMap&layers=by_dop20c&styles=&bbox=1287862.810315308%2C6130312.357411811%2C1289361.512734244%2C6131811.059830746&width=2048&height=2048&format=image%2Fjpeg&srs=EPSG%3A3857",
+          "sha256": "b36fa24299971d47e23b8b28f67a966c8982c725ee8a2c037cc0389e9cdc0479",
+          "bytes": 914378,
+          "input": "bavaria-6de96e2d12a68e23c31ae8f382b8f0c130924f86136bf61970999b4d7fccccd6.image"
+        }
+      ],
+      "footprintM": {
+        "width": 1000.0,
+        "height": 1000.0
+      },
+      "mobile": {
+        "url": "assets/destination-orthophotos/ortho-bavaria-11p575800-48p145300-1024-00dee18e1599.webp",
+        "width": 1024,
+        "height": 1024,
+        "bytes": 542496,
+        "sha256": "00dee18e15994a044bbf7d18b846cc10b3b48ba16c163d21cbd06619f11c082a",
+        "resolutionM": 0.976562,
+        "decodedRgbaBytes": 4194304
+      }
+    },
+    "switzerland-6p566800-46p519100": {
+      "url": "assets/destination-orthophotos/ortho-switzerland-6p566800-46p519100-2048-cd4a0268d123.webp",
+      "width": 2048,
+      "height": 2048,
+      "bytes": 1671010,
+      "sha256": "cd4a0268d12396792de714e22ead0e194ee526976862b7390bb219a4d7cb4626",
+      "resolutionM": 0.488281,
+      "decodedRgbaBytes": 16777216,
+      "id": "switzerland-6p566800-46p519100",
+      "bounds": [
+        6.560272615406405,
+        46.514608237933174,
+        6.5733273845935924,
+        46.5235913907754
+      ],
+      "coordinates": [
+        [
+          6.560272615406405,
+          46.5235913907754
+        ],
+        [
+          6.5733273845935924,
+          46.5235913907754
+        ],
+        [
+          6.5733273845935924,
+          46.514608237933174
+        ],
+        [
+          6.560272615406405,
+          46.514608237933174
+        ]
+      ],
+      "source": {
+        "title": "SWISSIMAGE",
+        "url": "https://www.swisstopo.admin.ch/en/faq-free-geodata",
+        "license": "swisstopo OGD terms",
+        "licenseUrl": "https://www.swisstopo.admin.ch/en/terms-of-use-free-geodata-and-geoservices",
+        "attribution": "© swisstopo · SWISSIMAGE (modified)",
+        "nativeResolutionM": 0.1
+      },
+      "inputs": [
+        {
+          "url": "https://wms.geo.admin.ch/?service=WMS&version=1.3.0&request=GetMap&layers=ch.swisstopo.swissimage&styles=&bbox=730286.207012098%2C5863202.565924925%2C731739.457270439%2C5864655.816183266&width=2048&height=2048&format=image%2Fjpeg&crs=EPSG%3A3857",
+          "sha256": "c74d5dae7024746f23eaf485d1a64d90e3b6e839ebdfd0de9dc2d1ba9922d8f0",
+          "bytes": 1415905,
+          "input": "switzerland-04ba415fdc3323dd062adb3a2e9d8b5fd3b54cffc7c86a9a659c746b014ddbc3.image"
+        }
+      ],
+      "footprintM": {
+        "width": 1000.0,
+        "height": 1000.0
+      },
+      "mobile": {
+        "url": "assets/destination-orthophotos/ortho-switzerland-6p566800-46p519100-1024-828ca4f0c4c9.webp",
+        "width": 1024,
+        "height": 1024,
+        "bytes": 512298,
+        "sha256": "828ca4f0c4c9a2a6a603be4eed2dd53b45ba815dbff62918376ae41b089c2af4",
+        "resolutionM": 0.976562,
+        "decodedRgbaBytes": 4194304
+      }
+    },
+    "austria-13p044800-47p801400": {
+      "url": "assets/destination-orthophotos/ortho-austria-13p044800-47p801400-2048-a01884087af1.webp",
+      "width": 2048,
+      "height": 2048,
+      "bytes": 1126876,
+      "sha256": "a01884087af10e6a85f0ad916caea818d46913f5ae5eb75902cd40dfd003ad3d",
+      "resolutionM": 0.401117,
+      "decodedRgbaBytes": 16777216,
+      "id": "austria-13p044800-47p801400",
+      "bounds": [
+        13.03802490234375,
+        47.79839667295524,
+        13.04901123046875,
+        47.80577611936809
+      ],
+      "coordinates": [
+        [
+          13.03802490234375,
+          47.80577611936809
+        ],
+        [
+          13.04901123046875,
+          47.80577611936809
+        ],
+        [
+          13.04901123046875,
+          47.79839667295524
+        ],
+        [
+          13.03802490234375,
+          47.79839667295524
+        ]
+      ],
+      "source": {
+        "title": "basemap.at Orthofoto",
+        "url": "https://basemap.at/en/orthofoto/",
+        "license": "CC BY 4.0",
+        "licenseUrl": "https://basemap.at/",
+        "attribution": "© basemap.at · Orthofoto (modified) · CC BY 4.0",
+        "nativeResolutionM": 0.3
+      },
+      "inputs": [
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/91336/140566.jpeg",
+          "sha256": "3bc2c5d55cf415da34603aaccfadb0ba64026b392c0903c8af40f9dee9b0d975",
+          "bytes": 13094,
+          "input": "austria-5705b57f66789e460d4328d2f470745542313d1da79b03d70093cd6616f62576.image",
+          "z": 18,
+          "x": 140566,
+          "y": 91336
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/91336/140567.jpeg",
+          "sha256": "7d33fb67de76e54c791595aa816a33f6665421a41ea7035e8fe9a92f18e63ead",
+          "bytes": 14503,
+          "input": "austria-af2ff2085b4bffe82149a53a5dea9e9bfe55047ed5ecfe8833fc89ec4259daab.image",
+          "z": 18,
+          "x": 140567,
+          "y": 91336
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/91336/140568.jpeg",
+          "sha256": "521e07572b81afa2595fe4c35a93c2436ad7c270551ebb44035674581926f5ea",
+          "bytes": 15678,
+          "input": "austria-e310b01c93c0a1448fe6e41eb5d33e3ee9930006ec1fababfebafbcf7860fac2.image",
+          "z": 18,
+          "x": 140568,
+          "y": 91336
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/91336/140569.jpeg",
+          "sha256": "a410ecd88768ba8543fe4eb486fac6f512d7e2c4f92f1834d2e4b4f6d00497fe",
+          "bytes": 16026,
+          "input": "austria-82911338362c29bd8543aa0649f9cbaa762fe0da86174cc74f83fc6f32df35d7.image",
+          "z": 18,
+          "x": 140569,
+          "y": 91336
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/91336/140570.jpeg",
+          "sha256": "f5f8edc10fccb460c4114016d6b91fc5d52837025052bb37998212384a385ea8",
+          "bytes": 16538,
+          "input": "austria-9f2be9f4e28b21efc607123f6c32a5033342ed23d81e1baaa4d71888ad395c33.image",
+          "z": 18,
+          "x": 140570,
+          "y": 91336
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/91336/140571.jpeg",
+          "sha256": "245a50180387ab07c353d6f691e4c1d0bf791683b6842cc243d1fdb487505225",
+          "bytes": 15215,
+          "input": "austria-4437f40659d33ad8e767aca9e6ecf57288502340c04bb1ad846fcd9ca0d5ec35.image",
+          "z": 18,
+          "x": 140571,
+          "y": 91336
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/91336/140572.jpeg",
+          "sha256": "8756d58164f16551b234a25f52d4e4570017f495dff14317f14a16830642619e",
+          "bytes": 14938,
+          "input": "austria-34c33a71f7569dd54bbbe6dbe44ff465d895960a4d0757db09b74464711932df.image",
+          "z": 18,
+          "x": 140572,
+          "y": 91336
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/91336/140573.jpeg",
+          "sha256": "4b47f3e69056d0690e1b81cef8f432836d2e436b9e1d8b9f20c70cf932bbec00",
+          "bytes": 15671,
+          "input": "austria-6012e2f2b7f28f6237c1018736ebdfc359af51ddc042d96bfcdf412814e539cf.image",
+          "z": 18,
+          "x": 140573,
+          "y": 91336
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/91337/140566.jpeg",
+          "sha256": "8724ffe943922a7b22d30a6e5417db6aa9b5c8e027e326ec66681725c5729f2a",
+          "bytes": 7563,
+          "input": "austria-44d18ef0b81e384f2e6bdcc67b3d78086d4c7266a5bb384843e15812e684e056.image",
+          "z": 18,
+          "x": 140566,
+          "y": 91337
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/91337/140567.jpeg",
+          "sha256": "4a39dc6157b620ecf1a418e5bf14fbe9caab50f6dc6dcaca6cf3e09f72bbfb95",
+          "bytes": 14515,
+          "input": "austria-abafb937d54a14dc7ecbecfc95674ec54aa14a87da66d1f4398b4b9bea45f62d.image",
+          "z": 18,
+          "x": 140567,
+          "y": 91337
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/91337/140568.jpeg",
+          "sha256": "ac9fbf4a13c5a889bb8c39680f63bac6c48cee1903dbea73661b0f2c82997625",
+          "bytes": 15866,
+          "input": "austria-f0389d8a80d007e5409c501787baefcef5f796341baa19f31ddfe598e64bc4a9.image",
+          "z": 18,
+          "x": 140568,
+          "y": 91337
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/91337/140569.jpeg",
+          "sha256": "a7043b565bb994fd9e8c3f0e7442caf50f7fa562a929b5d9f6eaa6871dd92514",
+          "bytes": 16183,
+          "input": "austria-4481b0287eca9cf73f35185b6dd4cb855d4080d4479a28cba4bf3e3117ffa610.image",
+          "z": 18,
+          "x": 140569,
+          "y": 91337
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/91337/140570.jpeg",
+          "sha256": "91fb242101b9c319d39a1fa261e7e7e562a8446e487f972928862703363b95be",
+          "bytes": 14946,
+          "input": "austria-261e90e8ba803a5b289b36f3ab042b1f037b780d1f77ed78170f3323b3ed20ac.image",
+          "z": 18,
+          "x": 140570,
+          "y": 91337
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/91337/140571.jpeg",
+          "sha256": "e10fd356dc0f65e43940d29ef00022b7a8c00c8f4f64943cf2a660cf5c62dfaa",
+          "bytes": 14861,
+          "input": "austria-1942e7e9daf17b5b4595e599116669da06bae91d2e769ad39dd07255048d2d91.image",
+          "z": 18,
+          "x": 140571,
+          "y": 91337
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/91337/140572.jpeg",
+          "sha256": "7343c546f9053a0780f70928aa368e875f1e160f215300f4f740709a13c1d7fb",
+          "bytes": 14765,
+          "input": "austria-4f79c38e945b86c9e9e34f40ac7b81096adfda317a0f5ebe38e72292a13f9730.image",
+          "z": 18,
+          "x": 140572,
+          "y": 91337
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/91337/140573.jpeg",
+          "sha256": "b0ee49a76a5dd336a8493547cdd039b094050fb7b202526e078387343a2396c5",
+          "bytes": 16178,
+          "input": "austria-722e4c6cd4d4ba04b22a2c3261051c30065c4a754d4a80f7d8ee8b631c1dcfd2.image",
+          "z": 18,
+          "x": 140573,
+          "y": 91337
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/91338/140566.jpeg",
+          "sha256": "f77c4d85ac112d74f22897b78c574d19f99486fed18e710877552b2f23f7b4bc",
+          "bytes": 7312,
+          "input": "austria-9659c6d132d863a8759960c70f164f1333acbf37ee19406ead618afa1a58d6b2.image",
+          "z": 18,
+          "x": 140566,
+          "y": 91338
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/91338/140567.jpeg",
+          "sha256": "6d1e76dc8da606ccb0407688b58e3f30b227321661790ecf4f3a7546497867e1",
+          "bytes": 11067,
+          "input": "austria-b70298f5414d2d60e54a8098ba045025206ec684a093d80dd411de368f5d6ab2.image",
+          "z": 18,
+          "x": 140567,
+          "y": 91338
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/91338/140568.jpeg",
+          "sha256": "560622188186095b88e24e74e7341ee0d9f623d3a2e4b36b5543e144a7ad6ff8",
+          "bytes": 14790,
+          "input": "austria-7970973638f7362e175658e3d00ba9561748be651d8a27077a4b4cfbd9279fe4.image",
+          "z": 18,
+          "x": 140568,
+          "y": 91338
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/91338/140569.jpeg",
+          "sha256": "22a3f44618c33bca1226b4116b8635e84051dacadadac6eaf4ed706af2269fe8",
+          "bytes": 14721,
+          "input": "austria-daf8b7f3a2a2188eff1bc8dd834e40546b9667a56ace0f61992a0cb6f8425e4f.image",
+          "z": 18,
+          "x": 140569,
+          "y": 91338
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/91338/140570.jpeg",
+          "sha256": "a2e268a4fb241a99dc91761ede098dc63410a915066130b37541a514801f1b91",
+          "bytes": 13856,
+          "input": "austria-b48147c8902e494dc28103c04bb9c690cd0b93f5726529dceef5f37e9084a98b.image",
+          "z": 18,
+          "x": 140570,
+          "y": 91338
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/91338/140571.jpeg",
+          "sha256": "7a64d6f84e7d4e545104a846e1a303b3e95612648258ce9a2dc9f86a8f00e277",
+          "bytes": 15146,
+          "input": "austria-a77167c55a672f4f6397d56c99b30323869f34d11bdfa1bba3bd81d1a1c75414.image",
+          "z": 18,
+          "x": 140571,
+          "y": 91338
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/91338/140572.jpeg",
+          "sha256": "a8a9fde36b8edb47a660d4f7588f7aeb13a8a4e1508ce31f3f2532e84cee396d",
+          "bytes": 17272,
+          "input": "austria-20539937802d9c374f54fbdcc4de6f01821fe90a48b265a0bd69c98ca6dda895.image",
+          "z": 18,
+          "x": 140572,
+          "y": 91338
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/91338/140573.jpeg",
+          "sha256": "888b0adf2191030165230c83d20fc09790e0ea0a9964de7d999b86183b71e51d",
+          "bytes": 13369,
+          "input": "austria-e35317bb40a5fc1e060364e656645c15419fdcdc7fd61f77d47a287c81c1ab0a.image",
+          "z": 18,
+          "x": 140573,
+          "y": 91338
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/91339/140566.jpeg",
+          "sha256": "6be2e735f3df08cdcd4e300574b7c76c79bc1f790c14a3a9a9496155fcb83cc8",
+          "bytes": 11827,
+          "input": "austria-85701695793db0182fcd905ecfc13d8b32e4fa113be8a7e9728d2ec3499583c7.image",
+          "z": 18,
+          "x": 140566,
+          "y": 91339
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/91339/140567.jpeg",
+          "sha256": "065bf20e5fc894b87ff2f882bab7e843f89459f12b94412c75dc75b73cdd123e",
+          "bytes": 8347,
+          "input": "austria-ea1798f16a340f15545aa9a5183179632c6adc665c67e4acea4e156c39d21738.image",
+          "z": 18,
+          "x": 140567,
+          "y": 91339
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/91339/140568.jpeg",
+          "sha256": "a89f8f5996081fe99572200446cd2465287f1df0fc1af1f6b2be2660f535d278",
+          "bytes": 10953,
+          "input": "austria-f194c82004c201743150242de3f79c5f12379659263399fd6a1883cb7ea88017.image",
+          "z": 18,
+          "x": 140568,
+          "y": 91339
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/91339/140569.jpeg",
+          "sha256": "73c810225d7c82decc36c1444f7e0c5dfcb1752c25e85f93ec6929f4ed7f0c79",
+          "bytes": 14086,
+          "input": "austria-7ea396a8fd813b0b86cc74ef48dfabd3c2b547d49f3f8bfadf4571d8bf767b2a.image",
+          "z": 18,
+          "x": 140569,
+          "y": 91339
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/91339/140570.jpeg",
+          "sha256": "7a6e63556daff916bb94ce437eae8b1349da80e761ee72fa895712147aec69bc",
+          "bytes": 15396,
+          "input": "austria-cf3b1eb92acfb8d48a40b432bff6faec7680c511c0165372ffca6f4daa3b9fcc.image",
+          "z": 18,
+          "x": 140570,
+          "y": 91339
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/91339/140571.jpeg",
+          "sha256": "08e41d15c41f274657c37b4e4ea1266fb15ada8cd3ef5a6bdb6fb534e1e40da4",
+          "bytes": 15172,
+          "input": "austria-665e77bf7e1a322ae5db70a9ebfd691dd1edb06aa09c7616f03437810630ce21.image",
+          "z": 18,
+          "x": 140571,
+          "y": 91339
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/91339/140572.jpeg",
+          "sha256": "3adc357616700cf3a93096d4cb92726889f32bcd0226bf2e1538fe330833a0d9",
+          "bytes": 15120,
+          "input": "austria-71635421812fd3865a9b7c1f58c7e38aa7be0847bd641a477cb5d6437200af7e.image",
+          "z": 18,
+          "x": 140572,
+          "y": 91339
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/91339/140573.jpeg",
+          "sha256": "1e270a4b6e0a0ef2e6afc7a43d5189ca9b4ea2b6ac53069b00472998a6642260",
+          "bytes": 14085,
+          "input": "austria-0492f433cd3fa51846061150e1eb07dadfa7da5b2fb92e13dd5939d3d036f079.image",
+          "z": 18,
+          "x": 140573,
+          "y": 91339
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/91340/140566.jpeg",
+          "sha256": "2616bd8e508acd4c59574c8359ce59c24ce7ab026df1e445b820c927f78d94df",
+          "bytes": 12233,
+          "input": "austria-f7b51e210f0aa8601b036273e177ba4eb00322a818f077f037f99b8821eaba8c.image",
+          "z": 18,
+          "x": 140566,
+          "y": 91340
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/91340/140567.jpeg",
+          "sha256": "3b875def82eb4b763004ee7a75cddbf42a1a9381baa740fa647040001402d46b",
+          "bytes": 13897,
+          "input": "austria-a08e222140e1ef59fa44c61b6c81e0ed75d9d950de73ae8b181a7099adc98b81.image",
+          "z": 18,
+          "x": 140567,
+          "y": 91340
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/91340/140568.jpeg",
+          "sha256": "4508282b143836139b2837c833c1fcb917d0dda0c3a8476fc332c20396c2a3ba",
+          "bytes": 11817,
+          "input": "austria-1e0fa742cc427ca35d2f8f20f711bc4d9f8364d2a47b9fffe483db9c8cc94de3.image",
+          "z": 18,
+          "x": 140568,
+          "y": 91340
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/91340/140569.jpeg",
+          "sha256": "919dd8a9a9114626a2fa260dcfe0cdfcd9e76757713c6f3de57ca2078e68cf96",
+          "bytes": 9381,
+          "input": "austria-25dee14c42514771d1c05df11a8e7a9c36c208c413ea203ef1d863bb05f92b9c.image",
+          "z": 18,
+          "x": 140569,
+          "y": 91340
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/91340/140570.jpeg",
+          "sha256": "0217785b6a8c2bc93d281d2bf74dd8aee95fd383d62159bad510345d64764b00",
+          "bytes": 13508,
+          "input": "austria-0c0f1c6523c2c81ad9d54835af6a0e3354ef67ec89f4b4606ea10f7c81037c36.image",
+          "z": 18,
+          "x": 140570,
+          "y": 91340
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/91340/140571.jpeg",
+          "sha256": "2604cfa2f02e107a95cbf420dbe985cad21dc4facb02ba775d5a415db7293b2f",
+          "bytes": 15904,
+          "input": "austria-ce3a13593f0077899622171e6cc2d86502f065399900327db5c9968ceacb82a4.image",
+          "z": 18,
+          "x": 140571,
+          "y": 91340
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/91340/140572.jpeg",
+          "sha256": "fdeff4ed584c8fcaa4616147805726fcd203e632c4907134e371403e4ac52c77",
+          "bytes": 14364,
+          "input": "austria-63e1cf77612a41eb12c35dcfa2d3189afe1b82551cbde1f946e96c341e2ff5b8.image",
+          "z": 18,
+          "x": 140572,
+          "y": 91340
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/91340/140573.jpeg",
+          "sha256": "e91bd7ef7562209a97c91ce36ee43a0c38fed5cacc44985a08210202f93dd22d",
+          "bytes": 14104,
+          "input": "austria-97e6706527a7a6cbb39792cdc1967b25cce68cbcb4822261f5b7f1a44cc5bfbf.image",
+          "z": 18,
+          "x": 140573,
+          "y": 91340
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/91341/140566.jpeg",
+          "sha256": "f18b6677902359bc89f772aed5ca4776fc416f76b80015bbb62375f06f547093",
+          "bytes": 12044,
+          "input": "austria-147c54b6c10297fc333defea323b37ffd585ed308d0fafd5db54fc5502e21af5.image",
+          "z": 18,
+          "x": 140566,
+          "y": 91341
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/91341/140567.jpeg",
+          "sha256": "0ef7e0278382e3778c6e688dd30201e996a389c0df15b6bf67746f60e5607a0f",
+          "bytes": 14522,
+          "input": "austria-8ac653aacadf0b91cb5047865c90e4543a01b0844bd96316580b9e192b472d4a.image",
+          "z": 18,
+          "x": 140567,
+          "y": 91341
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/91341/140568.jpeg",
+          "sha256": "83a18d4190086002ee143d7ff19a74e47fb561c78b19f12ab5370cba6007947e",
+          "bytes": 13742,
+          "input": "austria-0ecd6cc0dcdc3f4385b06cfe45956577490ebb20b2cb4924f8d7784bb6896aae.image",
+          "z": 18,
+          "x": 140568,
+          "y": 91341
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/91341/140569.jpeg",
+          "sha256": "3f0ebb4701e4e0f6a1f5606a44c630bc9067c9fddb6b6903d68c42468f3d23b5",
+          "bytes": 14469,
+          "input": "austria-e85d58e4c74bf18fb26ad0b404ab35192efdc84e94822223d9dcc2131e92b7a9.image",
+          "z": 18,
+          "x": 140569,
+          "y": 91341
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/91341/140570.jpeg",
+          "sha256": "a090829b5a01109c9eacf35efd3ae57acd7c9c6f5e768209d3af27924e086395",
+          "bytes": 12355,
+          "input": "austria-f982e9136e4742a2f20cb69915887dfba97607fca19c3d3079a17b2e4dfeb6d7.image",
+          "z": 18,
+          "x": 140570,
+          "y": 91341
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/91341/140571.jpeg",
+          "sha256": "321faacbc1c8ee5ceb19d5c9cfde24bb5ee40300bb6c0119c527c11894f9b2e6",
+          "bytes": 9157,
+          "input": "austria-f3ae5f11bbd49c87f4d2e5a309e71e6bacb733d524ddc9ed419efe10546a0c7f.image",
+          "z": 18,
+          "x": 140571,
+          "y": 91341
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/91341/140572.jpeg",
+          "sha256": "1f6a7fbee36bfa470c8e917f663d76ac496c59568de09df92caa9aa4b40d6f21",
+          "bytes": 9941,
+          "input": "austria-8c8b0c5f7e0f5b4da25238c60a9adb56b11bd75b70d06ea1f5ed523a5c2f2271.image",
+          "z": 18,
+          "x": 140572,
+          "y": 91341
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/91341/140573.jpeg",
+          "sha256": "ba9cf2bf3838856d0ae0ea34d42bfe3b2e1141f03945a236331b8be47a8ea48d",
+          "bytes": 14045,
+          "input": "austria-e801077709fcf4daec2118dcf51edb87888c5bc55f3e524f07820ecd4eae1549.image",
+          "z": 18,
+          "x": 140573,
+          "y": 91341
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/91342/140566.jpeg",
+          "sha256": "43a94465c289a67ac7e46ee697bbc836f14679864d11c20d058c0d493791fd8e",
+          "bytes": 13193,
+          "input": "austria-fed1828a05852e82122dc1986089f4a271d101e39fe0ccb76fdbc128c5fe9b30.image",
+          "z": 18,
+          "x": 140566,
+          "y": 91342
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/91342/140567.jpeg",
+          "sha256": "094e23bd0f13fcb7785ff5b1550060de7ceb561ed2bc24cbde4b38dce00ad9a8",
+          "bytes": 11155,
+          "input": "austria-0f4c481aea8714499d445e4e1f9245ce25a5d270efc9e82a5aaa5e60cc619f2f.image",
+          "z": 18,
+          "x": 140567,
+          "y": 91342
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/91342/140568.jpeg",
+          "sha256": "1353f320202c08b9b3c23aa2a620e9642e4ffef82208090dd15618ce62730aae",
+          "bytes": 14427,
+          "input": "austria-4a98b1b03b72e479f20ceb8ab9b776e78c6aed61a670e95081344907506cda11.image",
+          "z": 18,
+          "x": 140568,
+          "y": 91342
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/91342/140569.jpeg",
+          "sha256": "d1b75ffc7d1fab292455e02f0f7ca555a9c164b0e174e272f7639ad29f92dde4",
+          "bytes": 14952,
+          "input": "austria-910dc435d578680bf1d39e944f5c7d0e6c7dbb5311120c83f41d1f9dd94bded3.image",
+          "z": 18,
+          "x": 140569,
+          "y": 91342
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/91342/140570.jpeg",
+          "sha256": "2bdf5f95578cbbf79f1bd77147f595ca176633036cc1310b6fbc0ac206612c0e",
+          "bytes": 15692,
+          "input": "austria-f7796faae19b89d192ab3f7b39b5f5dd16ab1cd1388c7d56d3c8669fade89e6c.image",
+          "z": 18,
+          "x": 140570,
+          "y": 91342
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/91342/140571.jpeg",
+          "sha256": "ce5b2d9e0239b6425306bf43ec42a4df25e16d977839277b029f8bb9f7c459d6",
+          "bytes": 15664,
+          "input": "austria-2417daf65f5dfd425d9eddb6aedf792816dcc1a8790e6932961e6ce60a7a205d.image",
+          "z": 18,
+          "x": 140571,
+          "y": 91342
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/91342/140572.jpeg",
+          "sha256": "798cdd37127bfa11e19b9c7de96653f676ccc018f9d0095431f9b99d3da5fb8b",
+          "bytes": 13916,
+          "input": "austria-47ce41853afe09e27df8378c90bcc5abf0ed262d8f3202e7c941ce91c41405e9.image",
+          "z": 18,
+          "x": 140572,
+          "y": 91342
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/91342/140573.jpeg",
+          "sha256": "88410d14ce65384732bc89b1cfa66e798594b8f5d14e6a7f1f32be146219a14c",
+          "bytes": 10053,
+          "input": "austria-e758af8241743fc1a832efe298fe34de8371bba925af73f5cbc08b34cf6fec29.image",
+          "z": 18,
+          "x": 140573,
+          "y": 91342
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/91343/140566.jpeg",
+          "sha256": "d76bd953ac75893ac55355d6a8ad1f3905bc7169d129fa15c950cd1d4990157e",
+          "bytes": 13673,
+          "input": "austria-2aea1c012616967fd5bac12484c08fb5a08436cdab983278d39a7b2fec4b9b00.image",
+          "z": 18,
+          "x": 140566,
+          "y": 91343
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/91343/140567.jpeg",
+          "sha256": "cced1b111f84fa99f1f8732a6fb7e0df6e57338496c750124d8b4353c46de6f2",
+          "bytes": 11406,
+          "input": "austria-d6b49872b3eac73e1f1c5af1d010f72faf73bd3485c3b2a89a930dff2ff4b74d.image",
+          "z": 18,
+          "x": 140567,
+          "y": 91343
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/91343/140568.jpeg",
+          "sha256": "f36e5a7e325d26289100697bb61675879ce3fc6b0ae5efccb506a2a0b35692c2",
+          "bytes": 11655,
+          "input": "austria-cd327bb56f00259c31d123ecdc1672144ccb5736253fbcaf1842451a61d173f2.image",
+          "z": 18,
+          "x": 140568,
+          "y": 91343
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/91343/140569.jpeg",
+          "sha256": "550a201c65901850029162b47722b89fe3cbe03111f8cd54518e8f3b540b6eb6",
+          "bytes": 14542,
+          "input": "austria-60cd68b4dc92e1940661df11aa50747af6dd50be1070d8bafeef2c225f624e0e.image",
+          "z": 18,
+          "x": 140569,
+          "y": 91343
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/91343/140570.jpeg",
+          "sha256": "553063d67a132fd57828b0f84de9e5df6c099e0a59a8d23f5ac6cb9ff6fc49af",
+          "bytes": 14787,
+          "input": "austria-f40cbc5f2e2d2768a23e9d8d94dcbca6031cb47d97ec41ead215ca2b676c1c59.image",
+          "z": 18,
+          "x": 140570,
+          "y": 91343
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/91343/140571.jpeg",
+          "sha256": "f3eb9d66131dc95cfacce556895509ddda96b59424e4d15fe22c921c3edbe7db",
+          "bytes": 12398,
+          "input": "austria-2e1ac5ba2b61fa49f685c8555ea69c48a746f554202c94d7d3e081f78f4fe3ad.image",
+          "z": 18,
+          "x": 140571,
+          "y": 91343
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/91343/140572.jpeg",
+          "sha256": "3cca9f6b7399ef42f804c33ecfa73f6fb3ea50cdb0532df9ea264714dc755ee3",
+          "bytes": 11934,
+          "input": "austria-5155e0a3a24bcf21a110beb7ae06accd584348a0c733a3e072ec7d33f9d4f93c.image",
+          "z": 18,
+          "x": 140572,
+          "y": 91343
+        },
+        {
+          "url": "https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/18/91343/140573.jpeg",
+          "sha256": "2567f2f6c5110ce2effd912d5f1ab2363dfe27ffb54389b98866ac4ef4873e88",
+          "bytes": 12976,
+          "input": "austria-c0c6e49bc14b67d23d15e79c03d8259496bf9efe04adf6054f851da221693980.image",
+          "z": 18,
+          "x": 140573,
+          "y": 91343
+        }
+      ],
+      "footprintM": {
+        "width": 821.487,
+        "height": 821.487
+      },
+      "mobile": {
+        "url": "assets/destination-orthophotos/ortho-austria-13p044800-47p801400-1024-1dff28959fa2.webp",
+        "width": 1024,
+        "height": 1024,
+        "bytes": 455846,
+        "sha256": "1dff28959fa258b7eca8b9aa58c38fd5ce7c6abd7814cdb00e70665a2a0b3b20",
+        "resolutionM": 0.802233,
+        "decodedRgbaBytes": 4194304
+      }
+    },
+    "switzerland-8p515300-47p388200": {
+      "url": "assets/destination-orthophotos/ortho-switzerland-8p515300-47p388200-2048-788fbc300919.webp",
+      "width": 2048,
+      "height": 2048,
+      "bytes": 1785936,
+      "sha256": "788fbc30091945b3fea8f638486cfe991840f574c811af53c2bc55e2f315cba6",
+      "resolutionM": 0.488281,
+      "decodedRgbaBytes": 16777216,
+      "id": "switzerland-8p515300-47p388200",
+      "bounds": [
+        8.508665740587356,
+        47.38370823220081,
+        8.521934259412642,
+        47.39269138504368
+      ],
+      "coordinates": [
+        [
+          8.508665740587356,
+          47.39269138504368
+        ],
+        [
+          8.521934259412642,
+          47.39269138504368
+        ],
+        [
+          8.521934259412642,
+          47.38370823220081
+        ],
+        [
+          8.508665740587356,
+          47.38370823220081
+        ]
+      ],
+      "source": {
+        "title": "SWISSIMAGE",
+        "url": "https://www.swisstopo.admin.ch/en/faq-free-geodata",
+        "license": "swisstopo OGD terms",
+        "licenseUrl": "https://www.swisstopo.admin.ch/en/terms-of-use-free-geodata-and-geoservices",
+        "attribution": "© swisstopo · SWISSIMAGE (modified)",
+        "nativeResolutionM": 0.1
+      },
+      "inputs": [
+        {
+          "url": "https://wms.geo.admin.ch/?service=WMS&version=1.3.0&request=GetMap&layers=ch.swisstopo.swissimage&styles=&bbox=947180.337572356%2C6004931.473108913%2C948657.382331568%2C6006408.517868125&width=2048&height=2048&format=image%2Fjpeg&crs=EPSG%3A3857",
+          "sha256": "e79a1ae5cd69be8e117f886d15d75f984b98303a18253fe24ddf91b25f502f7b",
+          "bytes": 1519328,
+          "input": "switzerland-3346974d149abe03d934f317c8769010ca9ef0e8757a9e6ced543e4b5a2a449b.image"
+        }
+      ],
+      "footprintM": {
+        "width": 1000.0,
+        "height": 1000.0
+      },
+      "mobile": {
+        "url": "assets/destination-orthophotos/ortho-switzerland-8p515300-47p388200-1024-2dc769ff2bc2.webp",
+        "width": 1024,
+        "height": 1024,
+        "bytes": 524792,
+        "sha256": "2dc769ff2bc2748abffcf907e8850cb37e3556756b8193f09b73ce52d7303097",
+        "resolutionM": 0.976562,
+        "decodedRgbaBytes": 4194304
+      }
+    },
+    "bavaria-11p580200-48p139200": {
+      "url": "assets/destination-orthophotos/ortho-bavaria-11p580200-48p139200-2048-4e9e90a7ae76.webp",
+      "width": 2048,
+      "height": 2048,
+      "bytes": 1467676,
+      "sha256": "4e9e90a7ae7676e6677ea0586eb7c14e50086916ac7d632932ab9708fc5484ea",
+      "resolutionM": 0.488281,
+      "decodedRgbaBytes": 16777216,
+      "id": "bavaria-11p580200-48p139200",
+      "bounds": [
+        11.573469263437763,
+        48.134708227093036,
+        11.586930736562236,
+        48.1436913799365
+      ],
+      "coordinates": [
+        [
+          11.573469263437763,
+          48.1436913799365
+        ],
+        [
+          11.586930736562236,
+          48.1436913799365
+        ],
+        [
+          11.586930736562236,
+          48.134708227093036
+        ],
+        [
+          11.573469263437763,
+          48.134708227093036
+        ]
+      ],
+      "source": {
+        "title": "Bavarian DOP20",
+        "url": "https://geodatenonline.bayern.de/geodatenonline/seiten/wms_dop",
+        "license": "CC BY 4.0",
+        "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+        "attribution": "© Bayerische Vermessungsverwaltung · DOP20 (modified) · CC BY 4.0",
+        "nativeResolutionM": 0.2
+      },
+      "inputs": [
+        {
+          "url": "https://geoservices.bayern.de/od/wms/dop/v1/dop20?service=WMS&version=1.1.1&request=GetMap&layers=by_dop20c&styles=&bbox=1288352.705117495%2C6129294.814702437%2C1289851.229451038%2C6130793.339035981&width=2048&height=2048&format=image%2Fjpeg&srs=EPSG%3A3857",
+          "sha256": "c512f259124809865e7585e783eae2e2e54630a641ccbeb08f5945f1a11ccf60",
+          "bytes": 933915,
+          "input": "bavaria-3e06c6fd4711485452189f71dd358eb70384b1ae0114938e81949e91cf260686.image"
+        }
+      ],
+      "footprintM": {
+        "width": 1000.0,
+        "height": 1000.0
+      },
+      "mobile": {
+        "url": "assets/destination-orthophotos/ortho-bavaria-11p580200-48p139200-1024-0b6c88f306b1.webp",
+        "width": 1024,
+        "height": 1024,
+        "bytes": 549260,
+        "sha256": "0b6c88f306b10757cad5b4cf0d91a6f5376b33925a04d250a24add0269f1d3fa",
+        "resolutionM": 0.976562,
+        "decodedRgbaBytes": 4194304
+      }
+    },
+    "saxony-12p373100-51p339700": {
+      "url": "assets/destination-orthophotos/ortho-saxony-12p373100-51p339700-2048-8b925197dc8d.webp",
+      "width": 2048,
+      "height": 2048,
+      "bytes": 1366576,
+      "sha256": "8b925197dc8d84dc40f9b553c0e5b6844855e1ea49159969129fcfd486b00a48",
+      "resolutionM": 0.488281,
+      "decodedRgbaBytes": 16777216,
+      "id": "saxony-12p373100-51p339700",
+      "bounds": [
+        12.365910046674466,
+        51.335208203513666,
+        12.380289953325535,
+        51.34419135636003
+      ],
+      "coordinates": [
+        [
+          12.365910046674466,
+          51.34419135636003
+        ],
+        [
+          12.380289953325535,
+          51.34419135636003
+        ],
+        [
+          12.380289953325535,
+          51.335208203513666
+        ],
+        [
+          12.365910046674466,
+          51.335208203513666
+        ]
+      ],
+      "source": {
+        "title": "GeoSN DOP20",
+        "url": "https://www.landesvermessung.sachsen.de/luftbild-produkte-4982.html",
+        "license": "dl-de/by-2-0",
+        "licenseUrl": "https://www.geodaten.sachsen.de/rechtsgrundlagen-und-nutzungsbedingungen-4509.html",
+        "attribution": "© GeoSN · DOP20 (modified) · dl-de/by-2-0",
+        "nativeResolutionM": 0.2
+      },
+      "inputs": [
+        {
+          "url": "https://geodienste.sachsen.de/wms_geosn_dop-rgb/guest?service=WMS&version=1.3.0&request=GetMap&layers=sn_dop_020&styles=&bbox=1376566.809591227%2C6680803.745243962%2C1378167.573477279%2C6682404.509130013&width=2048&height=2048&format=image%2Fjpeg&crs=EPSG%3A3857",
+          "sha256": "6ab091c9cab1bfe6d67cf848a14f68bbc8bd07d581eb738193cbf5046200f2d5",
+          "bytes": 1260910,
+          "input": "saxony-b76f00132c644816fc2892be2a845e096faab4b424a312253723352bde91d684.image"
+        }
+      ],
+      "footprintM": {
+        "width": 1000.0,
+        "height": 1000.0
+      },
+      "mobile": {
+        "url": "assets/destination-orthophotos/ortho-saxony-12p373100-51p339700-1024-b39e659188fa.webp",
+        "width": 1024,
+        "height": 1024,
+        "bytes": 485224,
+        "sha256": "b39e659188fa9b51a4b7f8df3934a58002127b35669c6903d526784535c0c929",
+        "resolutionM": 0.976562,
+        "decodedRgbaBytes": 4194304
+      }
+    },
+    "bavaria-11p568000-48p148000": {
+      "url": "assets/destination-orthophotos/ortho-bavaria-11p568000-48p148000-2048-820f1d0b5dc3.webp",
+      "width": 2048,
+      "height": 2048,
+      "bytes": 1503600,
+      "sha256": "820f1d0b5dc32f2f163d82f3ffb5c63cbd80511b3b5036cd5ebe2dd882272866",
+      "resolutionM": 0.488281,
+      "decodedRgbaBytes": 16777216,
+      "id": "bavaria-11p568000-48p148000",
+      "bounds": [
+        11.561268109421468,
+        48.1435082270323,
+        11.57473189057853,
+        48.15249137987577
+      ],
+      "coordinates": [
+        [
+          11.561268109421468,
+          48.15249137987577
+        ],
+        [
+          11.57473189057853,
+          48.15249137987577
+        ],
+        [
+          11.57473189057853,
+          48.1435082270323
+        ],
+        [
+          11.561268109421468,
+          48.1435082270323
+        ]
+      ],
+      "source": {
+        "title": "Bavarian DOP20",
+        "url": "https://geodatenonline.bayern.de/geodatenonline/seiten/wms_dop",
+        "license": "CC BY 4.0",
+        "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+        "attribution": "© Bayerische Vermessungsverwaltung · DOP20 (modified) · CC BY 4.0",
+        "nativeResolutionM": 0.2
+      },
+      "inputs": [
+        {
+          "url": "https://geoservices.bayern.de/od/wms/dop/v1/dop20?service=WMS&version=1.1.1&request=GetMap&layers=by_dop20c&styles=&bbox=1286994.478865311%2C6130762.783771776%2C1288493.260127867%2C6132261.565034332&width=2048&height=2048&format=image%2Fjpeg&srs=EPSG%3A3857",
+          "sha256": "15187619d02544fc98fde43f89f54f6b9f825934990711e68bb7f2de179e34ae",
+          "bytes": 947272,
+          "input": "bavaria-0ab9b3247364d31320134932eb6f9dfa2b810fd457bfdb31469a9779261fc4f0.image"
+        }
+      ],
+      "footprintM": {
+        "width": 1000.0,
+        "height": 1000.0
+      },
+      "mobile": {
+        "url": "assets/destination-orthophotos/ortho-bavaria-11p568000-48p148000-1024-d19d3717be15.webp",
+        "width": 1024,
+        "height": 1024,
+        "bytes": 557172,
+        "sha256": "d19d3717be15405ee9c013546807fbe27b686896300a3c89f713c72d58733af2",
+        "resolutionM": 0.976562,
+        "decodedRgbaBytes": 4194304
+      }
+    },
+    "bavaria-11p589200-48p144500": {
+      "url": "assets/destination-orthophotos/ortho-bavaria-11p589200-48p144500-2048-4ab24a2991d4.webp",
+      "width": 2048,
+      "height": 2048,
+      "bytes": 1359958,
+      "sha256": "4ab24a2991d4cfad3b0726140ead1e18b42fd698c3a8d1e0b1c711a2d0689d58",
+      "resolutionM": 0.488281,
+      "decodedRgbaBytes": 16777216,
+      "id": "bavaria-11p589200-48p144500",
+      "bounds": [
+        11.582468568471635,
+        48.14000822705646,
+        11.595931431528365,
+        48.14899137989992
+      ],
+      "coordinates": [
+        [
+          11.582468568471635,
+          48.14899137989992
+        ],
+        [
+          11.595931431528365,
+          48.14899137989992
+        ],
+        [
+          11.595931431528365,
+          48.14000822705646
+        ],
+        [
+          11.582468568471635,
+          48.14000822705646
+        ]
+      ],
+      "source": {
+        "title": "Bavarian DOP20",
+        "url": "https://geodatenonline.bayern.de/geodatenonline/seiten/wms_dop",
+        "license": "CC BY 4.0",
+        "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+        "attribution": "© Bayerische Vermessungsverwaltung · DOP20 (modified) · CC BY 4.0",
+        "nativeResolutionM": 0.2
+      },
+      "inputs": [
+        {
+          "url": "https://geoservices.bayern.de/od/wms/dop/v1/dop20?service=WMS&version=1.1.1&request=GetMap&layers=by_dop20c&styles=&bbox=1289354.503171359%2C6130178.902299257%2C1290853.182231454%2C6131677.581359351&width=2048&height=2048&format=image%2Fjpeg&srs=EPSG%3A3857",
+          "sha256": "e40c3850c145fe5c789ffe9d513340d3a0e021125fa7f0e10ea8ccbf11132bc6",
+          "bytes": 868047,
+          "input": "bavaria-66657581569e1bff6b4c3a691e178ba7ade7cbe7f1aa54e53b69dc05f9742ff1.image"
+        }
+      ],
+      "footprintM": {
+        "width": 1000.0,
+        "height": 1000.0
+      },
+      "mobile": {
+        "url": "assets/destination-orthophotos/ortho-bavaria-11p589200-48p144500-1024-63f7d193854f.webp",
+        "width": 1024,
+        "height": 1024,
+        "bytes": 524944,
+        "sha256": "63f7d193854fc360831ccdef91698a0048dbc84672513daab9932698abc5a603",
+        "resolutionM": 0.976562,
+        "decodedRgbaBytes": 4194304
+      }
+    },
+    "bavaria-11p567700-48p149700": {
+      "url": "assets/destination-orthophotos/ortho-bavaria-11p567700-48p149700-2048-36d5e256298e.webp",
+      "width": 2048,
+      "height": 2048,
+      "bytes": 1510830,
+      "sha256": "36d5e256298ed0585b85bfd6c6415cc1d13ff180b0fc95a20f5df30edbd82420",
+      "resolutionM": 0.488281,
+      "decodedRgbaBytes": 16777216,
+      "id": "bavaria-11p567700-48p149700",
+      "bounds": [
+        11.560967886422592,
+        48.145208227020554,
+        11.574432113577407,
+        48.15419137986402
+      ],
+      "coordinates": [
+        [
+          11.560967886422592,
+          48.15419137986402
+        ],
+        [
+          11.574432113577407,
+          48.15419137986402
+        ],
+        [
+          11.574432113577407,
+          48.145208227020554
+        ],
+        [
+          11.560967886422592,
+          48.145208227020554
+        ]
+      ],
+      "source": {
+        "title": "Bavarian DOP20",
+        "url": "https://geodatenonline.bayern.de/geodatenonline/seiten/wms_dop",
+        "license": "CC BY 4.0",
+        "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+        "attribution": "© Bayerische Vermessungsverwaltung · DOP20 (modified) · CC BY 4.0",
+        "nativeResolutionM": 0.2
+      },
+      "inputs": [
+        {
+          "url": "https://geoservices.bayern.de/od/wms/dop/v1/dop20?service=WMS&version=1.1.1&request=GetMap&layers=by_dop20c&styles=&bbox=1286961.058193951%2C6131046.397709203%2C1288459.889104750%2C6132545.228620003&width=2048&height=2048&format=image%2Fjpeg&srs=EPSG%3A3857",
+          "sha256": "0b59e05e5afa06070d93f0efbe911f0cbff7a7928efcf0769d5bcf6e57587524",
+          "bytes": 952693,
+          "input": "bavaria-d1da56b15db8bde279b669b34b72211279b267e63db89f4d0a270b01fc70cbaf.image"
+        }
+      ],
+      "footprintM": {
+        "width": 1000.0,
+        "height": 1000.0
+      },
+      "mobile": {
+        "url": "assets/destination-orthophotos/ortho-bavaria-11p567700-48p149700-1024-8ac314c9e3ce.webp",
+        "width": 1024,
+        "height": 1024,
+        "bytes": 560084,
+        "sha256": "8ac314c9e3ce3063f9682ab4f59a207bbc049235d54f09c8f752c55447394e01",
+        "resolutionM": 0.976562,
+        "decodedRgbaBytes": 4194304
+      }
+    },
+    "switzerland-8p550000-47p366700": {
+      "url": "assets/destination-orthophotos/ortho-switzerland-8p550000-47p366700-2048-26988776d975.webp",
+      "width": 2048,
+      "height": 2048,
+      "bytes": 1789992,
+      "sha256": "26988776d9754713a9900f0418b08f4cc93c908c92490e7f850cffe85ebb1896",
+      "resolutionM": 0.488281,
+      "decodedRgbaBytes": 16777216,
+      "id": "switzerland-8p550000-47p366700",
+      "bounds": [
+        8.543368445185262,
+        47.362208232344884,
+        8.556631554814738,
+        47.37119138518774
+      ],
+      "coordinates": [
+        [
+          8.543368445185262,
+          47.37119138518774
+        ],
+        [
+          8.556631554814738,
+          47.37119138518774
+        ],
+        [
+          8.556631554814738,
+          47.362208232344884
+        ],
+        [
+          8.543368445185262,
+          47.362208232344884
+        ]
+      ],
+      "source": {
+        "title": "SWISSIMAGE",
+        "url": "https://www.swisstopo.admin.ch/en/faq-free-geodata",
+        "license": "swisstopo OGD terms",
+        "licenseUrl": "https://www.swisstopo.admin.ch/en/terms-of-use-free-geodata-and-geoservices",
+        "attribution": "© swisstopo · SWISSIMAGE (modified)",
+        "nativeResolutionM": 0.1
+      },
+      "inputs": [
+        {
+          "url": "https://wms.geo.admin.ch/?service=WMS&version=1.3.0&request=GetMap&layers=ch.swisstopo.swissimage&styles=&bbox=951043.424977345%2C6001397.381689888%2C952519.867587633%2C6002873.824300176&width=2048&height=2048&format=image%2Fjpeg&crs=EPSG%3A3857",
+          "sha256": "39d9a65deccafd6e5a5646a3d6759e17f1bd49f932de3dbb2ab07ca22f9947a1",
+          "bytes": 1512349,
+          "input": "switzerland-fc2e00ef203c7b6a827604c2e41e73c7fb72c2c23378f3c7c63d96ab0764578b.image"
+        }
+      ],
+      "footprintM": {
+        "width": 1000.0,
+        "height": 1000.0
+      },
+      "mobile": {
+        "url": "assets/destination-orthophotos/ortho-switzerland-8p550000-47p366700-1024-defcba0c3179.webp",
+        "width": 1024,
+        "height": 1024,
+        "bytes": 524176,
+        "sha256": "defcba0c3179b2b9895a7fd6ce0245321888e413844853cc03acd6c37523109d",
+        "resolutionM": 0.976562,
+        "decodedRgbaBytes": 4194304
+      }
+    },
+    "barcelona-2p173400-41p385100": {
+      "url": "assets/destination-orthophotos/ortho-barcelona-2p173400-41p385100-2048-e1c8077a21f0.webp",
+      "width": 2048,
+      "height": 2048,
+      "bytes": 2481168,
+      "sha256": "e1c8077a21f09f7d0dd1c011250236f4ca75e078857a588a9d0a74223b3cc246",
+      "resolutionM": 0.488281,
+      "decodedRgbaBytes": 16777216,
+      "id": "barcelona-2p173400-41p385100",
+      "bounds": [
+        2.1674134905171916,
+        41.38060826844963,
+        2.179386509482808,
+        41.38959142128877
+      ],
+      "coordinates": [
+        [
+          2.1674134905171916,
+          41.38959142128877
+        ],
+        [
+          2.179386509482808,
+          41.38959142128877
+        ],
+        [
+          2.179386509482808,
+          41.38060826844963
+        ],
+        [
+          2.1674134905171916,
+          41.38060826844963
+        ]
+      ],
+      "source": {
+        "title": "ICGC Catalonia orthophoto 2025",
+        "url": "https://www.icgc.cat/en/Geoinformation-and-Maps/Online-services-Geoservices/WMS-Orthoimages/WMS-Territorial-Orthophoto",
+        "license": "CC BY 4.0",
+        "licenseUrl": "https://www.icgc.cat/en/ICGC/Public-Information/Transparency/Re-use-information",
+        "attribution": "Derived from the Orthophoto of Catalonia 2025 · Institut Cartogràfic i Geològic de Catalunya (ICGC) · CC BY 4.0",
+        "nativeResolutionM": 0.25
+      },
+      "inputs": [
+        {
+          "url": "https://geoserveis.icgc.cat/servei/catalunya/orto-territorial/wms?service=WMS&version=1.3.0&request=GetMap&layers=ortofoto_color_2025&styles=&bbox=241275.366102845%2C5068644.429904933%2C242608.196477356%2C5069977.260279444&width=2048&height=2048&format=image%2Fjpeg&crs=EPSG%3A3857",
+          "sha256": "4434566cff8f8cf53090cea2de77e08caf8119b5415454ae24be432b952487fd",
+          "bytes": 1600776,
+          "input": "barcelona-28ff618d375edde2e5ecc69df92e884e38495db982808d837c458bd1c715b082.image"
+        }
+      ],
+      "footprintM": {
+        "width": 1000.0,
+        "height": 1000.0
+      },
+      "mobile": {
+        "url": "assets/destination-orthophotos/ortho-barcelona-2p173400-41p385100-1024-33cea86bedca.webp",
+        "width": 1024,
+        "height": 1024,
+        "bytes": 697348,
+        "sha256": "33cea86bedca9f213976c89608c095fea2f28d485ce1b218d52d040200416d24",
+        "resolutionM": 0.976562,
+        "decodedRgbaBytes": 4194304
+      }
+    },
+    "schleswig-holstein-10p686600-53p865500": {
+      "url": "assets/destination-orthophotos/ortho-schleswig-holstein-10p686600-53p865500-2048-fe2799aaf94a.webp",
+      "width": 2048,
+      "height": 2048,
+      "bytes": 1795336,
+      "sha256": "fe2799aaf94acdaf463fe15207e30dfc92bbafa9c93643379cde044d8f58dfbd",
+      "resolutionM": 0.488281,
+      "decodedRgbaBytes": 16777216,
+      "id": "schleswig-holstein-10p686600-53p865500",
+      "bounds": [
+        10.678983063181073,
+        53.8610081824507,
+        10.694216936818927,
+        53.86999133529996
+      ],
+      "coordinates": [
+        [
+          10.678983063181073,
+          53.86999133529996
+        ],
+        [
+          10.694216936818927,
+          53.86999133529996
+        ],
+        [
+          10.694216936818927,
+          53.8610081824507
+        ],
+        [
+          10.678983063181073,
+          53.8610081824507
+        ]
+      ],
+      "source": {
+        "title": "Schleswig-Holstein DOP20",
+        "url": "https://www.govdata.de/suche/daten/digitale-orthophotos-dop2079a43",
+        "license": "CC BY 4.0",
+        "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+        "attribution": "© GeoBasis-DE/LVermGeo SH/CC BY 4.0 · DOP20 (modified)",
+        "nativeResolutionM": 0.2
+      },
+      "inputs": [
+        {
+          "url": "https://dienste.gdi-sh.de/WMS_SH_DOP20col_OpenGBD?service=WMS&version=1.3.0&request=GetMap&layers=sh_dop20_rgb&styles=&bbox=1188778.956783310%2C7143876.730043441%2C1190474.783839485%2C7145572.557099616&width=2048&height=2048&format=image%2Fjpeg&crs=EPSG%3A3857",
+          "sha256": "2c412541a2c0f3d155307a09dd91730d5cd68f8fdb34d2a09711c77f640fdaf5",
+          "bytes": 1679259,
+          "input": "schleswig-holstein-2fb0b92fba4551f18a68d522542875fc7bbcd8919aa5fb85ab58cfe9143782ab.image"
+        }
+      ],
+      "footprintM": {
+        "width": 1000.0,
+        "height": 1000.0
+      },
+      "mobile": {
+        "url": "assets/destination-orthophotos/ortho-schleswig-holstein-10p686600-53p865500-1024-7c1053b0dc06.webp",
+        "width": 1024,
+        "height": 1024,
+        "bytes": 525376,
+        "sha256": "7c1053b0dc062709b28771be63c89bdb97c85a28bd62255855e29d18cad6785c",
+        "resolutionM": 0.976562,
+        "decodedRgbaBytes": 4194304
+      }
+    },
+    "bavaria-11p582000-48p135100": {
+      "url": "assets/destination-orthophotos/ortho-bavaria-11p582000-48p135100-2048-657705492318.webp",
+      "width": 2048,
+      "height": 2048,
+      "bytes": 1507826,
+      "sha256": "65770549231833406be4f70dc4d3ffd39c22ffe84f24f14906dc791f88e8bf72",
+      "resolutionM": 0.488281,
+      "decodedRgbaBytes": 16777216,
+      "id": "bavaria-11p582000-48p135100",
+      "bounds": [
+        11.57526980091514,
+        48.13060822712133,
+        11.588730199084864,
+        48.13959137996478
+      ],
+      "coordinates": [
+        [
+          11.57526980091514,
+          48.13959137996478
+        ],
+        [
+          11.588730199084864,
+          48.13959137996478
+        ],
+        [
+          11.588730199084864,
+          48.13060822712133
+        ],
+        [
+          11.57526980091514,
+          48.13060822712133
+        ]
+      ],
+      "source": {
+        "title": "Bavarian DOP20",
+        "url": "https://geodatenonline.bayern.de/geodatenonline/seiten/wms_dop",
+        "license": "CC BY 4.0",
+        "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+        "attribution": "© Bayerische Vermessungsverwaltung · DOP20 (modified) · CC BY 4.0",
+        "nativeResolutionM": 0.2
+      },
+      "inputs": [
+        {
+          "url": "https://geoservices.bayern.de/od/wms/dop/v1/dop20?service=WMS&version=1.1.1&request=GetMap&layers=by_dop20c&styles=&bbox=1288553.140032630%2C6128610.960483367%2C1290051.544702759%2C6130109.365153495&width=2048&height=2048&format=image%2Fjpeg&srs=EPSG%3A3857",
+          "sha256": "e439524bef37f783d13bb349bf951101f2e19ce233eb1358e0225c2773ef5482",
+          "bytes": 941267,
+          "input": "bavaria-e19b1d10294867d409ea49dde384e81afe9302a515a91bd171e59db20eb29efc.image"
+        }
+      ],
+      "footprintM": {
+        "width": 1000.0,
+        "height": 1000.0
+      },
+      "mobile": {
+        "url": "assets/destination-orthophotos/ortho-bavaria-11p582000-48p135100-1024-0ccb1890ad37.webp",
+        "width": 1024,
+        "height": 1024,
+        "bytes": 558066,
+        "sha256": "0ccb1890ad377b1d124524d27f2f4706a32575d6a3d92a060cd2ee9a23dcbc37",
+        "resolutionM": 0.976562,
+        "decodedRgbaBytes": 4194304
+      }
+    },
+    "baden-wuerttemberg-8p403700-49p006900": {
+      "url": "assets/destination-orthophotos/ortho-baden-wuerttemberg-8p403700-49p006900-2048-f25f88f74a6c.webp",
+      "width": 2048,
+      "height": 2048,
+      "bytes": 1946464,
+      "sha256": "f25f88f74a6c27e39e3d1321bd91f9113b5d7332f816c9a707ca7c1721a2604c",
+      "resolutionM": 0.488281,
+      "decodedRgbaBytes": 16777216,
+      "id": "baden-wuerttemberg-8p403700-49p006900",
+      "bounds": [
+        8.39685275213509,
+        49.00240822100212,
+        8.410547247864912,
+        49.0113913738463
+      ],
+      "coordinates": [
+        [
+          8.39685275213509,
+          49.0113913738463
+        ],
+        [
+          8.410547247864912,
+          49.0113913738463
+        ],
+        [
+          8.410547247864912,
+          49.00240822100212
+        ],
+        [
+          8.39685275213509,
+          49.00240822100212
+        ]
+      ],
+      "source": {
+        "title": "LGL-BW DOP20",
+        "url": "https://www.lgl-bw.de/Produkte/Open-Data/index.html",
+        "license": "dl-de/by-2-0",
+        "licenseUrl": "https://www.govdata.de/dl-de/by-2-0",
+        "attribution": "LGL-BW (2026) · DOP20 (modified) · dl-de/by-2-0 · www.lgl-bw.de",
+        "nativeResolutionM": 0.2
+      },
+      "inputs": [
+        {
+          "url": "https://owsproxy.lgl-bw.de/owsproxy/ows/WMS_LGL-BW_ATKIS_DOP_20_C?service=WMS&version=1.3.0&request=GetMap&layers=IMAGES_DOP_20_RGB&styles=&bbox=934733.372633776%2C6275270.028603781%2C936257.836925091%2C6276794.492895097&width=2048&height=2048&format=image%2Fjpeg&crs=EPSG%3A3857",
+          "sha256": "8be6b5f9db6bf47ce89615226be4e5e6ac36bc7edc0f59aeb658ebd5e136f491",
+          "bytes": 1233846,
+          "input": "baden-wuerttemberg-396ba6af32ad7a8b590254846c74014fcc77ce64555a12077f937cfd5bd39a31.image"
+        }
+      ],
+      "footprintM": {
+        "width": 1000.0,
+        "height": 1000.0
+      },
+      "mobile": {
+        "url": "assets/destination-orthophotos/ortho-baden-wuerttemberg-8p403700-49p006900-1024-b3103103dbfc.webp",
+        "width": 1024,
+        "height": 1024,
+        "bytes": 580352,
+        "sha256": "b3103103dbfc7f4c168678f62c35d6723dad127157ee9b5c87163b7b503904ae",
+        "resolutionM": 0.976562,
+        "decodedRgbaBytes": 4194304
+      }
+    },
+    "tesla-gigafactory-brandenburg": {
+      "url": "assets/isometric/tesla-gigafactory-ground-truedop20-v1.webp",
+      "width": 2048,
+      "height": 2048,
+      "bytes": 1149590,
+      "sha256": "549bcf51bdae055b90f5af34e8d4bfb5e9cb53ff545ae4c81f417ef058a8f742",
+      "resolutionM": 0.6376953811375188,
+      "decodedRgbaBytes": 16777216,
+      "id": "tesla-gigafactory-brandenburg",
+      "bounds": [
+        13.7823486328,
+        52.3898491698,
+        13.801574707,
+        52.4015810051
+      ],
+      "coordinates": [
+        [
+          13.7823486328,
+          52.4015810051
+        ],
+        [
+          13.801574707,
+          52.4015810051
+        ],
+        [
+          13.801574707,
+          52.3898491698
+        ],
+        [
+          13.7823486328,
+          52.3898491698
+        ]
+      ],
+      "footprintM": {
+        "width": 1306.0001405696385,
+        "height": 1306.0001405696385
+      },
+      "source": {
+        "title": "GeoBasis-DE/LGB Brandenburg, 20 cm RGB TrueDOP",
+        "url": "https://data.geobasis-bb.de/geobasis/daten/dop/rgb_jpg/dop_33417-5805.zip",
+        "license": "Datenlizenz Deutschland – Namensnennung – Version 2.0",
+        "licenseUrl": "https://www.govdata.de/dl-de/by-2-0",
+        "attribution": "© GeoBasis-DE/LGB, dl-de/by-2-0 (Daten geändert)",
+        "nativeResolutionM": 0.2,
+        "captureDate": "2023-05-04"
+      },
+      "camera": {
+        "center": [
+          13.79215,
+          52.3951
+        ],
+        "zoom": 16.6,
+        "pitch": 52,
+        "bearing": 25
+      },
+      "mobile": {
+        "url": "assets/isometric/tesla-gigafactory-ground-truedop20-v1-half.webp",
+        "width": 1024,
+        "height": 1024,
+        "bytes": 364256,
+        "sha256": "93a426623d1b070343a9eeb05adc4d97c9f70a505f40330f8013a05b1e0d712e",
+        "resolutionM": 1.2753907622750376,
+        "decodedRgbaBytes": 4194304
+      },
+      "inputs": [],
+      "provenance": {
+        "metadataUrl": "assets/isometric/tesla-gigafactory-ground-truedop20-v1.json",
+        "metadataSha256": "91368aec173d9e09ecde5b34a8d0e00fa79b1e54b51243ea5e0b85b8e0abc222",
+        "sourceZipSha256": {
+          "33417-5805": "21c472b2d05096246ce93492305c3b3ac59fc12f729c724e3bf0be58e5a5aca5",
+          "33418-5805": "d3c9ddf5ba899efdbcab80ab232f127c27a706191894c2cff700fcd588465e99",
+          "33417-5806": "2c7643a7abdbbdc9c806da58fc04295d847c1fda688ba7f4b04932b6ac63c35a",
+          "33418-5806": "92d6e49278dcd362938f0141b8773adf7a7412356abc9e64603fe95fd7497f23"
+        }
+      }
+    },
+    "hong-kong-114p171838-22p279602": {
+      "url": "assets/destination-orthophotos/ortho-hong-kong-114p171838-22p279602-2048-dded7b5af6cb.webp",
+      "width": 2048,
+      "height": 2048,
+      "bytes": 1763786,
+      "sha256": "dded7b5af6cbfac63db35b7231c9051217673f58b736bd080d60c9ac7ed6caab",
+      "resolutionM": 0.552583,
+      "decodedRgbaBytes": 16777216,
+      "id": "hong-kong-114p171838-22p279602",
+      "bounds": [
+        114.16580200195312,
+        22.275118225250548,
+        114.17678833007812,
+        22.285284322727957
+      ],
+      "coordinates": [
+        [
+          114.16580200195312,
+          22.285284322727957
+        ],
+        [
+          114.17678833007812,
+          22.285284322727957
+        ],
+        [
+          114.17678833007812,
+          22.275118225250548
+        ],
+        [
+          114.16580200195312,
+          22.275118225250548
+        ]
+      ],
+      "source": {
+        "title": "Hong Kong Lands Department aerial imagery",
+        "url": "https://portal.csdi.gov.hk/csdi-webpage/apidoc/ImageryMapAPI",
+        "license": "CSDI Portal Terms of Use",
+        "licenseUrl": "https://portal.csdi.gov.hk/csdi-webpage/doc/TNC",
+        "attribution": "Aerial Photograph from Lands Department · © Government of the Hong Kong SAR · CSDI Portal (modified)",
+        "nativeResolutionM": 0.2,
+        "requiresLogo": true,
+        "logoUrl": "assets/destination-orthophotos/lands-department-logo-97fc83e2643b.jpg",
+        "logoSourceUrl": "https://api.hkmapservice.gov.hk/mapapi/landsdlogo.jpg"
+      },
+      "inputs": [
+        {
+          "url": "https://mapapi.geodata.gov.hk/gs/api/v1.0.0/xyz/imagery/WGS84/18/214205/114419.png",
+          "sha256": "e631407bd1d4e216690ab4ecc37f5963aa01d665d12ea267c89cc1f33bac5606",
+          "bytes": 140233,
+          "input": "hong-kong-fcd326204c9f46e6e4b1168c47eb5ccd32c70ceb5048051449872304c9943e9d.image",
+          "z": 18,
+          "x": 214205,
+          "y": 114419
+        },
+        {
+          "url": "https://mapapi.geodata.gov.hk/gs/api/v1.0.0/xyz/imagery/WGS84/18/214206/114419.png",
+          "sha256": "b5a5cac3748f94cc5227f4f77dcd6c184350f46b93bb6ff0bd12ef8df29bfe06",
+          "bytes": 139246,
+          "input": "hong-kong-4121879f89a6683dd9db9be05059d070d92e66b90c180a1d528824184dc37698.image",
+          "z": 18,
+          "x": 214206,
+          "y": 114419
+        },
+        {
+          "url": "https://mapapi.geodata.gov.hk/gs/api/v1.0.0/xyz/imagery/WGS84/18/214207/114419.png",
+          "sha256": "17a0c6aa0b238fe8cfec4b60819c61a13698b204ea047044906cc7abaf5a215b",
+          "bytes": 140117,
+          "input": "hong-kong-7fc561522bec11539904ead08b7de63c4f9798d959398af638e1995a75588347.image",
+          "z": 18,
+          "x": 214207,
+          "y": 114419
+        },
+        {
+          "url": "https://mapapi.geodata.gov.hk/gs/api/v1.0.0/xyz/imagery/WGS84/18/214208/114419.png",
+          "sha256": "a02fb6980b27a0079e38db7ab1b63c23b8ff1e640eedc23465d483073913f923",
+          "bytes": 135632,
+          "input": "hong-kong-3e7f71c7ee4824eeadd43eacfcc649dbb16e92734ef388695cb8880313937b4b.image",
+          "z": 18,
+          "x": 214208,
+          "y": 114419
+        },
+        {
+          "url": "https://mapapi.geodata.gov.hk/gs/api/v1.0.0/xyz/imagery/WGS84/18/214209/114419.png",
+          "sha256": "72430da7a14ad25ec9345729c81ac31f3d2bbb064d59ba3c69d5b3c8fc649f34",
+          "bytes": 144382,
+          "input": "hong-kong-7fd1ea960137300ba8ccc813c0694c454343f280a3ab2dc08a02362d4f6b913a.image",
+          "z": 18,
+          "x": 214209,
+          "y": 114419
+        },
+        {
+          "url": "https://mapapi.geodata.gov.hk/gs/api/v1.0.0/xyz/imagery/WGS84/18/214210/114419.png",
+          "sha256": "9ed91eaf17ed7664445de3da3d52c58936d7f9a6ddf19e43e247230ceca61dfb",
+          "bytes": 145643,
+          "input": "hong-kong-ec29d1f117af03b8f117918bdcc121e153d3a182511ecd991e37c07b262640be.image",
+          "z": 18,
+          "x": 214210,
+          "y": 114419
+        },
+        {
+          "url": "https://mapapi.geodata.gov.hk/gs/api/v1.0.0/xyz/imagery/WGS84/18/214211/114419.png",
+          "sha256": "8810df980ddf2f15cd5287b0518966f1e1847ffdd3b6871b4fcd8d6c9cd1bfef",
+          "bytes": 150900,
+          "input": "hong-kong-24d676402c36591eee060a77a3ba9399ff869b1c723736a94ab662193bb6959c.image",
+          "z": 18,
+          "x": 214211,
+          "y": 114419
+        },
+        {
+          "url": "https://mapapi.geodata.gov.hk/gs/api/v1.0.0/xyz/imagery/WGS84/18/214212/114419.png",
+          "sha256": "6b21ef056beb543390be4767e45d96dae8668e0d9a578f9e0f90057e3b8bc487",
+          "bytes": 138363,
+          "input": "hong-kong-14dcd2f5062272135217c9f8144f47a6efea1ed803c15142b3fff0521baa24a2.image",
+          "z": 18,
+          "x": 214212,
+          "y": 114419
+        },
+        {
+          "url": "https://mapapi.geodata.gov.hk/gs/api/v1.0.0/xyz/imagery/WGS84/18/214205/114420.png",
+          "sha256": "fc1418c8d49f9cbf7573920b128508da7e16c90d58826d55ae32f94076f33aca",
+          "bytes": 150675,
+          "input": "hong-kong-aae13caeb97b21ce0538d0aeb8cc2a4e9afc5f4c2117be609782a36afa4173c4.image",
+          "z": 18,
+          "x": 214205,
+          "y": 114420
+        },
+        {
+          "url": "https://mapapi.geodata.gov.hk/gs/api/v1.0.0/xyz/imagery/WGS84/18/214206/114420.png",
+          "sha256": "87bed343765fa7cb36db2c595483dca094d9afc16b009ffafce56862e3dc9006",
+          "bytes": 147896,
+          "input": "hong-kong-6a89efb14995bf4583ff6206e54f3eb99a9a505fbb1688705d3453fa5c01c70a.image",
+          "z": 18,
+          "x": 214206,
+          "y": 114420
+        },
+        {
+          "url": "https://mapapi.geodata.gov.hk/gs/api/v1.0.0/xyz/imagery/WGS84/18/214207/114420.png",
+          "sha256": "11ca082338834e1fe1fbadf5011658153bae78b3cf577169b2d2199e728ebe11",
+          "bytes": 140571,
+          "input": "hong-kong-bddb4eeba309c90b6e1172fc9c6a70b5022c178133d9018b09bd6fb45a5e1835.image",
+          "z": 18,
+          "x": 214207,
+          "y": 114420
+        },
+        {
+          "url": "https://mapapi.geodata.gov.hk/gs/api/v1.0.0/xyz/imagery/WGS84/18/214208/114420.png",
+          "sha256": "5e96cd413075d151a76b198e8c2a717c642d7847e912dadba045c5cf28862597",
+          "bytes": 138295,
+          "input": "hong-kong-78c47bef46412dd3f7733dd358443214287a1ce8a3050d9e462cdf09656b4767.image",
+          "z": 18,
+          "x": 214208,
+          "y": 114420
+        },
+        {
+          "url": "https://mapapi.geodata.gov.hk/gs/api/v1.0.0/xyz/imagery/WGS84/18/214209/114420.png",
+          "sha256": "3baeab0fbcb708bd9a033e470b91f7944e0ce8f428d5fb77742ee81695d1e349",
+          "bytes": 150649,
+          "input": "hong-kong-d7d68e7aa590f267d7317efa71f2f457023414837804417405f0baa5c6b5f892.image",
+          "z": 18,
+          "x": 214209,
+          "y": 114420
+        },
+        {
+          "url": "https://mapapi.geodata.gov.hk/gs/api/v1.0.0/xyz/imagery/WGS84/18/214210/114420.png",
+          "sha256": "87875ecfc054523c5d03e4079f0bbf9112980186a115a92c836e72b92de33662",
+          "bytes": 146748,
+          "input": "hong-kong-163e8c1dba48edf7765fb3a8821384fb28b8cd32a464e5f572b5ad7e7a398e1d.image",
+          "z": 18,
+          "x": 214210,
+          "y": 114420
+        },
+        {
+          "url": "https://mapapi.geodata.gov.hk/gs/api/v1.0.0/xyz/imagery/WGS84/18/214211/114420.png",
+          "sha256": "eed6a3c2cf76f35c283c3bd864c16b0038b320c98df52594007fb5841bf10bea",
+          "bytes": 147680,
+          "input": "hong-kong-d89531a3c979cdb2a091fd03fc5f4e301f24c1d35f37c13010820a628121c4ba.image",
+          "z": 18,
+          "x": 214211,
+          "y": 114420
+        },
+        {
+          "url": "https://mapapi.geodata.gov.hk/gs/api/v1.0.0/xyz/imagery/WGS84/18/214212/114420.png",
+          "sha256": "6a91d1cb36fe7def916918555ecac9e1897fe3db3b3aeb0c67690573ec252398",
+          "bytes": 147096,
+          "input": "hong-kong-84cd7d5b1b3def9a2b69824f137e5ca1af835fc830784d73ce4d888835862ace.image",
+          "z": 18,
+          "x": 214212,
+          "y": 114420
+        },
+        {
+          "url": "https://mapapi.geodata.gov.hk/gs/api/v1.0.0/xyz/imagery/WGS84/18/214205/114421.png",
+          "sha256": "96d793e09fd60c3619ea2556b3c523875d907fe77c09bc22d0cda960526e5ec9",
+          "bytes": 152933,
+          "input": "hong-kong-37d5e996454b34b69306efd6b833c3c9dd4edf1741d7b58fb32439bd2e2e4afe.image",
+          "z": 18,
+          "x": 214205,
+          "y": 114421
+        },
+        {
+          "url": "https://mapapi.geodata.gov.hk/gs/api/v1.0.0/xyz/imagery/WGS84/18/214206/114421.png",
+          "sha256": "034ea487810383d9a8a0288f61cdc590c9a7566eed1af60642b7d62570dbc15f",
+          "bytes": 153575,
+          "input": "hong-kong-73b5914fb2b48696c9a8bd89d241decaea5042351ef1ff60a9b1fe45980ce751.image",
+          "z": 18,
+          "x": 214206,
+          "y": 114421
+        },
+        {
+          "url": "https://mapapi.geodata.gov.hk/gs/api/v1.0.0/xyz/imagery/WGS84/18/214207/114421.png",
+          "sha256": "1757d687990d04a867955f2bc73b2543bef9dd1b503ddff727aa3fe027a684ae",
+          "bytes": 157024,
+          "input": "hong-kong-1fd391d0da2089c0d10a982dc730428620eb2eb46d76318c5a3f107d47c645dd.image",
+          "z": 18,
+          "x": 214207,
+          "y": 114421
+        },
+        {
+          "url": "https://mapapi.geodata.gov.hk/gs/api/v1.0.0/xyz/imagery/WGS84/18/214208/114421.png",
+          "sha256": "a30042b4f198b26aa1e2ee8c748309998fd401b868a43458822ece77cef74ca8",
+          "bytes": 155747,
+          "input": "hong-kong-ad0ea69e22ed6625f926d8311f8424c9c38ca9e567296968503e95a5445058de.image",
+          "z": 18,
+          "x": 214208,
+          "y": 114421
+        },
+        {
+          "url": "https://mapapi.geodata.gov.hk/gs/api/v1.0.0/xyz/imagery/WGS84/18/214209/114421.png",
+          "sha256": "4848dfac4b9890c1ce07e66f90639601f93eb719df680606a021f562629cb96f",
+          "bytes": 159041,
+          "input": "hong-kong-40d6f8fc30dd63b807f6bbcf0e091173201b465d3eae563f1218c2c88f684185.image",
+          "z": 18,
+          "x": 214209,
+          "y": 114421
+        },
+        {
+          "url": "https://mapapi.geodata.gov.hk/gs/api/v1.0.0/xyz/imagery/WGS84/18/214210/114421.png",
+          "sha256": "436b6e044523b6e7ef1c5797ae9219b6927162e759185986d01dce347d2903c6",
+          "bytes": 150088,
+          "input": "hong-kong-62b96ffd7472733affc439ce3748e4ea2baba9e56830a3b4a1a4c4f7160860af.image",
+          "z": 18,
+          "x": 214210,
+          "y": 114421
+        },
+        {
+          "url": "https://mapapi.geodata.gov.hk/gs/api/v1.0.0/xyz/imagery/WGS84/18/214211/114421.png",
+          "sha256": "69fde6c208e59e6db59fff68b36462363f38e052ff701cabd7c69a7a3d754ba9",
+          "bytes": 149664,
+          "input": "hong-kong-c01cd194321bdf1e77cdcd9718b89b7dab4376ef093081b875fe8d18deddff87.image",
+          "z": 18,
+          "x": 214211,
+          "y": 114421
+        },
+        {
+          "url": "https://mapapi.geodata.gov.hk/gs/api/v1.0.0/xyz/imagery/WGS84/18/214212/114421.png",
+          "sha256": "e3503d01a8de27600cd694193a10f6d0022405823963a8f0a4ed6e24bfb9cfcd",
+          "bytes": 151585,
+          "input": "hong-kong-c09947c4fbcd4cf06614e0dde23319a30e073e9827b7d147370a97530d02d5fa.image",
+          "z": 18,
+          "x": 214212,
+          "y": 114421
+        },
+        {
+          "url": "https://mapapi.geodata.gov.hk/gs/api/v1.0.0/xyz/imagery/WGS84/18/214205/114422.png",
+          "sha256": "3a9f46d4b0684eef899779f48e0d15ee9925d430633f6fa836a7e9fd98e7f16b",
+          "bytes": 161149,
+          "input": "hong-kong-6e1a70ce34d7d909fc6366ca8fe8a962cdefaa264fc841306928dee0ca5ad35d.image",
+          "z": 18,
+          "x": 214205,
+          "y": 114422
+        },
+        {
+          "url": "https://mapapi.geodata.gov.hk/gs/api/v1.0.0/xyz/imagery/WGS84/18/214206/114422.png",
+          "sha256": "419d8c713b78d50ce57285912cf8d2479bb3d972b8262bd764365b0cb1eed132",
+          "bytes": 159458,
+          "input": "hong-kong-d7cbb0a72f55deb775db3c8b637e8e26f405362d25ffc26555aa009cb53dc1ee.image",
+          "z": 18,
+          "x": 214206,
+          "y": 114422
+        },
+        {
+          "url": "https://mapapi.geodata.gov.hk/gs/api/v1.0.0/xyz/imagery/WGS84/18/214207/114422.png",
+          "sha256": "65f6b2f08426cac403a9fa9bf77c241a1858cb79d864db9c0b2edb82d65b467c",
+          "bytes": 160166,
+          "input": "hong-kong-dfee6394655868539548c16b7435e82c370e84cd5b7a1ee257bee91cc70db4ff.image",
+          "z": 18,
+          "x": 214207,
+          "y": 114422
+        },
+        {
+          "url": "https://mapapi.geodata.gov.hk/gs/api/v1.0.0/xyz/imagery/WGS84/18/214208/114422.png",
+          "sha256": "05a947efc2a4a6b0970df9133a69f1d3110941f3fc02022087c55141c52771a7",
+          "bytes": 157870,
+          "input": "hong-kong-2082b8e58c64be47164ce5b1e1f42cacb3baa0ecdfabbbadb6bfd4eb46171f24.image",
+          "z": 18,
+          "x": 214208,
+          "y": 114422
+        },
+        {
+          "url": "https://mapapi.geodata.gov.hk/gs/api/v1.0.0/xyz/imagery/WGS84/18/214209/114422.png",
+          "sha256": "b63b7dcee0f41730031fc87ec29ecb8151835c17623d0396f18fcc60e345d384",
+          "bytes": 156073,
+          "input": "hong-kong-d175d315e191426fd95c06d5460670c93f74a9fc5fb01a11e8b692b36c7499fc.image",
+          "z": 18,
+          "x": 214209,
+          "y": 114422
+        },
+        {
+          "url": "https://mapapi.geodata.gov.hk/gs/api/v1.0.0/xyz/imagery/WGS84/18/214210/114422.png",
+          "sha256": "a7961717f9852f2e29b8dec7610fcd7bbc487b8f1b4936daf24dbfcad11870b9",
+          "bytes": 154221,
+          "input": "hong-kong-162181a0a38f318e5b11cbd4a85a77282ff671c3a9d627ee73bbc5aa8eda92f2.image",
+          "z": 18,
+          "x": 214210,
+          "y": 114422
+        },
+        {
+          "url": "https://mapapi.geodata.gov.hk/gs/api/v1.0.0/xyz/imagery/WGS84/18/214211/114422.png",
+          "sha256": "b341548b9730938988226a2aade0434cc11f53b1fb81786efc642bfe2cda4f51",
+          "bytes": 149103,
+          "input": "hong-kong-9ca7f7bffa4bdd5e7dc47d57cc4a27d55d26df19791e97ca3c8c83c857b1dd62.image",
+          "z": 18,
+          "x": 214211,
+          "y": 114422
+        },
+        {
+          "url": "https://mapapi.geodata.gov.hk/gs/api/v1.0.0/xyz/imagery/WGS84/18/214212/114422.png",
+          "sha256": "02a4edd8f459e4260bf3ca699922cd4970daf5acfc2fd1451de8b79b72af3b69",
+          "bytes": 150471,
+          "input": "hong-kong-dcb2273f24d90194a034142223e97c6e1e65f3c2ea5f12a0631584222ade9f1b.image",
+          "z": 18,
+          "x": 214212,
+          "y": 114422
+        },
+        {
+          "url": "https://mapapi.geodata.gov.hk/gs/api/v1.0.0/xyz/imagery/WGS84/18/214205/114423.png",
+          "sha256": "dce516bc4c2d64ba4eb20e743dfaa9bcbfbf321814142bf7676d7425782d3b37",
+          "bytes": 153205,
+          "input": "hong-kong-aeacca92af2e5a145a22ed8a9d9d7fa45715851a61b2553a646c43e07cff3322.image",
+          "z": 18,
+          "x": 214205,
+          "y": 114423
+        },
+        {
+          "url": "https://mapapi.geodata.gov.hk/gs/api/v1.0.0/xyz/imagery/WGS84/18/214206/114423.png",
+          "sha256": "09556e2dc177442d9f48cbabdcd62af68c9014ea0a22bd1d1401271ee164f5df",
+          "bytes": 157783,
+          "input": "hong-kong-1e5d1172cecd1ac700902873f8747cfa4f326c606dc1dc64932ca1fbf4145c40.image",
+          "z": 18,
+          "x": 214206,
+          "y": 114423
+        },
+        {
+          "url": "https://mapapi.geodata.gov.hk/gs/api/v1.0.0/xyz/imagery/WGS84/18/214207/114423.png",
+          "sha256": "e0004427840e47810b78898698773072b3db175f12e5bc7dc2a50fe3d29a30cc",
+          "bytes": 153991,
+          "input": "hong-kong-109f02ef8615c646e612de918f56fb60dc45a349364fd564a04693a1777bc544.image",
+          "z": 18,
+          "x": 214207,
+          "y": 114423
+        },
+        {
+          "url": "https://mapapi.geodata.gov.hk/gs/api/v1.0.0/xyz/imagery/WGS84/18/214208/114423.png",
+          "sha256": "443871a0568cd9ec6d5560154cdddd12fee9f55e63fe9511e4f21919fa0e5940",
+          "bytes": 155251,
+          "input": "hong-kong-e68286aae0ec146ee1d4c9ac1d26df497e7faec4e78edef6b8a7048e6e7720ba.image",
+          "z": 18,
+          "x": 214208,
+          "y": 114423
+        },
+        {
+          "url": "https://mapapi.geodata.gov.hk/gs/api/v1.0.0/xyz/imagery/WGS84/18/214209/114423.png",
+          "sha256": "6cf69f8fe5790850426edf009ba36ec9e3ddfa56716d600e52e825ef548fd7d5",
+          "bytes": 153178,
+          "input": "hong-kong-d32e382a6fdeed9468cfb72f20c78a94f1ee9667cab32d04b308ebc3e406517e.image",
+          "z": 18,
+          "x": 214209,
+          "y": 114423
+        },
+        {
+          "url": "https://mapapi.geodata.gov.hk/gs/api/v1.0.0/xyz/imagery/WGS84/18/214210/114423.png",
+          "sha256": "7cf2aaeac1ee5b78de13b545dcf6012da0265952b42fc4ba78322dd26b24fdbb",
+          "bytes": 155354,
+          "input": "hong-kong-2150cc81539f451a0054118182ae623c4c8881f7f9f568b9083c84a81a524d05.image",
+          "z": 18,
+          "x": 214210,
+          "y": 114423
+        },
+        {
+          "url": "https://mapapi.geodata.gov.hk/gs/api/v1.0.0/xyz/imagery/WGS84/18/214211/114423.png",
+          "sha256": "e80d41700ae8f7b02f8ddc5edf68d6592db02d95141585af253226187c085705",
+          "bytes": 153528,
+          "input": "hong-kong-24e8deb8ecc458063ea165a9e02849ad857b20737cd76271b59c2c0c9cb17e95.image",
+          "z": 18,
+          "x": 214211,
+          "y": 114423
+        },
+        {
+          "url": "https://mapapi.geodata.gov.hk/gs/api/v1.0.0/xyz/imagery/WGS84/18/214212/114423.png",
+          "sha256": "a92562375fabb3fb5e40c0381b96fa8085d40aa4936b17b9425b517cc1aefeb9",
+          "bytes": 155504,
+          "input": "hong-kong-6dbfa5222fbc8ef7fca5f067af2ae15bbcf44425880c00c7e0ed557e656bce2c.image",
+          "z": 18,
+          "x": 214212,
+          "y": 114423
+        },
+        {
+          "url": "https://mapapi.geodata.gov.hk/gs/api/v1.0.0/xyz/imagery/WGS84/18/214205/114424.png",
+          "sha256": "f0ee3769e0cd788dc4ed2fa92814ffb5cf9597b494e0b33de19ac6a8b09a6790",
+          "bytes": 152873,
+          "input": "hong-kong-80794192a582cf3ab854d38221084d90c45ca61b6f8e860fc716993171928ea1.image",
+          "z": 18,
+          "x": 214205,
+          "y": 114424
+        },
+        {
+          "url": "https://mapapi.geodata.gov.hk/gs/api/v1.0.0/xyz/imagery/WGS84/18/214206/114424.png",
+          "sha256": "ef7b6050d516a3e3b82d159b31a223af058bb5d01a5e9ddb5674e0aa291632b5",
+          "bytes": 156697,
+          "input": "hong-kong-b62f3d0824da5eaa65a114f62c2a5701e70dab15bdbb4df60a123cb8303ec313.image",
+          "z": 18,
+          "x": 214206,
+          "y": 114424
+        },
+        {
+          "url": "https://mapapi.geodata.gov.hk/gs/api/v1.0.0/xyz/imagery/WGS84/18/214207/114424.png",
+          "sha256": "aff722a65b4432c8073506d5282ccba00d6741d48834aeeb49beb5a174372efd",
+          "bytes": 155806,
+          "input": "hong-kong-e802cf966908f2fd68082a1e9120ef571f5d0ab7ec3527855c4fedc42ef71d19.image",
+          "z": 18,
+          "x": 214207,
+          "y": 114424
+        },
+        {
+          "url": "https://mapapi.geodata.gov.hk/gs/api/v1.0.0/xyz/imagery/WGS84/18/214208/114424.png",
+          "sha256": "4e3f0a2cc64a2bb5445f2903cd8f6e98f22665ed8fcab0feda799f843a2dd61b",
+          "bytes": 156924,
+          "input": "hong-kong-8df390f9f98c924758620e857056eeac752d76b6fa01db966c98714ac141f651.image",
+          "z": 18,
+          "x": 214208,
+          "y": 114424
+        },
+        {
+          "url": "https://mapapi.geodata.gov.hk/gs/api/v1.0.0/xyz/imagery/WGS84/18/214209/114424.png",
+          "sha256": "c6f0dd05f3762a3b52c524af0831092b5c2fb5db3c8966f1935f79c62cb1aa2e",
+          "bytes": 157689,
+          "input": "hong-kong-5bc467f8c3a6d8798d8ded03f787989b2f2a52b5e41f1102e104b0c6cea805f4.image",
+          "z": 18,
+          "x": 214209,
+          "y": 114424
+        },
+        {
+          "url": "https://mapapi.geodata.gov.hk/gs/api/v1.0.0/xyz/imagery/WGS84/18/214210/114424.png",
+          "sha256": "d64a4e64f7becbf86ea3ac53700249898dcc29d927a1d9169c733b432fddae06",
+          "bytes": 156499,
+          "input": "hong-kong-15329cfa8e2acfba3b958e16bd80be955f53a52097d7f92020b7032012e9e5e4.image",
+          "z": 18,
+          "x": 214210,
+          "y": 114424
+        },
+        {
+          "url": "https://mapapi.geodata.gov.hk/gs/api/v1.0.0/xyz/imagery/WGS84/18/214211/114424.png",
+          "sha256": "fb86d6c878e3dfbc51cb0c14d1ddcc16fdc9ea18ed3b43f57ef1d761eb1864ac",
+          "bytes": 155676,
+          "input": "hong-kong-8d38f39606803c03b1c5bf05fd4e27458cf048d800704d3ba9fd44c6b40ae315.image",
+          "z": 18,
+          "x": 214211,
+          "y": 114424
+        },
+        {
+          "url": "https://mapapi.geodata.gov.hk/gs/api/v1.0.0/xyz/imagery/WGS84/18/214212/114424.png",
+          "sha256": "af126f8e172a20f6acdbc3837135004ad2e549d35a81c9f94bdfd0cfba379875",
+          "bytes": 156905,
+          "input": "hong-kong-86c3cf3db168b8437366502012f452f4b049224323c638cbe5fd796a5a7364a3.image",
+          "z": 18,
+          "x": 214212,
+          "y": 114424
+        },
+        {
+          "url": "https://mapapi.geodata.gov.hk/gs/api/v1.0.0/xyz/imagery/WGS84/18/214205/114425.png",
+          "sha256": "15ac0767911424638a519ee8906d17492d8aaea89d619b932be7ed206a74cd8e",
+          "bytes": 161262,
+          "input": "hong-kong-6693be05f8ecea7a7d2433ae7305d3e3f1a84263132521067a17164cb3842413.image",
+          "z": 18,
+          "x": 214205,
+          "y": 114425
+        },
+        {
+          "url": "https://mapapi.geodata.gov.hk/gs/api/v1.0.0/xyz/imagery/WGS84/18/214206/114425.png",
+          "sha256": "b47028d17c3f9ce0eca23f83097976a151030ef53dcf0ffd4aa0b3392519e93a",
+          "bytes": 162447,
+          "input": "hong-kong-c180852bd32546f31a9a7c627ad5cea72e2ff1a66ace4036419fea3f8a0b2740.image",
+          "z": 18,
+          "x": 214206,
+          "y": 114425
+        },
+        {
+          "url": "https://mapapi.geodata.gov.hk/gs/api/v1.0.0/xyz/imagery/WGS84/18/214207/114425.png",
+          "sha256": "07d2bea2fdb4cc97e33cf2baa73eaa27e80b386a4f83c6543478f1e615b4f37e",
+          "bytes": 163301,
+          "input": "hong-kong-ea443ac627c2501e0a491c6a422436349426aca65ae4aabe95df9b342e5c20f4.image",
+          "z": 18,
+          "x": 214207,
+          "y": 114425
+        },
+        {
+          "url": "https://mapapi.geodata.gov.hk/gs/api/v1.0.0/xyz/imagery/WGS84/18/214208/114425.png",
+          "sha256": "ac9058a6da3c7fd7d18ff7fafa1c7516bb1326d1941d49e137ca16fcf91fa746",
+          "bytes": 161615,
+          "input": "hong-kong-4badd03c0f3876daa7e5c5f13e636c165995473d21758dc62afbeda933aebcaf.image",
+          "z": 18,
+          "x": 214208,
+          "y": 114425
+        },
+        {
+          "url": "https://mapapi.geodata.gov.hk/gs/api/v1.0.0/xyz/imagery/WGS84/18/214209/114425.png",
+          "sha256": "00049c8b639d3a35e6ea9400a05c1c533b5acc1e923b6b5789245dfe2f350e6c",
+          "bytes": 151298,
+          "input": "hong-kong-5fd3ba87b6b27edb8a7a692d6cf093c304ed45a0ca4427773bfd378cdcbbd26a.image",
+          "z": 18,
+          "x": 214209,
+          "y": 114425
+        },
+        {
+          "url": "https://mapapi.geodata.gov.hk/gs/api/v1.0.0/xyz/imagery/WGS84/18/214210/114425.png",
+          "sha256": "cbcff70fa39784db384abdf84e4dadbe9bb41f12aafa8b0e07a03bd8d7c3a202",
+          "bytes": 155251,
+          "input": "hong-kong-f8080f168247c60216824a5fcdbba987bbca80f1ae8bf06e867cf9ea1673f8ca.image",
+          "z": 18,
+          "x": 214210,
+          "y": 114425
+        },
+        {
+          "url": "https://mapapi.geodata.gov.hk/gs/api/v1.0.0/xyz/imagery/WGS84/18/214211/114425.png",
+          "sha256": "d53b89e80e4a8cf846e9fbbd079654752abc47e10f0c84b9140ad233f3581185",
+          "bytes": 158287,
+          "input": "hong-kong-f8ef423d0db06e7b21668338530e90c3e2aaa43b126832ecc6d982a2ddbc0356.image",
+          "z": 18,
+          "x": 214211,
+          "y": 114425
+        },
+        {
+          "url": "https://mapapi.geodata.gov.hk/gs/api/v1.0.0/xyz/imagery/WGS84/18/214212/114425.png",
+          "sha256": "78dd67ae51cca29a42c64dfee0e5f64e1db640aed26984ee0585444dd0d5d968",
+          "bytes": 160355,
+          "input": "hong-kong-e2a0539dfa07a61abc96433adba7541e21e31b0024369c3e384e871cb0d09d12.image",
+          "z": 18,
+          "x": 214212,
+          "y": 114425
+        },
+        {
+          "url": "https://mapapi.geodata.gov.hk/gs/api/v1.0.0/xyz/imagery/WGS84/18/214205/114426.png",
+          "sha256": "305cfcd8e99eb041ad611992d75a8a2456d0ce29f8e7b23669d2d6a1f361d03d",
+          "bytes": 153130,
+          "input": "hong-kong-207f8a6edcd10ac9f1891689783b3f72b1c8a4b8fb64adfcd7919c5addd7d747.image",
+          "z": 18,
+          "x": 214205,
+          "y": 114426
+        },
+        {
+          "url": "https://mapapi.geodata.gov.hk/gs/api/v1.0.0/xyz/imagery/WGS84/18/214206/114426.png",
+          "sha256": "373abc5c4ad0fbaa2eab58ad97ce3154699928563b7d991f54217ee911f3e62f",
+          "bytes": 160905,
+          "input": "hong-kong-0c71cb8b8ebfd17d0d55bf35b5d26bde595213a07b95fa9a75280710fbd6e32c.image",
+          "z": 18,
+          "x": 214206,
+          "y": 114426
+        },
+        {
+          "url": "https://mapapi.geodata.gov.hk/gs/api/v1.0.0/xyz/imagery/WGS84/18/214207/114426.png",
+          "sha256": "e9eea38f9713582f081f2e76f56a3baa9c0f6a5d9a468eb4a4b60ea87dde6b99",
+          "bytes": 157695,
+          "input": "hong-kong-32ae33b7e85c22cbc80d494deea9dc97417d9601acae3d610570c39a135aa014.image",
+          "z": 18,
+          "x": 214207,
+          "y": 114426
+        },
+        {
+          "url": "https://mapapi.geodata.gov.hk/gs/api/v1.0.0/xyz/imagery/WGS84/18/214208/114426.png",
+          "sha256": "cc22fd1ce9329df44ec6eb4e9ac9ecbc5fcc8a14608d27cdb6742d32bf14ace5",
+          "bytes": 164722,
+          "input": "hong-kong-35f8e177813da62bb25481970c2dfa2b7d65759145b67e1f394d60430123ef02.image",
+          "z": 18,
+          "x": 214208,
+          "y": 114426
+        },
+        {
+          "url": "https://mapapi.geodata.gov.hk/gs/api/v1.0.0/xyz/imagery/WGS84/18/214209/114426.png",
+          "sha256": "4e8d37f4324bf7fbd61da71f8e76aa751c9096de67d0fc10423ccf5d8639a519",
+          "bytes": 155079,
+          "input": "hong-kong-e6e747422ba94f30248a58ec11270be337b851790d9edf6a738d5c70da849d28.image",
+          "z": 18,
+          "x": 214209,
+          "y": 114426
+        },
+        {
+          "url": "https://mapapi.geodata.gov.hk/gs/api/v1.0.0/xyz/imagery/WGS84/18/214210/114426.png",
+          "sha256": "f99cd0857727d61e8580bc30d81a8c7e7d4ae6a5ebad104afe7a3d75fb80c58e",
+          "bytes": 155337,
+          "input": "hong-kong-26f7d7962410bc2e993725ba7ff3cb007878069da711865102e2d23c3a8e542c.image",
+          "z": 18,
+          "x": 214210,
+          "y": 114426
+        },
+        {
+          "url": "https://mapapi.geodata.gov.hk/gs/api/v1.0.0/xyz/imagery/WGS84/18/214211/114426.png",
+          "sha256": "d3f6891e8b16dc71b8fc5346c309b87b0d27f264e77abc9766ffbffc4022c8e7",
+          "bytes": 155486,
+          "input": "hong-kong-6c93cd366fac40a20624f3e879ca4c23af0c3537b05d2ec88f6fcb4269227c80.image",
+          "z": 18,
+          "x": 214211,
+          "y": 114426
+        },
+        {
+          "url": "https://mapapi.geodata.gov.hk/gs/api/v1.0.0/xyz/imagery/WGS84/18/214212/114426.png",
+          "sha256": "c78edb71f87e5346b176d7d90827bd895cfc396456fad644c105ad78dc21d0ab",
+          "bytes": 157072,
+          "input": "hong-kong-45b3cba05d805b7da3327a35d88ae56ba3a770535ad044fb0854b1a38abeef12.image",
+          "z": 18,
+          "x": 214212,
+          "y": 114426
+        }
+      ],
+      "footprintM": {
+        "width": 1131.69,
+        "height": 1131.69
+      },
+      "mobile": {
+        "url": "assets/destination-orthophotos/ortho-hong-kong-114p171838-22p279602-1024-a22a98899c73.webp",
+        "width": 1024,
+        "height": 1024,
+        "bytes": 375040,
+        "sha256": "a22a98899c73f383793fd21139a06257f099c542a58f0443df65056ff2c54339",
+        "resolutionM": 1.105166,
+        "decodedRgbaBytes": 4194304
+      },
+      "locationProvenance": {
+        "contactUrl": "https://www.hkengage.gov.hk/en/contact-us",
+        "confirmedAddress": "12/F, Revenue Tower, 5 Gloucester Road, Wan Chai, Hong Kong",
+        "governmentLocationSearchUrl": "https://www.map.gov.hk/gs/api/v1.0.0/locationSearch?q=Revenue%20Tower",
+        "sourceCrs": "EPSG:2326",
+        "sourcePoint": [
+          835749.0,
+          815637.0
+        ],
+        "sourceResponseSha256": "846a5e1d76323ac396290de4be1ec9ffb7fb97bb5ed8b3a7953a1e3d99e6cd88",
+        "sourceResponseInput": "revenue-tower-location-search.json",
+        "convertedWgs84Coordinates": [
+          114.17183837641731,
+          22.27960209392446
+        ],
+        "conversion": "pyproj Transformer.from_crs(2326,4326,always_xy=True)",
+        "previousEstimatedCoordinates": [
+          114.1698,
+          22.2745
+        ],
+        "note": "Original venue name preserved. Earlier geographic estimate was about 605m south of the government-confirmed venue; local-grid geocoding precision is metre-class, not survey GPS precision."
+      }
+    }
+  },
+  "missing": {
+    "bachelors-thesis": "No verified redistributable sub-metre Beykoz source; do not overzoom ESA 10m.",
+    "tgu-perfect-gpa": "No verified redistributable sub-metre Beykoz source; do not overzoom ESA 10m."
+  }
+}

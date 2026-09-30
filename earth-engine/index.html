@@ -54,7 +54,7 @@
       <footer class="intro-footer">
         <div class="intro-footer-links"><a href="/?view=cv">View CV ↗</a><a href="mailto:batikanor@gmail.com">Contact ↗</a></div>
         <p id="intro-load-status" class="intro-load-status" role="status" aria-live="polite"></p>
-        <button id="intro-enter" class="intro-enter" type="button"><span class="intro-enter-label">Enter</span><span class="intro-enter-arrow" aria-hidden="true">↗</span></button>
+        <button id="intro-enter" class="intro-enter" type="button" disabled><span class="intro-enter-label">Enter</span><span class="intro-enter-arrow" aria-hidden="true">↗</span></button>
         <a id="intro-fallback-link" class="intro-enter" href="/?view=list" hidden>Open achievement list <span class="intro-enter-arrow" aria-hidden="true">↗</span></a>
       </footer>
     </div>
@@ -142,6 +142,7 @@
     </nav>
 
     <div class="context-actions" aria-label="Achievement actions">
+      <button id="inspect-exhibit" type="button" title="Approach the project exhibit and read its signs" hidden>↗ <span>INSPECT EXHIBIT</span></button>
       <button id="drive-button" type="button" title="Start a local drive" hidden disabled>⌁ <span>DRIVE</span></button>
       <button id="scan-button" type="button" title="Activate the Protective Radar installation" hidden disabled>◉ <span>SCAN RADAR</span></button>
     </div>
@@ -153,12 +154,15 @@
     <div id="status" class="sr-only" aria-live="polite">Initializing streamed Earth…</div>
     <div class="drive-hud" id="drive-hud" hidden><div class="eyebrow">LOCAL DRIVE / PHYSICAL METERS</div><strong id="speed">0</strong><span>km/h</span><p>W/S move · A/D steer · C camera · Esc exit</p><div class="drive-controls" aria-label="Touch driving controls"><button data-drive-key="a" aria-label="Steer left">←</button><button data-drive-key="w" aria-label="Accelerate">↑</button><button data-drive-key="s" aria-label="Brake and reverse">↓</button><button data-drive-key="d" aria-label="Steer right">→</button></div><button id="drive-camera-toggle" class="drive-camera-switch" type="button" aria-pressed="true" aria-label="Close chase camera active. Switch to site overview. Shortcut C.">◉ CAMERA / <span>CLOSE CHASE</span><kbd>C</kbd></button></div>
 
+    <img id="destination-photo-logo" alt="Hong Kong Lands Department" hidden>
     <div class="sources" id="sources" aria-label="Map data sources">
+      <span id="destination-photo-credit" hidden></span>
       <span id="imagery-credit"><a href="https://cloudless.eox.at">EOxCloudless</a> by EOX IT Services GmbH (Contains modified Copernicus Sentinel data 2024) · <a href="https://cloudless.eox.at/license-non-commercial">CC BY-NC-SA 4.0</a></span>
       <span id="bavaria-credit" hidden>Bavaria DOP20 / LoD2 where shown: <a href="https://www.geodaten.bayern.de/">Bayerische Vermessungsverwaltung</a> (data modified), <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a></span>
       <span id="berlin-credit" hidden>Berlin TrueDOP 2026 / LoD2 where shown: <a href="https://daten.berlin.de/datensaetze/digitale-farbige-trueorthophotos-2026-dop20rgbi-wms-3801a94c">Geoportal Berlin</a> (data modified), dl-de-zero-2.0</span>
-      <span id="cottbus-credit" hidden>Cottbus TrueDOP20 / LoD2 where shown: <a href="https://geobroker.geobasis-bb.de/">© GeoBasis-DE/LGB</a> (data modified), <a href="https://www.govdata.de/dl-de/by-2-0">dl-de/by-2-0</a></span>
+      <span id="cottbus-credit" hidden>Brandenburg TrueDOP20 / LoD2 where shown: <a href="https://geobroker.geobasis-bb.de/">© GeoBasis-DE/LGB</a> (data modified), <a href="https://www.govdata.de/dl-de/by-2-0">dl-de/by-2-0</a></span>
       <span id="rome-credit" hidden>Rome venue: <a href="https://geoportale.regione.lazio.it/catalogue/csw_to_extra_format/r_lazio:92b0f7e3-3b75-4feb-ac5e-2382/ortofoto-agea-v-2020.html">Regione Lazio AGEA 2020 ortho</a> (modified), CC BY 4.0; buildings © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>, ODbL · illustrative heights</span>
+      <span id="achievement-scene-credit" hidden>© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>, ODbL · mapped footprints/trees; some heights estimated · project exhibits illustrative</span>
       <span>Relief: <a href="https://mapterhorn.com/attribution/">© Mapterhorn</a></span>
     </div>
   </div>

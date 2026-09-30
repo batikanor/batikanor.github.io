@@ -1,0 +1,1572 @@
+{
+  "site": "https://staging.batikanor.com/",
+  "viewport": "1920x873 desktop",
+  "conditions": "Single developer-browser traversal after entry-screen preparation; not a cross-device p95 benchmark; readyMs measures settled local landing painted, excludes 250ms handoff fade and third-party embedded media.",
+  "records": [
+    {
+      "courtScreen": {
+        "x": 570.001153035566,
+        "y": 436.499400921684
+      },
+      "from": null,
+      "hero": false,
+      "landing": {
+        "aborted": 0,
+        "activeSources": 1,
+        "bytes": 74464,
+        "closedImages": 0,
+        "completed": 1,
+        "decodes": 1,
+        "decoding": 0,
+        "enabled": true,
+        "estimatedDecodedRgbaBytes": 2359296,
+        "eventSlug": "tesla-gigathon-2026",
+        "failures": 0,
+        "loading": false,
+        "ownedDecodedImages": 1,
+        "ready": true,
+        "requests": 1,
+        "sourceId": "earth-arrival-landing-1-2"
+      },
+      "panel": {
+        "h": 663,
+        "w": 780,
+        "x": 1112,
+        "y": 84
+      },
+      "readyMs": 529,
+      "scene": {
+        "activeScenes": 1,
+        "buildings": 8,
+        "contextBytes": 576252,
+        "contextReady": true,
+        "enabled": true,
+        "eventSlug": "tesla-gigathon-2026",
+        "illustrative": true,
+        "ready": true,
+        "subject": "supply-chain",
+        "surveyedContext": false,
+        "trees": 1,
+        "triangles": 3851
+      },
+      "start": 19057.10000002384,
+      "to": "tesla-gigathon-2026"
+    },
+    {
+      "courtScreen": {
+        "x": 555.9999993433116,
+        "y": 416.00000023265784
+      },
+      "from": "tesla-gigathon-2026",
+      "hero": false,
+      "landing": {
+        "aborted": 0,
+        "activeSources": 1,
+        "bytes": 157266,
+        "closedImages": 1,
+        "completed": 2,
+        "decodes": 2,
+        "decoding": 0,
+        "enabled": true,
+        "estimatedDecodedRgbaBytes": 2359296,
+        "eventSlug": "hong-kong-talent-engage-eurotech-healthtech-2026",
+        "failures": 0,
+        "loading": false,
+        "ownedDecodedImages": 1,
+        "ready": true,
+        "requests": 2,
+        "sourceId": "earth-arrival-landing-1-4"
+      },
+      "panel": {
+        "h": 663,
+        "w": 780,
+        "x": 1112,
+        "y": 84
+      },
+      "readyMs": 584,
+      "scene": {
+        "activeScenes": 1,
+        "buildings": 100,
+        "contextBytes": 576252,
+        "contextReady": true,
+        "enabled": true,
+        "eventSlug": "hong-kong-talent-engage-eurotech-healthtech-2026",
+        "illustrative": true,
+        "ready": true,
+        "subject": "health-imaging",
+        "surveyedContext": false,
+        "trees": 1,
+        "triangles": 6889
+      },
+      "start": 32775.90000009537,
+      "to": "hong-kong-talent-engage-eurotech-healthtech-2026"
+    },
+    {
+      "courtScreen": {
+        "x": 520.830645109336,
+        "y": 513.3094598916545
+      },
+      "from": "hong-kong-talent-engage-eurotech-healthtech-2026",
+      "hero": false,
+      "landing": {
+        "aborted": 0,
+        "activeSources": 1,
+        "bytes": 169920,
+        "closedImages": 2,
+        "completed": 3,
+        "decodes": 3,
+        "decoding": 0,
+        "enabled": true,
+        "estimatedDecodedRgbaBytes": 2359296,
+        "eventSlug": "decarbon-days-climathon-2026",
+        "failures": 0,
+        "loading": false,
+        "ownedDecodedImages": 1,
+        "ready": true,
+        "requests": 3,
+        "sourceId": "earth-arrival-landing-1-6"
+      },
+      "panel": {
+        "h": 663,
+        "w": 780,
+        "x": 1112,
+        "y": 84
+      },
+      "readyMs": 941,
+      "scene": {
+        "activeScenes": 1,
+        "buildings": 0,
+        "contextBytes": 576252,
+        "contextReady": true,
+        "enabled": true,
+        "eventSlug": "decarbon-days-climathon-2026",
+        "illustrative": true,
+        "ready": true,
+        "subject": "energy-forum",
+        "surveyedContext": true,
+        "trees": 0,
+        "triangles": 704
+      },
+      "start": 33484.10000002384,
+      "to": "decarbon-days-climathon-2026"
+    },
+    {
+      "courtScreen": {
+        "x": 555.9999995823827,
+        "y": 415.99999998254174
+      },
+      "from": "decarbon-days-climathon-2026",
+      "hero": false,
+      "landing": {
+        "aborted": 0,
+        "activeSources": 1,
+        "bytes": 236318,
+        "closedImages": 3,
+        "completed": 4,
+        "decodes": 4,
+        "decoding": 0,
+        "enabled": true,
+        "estimatedDecodedRgbaBytes": 2359296,
+        "eventSlug": "zero-one-hack-supercompute-industrial-2026",
+        "failures": 0,
+        "loading": false,
+        "ownedDecodedImages": 1,
+        "ready": true,
+        "requests": 4,
+        "sourceId": "earth-arrival-landing-1-8"
+      },
+      "panel": {
+        "h": 663,
+        "w": 780,
+        "x": 1112,
+        "y": 84
+      },
+      "readyMs": 383,
+      "scene": {
+        "activeScenes": 1,
+        "buildings": 32,
+        "contextBytes": 576252,
+        "contextReady": true,
+        "enabled": true,
+        "eventSlug": "zero-one-hack-supercompute-industrial-2026",
+        "illustrative": true,
+        "ready": true,
+        "subject": "semiconductor",
+        "surveyedContext": false,
+        "trees": 70,
+        "triangles": 22401
+      },
+      "start": 34952.200000047684,
+      "to": "zero-one-hack-supercompute-industrial-2026"
+    },
+    {
+      "courtScreen": {
+        "x": 555.9999997737776,
+        "y": 416.00000011169715
+      },
+      "from": "zero-one-hack-supercompute-industrial-2026",
+      "hero": false,
+      "landing": {
+        "aborted": 0,
+        "activeSources": 1,
+        "bytes": 193254,
+        "closedImages": 4,
+        "completed": 5,
+        "decodes": 5,
+        "decoding": 0,
+        "enabled": true,
+        "estimatedDecodedRgbaBytes": 2359296,
+        "eventSlug": "pdm-kill-the-search-bar-2026",
+        "failures": 0,
+        "loading": false,
+        "ownedDecodedImages": 1,
+        "ready": true,
+        "requests": 5,
+        "sourceId": "earth-arrival-landing-1-10"
+      },
+      "panel": {
+        "h": 663,
+        "w": 780,
+        "x": 1112,
+        "y": 84
+      },
+      "readyMs": 314,
+      "scene": {
+        "activeScenes": 1,
+        "buildings": 100,
+        "contextBytes": 576252,
+        "contextReady": true,
+        "enabled": true,
+        "eventSlug": "pdm-kill-the-search-bar-2026",
+        "illustrative": true,
+        "ready": true,
+        "subject": "discovery-graph",
+        "surveyedContext": false,
+        "trees": 70,
+        "triangles": 26007
+      },
+      "start": 35500.10000002384,
+      "to": "pdm-kill-the-search-bar-2026"
+    },
+    {
+      "courtScreen": {
+        "x": 556.0000000280133,
+        "y": 416.00000000249406
+      },
+      "from": "pdm-kill-the-search-bar-2026",
+      "hero": false,
+      "landing": {
+        "aborted": 0,
+        "activeSources": 1,
+        "bytes": 173738,
+        "closedImages": 5,
+        "completed": 6,
+        "decodes": 6,
+        "decoding": 0,
+        "enabled": true,
+        "estimatedDecodedRgbaBytes": 2359296,
+        "eventSlug": "huawei-tech-arena-finland-2025",
+        "failures": 0,
+        "loading": false,
+        "ownedDecodedImages": 1,
+        "ready": true,
+        "requests": 6,
+        "sourceId": "earth-arrival-landing-1-12"
+      },
+      "panel": {
+        "h": 663,
+        "w": 780,
+        "x": 1112,
+        "y": 84
+      },
+      "readyMs": 374,
+      "scene": {
+        "activeScenes": 1,
+        "buildings": 42,
+        "contextBytes": 576252,
+        "contextReady": true,
+        "enabled": true,
+        "eventSlug": "huawei-tech-arena-finland-2025",
+        "illustrative": true,
+        "ready": true,
+        "subject": "globe",
+        "surveyedContext": false,
+        "trees": 2,
+        "triangles": 7656
+      },
+      "start": 35880.800000071526,
+      "to": "huawei-tech-arena-finland-2025"
+    },
+    {
+      "courtScreen": {
+        "x": 526.5921776849037,
+        "y": 497.3680894294912
+      },
+      "from": "huawei-tech-arena-finland-2025",
+      "hero": false,
+      "landing": {
+        "aborted": 0,
+        "activeSources": 1,
+        "bytes": 198120,
+        "closedImages": 6,
+        "completed": 7,
+        "decodes": 7,
+        "decoding": 0,
+        "enabled": true,
+        "estimatedDecodedRgbaBytes": 2359296,
+        "eventSlug": "real-coin-map-2025",
+        "failures": 0,
+        "loading": false,
+        "ownedDecodedImages": 1,
+        "ready": true,
+        "requests": 7,
+        "sourceId": "earth-arrival-landing-1-14"
+      },
+      "panel": {
+        "h": 663,
+        "w": 780,
+        "x": 1112,
+        "y": 84
+      },
+      "readyMs": 1147,
+      "scene": {
+        "activeScenes": 1,
+        "buildings": 0,
+        "contextBytes": 576252,
+        "contextReady": true,
+        "enabled": true,
+        "eventSlug": "real-coin-map-2025",
+        "illustrative": true,
+        "ready": true,
+        "subject": "coins",
+        "surveyedContext": true,
+        "trees": 0,
+        "triangles": 3240
+      },
+      "start": 46741.70000004768,
+      "to": "real-coin-map-2025"
+    },
+    {
+      "courtScreen": {
+        "x": 429.2860894530612,
+        "y": 437.9210806564652
+      },
+      "from": "real-coin-map-2025",
+      "hero": false,
+      "landing": {
+        "aborted": 0,
+        "activeSources": 1,
+        "bytes": 271768,
+        "closedImages": 7,
+        "completed": 8,
+        "decodes": 8,
+        "decoding": 0,
+        "enabled": true,
+        "estimatedDecodedRgbaBytes": 2359296,
+        "eventSlug": "ethrome-2025",
+        "failures": 0,
+        "loading": false,
+        "ownedDecodedImages": 1,
+        "ready": true,
+        "requests": 8,
+        "sourceId": "earth-arrival-landing-1-16"
+      },
+      "panel": {
+        "h": 663,
+        "w": 780,
+        "x": 1112,
+        "y": 84
+      },
+      "readyMs": 344,
+      "scene": {
+        "activeScenes": 1,
+        "buildings": 57,
+        "contextBytes": 576252,
+        "contextReady": true,
+        "enabled": true,
+        "eventSlug": "ethrome-2025",
+        "illustrative": true,
+        "ready": true,
+        "subject": "gifting",
+        "surveyedContext": false,
+        "trees": 9,
+        "triangles": 8154
+      },
+      "start": 47997.5,
+      "to": "ethrome-2025"
+    },
+    {
+      "courtScreen": {
+        "x": 556.0000001009082,
+        "y": 416.0000000663592
+      },
+      "from": "ethrome-2025",
+      "hero": false,
+      "landing": {
+        "aborted": 0,
+        "activeSources": 1,
+        "bytes": 159112,
+        "closedImages": 8,
+        "completed": 9,
+        "decodes": 9,
+        "decoding": 0,
+        "enabled": true,
+        "estimatedDecodedRgbaBytes": 2359296,
+        "eventSlug": "nasa-space-apps-zurich-2025",
+        "failures": 0,
+        "loading": false,
+        "ownedDecodedImages": 1,
+        "ready": true,
+        "requests": 9,
+        "sourceId": "earth-arrival-landing-1-18"
+      },
+      "panel": {
+        "h": 663,
+        "w": 780,
+        "x": 1112,
+        "y": 84
+      },
+      "readyMs": 287,
+      "scene": {
+        "activeScenes": 1,
+        "buildings": 29,
+        "contextBytes": 576252,
+        "contextReady": true,
+        "enabled": true,
+        "eventSlug": "nasa-space-apps-zurich-2025",
+        "illustrative": true,
+        "ready": true,
+        "subject": "satellite",
+        "surveyedContext": false,
+        "trees": 0,
+        "triangles": 5066
+      },
+      "start": 48443.20000004768,
+      "to": "nasa-space-apps-zurich-2025"
+    },
+    {
+      "courtScreen": {
+        "x": 555.9999999421696,
+        "y": 415.99999993105774
+      },
+      "from": "nasa-space-apps-zurich-2025",
+      "hero": false,
+      "landing": {
+        "aborted": 0,
+        "activeSources": 1,
+        "bytes": 203896,
+        "closedImages": 9,
+        "completed": 10,
+        "decodes": 10,
+        "decoding": 0,
+        "enabled": true,
+        "estimatedDecodedRgbaBytes": 2359296,
+        "eventSlug": "sui-hackathon-poland-2025",
+        "failures": 0,
+        "loading": false,
+        "ownedDecodedImages": 1,
+        "ready": true,
+        "requests": 10,
+        "sourceId": "earth-arrival-landing-1-20"
+      },
+      "panel": {
+        "h": 663,
+        "w": 780,
+        "x": 1112,
+        "y": 84
+      },
+      "readyMs": 348,
+      "scene": {
+        "activeScenes": 1,
+        "buildings": 69,
+        "contextBytes": 576252,
+        "contextReady": true,
+        "enabled": true,
+        "eventSlug": "sui-hackathon-poland-2025",
+        "illustrative": true,
+        "ready": true,
+        "subject": "linked-ledger",
+        "surveyedContext": false,
+        "trees": 20,
+        "triangles": 11848
+      },
+      "start": 48798.10000002384,
+      "to": "sui-hackathon-poland-2025"
+    },
+    {
+      "courtScreen": {
+        "x": 599.1131203595883,
+        "y": 569.169024928192
+      },
+      "from": "sui-hackathon-poland-2025",
+      "hero": false,
+      "landing": {
+        "aborted": 0,
+        "activeSources": 1,
+        "bytes": 122844,
+        "closedImages": 10,
+        "completed": 11,
+        "decodes": 11,
+        "decoding": 0,
+        "enabled": true,
+        "estimatedDecodedRgbaBytes": 2359296,
+        "eventSlug": "decarbon-days-climathon-2025",
+        "failures": 0,
+        "loading": false,
+        "ownedDecodedImages": 1,
+        "ready": true,
+        "requests": 11,
+        "sourceId": "earth-arrival-landing-1-22"
+      },
+      "panel": {
+        "h": 663,
+        "w": 780,
+        "x": 1112,
+        "y": 84
+      },
+      "readyMs": 873,
+      "scene": {
+        "activeScenes": 1,
+        "buildings": 0,
+        "contextBytes": 576252,
+        "contextReady": true,
+        "enabled": true,
+        "eventSlug": "decarbon-days-climathon-2025",
+        "illustrative": true,
+        "ready": true,
+        "subject": "energy-forum",
+        "surveyedContext": true,
+        "trees": 0,
+        "triangles": 704
+      },
+      "start": 49223.90000009537,
+      "to": "decarbon-days-climathon-2025"
+    },
+    {
+      "courtScreen": {
+        "x": 555.9999990854684,
+        "y": 416.0000001462574
+      },
+      "from": "decarbon-days-climathon-2025",
+      "hero": false,
+      "landing": {
+        "aborted": 0,
+        "activeSources": 1,
+        "bytes": 149694,
+        "closedImages": 11,
+        "completed": 12,
+        "decodes": 12,
+        "decoding": 0,
+        "enabled": true,
+        "estimatedDecodedRgbaBytes": 2359296,
+        "eventSlug": "music-ai-osaka-2025",
+        "failures": 0,
+        "loading": false,
+        "ownedDecodedImages": 1,
+        "ready": true,
+        "requests": 12,
+        "sourceId": "earth-arrival-landing-1-24"
+      },
+      "panel": {
+        "h": 663,
+        "w": 780,
+        "x": 1112,
+        "y": 84
+      },
+      "readyMs": 502,
+      "scene": {
+        "activeScenes": 1,
+        "buildings": 3,
+        "contextBytes": 576252,
+        "contextReady": true,
+        "enabled": true,
+        "eventSlug": "music-ai-osaka-2025",
+        "illustrative": true,
+        "ready": true,
+        "subject": "spatial-audio",
+        "surveyedContext": false,
+        "trees": 0,
+        "triangles": 2438
+      },
+      "start": 59282.10000002384,
+      "to": "music-ai-osaka-2025"
+    },
+    {
+      "courtScreen": null,
+      "from": "music-ai-osaka-2025",
+      "hero": true,
+      "landing": {
+        "aborted": 0,
+        "activeSources": 1,
+        "bytes": 128602,
+        "closedImages": 12,
+        "completed": 13,
+        "decodes": 13,
+        "decoding": 0,
+        "enabled": true,
+        "estimatedDecodedRgbaBytes": 2359296,
+        "eventSlug": "european-defense-tech-2025-munich",
+        "failures": 0,
+        "loading": false,
+        "ownedDecodedImages": 1,
+        "ready": true,
+        "requests": 13,
+        "sourceId": "earth-arrival-landing-1-26"
+      },
+      "panel": {
+        "h": 663,
+        "w": 780,
+        "x": 1112,
+        "y": 84
+      },
+      "readyMs": 434,
+      "scene": {
+        "activeScenes": 0,
+        "buildings": 0,
+        "contextBytes": 576252,
+        "contextReady": true,
+        "enabled": true,
+        "eventSlug": null,
+        "illustrative": false,
+        "ready": false,
+        "subject": null,
+        "surveyedContext": true,
+        "trees": 0,
+        "triangles": 0
+      },
+      "start": 59874,
+      "to": "european-defense-tech-2025-munich"
+    },
+    {
+      "courtScreen": {
+        "x": 556.0000001366598,
+        "y": 416.000000066092
+      },
+      "from": "european-defense-tech-2025-munich",
+      "hero": false,
+      "landing": {
+        "aborted": 0,
+        "activeSources": 1,
+        "bytes": 209042,
+        "closedImages": 13,
+        "completed": 14,
+        "decodes": 14,
+        "decoding": 0,
+        "enabled": true,
+        "estimatedDecodedRgbaBytes": 2359296,
+        "eventSlug": "tech-berlin-ai-hackathon-2",
+        "failures": 0,
+        "loading": false,
+        "ownedDecodedImages": 1,
+        "ready": true,
+        "requests": 14,
+        "sourceId": "earth-arrival-landing-1-28"
+      },
+      "panel": {
+        "h": 663,
+        "w": 780,
+        "x": 1112,
+        "y": 84
+      },
+      "readyMs": 633,
+      "scene": {
+        "activeScenes": 1,
+        "buildings": 20,
+        "contextBytes": 576252,
+        "contextReady": true,
+        "enabled": true,
+        "eventSlug": "tech-berlin-ai-hackathon-2",
+        "illustrative": true,
+        "ready": true,
+        "subject": "finance-graph",
+        "surveyedContext": false,
+        "trees": 70,
+        "triangles": 23737
+      },
+      "start": 60580.70000004768,
+      "to": "tech-berlin-ai-hackathon-2"
+    },
+    {
+      "courtScreen": {
+        "x": 555.9999995746446,
+        "y": 415.9999999689136
+      },
+      "from": "tech-berlin-ai-hackathon-2",
+      "hero": false,
+      "landing": {
+        "aborted": 0,
+        "activeSources": 1,
+        "bytes": 205554,
+        "closedImages": 14,
+        "completed": 15,
+        "decodes": 15,
+        "decoding": 0,
+        "enabled": true,
+        "estimatedDecodedRgbaBytes": 2359296,
+        "eventSlug": "huawei-agorize-2024",
+        "failures": 0,
+        "loading": false,
+        "ownedDecodedImages": 1,
+        "ready": true,
+        "requests": 15,
+        "sourceId": "earth-arrival-landing-1-30"
+      },
+      "panel": {
+        "h": 663,
+        "w": 780,
+        "x": 1112,
+        "y": 84
+      },
+      "readyMs": 380,
+      "scene": {
+        "activeScenes": 1,
+        "buildings": 26,
+        "contextBytes": 576252,
+        "contextReady": true,
+        "enabled": true,
+        "eventSlug": "huawei-agorize-2024",
+        "illustrative": true,
+        "ready": true,
+        "subject": "spatial-audio",
+        "surveyedContext": false,
+        "trees": 70,
+        "triangles": 22275
+      },
+      "start": 61297.60000002384,
+      "to": "huawei-agorize-2024"
+    },
+    {
+      "courtScreen": {
+        "x": 604.1478859293708,
+        "y": 455.93663515282054
+      },
+      "from": "huawei-agorize-2024",
+      "hero": false,
+      "landing": {
+        "aborted": 0,
+        "activeSources": 1,
+        "bytes": 248902,
+        "closedImages": 15,
+        "completed": 16,
+        "decodes": 16,
+        "decoding": 0,
+        "enabled": true,
+        "estimatedDecodedRgbaBytes": 2359296,
+        "eventSlug": "masters-thesis",
+        "failures": 0,
+        "loading": false,
+        "ownedDecodedImages": 1,
+        "ready": true,
+        "requests": 16,
+        "sourceId": "earth-arrival-landing-1-32"
+      },
+      "panel": {
+        "h": 663,
+        "w": 780,
+        "x": 1112,
+        "y": 84
+      },
+      "readyMs": 998,
+      "scene": {
+        "activeScenes": 1,
+        "buildings": 92,
+        "contextBytes": 576252,
+        "contextReady": true,
+        "enabled": true,
+        "eventSlug": "masters-thesis",
+        "illustrative": true,
+        "ready": true,
+        "subject": "trajectory-policy",
+        "surveyedContext": false,
+        "trees": 70,
+        "triangles": 25757
+      },
+      "start": 61925.800000071526,
+      "to": "masters-thesis"
+    },
+    {
+      "courtScreen": {
+        "x": 556.0000000781056,
+        "y": 416.0000000603022
+      },
+      "from": "masters-thesis",
+      "hero": false,
+      "landing": {
+        "aborted": 0,
+        "activeSources": 1,
+        "bytes": 130994,
+        "closedImages": 16,
+        "completed": 17,
+        "decodes": 17,
+        "decoding": 0,
+        "enabled": true,
+        "estimatedDecodedRgbaBytes": 2359296,
+        "eventSlug": "lauzhack-2024",
+        "failures": 0,
+        "loading": false,
+        "ownedDecodedImages": 1,
+        "ready": true,
+        "requests": 17,
+        "sourceId": "earth-arrival-landing-1-34"
+      },
+      "panel": {
+        "h": 663,
+        "w": 780,
+        "x": 1112,
+        "y": 84
+      },
+      "readyMs": 473,
+      "scene": {
+        "activeScenes": 1,
+        "buildings": 42,
+        "contextBytes": 576252,
+        "contextReady": true,
+        "enabled": true,
+        "eventSlug": "lauzhack-2024",
+        "illustrative": true,
+        "ready": true,
+        "subject": "focus",
+        "surveyedContext": false,
+        "trees": 70,
+        "triangles": 23092
+      },
+      "start": 75230,
+      "to": "lauzhack-2024"
+    },
+    {
+      "courtScreen": {
+        "x": 555.999999755206,
+        "y": 416.0000000828376
+      },
+      "from": "lauzhack-2024",
+      "hero": false,
+      "landing": {
+        "aborted": 0,
+        "activeSources": 1,
+        "bytes": 219702,
+        "closedImages": 17,
+        "completed": 18,
+        "decodes": 18,
+        "decoding": 0,
+        "enabled": true,
+        "estimatedDecodedRgbaBytes": 2359296,
+        "eventSlug": "salzburg-tourism-2024",
+        "failures": 0,
+        "loading": false,
+        "ownedDecodedImages": 1,
+        "ready": true,
+        "requests": 18,
+        "sourceId": "earth-arrival-landing-1-36"
+      },
+      "panel": {
+        "h": 663,
+        "w": 780,
+        "x": 1112,
+        "y": 84
+      },
+      "readyMs": 335,
+      "scene": {
+        "activeScenes": 1,
+        "buildings": 100,
+        "contextBytes": 576252,
+        "contextReady": true,
+        "enabled": true,
+        "eventSlug": "salzburg-tourism-2024",
+        "illustrative": true,
+        "ready": true,
+        "subject": "neural-route",
+        "surveyedContext": false,
+        "trees": 37,
+        "triangles": 15765
+      },
+      "start": 75785.90000009537,
+      "to": "salzburg-tourism-2024"
+    },
+    {
+      "courtScreen": {
+        "x": 556.0000000719151,
+        "y": 416.0000000574518
+      },
+      "from": "salzburg-tourism-2024",
+      "hero": false,
+      "landing": {
+        "aborted": 0,
+        "activeSources": 1,
+        "bytes": 204634,
+        "closedImages": 18,
+        "completed": 19,
+        "decodes": 19,
+        "decoding": 0,
+        "enabled": true,
+        "estimatedDecodedRgbaBytes": 2359296,
+        "eventSlug": "zurich-climathon-2024",
+        "failures": 0,
+        "loading": false,
+        "ownedDecodedImages": 1,
+        "ready": true,
+        "requests": 19,
+        "sourceId": "earth-arrival-landing-1-38"
+      },
+      "panel": {
+        "h": 663,
+        "w": 780,
+        "x": 1112,
+        "y": 84
+      },
+      "readyMs": 425,
+      "scene": {
+        "activeScenes": 1,
+        "buildings": 35,
+        "contextBytes": 576252,
+        "contextReady": true,
+        "enabled": true,
+        "eventSlug": "zurich-climathon-2024",
+        "illustrative": true,
+        "ready": true,
+        "subject": "energy-forum",
+        "surveyedContext": false,
+        "trees": 70,
+        "triangles": 22722
+      },
+      "start": 76206.20000004768,
+      "to": "zurich-climathon-2024"
+    },
+    {
+      "courtScreen": {
+        "x": 411.03876536819314,
+        "y": 560.3316807236486
+      },
+      "from": "zurich-climathon-2024",
+      "hero": false,
+      "landing": {
+        "aborted": 0,
+        "activeSources": 1,
+        "bytes": 234938,
+        "closedImages": 19,
+        "completed": 20,
+        "decodes": 20,
+        "decoding": 0,
+        "enabled": true,
+        "estimatedDecodedRgbaBytes": 2359296,
+        "eventSlug": "bayer-ai-2024",
+        "failures": 0,
+        "loading": false,
+        "ownedDecodedImages": 1,
+        "ready": true,
+        "requests": 20,
+        "sourceId": "earth-arrival-landing-1-40"
+      },
+      "panel": {
+        "h": 663,
+        "w": 780,
+        "x": 1112,
+        "y": 84
+      },
+      "readyMs": 631,
+      "scene": {
+        "activeScenes": 1,
+        "buildings": 0,
+        "contextBytes": 576252,
+        "contextReady": true,
+        "enabled": true,
+        "eventSlug": "bayer-ai-2024",
+        "illustrative": true,
+        "ready": true,
+        "subject": "bioinformatics",
+        "surveyedContext": true,
+        "trees": 0,
+        "triangles": 5888
+      },
+      "start": 76748,
+      "to": "bayer-ai-2024"
+    },
+    {
+      "courtScreen": {
+        "x": 556.0000001206156,
+        "y": 416.00000006404326
+      },
+      "from": "bayer-ai-2024",
+      "hero": false,
+      "landing": {
+        "aborted": 0,
+        "activeSources": 1,
+        "bytes": 202294,
+        "closedImages": 20,
+        "completed": 21,
+        "decodes": 21,
+        "decoding": 0,
+        "enabled": true,
+        "estimatedDecodedRgbaBytes": 2359296,
+        "eventSlug": "dsag-ideathon-2024",
+        "failures": 0,
+        "loading": false,
+        "ownedDecodedImages": 1,
+        "ready": true,
+        "requests": 21,
+        "sourceId": "earth-arrival-landing-1-42"
+      },
+      "panel": {
+        "h": 663,
+        "w": 780,
+        "x": 1112,
+        "y": 84
+      },
+      "readyMs": 351,
+      "scene": {
+        "activeScenes": 1,
+        "buildings": 85,
+        "contextBytes": 576252,
+        "contextReady": true,
+        "enabled": true,
+        "eventSlug": "dsag-ideathon-2024",
+        "illustrative": true,
+        "ready": true,
+        "subject": "discovery-graph",
+        "surveyedContext": false,
+        "trees": 70,
+        "triangles": 25902
+      },
+      "start": 77961,
+      "to": "dsag-ideathon-2024"
+    },
+    {
+      "courtScreen": {
+        "x": 556.0000001024558,
+        "y": 416.0000000675171
+      },
+      "from": "dsag-ideathon-2024",
+      "hero": false,
+      "landing": {
+        "aborted": 0,
+        "activeSources": 1,
+        "bytes": 248902,
+        "closedImages": 21,
+        "completed": 22,
+        "decodes": 22,
+        "decoding": 0,
+        "enabled": true,
+        "estimatedDecodedRgbaBytes": 2359296,
+        "eventSlug": "circular-bsh-2024",
+        "failures": 0,
+        "loading": false,
+        "ownedDecodedImages": 1,
+        "ready": true,
+        "requests": 22,
+        "sourceId": "earth-arrival-landing-1-44"
+      },
+      "panel": {
+        "h": 663,
+        "w": 780,
+        "x": 1112,
+        "y": 84
+      },
+      "readyMs": 1681,
+      "scene": {
+        "activeScenes": 1,
+        "buildings": 50,
+        "contextBytes": 576252,
+        "contextReady": true,
+        "enabled": true,
+        "eventSlug": "circular-bsh-2024",
+        "illustrative": true,
+        "ready": true,
+        "subject": "circular-appliances",
+        "surveyedContext": false,
+        "trees": 70,
+        "triangles": 24538
+      },
+      "start": 87965.70000004768,
+      "to": "circular-bsh-2024"
+    },
+    {
+      "courtScreen": {
+        "x": 555.9999996187021,
+        "y": 415.9999999663305
+      },
+      "from": "circular-bsh-2024",
+      "hero": false,
+      "landing": {
+        "aborted": 0,
+        "activeSources": 1,
+        "bytes": 234938,
+        "closedImages": 22,
+        "completed": 23,
+        "decodes": 23,
+        "decoding": 0,
+        "enabled": true,
+        "estimatedDecodedRgbaBytes": 2359296,
+        "eventSlug": "thuega-2024",
+        "failures": 0,
+        "loading": false,
+        "ownedDecodedImages": 1,
+        "ready": true,
+        "requests": 23,
+        "sourceId": "earth-arrival-landing-1-46"
+      },
+      "panel": {
+        "h": 663,
+        "w": 780,
+        "x": 1112,
+        "y": 84
+      },
+      "readyMs": 975,
+      "scene": {
+        "activeScenes": 1,
+        "buildings": 17,
+        "contextBytes": 576252,
+        "contextReady": true,
+        "enabled": true,
+        "eventSlug": "thuega-2024",
+        "illustrative": true,
+        "ready": true,
+        "subject": "energy-grid",
+        "surveyedContext": false,
+        "trees": 23,
+        "triangles": 9056
+      },
+      "start": 89798.10000002384,
+      "to": "thuega-2024"
+    },
+    {
+      "courtScreen": {
+        "x": 555.9999995958995,
+        "y": 415.9999999634802
+      },
+      "from": "thuega-2024",
+      "hero": false,
+      "landing": {
+        "aborted": 0,
+        "activeSources": 1,
+        "bytes": 248902,
+        "closedImages": 23,
+        "completed": 24,
+        "decodes": 24,
+        "decoding": 0,
+        "enabled": true,
+        "estimatedDecodedRgbaBytes": 2359296,
+        "eventSlug": "solana-ideathon-2024",
+        "failures": 0,
+        "loading": false,
+        "ownedDecodedImages": 1,
+        "ready": true,
+        "requests": 24,
+        "sourceId": "earth-arrival-landing-1-48"
+      },
+      "panel": {
+        "h": 663,
+        "w": 780,
+        "x": 1112,
+        "y": 84
+      },
+      "readyMs": 930,
+      "scene": {
+        "activeScenes": 1,
+        "buildings": 100,
+        "contextBytes": 576252,
+        "contextReady": true,
+        "enabled": true,
+        "eventSlug": "solana-ideathon-2024",
+        "illustrative": true,
+        "ready": true,
+        "subject": "linked-ledger",
+        "surveyedContext": false,
+        "trees": 70,
+        "triangles": 23511
+      },
+      "start": 90864.40000009535,
+      "to": "solana-ideathon-2024"
+    },
+    {
+      "courtScreen": {
+        "x": 555.9999996217973,
+        "y": 415.9999999672213
+      },
+      "from": "solana-ideathon-2024",
+      "hero": false,
+      "landing": {
+        "aborted": 0,
+        "activeSources": 1,
+        "bytes": 149948,
+        "closedImages": 24,
+        "completed": 25,
+        "decodes": 25,
+        "decoding": 0,
+        "enabled": true,
+        "estimatedDecodedRgbaBytes": 2359296,
+        "eventSlug": "six-swisshacks-2024",
+        "failures": 0,
+        "loading": false,
+        "ownedDecodedImages": 1,
+        "ready": true,
+        "requests": 25,
+        "sourceId": "earth-arrival-landing-1-50"
+      },
+      "panel": {
+        "h": 663,
+        "w": 780,
+        "x": 1112,
+        "y": 84
+      },
+      "readyMs": 417,
+      "scene": {
+        "activeScenes": 1,
+        "buildings": 100,
+        "contextBytes": 576252,
+        "contextReady": true,
+        "enabled": true,
+        "eventSlug": "six-swisshacks-2024",
+        "illustrative": true,
+        "ready": true,
+        "subject": "energy-forum",
+        "surveyedContext": false,
+        "trees": 24,
+        "triangles": 11949
+      },
+      "start": 92347.10000002384,
+      "to": "six-swisshacks-2024"
+    },
+    {
+      "courtScreen": {
+        "x": 556.0000001009082,
+        "y": 416.0000000638651
+      },
+      "from": "six-swisshacks-2024",
+      "hero": false,
+      "landing": {
+        "aborted": 0,
+        "activeSources": 1,
+        "bytes": 281602,
+        "closedImages": 25,
+        "completed": 26,
+        "decodes": 26,
+        "decoding": 0,
+        "enabled": true,
+        "estimatedDecodedRgbaBytes": 2359296,
+        "eventSlug": "hackupc-2024",
+        "failures": 0,
+        "loading": false,
+        "ownedDecodedImages": 1,
+        "ready": true,
+        "requests": 26,
+        "sourceId": "earth-arrival-landing-1-52"
+      },
+      "panel": {
+        "h": 663,
+        "w": 780,
+        "x": 1112,
+        "y": 84
+      },
+      "readyMs": 330,
+      "scene": {
+        "activeScenes": 1,
+        "buildings": 100,
+        "contextBytes": 576252,
+        "contextReady": true,
+        "enabled": true,
+        "eventSlug": "hackupc-2024",
+        "illustrative": true,
+        "ready": true,
+        "subject": "neural-route",
+        "surveyedContext": false,
+        "trees": 2,
+        "triangles": 8666
+      },
+      "start": 92849.10000002384,
+      "to": "hackupc-2024"
+    },
+    {
+      "courtScreen": {
+        "x": 555.9999997515429,
+        "y": 416.000000094328
+      },
+      "from": "hackupc-2024",
+      "hero": false,
+      "landing": {
+        "aborted": 0,
+        "activeSources": 1,
+        "bytes": 248902,
+        "closedImages": 26,
+        "completed": 27,
+        "decodes": 27,
+        "decoding": 0,
+        "enabled": true,
+        "estimatedDecodedRgbaBytes": 2359296,
+        "eventSlug": "mdsi-bundesliga-2024",
+        "failures": 0,
+        "loading": false,
+        "ownedDecodedImages": 1,
+        "ready": true,
+        "requests": 27,
+        "sourceId": "earth-arrival-landing-1-54"
+      },
+      "panel": {
+        "h": 663,
+        "w": 780,
+        "x": 1112,
+        "y": 84
+      },
+      "readyMs": 881,
+      "scene": {
+        "activeScenes": 1,
+        "buildings": 100,
+        "contextBytes": 576252,
+        "contextReady": true,
+        "enabled": true,
+        "eventSlug": "mdsi-bundesliga-2024",
+        "illustrative": true,
+        "ready": true,
+        "subject": "football",
+        "surveyedContext": false,
+        "trees": 70,
+        "triangles": 26439
+      },
+      "start": 147815.40000009537,
+      "to": "mdsi-bundesliga-2024"
+    },
+    {
+      "courtScreen": {
+        "x": 556.0000001009082,
+        "y": 416.0000000677843
+      },
+      "from": "mdsi-bundesliga-2024",
+      "hero": false,
+      "landing": {
+        "aborted": 0,
+        "activeSources": 1,
+        "bytes": 176148,
+        "closedImages": 27,
+        "completed": 28,
+        "decodes": 28,
+        "decoding": 0,
+        "enabled": true,
+        "estimatedDecodedRgbaBytes": 2359296,
+        "eventSlug": "draeger-2023",
+        "failures": 0,
+        "loading": false,
+        "ownedDecodedImages": 1,
+        "ready": true,
+        "requests": 28,
+        "sourceId": "earth-arrival-landing-1-56"
+      },
+      "panel": {
+        "h": 663,
+        "w": 780,
+        "x": 1112,
+        "y": 84
+      },
+      "readyMs": 445,
+      "scene": {
+        "activeScenes": 1,
+        "buildings": 100,
+        "contextBytes": 576252,
+        "contextReady": true,
+        "enabled": true,
+        "eventSlug": "draeger-2023",
+        "illustrative": true,
+        "ready": true,
+        "subject": "health-imaging",
+        "surveyedContext": false,
+        "trees": 20,
+        "triangles": 10836
+      },
+      "start": 149073,
+      "to": "draeger-2023"
+    },
+    {
+      "courtScreen": {
+        "x": 555.9999999307682,
+        "y": 415.9999999353332
+      },
+      "from": "draeger-2023",
+      "hero": false,
+      "landing": {
+        "aborted": 0,
+        "activeSources": 1,
+        "bytes": 237794,
+        "closedImages": 28,
+        "completed": 29,
+        "decodes": 29,
+        "decoding": 0,
+        "enabled": true,
+        "estimatedDecodedRgbaBytes": 2359296,
+        "eventSlug": "ethmunich-2023",
+        "failures": 0,
+        "loading": false,
+        "ownedDecodedImages": 1,
+        "ready": true,
+        "requests": 29,
+        "sourceId": "earth-arrival-landing-1-58"
+      },
+      "panel": {
+        "h": 663,
+        "w": 780,
+        "x": 1112,
+        "y": 84
+      },
+      "readyMs": 751,
+      "scene": {
+        "activeScenes": 1,
+        "buildings": 100,
+        "contextBytes": 576252,
+        "contextReady": true,
+        "enabled": true,
+        "eventSlug": "ethmunich-2023",
+        "illustrative": true,
+        "ready": true,
+        "subject": "linked-ledger",
+        "surveyedContext": false,
+        "trees": 54,
+        "triangles": 18811
+      },
+      "start": 149632.30000007153,
+      "to": "ethmunich-2023"
+    },
+    {
+      "courtScreen": {
+        "x": 555.9999995958995,
+        "y": 415.9999999634802
+      },
+      "from": "ethmunich-2023",
+      "hero": false,
+      "landing": {
+        "aborted": 0,
+        "activeSources": 1,
+        "bytes": 190164,
+        "closedImages": 29,
+        "completed": 30,
+        "decodes": 30,
+        "decoding": 0,
+        "enabled": true,
+        "estimatedDecodedRgbaBytes": 2359296,
+        "eventSlug": "msg-karlsruhe-2023",
+        "failures": 0,
+        "loading": false,
+        "ownedDecodedImages": 1,
+        "ready": true,
+        "requests": 30,
+        "sourceId": "earth-arrival-landing-1-60"
+      },
+      "panel": {
+        "h": 663,
+        "w": 780,
+        "x": 1112,
+        "y": 84
+      },
+      "readyMs": 496,
+      "scene": {
+        "activeScenes": 1,
+        "buildings": 100,
+        "contextBytes": 576252,
+        "contextReady": true,
+        "enabled": true,
+        "eventSlug": "msg-karlsruhe-2023",
+        "illustrative": true,
+        "ready": true,
+        "subject": "neural-route",
+        "surveyedContext": false,
+        "trees": 70,
+        "triangles": 25740
+      },
+      "start": 150540.80000007153,
+      "to": "msg-karlsruhe-2023"
+    },
+    {
+      "courtScreen": {
+        "x": 555.9999997561857,
+        "y": 416.0000001027899
+      },
+      "from": "msg-karlsruhe-2023",
+      "hero": false,
+      "landing": {
+        "aborted": 0,
+        "activeSources": 1,
+        "bytes": 130450,
+        "closedImages": 30,
+        "completed": 31,
+        "decodes": 31,
+        "decoding": 0,
+        "enabled": true,
+        "estimatedDecodedRgbaBytes": 2359296,
+        "eventSlug": "bachelors-thesis",
+        "failures": 0,
+        "loading": false,
+        "ownedDecodedImages": 1,
+        "ready": true,
+        "requests": 31,
+        "sourceId": "earth-arrival-landing-1-62"
+      },
+      "panel": {
+        "h": 663,
+        "w": 780,
+        "x": 1112,
+        "y": 84
+      },
+      "readyMs": 275,
+      "scene": {
+        "activeScenes": 1,
+        "buildings": 24,
+        "contextBytes": 576252,
+        "contextReady": true,
+        "enabled": true,
+        "eventSlug": "bachelors-thesis",
+        "illustrative": true,
+        "ready": true,
+        "subject": "noseprints",
+        "surveyedContext": false,
+        "trees": 42,
+        "triangles": 15879
+      },
+      "start": 151171.30000007153,
+      "to": "bachelors-thesis"
+    },
+    {
+      "courtScreen": {
+        "x": 555.9999999535709,
+        "y": 415.9999999324829
+      },
+      "from": "bachelors-thesis",
+      "hero": false,
+      "landing": {
+        "aborted": 0,
+        "activeSources": 1,
+        "bytes": 130450,
+        "closedImages": 30,
+        "completed": 31,
+        "decodes": 31,
+        "decoding": 0,
+        "enabled": true,
+        "estimatedDecodedRgbaBytes": 2359296,
+        "eventSlug": "tgu-perfect-gpa",
+        "failures": 0,
+        "loading": false,
+        "ownedDecodedImages": 1,
+        "ready": true,
+        "requests": 31,
+        "sourceId": "earth-arrival-landing-1-62"
+      },
+      "panel": {
+        "h": 663,
+        "w": 780,
+        "x": 1112,
+        "y": 84
+      },
+      "readyMs": 938,
+      "scene": {
+        "activeScenes": 1,
+        "buildings": 24,
+        "contextBytes": 576252,
+        "contextReady": true,
+        "enabled": true,
+        "eventSlug": "tgu-perfect-gpa",
+        "illustrative": true,
+        "ready": true,
+        "subject": "academia",
+        "surveyedContext": false,
+        "trees": 42,
+        "triangles": 13855
+      },
+      "start": 151542.10000002384,
+      "to": "tgu-perfect-gpa"
+    }
+  ]
+}

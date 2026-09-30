@@ -1,0 +1,76 @@
+{
+  "source": "GeoBasis-DE/LGB Brandenburg, 20 cm RGB TrueDOP",
+  "source_urls": [
+    "https://data.geobasis-bb.de/geobasis/daten/dop/rgb_jpg/dop_33417-5805.zip",
+    "https://data.geobasis-bb.de/geobasis/daten/dop/rgb_jpg/dop_33418-5805.zip",
+    "https://data.geobasis-bb.de/geobasis/daten/dop/rgb_jpg/dop_33417-5806.zip",
+    "https://data.geobasis-bb.de/geobasis/daten/dop/rgb_jpg/dop_33418-5806.zip"
+  ],
+  "source_zip_sha256": {
+    "33417-5805": "21c472b2d05096246ce93492305c3b3ac59fc12f729c724e3bf0be58e5a5aca5",
+    "33418-5805": "d3c9ddf5ba899efdbcab80ab232f127c27a706191894c2cff700fcd588465e99",
+    "33417-5806": "2c7643a7abdbbdc9c806da58fc04295d847c1fda688ba7f4b04932b6ac63c35a",
+    "33418-5806": "92d6e49278dcd362938f0141b8773adf7a7412356abc9e64603fe95fd7497f23"
+  },
+  "source_crs": "EPSG:25833",
+  "source_update_date": null,
+  "source_flight_date": "2023-05-04",
+  "source_publication_date": "2023-12-19",
+  "license": "Datenlizenz Deutschland – Namensnennung – Version 2.0",
+  "license_url": "https://www.govdata.de/dl-de/by-2-0",
+  "credit": "© GeoBasis-DE/LGB, dl-de/by-2-0 (Daten geändert)",
+  "event_slug": "tesla-gigathon-2026",
+  "origin_lonlat": [
+    13.79215,
+    52.3951
+  ],
+  "event_coordinates_lonlat": [
+    13.79215,
+    52.391331
+  ],
+  "venue": "Tesla Gigafactory Berlin-Brandenburg",
+  "source_native_metres_per_pixel": 0.2,
+  "effective_metres_per_pixel": 1.2753907622750376,
+  "source_tile_zoom": 18,
+  "source_tile_bounds_xyxy": [
+    141108,
+    86113,
+    141121,
+    86126
+  ],
+  "coordinates": [
+    [
+      13.7823486328,
+      52.4015810051
+    ],
+    [
+      13.801574707,
+      52.4015810051
+    ],
+    [
+      13.801574707,
+      52.3898491698
+    ],
+    [
+      13.7823486328,
+      52.3898491698
+    ]
+  ],
+  "derived_changes": "Same-source Lanczos 2× ground reduction for constrained devices; identical geographic corners; no fabricated pixels",
+  "camera": {
+    "center": [
+      13.79215,
+      52.3951
+    ],
+    "zoom": 16.6,
+    "pitch": 52,
+    "bearing": 25
+  },
+  "asset": "tesla-gigafactory-ground-truedop20-v1-half.webp",
+  "width": 1024,
+  "height": 1024,
+  "bytes": 364256,
+  "sha256": "93a426623d1b070343a9eeb05adc4d97c9f70a505f40330f8013a05b1e0d712e",
+  "source_asset": "tesla-gigafactory-ground-truedop20-v1.webp",
+  "source_asset_sha256": "549bcf51bdae055b90f5af34e8d4bfb5e9cb53ff545ae4c81f417ef058a8f742"
+}

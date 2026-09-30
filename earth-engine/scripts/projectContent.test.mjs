@@ -34,6 +34,11 @@ test('the local portfolio snapshot still matches the existing-site source', () =
       // design/rome-venue-pilot.md, and only achievements.json is corrected.
       assert.deepEqual(mapEvent?.coordinates, {lat:41.8678291,lng:12.4791336});
       assert.deepEqual(project.mapData.coordinates, {lat:41.8719,lng:12.4802});
+    } else if(project.slug==='hong-kong-talent-engage-eurotech-healthtech-2026') {
+      // Map-only correction to named Revenue Tower: HK government location API
+      // and HKTE contact page evidence are pinned in the photo manifest.
+      assert.deepEqual(mapEvent.coordinates,{lat:22.2796020939,lng:114.1718383764});
+      assert.deepEqual(project.mapData.coordinates,{lat:22.2745,lng:114.1698});
     } else assert.deepEqual(mapEvent?.coordinates, project.mapData.coordinates);
   }
 });
