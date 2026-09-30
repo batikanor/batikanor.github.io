@@ -76,6 +76,9 @@ export function createMapTransition(map, {container, overviewSource = 'esa-overv
     const release = () => {
       if (released || current !== token) return;
       released = true;
+      // A warm destination may release before the delayed cue appears. Do
+      // not let that timer revive a stale "Approaching" chip afterward.
+      clearTimeout(cueDelay);
       veil.classList.add('is-releasing');
       settlingTimer = setTimeout(() => {
         if (current !== token) return;
