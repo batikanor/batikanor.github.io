@@ -17,7 +17,7 @@ function canvasFixture() {
     const context = {calls, get font() { return font; }, set font(value) { font = value; },
       fillRect(...values) { calls.push(['fillRect', ...values]); },
       strokeRect(...values) { calls.push(['strokeRect', ...values]); },
-      measureText(text) { return {width: text.length * parseInt(font, 10) * .52}; },
+      measureText(text) { return {width: text.length * Number(font.match(/(\d+)px/)[1]) * .52}; },
       fillText(text, ...values) { calls.push(['text', text, ...values]); }};
     const canvas = {width, height, context, getContext: kind => kind === '2d' ? context : null};
     canvases.push(canvas);
@@ -100,7 +100,7 @@ test('activation before MapLibre onAdd defers canvases until the scene exists', 
   layer.onRemove();
 });
 
-test('the two Hero panels use only authored title/prose and do not duplicate the radar', () => {
+test('the two Hero panels use itemized source notes and do not duplicate the radar', () => {
   const {layer, map, canvases} = fixture();
   layer.onAdd(map, {});
   layer.setActive(true);
@@ -109,12 +109,14 @@ test('the two Hero panels use only authored title/prose and do not duplicate the
   assert.deepEqual(layer.getSignContent(), selectAchievementSignContent(project));
   assert.equal(layer.getSignContent(), signs.userData.content);
   assert.equal(layer.getSignContent().title, project.title);
-  assert.equal(layer.getSignContent().summary, project.shortDescription);
-  assert.ok(project.longDescription.includes(layer.getSignContent().detail));
+  assert.equal(layer.getSignContent().source, 'portfolio-exhibit-notes');
+  assert.deepEqual(layer.getSignContent().summaryItems, project.exhibitNotes.overview);
+  assert.deepEqual(layer.getSignContent().detailItems, project.exhibitNotes.details);
+  assert.notEqual(layer.getSignContent().summary, project.shortDescription);
   let radars = 0;
   layer.scene.traverse(object => { if (object.name === 'Protective Radar · Garching') radars++; });
   assert.equal(radars, 1);
-  assert.deepEqual(signs.userData.panels.map(panel => panel.head.position.toArray()), [[-7,2.7,-8], [7,2.7,-8]]);
+  assert.deepEqual(signs.userData.panels.map(panel => panel.head.position.toArray()), [[-8.55,3.4,.6], [8.55,3.4,.6]]);
   for (const canvas of canvases) {
     assert.equal(canvas.width, 1024);
     assert.equal(canvas.height, 640);
@@ -135,18 +137,20 @@ test('the two Hero panels use only authored title/prose and do not duplicate the
   assert.equal(draws, 5);
   assert.equal(triangles, 92);
   assert.ok(signs.userData.panels.every(panel => !panel.layout.overflow));
-  // The nearest possible panel edge stays outside the existing 5.48m platform.
-  assert.ok(Math.hypot(7, 8) - 3.4 > 5.48);
+  // Compact note markers stay outside the physical game's 6.65m footprint.
+  assert.ok(Math.hypot(8.55,.6)-Math.hypot(1.71,.985*Math.sin(35*Math.PI/180)+.071)>6.65);
   layer.onRemove();
 });
 
-test('public camera events change sign LOD/orientation without allocations or an animation loop', () => {
+test('public camera events orient visible game signs without native canvas allocations', async () => {
   const {layer, map, renderer, canvases} = fixture();
   layer.onAdd(map, {});
   layer.setActive(true);
   const signs = signsFor(layer);
   const calls = canvases.map(canvas => canvas.context.calls.length);
   const textures = [...signs.userData.textures];
+  assert.deepEqual(layer.getSignPositions(),[],'idle scene has no reading markers');
+  await layer.startGame(HERO_VENUE_EVENT);
   const repaints = map.repaints;
   layer.render({}, args);
   assert.equal(signs.userData.signState.readable, true);
@@ -174,24 +178,24 @@ test('public camera events change sign LOD/orientation without allocations or an
   layer.onRemove();
 });
 
-test('Hero signs preserve the original radar projection, positive-up lighting and metre-scale positions', () => {
+test('Hero game signs preserve the original radar projection, positive-up lighting and metre-scale positions', async () => {
   const {layer, map} = fixture();
   layer.onAdd(map, {});
   layer.setActive(true);
-  layer.render({}, args);
+  await layer.startGame(HERO_VENUE_EVENT);layer.render({}, args);
   const signs = signsFor(layer), positions = layer.getSignPositions();
   assert.deepEqual(layer.getExhibitFocus(), HERO_VENUE_LOCATION);
   layer.getExhibitFocus()[0] = 0;
   assert.deepEqual(layer.getExhibitFocus(), HERO_VENUE_LOCATION, 'coordinate getter must not mutate siting');
   assert.equal(positions.length, 2);
   for (const [index, panel] of signs.userData.panels.entries()) {
-    assert.ok(positions[index][1] > HERO_VENUE_LOCATION[1], 'Hero z=-8 is north, unlike the other scene basis');
-    assert.ok(Math.abs(distanceMetres(positions[index], HERO_VENUE_LOCATION) - Math.hypot(7, 8)) < .02);
+    assert.ok(positions[index][1] < HERO_VENUE_LOCATION[1], 'positive Hero z remains south in the original scene basis');
+    assert.ok(Math.abs(distanceMetres(positions[index], HERO_VENUE_LOCATION) - Math.hypot(8.55, .6)) < .02);
     const world = panel.head.getWorldPosition(new THREE.Vector3());
     assert.equal(panel.plane.matrixWorld.determinant(), 1, 'existing radar world basis must stay unreflected');
     assert.equal(panel.material.side, THREE.DoubleSide, 'Hero text must survive original projection winding');
     const projected = new THREE.Vector4(world.x, world.y, world.z, 1).applyMatrix4(layer.camera.projectionMatrix);
-    const ground = maplibregl.MercatorCoordinate.fromLngLat(positions[index], 7 + .06 + 2.7);
+    const ground = maplibregl.MercatorCoordinate.fromLngLat(positions[index], 7 + .06 + 3.4);
     assert.ok(Math.abs(projected.x - ground.x) < 1e-12);
     assert.ok(Math.abs(projected.y - ground.y) < 1e-12);
     assert.ok(Math.abs(projected.z - ground.z) < 1e-10);
@@ -311,7 +315,7 @@ test('denied native canvas never blocks the radar/story or retries allocation in
     assert.equal(attempts, 1);
     assert.equal(renders, 2);
     assert.equal(layer.getSignContent().title, getProject(HERO_VENUE_EVENT).title);
-    assert.equal(layer.getSignPositions().length, 2);
+    assert.deepEqual(layer.getSignPositions(),[],'idle denied-canvas scene has no reading markers');
     assert.equal(signsFor(layer), null);
     layer.setActive(false);
     layer.setActive(true);
@@ -320,4 +324,56 @@ test('denied native canvas never blocks the radar/story or retries allocation in
     layer.onRemove();
     console.warn = originalWarn;
   }
+});
+
+
+test('the existing Hero console only exposes a game target after a valid current frame, without extra geometry',()=>{
+  const {layer,map}=fixture();map.getCanvas=()=>({clientWidth:1200,clientHeight:800});layer.onAdd(map,{});layer.setActive(true);
+  assert.equal(layer.getGameScreenPosition(),null);layer.render({},args);const point=layer.getGameScreenPosition();assert.ok(Number.isFinite(point.x)&&Number.isFinite(point.y));assert.equal(layer.getGameScreenPosition(),point);
+  layer.render({}, {defaultProjectionData:{mainMatrix:args.defaultProjectionData.mainMatrix,projectionTransition:1}});assert.equal(layer.getGameScreenPosition(),null);layer.render({},args);assert.ok(layer.getGameScreenPosition());
+  layer.setActive(false);assert.equal(layer.getGamePosition(),null);assert.equal(layer.getGameScreenPosition(),null);layer.setActive(true);assert.equal(layer.getGameScreenPosition(),null);layer.onRemove();
+});
+
+test('physical Hero game shows source signs only during real game renders and releases each owned resource once',async()=>{
+  const {layer,map,renderer,canvases}=fixture();
+  function watchResources(root){
+    const owned=ownedResources(root),resources=new Set([...owned.geometries,...owned.materials,...owned.textures,...owned.instances]);
+    const counts=new Map([...resources].map(resource=>[resource,0]));
+    for(const resource of resources)resource.addEventListener('dispose',()=>counts.set(resource,counts.get(resource)+1));
+    return expected=>{assert.ok(counts.size>0);for(const [resource,count]of counts)assert.equal(count,expected,`${resource.type??resource.constructor.name} disposal count`);};
+  }
+  try{
+    layer.onAdd(map,{});layer.setActive(true);layer.render({},args);
+    const signs=signsFor(layer),content=layer.getSignContent(),textures=[...signs.userData.textures];
+    const radar=layer.scene.getObjectByName('Protective Radar · Garching'),originalResources=watchResources(layer.scene);
+    assert.ok(radar&&radar.visible);
+    assert.equal(signs.visible,false);
+    assert.equal(await layer.startGame(HERO_VENUE_EVENT),true);
+    let gameRoot;layer.scene.traverse(object=>{if(object.userData.isExhibitGame)gameRoot=object;});
+    assert.ok(gameRoot);
+    assert.ok(gameRoot.getObjectByName('finite-completion-sparks')?.isInstancedMesh,'test observes real game instance ownership');
+    const gameResources=watchResources(gameRoot);
+    for(let frame=0;frame<3;frame++){
+      layer.render({},args);
+      assert.equal(signs.visible,true,`frame ${frame}: source signs belong only inside the active game`);
+      assert.equal(radar.visible,false,'original radar stays hidden while its physical game plays');
+      assert.equal(layer.getSignContent(),content,'game never rewrites project/sign copy');
+      assert.equal(canvases.length,2,'play creates no extra text canvases');
+    }
+    originalResources(0);gameResources(0);
+    layer.stopGame();layer.render({},args);
+    assert.equal(signsFor(layer),signs);
+    assert.equal(signs.visible,false);
+    assert.equal(layer.getSignContent(),content);
+    assert.deepEqual(signs.userData.textures,textures);
+    assert.equal(layer.scene.getObjectByName('Protective Radar · Garching'),radar);
+    assert.equal(radar.visible,true);
+    assert.equal(gameRoot.parent,null);
+    gameResources(1);originalResources(0);
+    layer.stopGame();gameResources(1);
+    layer.onRemove();layer.onRemove();
+    originalResources(1);gameResources(1);
+    assert.ok(textures.every(texture=>texture.image===null));
+    assert.equal(renderer.disposals,1);
+  }finally{if(layer.scene)layer.onRemove();}
 });

@@ -1,6 +1,6 @@
 /**
  * Publish the Vite Earth homepage inside the existing Next.js Pages export.
- * Never replace the whole `out/` directory: /sui, CV, project archives, games,
+ * Never replace the whole `out/` directory: /sui, project archives, games,
  * public certificates, and the custom-domain CNAME must keep working.
  */
 import {createHash} from 'node:crypto';
@@ -8,6 +8,7 @@ import {readFile, readdir, mkdir, writeFile, copyFile, cp, rm, stat} from 'node:
 import {dirname, join, resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {renderNoScriptIndex, renderSitemap, writeAchievementPages} from './achievement-seo.mjs';
+import {writeCvPages} from './cv-pages.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 // The default remains the GitHub Pages release. Staging is a separate copy of
@@ -24,7 +25,7 @@ const preserved = [
   'CNAME', 'favicon.ico',
   'sui/index.html', 'solana/index.html', 'lab/index.html', 'game/index.html',
   'catalyst-run/index.html', 'explore-projects-world/index.html',
-  'demo/1/index.html', 'demo/2/index.html', 'cv/index.html', 'projects/index.html'
+  'demo/1/index.html', 'demo/2/index.html', 'projects/index.html'
 ];
 
 async function sha256(file) {
@@ -87,7 +88,11 @@ html = html.replace(entryTag, `<script type="module">
     if (!/^\\/assets\\/index-[A-Za-z0-9_-]+\\.js$/.test(entry)) throw new Error('Invalid Earth release entry');
     // Start the large map download alongside the small bootstrap, not after
     // it. CV/list routes deliberately avoid this speculative runtime work.
-    const view = new URLSearchParams(location.search).get('view');
+    const path = location.pathname.replace(/\\/index\\.html$/, '').replace(/\\/+$/, '');
+    let hash = '';
+    try { hash = decodeURIComponent(location.hash.slice(1)); } catch { /* Ignore malformed old anchors. */ }
+    const cvRoute = path === '/cv' || path === '/cv/en' || hash === 'cv';
+    const view = cvRoute ? 'cv' : new URLSearchParams(location.search).get('view');
     if (view !== 'cv' && view !== 'list' && /^\\/assets\\/main-[A-Za-z0-9_-]+\\.js$/.test(mapEntry || '')) {
       const preload = document.createElement('link');
       preload.rel = 'modulepreload'; preload.href = mapEntry; preload.crossOrigin = 'anonymous';
@@ -157,6 +162,7 @@ await writeFile(join(out, 'assets', 'earth-current.json'),
   JSON.stringify({entry: entryMatch[1],mapEntry:`/assets/${mapEntryMatch[1]}`}) + '\n');
 await writeFile(join(out, 'index.html'), html);
 await writeAchievementPages(out, {staging});
+await writeCvPages(out, html, {staging});
 if (staging) {
   await writeFile(join(out, 'robots.txt'), 'User-agent: *\nDisallow: /\n');
   await rm(join(out, 'sitemap.xml'), {force: true});
@@ -168,4 +174,4 @@ for (const [item, before] of checksums) {
   assert(await sha256(join(out, item)) === before, `Legacy output changed during overlay: ${item}`);
 }
 if (staging) await rm(join(out, 'CNAME'));
-console.log(`Overlayed ${target} Earth homepage and ${assetFiles.length} built assets without changing ${preserved.length - (staging ? 1 : 0)} legacy routes/files.`);
+console.log(`Overlayed ${target} Earth homepage, both CV routes and ${assetFiles.length} built assets without changing ${preserved.length - (staging ? 1 : 0)} legacy routes/files.`);

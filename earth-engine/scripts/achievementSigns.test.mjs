@@ -2,16 +2,20 @@ import assert from 'node:assert/strict';
 import {test} from 'node:test';
 import * as THREE from 'three';
 import {contestsAndActivities} from '../src/data/contestsAndActivities.js';
-import {authoredSignProse,selectAchievementSignContent,createAchievementSigns,updateAchievementSigns} from '../src/achievementSigns.js';
+import {authoredSignProse,selectAchievementSignContent,createAchievementSigns,updateAchievementSigns,ACHIEVEMENT_SIGN_FACE,ACHIEVEMENT_GAME_SIGN_POSITIONS} from '../src/achievementSigns.js';
+import {getExhibitGameSignContent,EXHIBIT_GAME_AI_DISCLAIMER} from '../src/exhibitGameSignContent.js';
+import {CAPSULE_LAYOUT,CAPSULE_SCALE,CAPSULE_SIGN_POSITIONS} from '../src/achievementCapsule.js';
 
-function canvasFixture(){
+function canvasFixture(glyphWidth=.52){
   const canvases=[];
   const canvasFactory=(width,height)=>{
     const calls=[];let font='10px Arial';
     const context={calls,get font(){return font;},set font(value){font=value;},
       fillRect(...args){calls.push({kind:'fillRect',args,fill:this.fillStyle});},
       strokeRect(...args){calls.push({kind:'strokeRect',args});},
-      measureText(text){return {width:text.length*parseInt(font,10)*.52};},
+      save(){calls.push({kind:'save'});},scale(...args){calls.push({kind:'scale',args});},restore(){calls.push({kind:'restore'});},
+      measureText(text){const size=Number(font.match(/(\d+)px/)[1]);return {width:text.length*size*glyphWidth,
+        actualBoundingBoxAscent:size*.72,actualBoundingBoxDescent:size*(/[pgqy]/.test(text)?.22:.02)};},
       fillText(text,x,y){calls.push({kind:'text',text,x,y,font,fill:this.fillStyle});}};
     const canvas={width,height,getContext:kind=>kind==='2d'?context:null,context};canvases.push(canvas);return canvas;
   };
@@ -24,36 +28,43 @@ function release(group){
 }
 const tesla=contestsAndActivities.find(project=>project.slug==='tesla-gigathon-2026');
 
-test('all 32 signs retain authored titles as metadata and literal source excerpts, with no inferred exhibition names',()=>{
+test('all 32 monitors use explicit itemized source notes without repeated titles or prose blocks',()=>{
   assert.equal(contestsAndActivities.length,32);
   for(const project of contestsAndActivities){
     const content=selectAchievementSignContent(project);
     assert.equal(content.slug,project.slug);assert.equal(content.title,authoredSignProse(project.title));
-    assert.equal(content.source,'portfolio-authored');
-    assert.ok(authoredSignProse(project.shortDescription).includes(content.summary));
-    assert.ok(authoredSignProse(project.longDescription).includes(content.detail),`${project.slug}: detail is not original prose`);
-    assert.ok(content.summary.length<=150);assert.ok(content.detail.length<=190);
-    assert.ok(content.detail.length>=30);assert.ok(Object.isFrozen(content));
-    assert.ok(!/\{\{|gdrive_embed\[|<iframe|!\[|\]\(https?:/.test([content.summary,content.detail].join('\n')));
+    assert.equal(content.source,'portfolio-exhibit-notes');assert.equal(content.mode,'itemized');
+    assert.equal(content.summarySource,'exhibitNotes.overview');assert.equal(content.detailSource,'exhibitNotes.details');
+    assert.deepEqual(content.summaryItems,project.exhibitNotes.overview);
+    assert.deepEqual(content.detailItems,project.exhibitNotes.details);
+    assert.equal(content.summary,content.summaryItems.join('\n'));assert.equal(content.detail,content.detailItems.join('\n'));
+    assert.equal(content.summaryTruncated,false);assert.equal(content.detailTruncated,false);
+    assert.ok(Object.isFrozen(content)&&Object.isFrozen(content.summaryItems)&&Object.isFrozen(content.detailItems));
+    for(const item of [...content.summaryItems,...content.detailItems]){
+      assert.ok(item.length<=120&&item.length>0);assert.notEqual(item,content.title);
+      assert.notEqual(item,project.shortDescription);assert.notEqual(item,project.longDescription);
+      assert.doesNotMatch(item,/\{\{|gdrive_embed\[|<iframe|!\[|\]\(https?:/);
+    }
   }
 });
 
-test('Tesla text is exact existing title, description and first original explanatory sentence',()=>{
+test('Tesla monitors use curated logistics facts rather than its prize title or team paragraph',()=>{
   const content=selectAchievementSignContent(tesla);
   assert.equal(content.title,'1st Place at Tesla Gigathon 2026');
-  assert.equal(content.summary,tesla.shortDescription);
-  assert.equal(content.detail,'I teamed up with people I met for the first time, as I have in many other competitions I won in the past, and we won 1st place at this supply chain and logistics-focused competition.');
+  assert.deepEqual(content.summaryItems,tesla.exhibitNotes.overview);assert.deepEqual(content.detailItems,tesla.exhibitNotes.details);
+  assert.notEqual(content.summary,tesla.shortDescription);
+  assert.ok(!content.detail.startsWith('I teamed up with people'));
+  assert.doesNotMatch(content.summary+'\n'+content.detail,/forklift|scanner|conveyor/i,'illustrative model parts are not claims about a confidential Tesla solution');
 });
 
-test('long achievement titles never reduce the original detail excerpt budget',()=>{
-  const longDescription='A precise original explanation of the project architecture and its implementation choices with several meaningful components, real inputs, careful validation and useful outputs for the people who use this project.';
-  const project={slug:'source-budget-regression',title:'An original achievement title long enough to exceed the old sixty-five-character restriction',
-    shortDescription:'A separate original project summary.',longDescription};
-  const content=selectAchievementSignContent(project);
-  assert.equal(content.detail,longDescription.slice(0,190).slice(0,longDescription.slice(0,190).lastIndexOf(' ')));
-  assert.ok(content.detail.length>160);assert.ok(content.detail.length<=190);
-  assert.equal(content.detail,selectAchievementSignContent({...project,title:'Short original title'}).detail);
-  assert.ok(authoredSignProse(longDescription).includes(content.detail));
+test('monitor notes are copied and frozen independently of title length or later data mutation',()=>{
+  const overview=['Recorded trajectories','Shared policy across environments'],details=['Offline reinforcement learning','Latent trajectory encoding'];
+  const project={slug:'notes-regression',title:'An original achievement title longer than the old sixty-five-character restriction',exhibitNotes:{overview,details}};
+  const content=selectAchievementSignContent(project),short=selectAchievementSignContent({...project,title:'Short original title'});
+  assert.deepEqual(content.summaryItems,short.summaryItems);assert.deepEqual(content.detailItems,short.detailItems);
+  overview.push('Later source edit');details[0]='Changed later';
+  assert.equal(content.summaryItems.length,2);assert.equal(content.detailItems[0],'Offline reinforcement learning');
+  assert.throws(()=>content.summaryItems.push('mutation'),TypeError);
 });
 
 test('plain source extraction excludes embeds/media/code and retains real linked prose without its URL',()=>{
@@ -62,50 +73,76 @@ test('plain source extraction excludes embeds/media/code and retains real linked
   assert.throws(()=>selectAchievementSignContent({slug:'invented'}),/authored/);
 });
 
-test('excerpt-only canvas fonts and scene resources stay bounded to two active panels without network or title rendering',()=>{
-  const fixture=canvasFixture();const group=createAchievementSigns(tesla,{canvasFactory:fixture.canvasFactory});
+test('two printed game signs retain the existing face, texture and geometry budgets',()=>{
+  const fixture=canvasFixture(),group=createAchievementSigns(tesla,{canvasFactory:fixture.canvasFactory});
   assert.equal(fixture.canvases.length,2);assert.equal(group.userData.textures.length,2);
   assert.equal(group.userData.texturePixels,1_310_720);assert.equal(group.userData.textureBytes,5_242_880);
   assert.equal(group.userData.content.title,tesla.title);assert.equal(group.userData.authored,true);
   assert.equal(group.userData.triangles,92);assert.equal(group.userData.drawCalls,5);
   assert.equal(group.userData.panels.length,2);assert.equal(group.visible,false);
-  for(const canvas of fixture.canvases){
+  for(const [index,panel] of group.userData.panels.entries()){
+    const canvas=fixture.canvases[index],printed=getExhibitGameSignContent(tesla.slug).panels[index];
     assert.equal(canvas.width,1024);assert.equal(canvas.height,640);
-    const textCalls=canvas.context.calls.filter(call=>call.kind==='text');
-    assert.ok(textCalls.length>0);assert.ok(textCalls.every(call=>call.font.includes('Arial')));
-    assert.ok(textCalls.every(call=>!call.font.includes('Georgia')));
-    assert.equal(textCalls[0].y,90);
-    assert.ok(textCalls.every(call=>parseInt(call.font,10)>=44&&parseInt(call.font,10)<=64));
-    assert.ok(textCalls.every(call=>call.fill==='#f5f3eb'));
-    assert.equal(canvas.context.calls.find(call=>call.kind==='fillRect').fill,'#112227');
+    assert.deepEqual(canvas.context.calls.filter(c=>c.kind==='text').map(c=>c.text),[...(printed.title?[printed.title]:[]),...printed.lines]);
+    assert.ok(canvas.context.calls.filter(c=>c.kind==='text').every(c=>c.font.includes('Arial')));
+    assert.equal(canvas.context.calls.find(c=>c.kind==='fillRect').fill,'#112227');
+    assert.equal(panel.material.side,THREE.FrontSide);assert.equal(panel.material.toneMapped,false);
+    assert.equal(panel.material.map.colorSpace,THREE.SRGBColorSpace);assert.equal(panel.material.map.generateMipmaps,false);
+    assert.equal(panel.material.map.repeat.x,-1);assert.equal(panel.material.map.offset.x,1);assert.equal(panel.material.map.flipY,true);
+    assert.deepEqual(panel.head.position.toArray(),ACHIEVEMENT_GAME_SIGN_POSITIONS[index]);
+    assert.equal(panel.text,printed.text);assert.equal(panel.kind,printed.kind);
   }
-  for(const panel of group.userData.panels){
-    assert.equal(panel.material.side,THREE.FrontSide,'no mirrored backside text');
-    assert.equal(panel.material.toneMapped,false);assert.equal(panel.material.map.colorSpace,THREE.SRGBColorSpace);
-    assert.equal(panel.material.map.generateMipmaps,false);
-    assert.equal(panel.material.map.repeat.x,-1);assert.equal(panel.material.map.offset.x,1);
-    assert.equal(panel.material.map.flipY,true,'Canvas Y orientation remains native/upright');
-    assert.deepEqual(panel.head.position.toArray().filter((_,index)=>index!==0),[2.7,-8]);
-  }
-  assert.deepEqual(group.userData.panels.map(panel=>panel.head.position.x),[-7,7]);release(group);
+  assert.deepEqual(group.userData.gameContent,getExhibitGameSignContent(tesla.slug));release(group);
 });
 
-test('all authored text fits the capped native canvases without silently dropping the selected source excerpt',()=>{
+test('all 32 games print their actual rules and the exact disclaimer without reading actions',()=>{
   for(const project of contestsAndActivities){
     const fixture=canvasFixture(),group=createAchievementSigns(project,{canvasFactory:fixture.canvasFactory});
+    const content=getExhibitGameSignContent(project.slug);
     for(const [index,panel] of group.userData.panels.entries()){
-      assert.equal(panel.layout.overflow,false,`${project.slug}: panel${index} overflow`);
-      const textCalls=fixture.canvases[index].context.calls.filter(call=>call.kind==='text');
-      const text=textCalls.map(call=>call.text).join(' ');
-      const truncated=index===0?group.userData.content.summaryTruncated:group.userData.content.detailTruncated;
-      assert.equal(text,panel.text+(truncated?'…':''),`${project.slug}: only the original excerpt should be drawn`);
-      assert.ok(!text.includes(group.userData.content.title),`${project.slug}: title repeated on sign`);
-      assert.equal(textCalls[0].y,90);
-      assert.ok(panel.layout.bodyFontSize>=44&&panel.layout.bodyFontSize<=64);
-      assert.ok(textCalls.every(call=>call.y+Math.ceil(parseInt(call.font,10)*1.17)<=fixture.canvases[index].height-56),`${project.slug}: excerpt crosses bottom padding`);
+      const printed=content.panels[index],textCalls=fixture.canvases[index].context.calls.filter(c=>c.kind==='text');
+      assert.deepEqual(textCalls.map(c=>c.text),[...(printed.title?[printed.title]:[]),...printed.lines]);
+      assert.equal(panel.layout.overflow,false);assert.ok(textCalls.every(c=>c.x===512));
+      assert.doesNotMatch(textCalls.map(c=>c.text).join(' '),/Read excerpt|Read more/i);
+      assert.ok(panel.layout.glyphBounds.every(g=>g.bottom-g.top===276/3),'visible type must be exactly one third the former lettering');
+      assert.ok(panel.layout.glyphBounds.every(g=>g.top>=28&&g.bottom<=612&&g.width<=936),'complete words clear frame and fit face');
     }
+    assert.equal(group.userData.panels[0].label,'Game rules');
+    assert.equal(group.userData.panels[1].layout.lines.join(' '),EXHIBIT_GAME_AI_DISCLAIMER);
     release(group);
   }
+});
+
+test('rule heading and body share the requested ink height while heading retains clear emphasis',()=>{
+  const fixture=canvasFixture(),group=createAchievementSigns(tesla,{canvasFactory:fixture.canvasFactory});
+  const rules=fixture.canvases[0].context.calls.filter(c=>c.kind==='text');
+  assert.equal(rules[0].text,'Game rules');assert.ok(rules[0].font.startsWith('bold '));assert.equal(rules[0].fill,'#e3c084');
+  assert.ok(rules.slice(1).every(c=>!c.font.startsWith('bold ')&&c.fill==='#f5f3eb'));
+  assert.ok(group.userData.panels.every(p=>p.layout.fontSize>=72&&p.layout.fontSize<=85));
+  assert.ok(group.userData.panels.flatMap(p=>p.layout.glyphBounds).every(g=>g.bottom-g.top===92));release(group);
+});
+
+test('printed signs are game-only and non-interactive beyond the playable floor',()=>{
+  const fixture=canvasFixture(),group=createAchievementSigns(tesla,{canvasFactory:fixture.canvasFactory});
+  assert.equal(updateAchievementSigns(group,{zoom:20,distanceM:0}).visible,false,'idle never reveals signs implicitly');
+  const point=new THREE.Vector3(),halfWidth=(ACHIEVEMENT_SIGN_FACE.widthM+.12)/2,halfHeight=(ACHIEVEMENT_SIGN_FACE.heightM+.12)/2;
+  for(const [index,panel] of group.userData.panels.entries()){
+    assert.deepEqual(panel.head.position.toArray(),ACHIEVEMENT_GAME_SIGN_POSITIONS[index]);
+    panel.head.traverse(object=>{
+      assert.equal(object.userData.gameObjectId,undefined);assert.equal(object.userData.signIndex,undefined);
+      assert.equal(object.userData.actionLabel,undefined);
+    });
+  }
+  for(let bearing=0;bearing<360;bearing+=15)for(const pitch of [0,30,54,65]){
+    updateAchievementSigns(group,{visible:true,zoom:20,distanceM:0,bearing,pitch});group.updateMatrixWorld(true);
+    for(const {head} of group.userData.panels)for(const x of [-halfWidth,halfWidth])for(const y of [-halfHeight,halfHeight])for(const z of [-.065,.071]){
+      point.set(x,y,z).applyMatrix4(head.matrixWorld);
+      assert.ok(Math.hypot(point.x,point.z)>6.65,'rotated physical faces must stay beyond the playable footprint');
+    }
+  }
+  assert.equal(updateAchievementSigns(group,{visible:true,zoom:20,distanceM:0}).visible,true);
+  assert.equal(updateAchievementSigns(group,{visible:false,zoom:20,distanceM:0}).visible,false);
+  release(group);
 });
 
 test('proximity LOD changes only opacity/head orientation, never redraws textures or billboards the poles',()=>{
@@ -113,9 +150,9 @@ test('proximity LOD changes only opacity/head orientation, never redraws texture
   const canvases=fixture.canvases.map(canvas=>canvas.context.calls.length),textures=[...group.userData.textures];
   const poles=group.children.find(child=>child.isInstancedMesh),poleMatrix=poles.instanceMatrix.array.slice();
   const positions=group.userData.panels.map(panel=>panel.head.position.toArray());
-  assert.equal(updateAchievementSigns(group,{zoom:16,distanceM:20}).visible,false);
-  assert.equal(updateAchievementSigns(group,{zoom:17.3,distanceM:180}).readable,false);
-  const ready=updateAchievementSigns(group,{zoom:20,distanceM:30,bearing:90,pitch:65});
+  assert.equal(updateAchievementSigns(group,{visible:true,zoom:16,distanceM:20}).visible,false);
+  assert.equal(updateAchievementSigns(group,{visible:true,zoom:17.3,distanceM:180}).readable,false);
+  const ready=updateAchievementSigns(group,{visible:true,zoom:20,distanceM:30,bearing:90,pitch:65});
   assert.equal(ready.visible,true);assert.equal(ready.readable,true);assert.equal(ready.opacity,1);
   group.userData.panels.forEach((panel,index)=>{
     assert.deepEqual(panel.head.position.toArray(),positions[index]);assert.equal(panel.head.rotation.y,Math.PI*1.5);
@@ -123,8 +160,48 @@ test('proximity LOD changes only opacity/head orientation, never redraws texture
   });
   assert.deepEqual([...poles.instanceMatrix.array],[...poleMatrix]);
   assert.deepEqual(group.userData.textures,textures);assert.deepEqual(fixture.canvases.map(canvas=>canvas.context.calls.length),canvases);
-  assert.equal(updateAchievementSigns(group,{zoom:20,distanceM:300}).visible,false);
+  assert.equal(updateAchievementSigns(group,{visible:true,zoom:20,distanceM:300}).visible,false);
   assert.equal(updateAchievementSigns(group,{zoom:20,distanceM:20,visible:false}).visible,false);
+  release(group);
+});
+
+test('every viewport keeps the complete printed words without icon fallback or texture repaint',()=>{
+  const fixture=canvasFixture(),group=createAchievementSigns(tesla,{canvasFactory:fixture.canvasFactory});
+  const textures=[...group.userData.textures],calls=fixture.canvases.map(c=>c.context.calls.length);
+  const lines=group.userData.panels.map(p=>[...p.layout.lines]);
+  for(const [viewportWidth,viewportHeight] of [[1280,900],[390,844],[568,320],[390,320]]){
+    updateAchievementSigns(group,{visible:true,zoom:20,distanceM:0,viewportWidth,viewportHeight});
+    assert.deepEqual(group.userData.panels.map(p=>p.layout.lines),lines);
+    assert.ok(group.userData.panels.every(p=>!p.layout.compact&&p.layout.glyphBounds.length>0));
+  }
+  assert.deepEqual(fixture.canvases.map(c=>c.context.calls.length),calls);assert.deepEqual(group.userData.textures,textures);
+  assert.equal(fixture.canvases.length,2);release(group);
+});
+
+test('large rim placards stand on the capsule floor and stay inside the camera allowance at fourfold scale',()=>{
+  const fixture=canvasFixture(),group=createAchievementSigns(tesla,{canvasFactory:fixture.canvasFactory,
+    positions:CAPSULE_SIGN_POSITIONS,baseY:CAPSULE_LAYOUT.floorY,panelWidthM:ACHIEVEMENT_SIGN_FACE.widthM,panelHeightM:ACHIEVEMENT_SIGN_FACE.heightM,exhibitScale:CAPSULE_SCALE});
+  const calls=fixture.canvases.map(canvas=>canvas.context.calls.length);
+  const pole=group.children.find(object=>object.isInstancedMesh),matrix=new THREE.Matrix4(),point=new THREE.Vector3();
+  for(let i=0;i<2;i++) {
+    pole.getMatrixAt(i,matrix);
+    const bottom=new THREE.Vector3(0,-1.35,0).applyMatrix4(matrix);
+    assert.ok(Math.abs(bottom.y-CAPSULE_LAYOUT.floorY)<1e-6,'pole must start at the internal floor, not ground level');
+    assert.deepEqual(group.userData.panels[i].head.position.toArray(),CAPSULE_SIGN_POSITIONS[i]);
+  }
+  for(const bearing of [0,42,90,180,270])for(const pitch of [0,30,54,65]) {
+    const state=updateAchievementSigns(group,{visible:true,zoom:18,distanceM:100,bearing,pitch});
+    assert.equal(state.visible,true);assert.equal(state.readable,true);assert.equal(state.opacity,1);
+    group.updateMatrixWorld(true);
+    for(const {head} of group.userData.panels)for(const x of [-1.71,1.71])for(const y of [-.985,.985])for(const z of [-.065,.071]) {
+      point.set(x,y,z).applyMatrix4(head.matrixWorld);
+      assert.ok(point.y>=CAPSULE_LAYOUT.floorY,'panel must not pierce the floor');
+      assert.ok(Math.abs(point.x)<10.45&&Math.abs(point.z)<10.45,
+        `rim placard outside game camera at bearing${bearing}/pitch${pitch}`);
+    }
+  }
+  assert.deepEqual(fixture.canvases.map(canvas=>canvas.context.calls.length),calls,'scale/orientation never redraws prose');
+  assert.equal(group.userData.textureBytes,5_242_880);assert.equal(group.userData.triangles,92);
   release(group);
 });
 
@@ -141,21 +218,39 @@ test('one active sign assembly releases all owned textures, materials, geometrie
 });
 
 
-test('Salzburg sign quotes the actual EEG headband pipeline, not its hypothetical marketing preamble',()=>{
+test('Salzburg notes describe the real EEG pipeline without hypothetical marketing preamble or duplicated paragraphs',()=>{
   const project=contestsAndActivities.find(project=>project.slug==='salzburg-tourism-2024');
   const content=selectAchievementSignContent(project);
-  assert.match(content.detail,/^1\) You use a Muse 2 headband/);
-  assert.ok(authoredSignProse(project.longDescription).includes(content.detail));
-  assert.ok(!content.detail.includes('Assume you are working'));
+  assert.match(content.summary+'\n'+content.detail,/Muse 2|EEG/);assert.match(content.summary+'\n'+content.detail,/personality|recommend/i);
+  assert.doesNotMatch(content.summary+'\n'+content.detail,/Assume you are working|1\) You use/);
 });
 
-test('a truncated excerpt receives a visual ellipsis without altering the authored content string',()=>{
-  const project=contestsAndActivities.find(project=>project.slug==='tech-berlin-ai-hackathon-2');
-  const fixture=canvasFixture(),group=createAchievementSigns(project,{canvasFactory:fixture.canvasFactory});
-  const content=group.userData.content;assert.equal(content.detailTruncated,true);assert.ok(!content.detail.endsWith('…'));
-  const drawn=fixture.canvases[1].context.calls.filter(call=>call.kind==='text').map(call=>call.text).join(' ');
-  assert.ok(drawn.includes(`${content.detail}…`));
-  assert.ok(authoredSignProse(project.longDescription).includes(content.detail));release(group);
+test('new projects without curated notes fall back only to existing tags, never a title or paragraph',()=>{
+  const project={slug:'future-project',title:'Future project title',shortDescription:'A paragraph that must not be repeated.',
+    longDescription:'Another paragraph that must not be repeated.',technologies:['Python','AI','Python','Robotics','Data','Energy']};
+  const content=selectAchievementSignContent(project);
+  assert.equal(content.source,'portfolio-technologies');assert.deepEqual(content.summaryItems,['Python','AI','Robotics']);
+  assert.deepEqual(content.detailItems,['Data','Energy']);
+  assert.deepEqual(selectAchievementSignContent({...project,technologies:[]}).summaryItems,[]);
+  assert.deepEqual(selectAchievementSignContent({...project,technologies:[]}).detailItems,[]);
+  assert.ok(!content.summary.includes(project.title)&&!content.detail.includes('paragraph'));
+});
+
+test('malformed or oversized curated lists fail before any canvas/GPU resources are allocated',()=>{
+  for(const notes of [null,{overview:'not a list',details:[]},{overview:[''],details:[]},
+    {overview:['x'.repeat(121)],details:[]},{overview:['<iframe>'],details:[]},
+    {overview:['line\nline'],details:[]},{overview:Array(13).fill('Too many'),details:[]}]){
+    if(notes===null)continue;
+    const fixture=canvasFixture();
+    assert.throws(()=>createAchievementSigns({...tesla,exhibitNotes:notes},{canvasFactory:fixture.canvasFactory}),/Monitor/);
+    assert.equal(fixture.canvases.length,0);
+  }
+});
+
+test('unknown game rules cannot allocate a misleading printed sign',()=>{
+  const fixture=canvasFixture();
+  assert.throws(()=>createAchievementSigns({...tesla,slug:'unknown-exhibit'},{canvasFactory:fixture.canvasFactory}),/known exhibit game/);
+  assert.equal(fixture.canvases.length,0);
 });
 
 test('hero east/up/south basis can explicitly retain ordinary U orientation',()=>{
@@ -189,8 +284,45 @@ test('second-panel native canvas failure rolls back first pixels and every parti
 
 test('opaque close-range sign faces occlude their supports instead of drawing poles through authored text',()=>{
   const group=createAchievementSigns(tesla,{canvasFactory:canvasFixture().canvasFactory});
-  updateAchievementSigns(group,{zoom:20,distanceM:0});
+  updateAchievementSigns(group,{visible:true,zoom:20,distanceM:0});
   for(const panel of group.userData.panels){assert.equal(panel.material.depthWrite,true);assert.equal(panel.plane.renderOrder,2);assert.equal(panel.head.children[0].renderOrder,1);}
-  updateAchievementSigns(group,{zoom:17.2,distanceM:0});
+  updateAchievementSigns(group,{visible:true,zoom:17.2,distanceM:0});
   assert.ok(group.userData.panels.every(panel=>panel.material.depthWrite===false));release(group);
+});
+
+
+test('future technology tags are normalized, deduplicated and balanced without risking sign construction',()=>{
+  const project={slug:'future-tags',title:'Future title',technologies:[' Python ','Python',null,42,' AI ','<script>','https://example.org','Future title','']};
+  const content=selectAchievementSignContent(project);
+  assert.deepEqual(content.summaryItems,['Python']);assert.deepEqual(content.detailItems,['AI']);
+  assert.deepEqual(selectAchievementSignContent({...project,technologies:'not an array'}).summaryItems,[]);
+  assert.equal(content.source,'portfolio-technologies');
+});
+
+test('source notes cannot replace printed game rules or AI disclaimer',()=>{
+  const notes=Array.from({length:12},(_,i)=>`Source fact ${i+1}: `+'W'.repeat(96));
+  const original=getExhibitGameSignContent(tesla.slug),fixture=canvasFixture();
+  const group=createAchievementSigns({...tesla,exhibitNotes:{overview:notes,details:notes}},{canvasFactory:fixture.canvasFactory});
+  assert.deepEqual(group.userData.content.summaryItems,notes);
+  assert.deepEqual(group.userData.gameContent,original);
+  assert.deepEqual(group.userData.panels.map(p=>p.layout.lines),original.panels.map(p=>[...(p.title?[p.title]:[]),...p.lines]));
+  release(group);
+});
+
+test('all printed rules fit a conservative native sans-serif width estimate without hiding words',()=>{
+  for(const project of contestsAndActivities){
+    const fixture=canvasFixture(.6),group=createAchievementSigns(project,{canvasFactory:fixture.canvasFactory});
+    for(const panel of group.userData.panels){
+      assert.equal(panel.layout.overflow,false);assert.ok(panel.layout.fontSize>=72);
+      assert.ok(panel.layout.glyphBounds.every(g=>g.width<=936&&g.top>=28&&g.bottom<=612));
+      assert.equal(panel.layout.glyphBounds.length,panel.layout.lines.length);
+    }
+    release(group);
+  }
+});
+
+test('unavailable native printed type rejects transactionally without retaining pixels',()=>{
+  const fixture=canvasFixture(2);
+  assert.throws(()=>createAchievementSigns(tesla,{canvasFactory:fixture.canvasFactory}),/Printed game sign text does not fit/);
+  assert.equal(fixture.canvases.length,1);assert.equal(fixture.canvases[0].width,0);assert.equal(fixture.canvases[0].height,0);
 });

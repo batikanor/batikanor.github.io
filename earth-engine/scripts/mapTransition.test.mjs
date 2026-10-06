@@ -1,10 +1,20 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {EventEmitter} from 'node:events';
+import {readFileSync} from 'node:fs';
+import {runInNewContext} from 'node:vm';
 import {createMapTransition} from '../src/mapTransition.js';
 
 const expectedOverview = {z:11, x:1105, y:678};
 const expectedDetail = {z:14, x:8843, y:5429};
+const mainSource=readFileSync(new URL('../src/main.js',import.meta.url),'utf8');
+function actualQualityFallback(globals){
+  const start=mainSource.indexOf('onQualityTimeout:()=>{');
+  const end=mainSource.indexOf('\n  },\n  arrivalTiles:',start);
+  assert.ok(start>=0&&end>start,'the actual main arrival quality callback must exist');
+  const body=mainSource.slice(start+'onQualityTimeout:()=>{'.length,end);
+  return runInNewContext(`(()=>{${body}\n})`,globals);
+}
 function setupTransition(t, {automaticFrames = true, arrivalReady = () => false, qualityRequired=()=>false,
   qualityTimeoutMs=8000,onQualityTimeout=null} = {}) {
   const previousDocument = globalThis.document;
@@ -320,6 +330,50 @@ test('HQ timeout calls honest camera fallback exactly once and releases only its
   t.mock.timers.tick(250);assert.equal(state.container.veil.hidden,true);
   t.mock.timers.tick(10000);assert.equal(callbacks.length,1);assert.equal(state.container.cue.hidden,true);
   assert.equal(state.map.listenerCount('render'),0);assert.equal(state.map.listenerCount('sourcedata'),0);
+});
+
+test('actual Hero arrival timeout retains the native clickable radar camera and open notes while imagery is pending',async t=>{
+  const detail={hidden:false};
+  const globals={activeEvent:{slug:'european-defense-tech-2025-munich'},
+    HERO_VENUE_EVENT:'european-defense-tech-2025-munich',venueSceneSelected:true,cityDetailOn:true,
+    $:id=>{assert.equal(id,'detail');return detail;},
+    activeGameScene:()=>({gameIsActive:()=>false}),framePhysicalGame(){assert.fail('an idle arrival must not start or frame a game');},
+    destinationQualityReady:()=>false};
+  const state=setupTransition(t,{automaticFrames:false,qualityRequired:()=>true,
+    onQualityTimeout:()=>actualQualityFallback({...globals,map:state.map})()});
+  state.map.getZoom=()=>state.cameraCalls.at(-1).options.zoom;
+  const target={center:[11.666695,48.262270],zoom:20.23,pitch:68,bearing:285,offset:[-390,0]};
+  const pending=state.transition.jump(target,'Munich');state.map.emit('render');await pending;state.map.emit('render');
+  assert.equal(state.cameraCalls.length,2,'the original arrival applies its supported popup offset');
+  t.mock.timers.tick(8000);
+  assert.equal(state.cameraCalls.length,2,'slow imagery must not zoom the radar below the native picking threshold');
+  assert.equal(state.map.getZoom(),20.23);
+  assert.deepEqual(state.projectDestination({width:1440,height:900}),{x:330,y:450});
+  assert.equal(detail.hidden,false,'the notes remain open until the user clicks the exhibit');
+  state.map.emit('render');t.mock.timers.tick(250);
+  assert.equal(state.container.veil.hidden,true,'the retained exhibit becomes usable after the bounded quality wait');
+  t.mock.timers.tick(6000);
+  assert.equal(state.container.cue.hidden,true);assert.equal(state.map.listenerCount('render'),0);
+});
+
+test('actual quality callback preserves active game framing and the existing wide fallback outside close Hero notes',()=>{
+  const detail={hidden:false},calls=[];
+  const globals={activeEvent:{slug:'european-defense-tech-2025-munich'},
+    HERO_VENUE_EVENT:'european-defense-tech-2025-munich',venueSceneSelected:true,cityDetailOn:true,
+    $:()=>detail,activeGameScene:()=>({gameIsActive:()=>false}),
+    framePhysicalGame:()=>calls.push('game'),destinationQualityReady:()=>false,
+    map:{getZoom:()=>20.23,easeTo:options=>calls.push(options)}};
+  for(const override of [{activeEvent:{slug:'tesla-gigathon-2026'}},{venueSceneSelected:false},
+    {cityDetailOn:false},{map:{...globals.map,getZoom:()=>16.9}}]){
+    calls.length=0;actualQualityFallback({...globals,...override})();
+    assert.deepEqual(calls.map(call=>({...call})),[{zoom:13.8,pitch:43,duration:0,animate:false}]);
+  }
+  detail.hidden=true;calls.length=0;actualQualityFallback(globals)();
+  assert.equal(calls[0].zoom,13.8);
+  calls.length=0;actualQualityFallback({...globals,activeGameScene:()=>({gameIsActive:()=>true})})();
+  assert.deepEqual(calls,['game'],'a playing exhibit still uses the dedicated game camera');
+  calls.length=0;actualQualityFallback({...globals,destinationQualityReady:()=>true})();
+  assert.deepEqual(calls,[],'ready native imagery needs no fallback');
 });
 
 test('HQ quality fallback is bounded even when a background tab produces no paint',async t=>{

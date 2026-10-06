@@ -398,18 +398,12 @@ a { color: inherit; }
 #destination-photo-logo { position:absolute; z-index:4; right:12px; bottom:calc(var(--credits-height) + 9px); width:72px; height:auto; pointer-events:none; }
 #destination-photo-logo[hidden] { display:none; }
 
-/* Original prose on physical exhibit signs, with accessible close-range readers. */
-.inspect-project-exhibit { padding: 10px 16px; min-height: 44px; margin: 0 0 18px; border: 1px solid #d9bb8d88; border-radius: 3px; background: #14262a; color: #e3c084; font: 700 12px Arial, sans-serif; cursor: pointer; }
-.exhibit-sign-reader { min-height: 44px; padding: 9px 13px; border: 1px solid #e3c084; border-radius: 3px; background: #112227f5; color: #f5f3eb; font: 700 12px Arial, sans-serif; box-shadow: 0 3px 12px #0004; cursor: pointer; }
-.exhibit-sign-reader:hover,.inspect-project-exhibit:hover { background: #e3c084; color: #112227; }
-.exhibit-sign-reader:focus-visible,.inspect-project-exhibit:focus-visible { outline: 3px solid white; outline-offset: 3px; }
-.exhibit-excerpt-popup .maplibregl-popup-content { background: #112227; color: #f5f3eb; border: 1px solid #d9bb8d; border-radius: 4px; padding: 25px 22px 18px; }
-.exhibit-excerpt-popup .maplibregl-popup-tip { border-top-color: #d9bb8d; border-bottom-color: #d9bb8d; }
-.exhibit-excerpt-popup .maplibregl-popup-close-button { color: #e3c084; width: 44px; height: 44px; font-size: 24px; }
-.exhibit-excerpt p { font: 15px/1.55 Arial,sans-serif; margin: 6px 22px 16px 0; }
-.exhibit-excerpt button { min-height: 44px; padding: 9px 13px; background: #e3c084; color: #112227; border: 0; border-radius: 2px; cursor: pointer; font-weight: 700; }
-@media(max-width:600px) { .exhibit-sign-reader { padding: 8px 10px; font-size: 11px; } .exhibit-excerpt-popup { max-width: calc(100vw - 40px) !important; } }
+/* Short screens keep the game clear; leaving restores the navigation. */
+@media(max-height:360px) {
+  #app:has(.maplibregl-canvas[data-exhibit-playing="true"]) #journey,
+  #app:has(.maplibregl-canvas[data-exhibit-playing="true"]) .context-actions { display:none; }
+}
 
-.reader-label-compact { display: none; }
-@media(max-width:600px) { .reader-label-wide { display: none; } .reader-label-compact { display: inline; } .exhibit-sign-reader { min-width: 44px; width: 44px; padding: 4px; } }
-.exhibit-excerpt-popup.maplibregl-popup-anchor-center .maplibregl-popup-tip { display: none; }
+/* Physical games share the map canvas; there is no separate game interface. */
+
+.maplibregl-canvas[data-exhibit-playing="true"] { cursor:crosshair; }

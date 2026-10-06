@@ -14,3 +14,16 @@ export function distanceMetres([lng1,lat1],[lng2,lat2]){
   const h=Math.sin(dLat/2)**2+Math.cos(lat1*rad)*Math.cos(lat2*rad)*Math.sin(dLng/2)**2;
   return 2*EARTH_RADIUS_METRES*Math.asin(Math.min(1,Math.sqrt(h)));
 }
+
+/** A venue can precede its DEM tiles during a cross-city navigation. */
+export function sampleTerrainElevation(map,coordinate){
+  try{
+    const value=map?.queryTerrainElevation?.(coordinate);
+    return Number.isFinite(value)?value:null;
+  }catch(error){
+    // MapLibre's stale tile handoff can reject a point outside the old DEM.
+    // Treat that sample as pending; source settlement already resamples it.
+    if(error instanceof RangeError&&/Out of range source coordinates for DEM data/.test(error.message))return null;
+    throw error;
+  }
+}

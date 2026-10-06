@@ -1,9 +1,9 @@
 /**
  * Full project stories from the existing batikanor.com portfolio.
  *
- * `data/contestsAndActivities.js` is a verbatim snapshot of the source file in
- * the neighbouring batikanor.github.io project. Keep it in sync when the live
- * portfolio changes; never replace the author's copy with generated summaries.
+ * `data/contestsAndActivities.js` mirrors this release's portfolio source file.
+ * Keep original stories/media intact. Separate `exhibitNotes` hold concise,
+ * source-backed monitor lists; they never replace the full author's copy.
  */
 import {contestsAndActivities} from './data/contestsAndActivities.js';
 

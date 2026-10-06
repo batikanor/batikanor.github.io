@@ -77,8 +77,8 @@ jobs:
           NEXT_PUBLIC_OPENROUTER_API_KEY: ${{ secrets.NEXT_PUBLIC_OPENROUTER_API_KEY }}
         run: ${{ steps.detect-package-manager.outputs.runner }} build
 
-      # Keep the Next static export (including /sui, old demos, certificates,
-      # and CV routes), then replace only its homepage with the Earth app.
+      # Keep the Next static export (including /sui, old demos and certificates),
+      # then replace its homepage and CV routes with the Earth app.
       # The public build excludes EOX's non-commercial imagery completely.
       - name: Build and verify Earth homepage
         env:
@@ -88,7 +88,7 @@ jobs:
           npm --prefix earth-engine run verify
           npm --prefix earth-engine run build
           node scripts/overlay-earth-homepage.mjs
-          node --test tests/achievementSeo.test.mjs
+          node --test tests/achievementSeo.test.mjs tests/cvPages.test.mjs
           node scripts/verify-seo-artifact.mjs production
 
       - name: Upload artifact

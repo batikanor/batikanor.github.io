@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {readPortfolioRoute, portfolioUrl} from '../src/portfolioRoute.js';
+import {readPortfolioRoute, portfolioUrl, cvDestinationUrl} from '../src/portfolioRoute.js';
 import {initialMapCamera, ISOMETRIC_CAMERA, COTTBUS_HANGAR_CAMERA, preferLocalStart} from '../src/initialCamera.js';
 
 const slugs = new Set(['tesla-gigathon-2026', 'sui-hackathon-poland-2025']);
@@ -16,7 +16,7 @@ test('old root and projects hashes still open the matching map story', () => {
 test('CV route and explicit map views survive canonicalization', () => {
   assert.equal(readPortfolioRoute('https://batikanor.com/#cv', slugs).view, 'cv');
   assert.equal(readPortfolioRoute('https://batikanor.com/cv/', slugs).view, 'cv');
-  assert.equal(readPortfolioRoute('https://batikanor.com/cv/en/', slugs).downloadCv, true);
+  assert.equal(readPortfolioRoute('https://batikanor.com/cv/en/', slugs).downloadCv, false);
   assert.equal(readPortfolioRoute('https://batikanor.com/?view=cv&download=cv', slugs).downloadCv, true);
   const canonical = portfolioUrl('https://batikanor.com/projects/?view=cv#foo',
     {eventSlug:'tesla-gigathon-2026', view:'world'});
@@ -57,4 +57,26 @@ test('a constrained device skips the homepage globe flight, but an ordinary desk
   assert.equal(preferLocalStart({coarsePointer:true}),true);
   assert.equal(preferLocalStart({saveData:true}),true);
   assert.equal(preferLocalStart({reducedMotion:true}),true);
+});
+
+
+test('all CV aliases open the map-free viewer without automatic downloads',()=>{
+  for (const path of ['/cv','/cv/','/cv/en','/cv/en/','/cv/index.html','/cv/en/index.html']) {
+    const route=readPortfolioRoute('https://batikanor.com'+path);
+    assert.equal(route.view,'cv',path);assert.equal(route.downloadCv,false,path);
+    assert.equal(readPortfolioRoute('https://batikanor.com'+path+'?download=cv').downloadCv,true);
+  }
+});
+
+test('standalone CV exits and project links return to the site root without alias loops',()=>{
+  for (const path of ['/cv/','/cv/en/','/']) {
+    const href='https://staging.batikanor.com'+path+'?view=cv&download=cv&utm_source=cv#section';
+    const home=cvDestinationUrl(href),project=cvDestinationUrl(href,'tesla-gigathon-2026');
+    assert.equal(home.pathname,'/');assert.equal(home.origin,'https://staging.batikanor.com');
+    assert.equal(home.searchParams.get('utm_source'),'cv');assert.equal(home.hash,'');
+    assert.equal(home.searchParams.has('view'),false);assert.equal(home.searchParams.has('download'),false);
+    assert.equal(project.pathname,'/');assert.equal(project.searchParams.get('event'),'tesla-gigathon-2026');
+    assert.equal(readPortfolioRoute(home.href).view,null);
+  }
+  assert.equal(cvDestinationUrl('https://batikanor.com/cv/?event=tesla-gigathon-2026').searchParams.get('event'),'tesla-gigathon-2026');
 });

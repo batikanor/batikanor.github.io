@@ -35,11 +35,29 @@ for (const item of achievementPages) {
   assert(html.includes('<h1>'), `Heading missing: ${path}`);
   assert(html.includes(`name="robots" content="${target === 'staging' ? 'noindex,nofollow' : 'index,follow'}"`), `Incorrect robots: ${path}`);
 }
-for (const route of ['cv', 'projects']) {
+for (const route of ['cv', 'cv/en']) {
   const html = await read(`${route}/index.html`);
-  assert(html.includes(`rel="canonical" href="${origin}/${route}/"`), `Incorrect canonical: /${route}/`);
-  if (target === 'staging') assert(/name="robots" content="noindex, nofollow/.test(html), `Missing noindex: /${route}/`);
+  // /cv/en is a language-compatible alias of the same live document. Both
+  // routes must render the current, map-free Earth CV view, not the retained
+  // Next portfolio layout or the former automatic PDF-download page.
+  assert(html.includes(`rel="canonical" href="${origin}/cv/"`), `Incorrect canonical: /${route}/`);
+  assert(html.includes('id="cv-view-root"'), `Modern CV viewer mount missing: /${route}/`);
+  assert(html.includes('/assets/earth-current.json'), `Stable Earth release bootstrap missing: /${route}/`);
+  assert(/await\s+import\(entry\)/.test(html), `Earth runtime import missing: /${route}/`);
+  assert(!html.includes('self.__next_f') && !/<script[^>]+src=["'][^"']*\/_next\//i.test(html),
+    `Legacy Next layout survived: /${route}/`);
+  assert(html.includes('<noscript>'), `No-JavaScript CV fallback missing: /${route}/`);
+  assert(html.includes('1WJrlmn0cTgHiylnJaGbDYt_AX4li0fC8VFtORVIkh8w/preview?rm=minimal'),
+    `Live CV Drive fallback missing: /${route}/`);
+  assert(html.includes('1WJrlmn0cTgHiylnJaGbDYt_AX4li0fC8VFtORVIkh8w/export?format=pdf'),
+    `Live CV PDF fallback missing: /${route}/`);
+  assert(html.includes('application/ld+json'), `CV structured data missing: /${route}/`);
+  const robots = target === 'staging' ? /name="robots" content="noindex,\s*nofollow/ : /name="robots" content="index,\s*follow/;
+  assert(robots.test(html), `Incorrect robots policy: /${route}/`);
 }
+const projects = await read('projects/index.html');
+assert(projects.includes(`rel="canonical" href="${origin}/projects/"`), 'Incorrect canonical: /projects/');
+if (target === 'staging') assert(/name="robots" content="noindex,\s*nofollow/.test(projects), 'Missing noindex: /projects/');
 if (target === 'staging') {
   assert(home.includes('name="robots" content="noindex,nofollow"'), 'Staging homepage must be noindex');
   assert(!(await exists('sitemap.xml')), 'Staging sitemap must not exist');
@@ -57,4 +75,4 @@ if (target === 'staging') {
   }
   assert((await read('robots.txt')).includes(`Sitemap: ${origin}/sitemap.xml`), 'Production robots.txt omits sitemap');
 }
-console.log(`Verified ${target} SEO artifact: homepage, ${achievementPages.length} pages, CV, projects, robots, canonical, social image and structured data.`);
+console.log(`Verified ${target} SEO artifact: homepage, ${achievementPages.length} pages, modern /cv and /cv/en, projects, robots, canonical, social image and structured data.`);

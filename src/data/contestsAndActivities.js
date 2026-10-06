@@ -1,6 +1,21 @@
 export const contestsAndActivities = [
   {
     slug: "tesla-gigathon-2026",
+    // Concise monitor notes, grounded in the full account below.
+    exhibitNotes: {
+      overview: [
+        "Supply-chain and logistics challenge",
+        "Real Tesla data supplied for the competition",
+        "Data analytics in a manufacturing context",
+        "Rapid prototyping alongside supply-chain analysis",
+      ],
+      details: [
+        "Newly formed team; first-time collaborators",
+        "Technical details protected by comprehensive NDAs",
+        "Factory photography was not permitted",
+        "Organiser-provided footage will be added when available",
+      ],
+    },
     importance: 8.5,
     categories: ["Hacker"],
     title: "1st Place at Tesla Gigathon 2026",
@@ -36,6 +51,31 @@ Real Tesla data was used during the competition, and we signed comprehensive NDA
   },
   {
     slug: "hong-kong-talent-engage-eurotech-healthtech-2026",
+    // Concise monitor notes, grounded in the full account below.
+    exhibitNotes: {
+      overview: [
+        "Estimated hemoglobin from conjunctiva images",
+        "Arranged online calls with Hong Kong elderly-care homes",
+        "Explored health-tech needs where anemia is prevalent",
+        "Health-tech work began in Munich before the sponsored delegation",
+        "Built the concept with Ulaş, Cem and Muhammad Moiz",
+        "The delegation included 20 winners and federation representatives",
+        "Qianhai and Nansha offered perspectives on the regional startup ecosystem",
+        "Met government, research and industry participants over shared conversations",
+        "Lunch with Chris Sun, Hong Kong's Secretary for Labour and Welfare",
+      ],
+      details: [
+        "Joined a delegation across Hong Kong and the Greater Bay Area",
+        "Visited medical robotics, AI and transport research centres",
+        "Explored incubators and support programmes for founders",
+        "CUHK's Multi-Scale Medical Robotics Centre was among the research visits",
+        "Saw work at GoerTek, LimX Dynamics, 51WORLD and Tencent",
+        "Experienced Pony.ai autonomous vehicles outside a pitch setting",
+        "Watched a drone food-delivery demonstration at Talent Park",
+        "HSITP visits included its VC Sandbox and Incubation Centre",
+        "Cyberport showcased low-altitude applications and digital technology",
+      ],
+    },
     importance: 9,
     categories: ["Hacker"],
     title:
@@ -159,6 +199,25 @@ Thanks to everyone who took initiative, including [Laurenz Sommerlad](https://ww
   },
   {
     slug: "decarbon-days-climathon-2026",
+    // Concise monitor notes, grounded in the full account below.
+    exhibitNotes: {
+      overview: [
+        "Supported a growing cross-border climate-tech event",
+        "Worked with BTU Cottbus and Zielona Gora partners",
+        "Returned to mentor teams and evaluate pitches",
+        "Submission and pitch quality increased as the event grew",
+        "Mentoring and pitch evaluation centred on climate tech and sustainability",
+      ],
+      details: [
+        "Jury colleagues included politicians and academics",
+        "Tesla sponsored Berlin Gigafactory tours for winning teams",
+        "Presented the ceremonial cheque to the winning team",
+        "Worked alongside jury colleagues from Climate KIC and LEAG",
+        "The jury included BTU expertise in industrial decarbonisation",
+        "University of Zielona Góra contributed mechanical-engineering expertise",
+        "Spree-Neiße-Bober Euroregion representatives also joined the jury",
+      ],
+    },
     importance: 9,
     highlighted: true,
     categories: ["Jury", "Mentor"],
@@ -227,6 +286,24 @@ I also had the honor of presenting the ceremonial award cheque to the winning te
   },
   {
     slug: "pdm-kill-the-search-bar-2026",
+    // Concise monitor notes, grounded in the full account below.
+    exhibitNotes: {
+      overview: [
+        "Rethought discovery, trust and digital interaction",
+        "Developed concepts to improve platform data quality",
+        "Worked in a three-day, five-team hackathon",
+        "Rapid prototyping framed the search and product-discovery challenge",
+        "The wider event explored AI-native platforms and real-time data experiences",
+        "Collaborated with Enrico Michael, Martin Trifonov and Richard M.",
+      ],
+      details: [
+        "Applied the challenge to the gelbeseiten.de platform",
+        "Presented at a directory-media industry meetup",
+        "Data-quality concepts remain confidential",
+        "Platform UX formed part of the search and discovery challenge",
+        "Concepts were presented alongside an industry-facing final ceremony",
+      ],
+    },
     importance: 7,
     categories: ["Hacker"],
     title:
@@ -281,6 +358,24 @@ Thanks to pdm solutions GmbH, the mentors, participants, and the jury: [Felix G�
   },
   {
     slug: "zero-one-hack-supercompute-industrial-2026",
+    // Concise monitor notes, grounded in the full account below.
+    exhibitNotes: {
+      overview: [
+        "Synthetic semiconductor fabrication sequences as input",
+        "Trained and benchmarked models on Leonardo HPC",
+        "Predicted the next step in a fabrication sequence",
+        "Infineon supplied the industrial challenge",
+        "Combined sequence modelling, anomaly detection and supercomputing",
+      ],
+      details: [
+        "Completed missing steps in process sequences",
+        "Detected anomalies in fabrication-sequence data",
+        "36-hour sprint of debugging and model training",
+        "Worked at the AI Factory Austria coworking hub in Vienna",
+        "Four-person team with Morgan, Ariunzaya and Cristian",
+        "The sprint included late-night debugging and sleeping at the venue",
+      ],
+    },
     importance: 4,
     categories: ["Hacker"],
     title: "2nd Place in the Industrial Track at Zero One Hack",
@@ -325,6 +420,21 @@ The team was [Morgan Nihlmar](https://www.linkedin.com/in/morgan-nihlmar/), [Ari
   },
   {
     slug: "huawei-tech-arena-finland-2025",
+    // Concise monitor notes, grounded in the full account below.
+    exhibitNotes: {
+      overview: [
+        "Used Gralobe, my open-source globe component",
+        "Seamless transitions between 2D and 3D map views",
+        "Dynamic visualisation of global data for the web",
+        "Developed the globe library for map enthusiasts building web applications",
+      ],
+      details: [
+        "React and TypeScript component stack",
+        "Three.js and WebGL for 3D rendering",
+        "Source repository and Gralobe demonstration link",
+        "The repository continues to evolve beyond the competition snapshot",
+      ],
+    },
     importance: 5,
     categories: ["Hacker"],
     title:
@@ -385,6 +495,20 @@ You can find more info about Gralobe here: [https://gralobe.vercel.app/](https:/
   },
   {
     slug: "real-coin-map-2025",
+    // Concise monitor notes, grounded in the full account below.
+    exhibitNotes: {
+      overview: [
+        "Visualised the average appearance of coins by mint",
+        "Located ancient coins and mints on a map",
+        "Applied AI, embeddings and LLMs to numismatic problems",
+        "Also explored archaeological applications for AI-assisted analysis",
+      ],
+      details: [
+        "Combined numismatic and geospatial data in a dashboard",
+        "Built a proof of concept for academic or industrial use",
+        "Python supported the technical stack",
+      ],
+    },
     importance: 5,
     categories: ["Hacker"],
     title:
@@ -434,6 +558,24 @@ Small note: I couldn't find where I put the prize certificate. I'll add a pictur
   },
   {
     slug: "ethrome-2025",
+    // Concise monitor notes, grounded in the full account below.
+    exhibitNotes: {
+      overview: [
+        "Pooled gift funds while hiding individual contributions",
+        "Recipients chose their own gifts from the shared pool",
+        "Used Web3 privacy tools and smart contracts",
+        "The name SecSanta combines the ideas of secure and secret gifting",
+        "Solidity supported the smart-contract side of the privacy prototype",
+      ],
+      details: [
+        "Built against ENS, IExec and Zama sponsor testnets",
+        "Proof of concept; not a mainnet deployment",
+        "Open-source code available on GitHub",
+        "Built for the privacy track rather than a conventional gifting checkout",
+        "The event connected us with Web3 builders in Rome",
+        "Further work and eventual deployment remained possible future directions",
+      ],
+    },
     importance: 6,
     categories: ["Hacker"],
     title: "3rd Place (Zama) & Pool Prize (ENS) at ETHRome 2025",
@@ -498,6 +640,17 @@ The app used the testnets of bounty sponsors, and it's unlikely to be deployed o
   },
   {
     slug: "nasa-space-apps-zurich-2025",
+    // Concise monitor notes, grounded in the full account below.
+    exhibitNotes: {
+      overview: [
+        "Helped teams use satellite and geography-based APIs",
+        "Shared AI methods for space and Earth-science challenges",
+      ],
+      details: [
+        "Advised participants on product-market fit",
+        "Shared lessons from comparable hackathon competitions",
+      ],
+    },
     importance: 4,
     categories: ["Mentor"],
     title: "Expert Mentor at NASA Space Apps Challenge in Zurich",
@@ -540,6 +693,27 @@ It was great to see the enthusiasm and creativity of the teams tackling real-wor
   },
   {
     slug: "sui-hackathon-poland-2025",
+    // Concise monitor notes, grounded in the full account below.
+    exhibitNotes: {
+      overview: [
+        "Word-joining dApp built with my first Move smart contract",
+        "Compose words, then mint them with a chosen image",
+        "Built solo while learning Sui and Move from scratch",
+        "Joined after the event had started, without a prior application",
+        "Asked in the Telegram group to join late on Saturday",
+        "Beginner questions were supported by the Sui team",
+        "ReactJS formed the application interface alongside Sui and Move",
+      ],
+      details: [
+        "Slush wallet, OpenRouter endpoints and devnet faucet tokens",
+        "Demo images were not stored on IPFS",
+        "Devnet minting may require periodic contract redeployment",
+        "Word composition starts by selecting a word in the interface",
+        "The demonstration was deployed on Sui devnet, not a production network",
+        "Travelled to the event on the Kulturbahn and joined a paper-cutting session",
+        "Stayed overnight at the venue before an early coding session",
+      ],
+    },
     importance: 5,
     categories: ["Hacker"],
     title: "3rd Place at the First Sui Hackathon in Poland",
@@ -630,6 +804,22 @@ They said they would even ship me my 3rd place trophy all the way to Cottbus. Tr
   },
   {
     slug: "decarbon-days-climathon-2025",
+    // Concise monitor notes, grounded in the full account below.
+    exhibitNotes: {
+      overview: [
+        "Reviewed pitches with academics and industry partners",
+        "Valued feasible first steps beyond the hackathon",
+        "Discussed climate and energy with partners and politicians",
+        "Cross-border collaboration brought together BTU Cottbus and Zielona Gora",
+        "The winning team showed openness to improving during the competition",
+      ],
+      details: [
+        "Winning team's proposal: RL for factory energy management",
+        "Their solution proposed balancing loads across factory machines",
+        "Presented prizes after the jury deliberated on pitches",
+        "zweihelden and Neela-Medea Löder helped make the climathon possible",
+      ],
+    },
     importance: 9,
     highlighted: true,
     categories: ["Jury", "Mentor"],
@@ -721,6 +911,31 @@ Thank you to zweihelden gmbh for making this possible. A special thank you to Ne
   },
   {
     slug: "music-ai-osaka-2025",
+    // Concise monitor notes, grounded in the full account below.
+    exhibitNotes: {
+      overview: [
+        "MX Ink pen position controls an audio equalizer",
+        "Frequency bands map to the x, y or z motion axes",
+        "Spatial movements change the music in real time",
+        "Infrared emitters on the pen enable precise 3D tracking",
+        "GPS and simple vision tracking were too imprecise for the intended musical control",
+        "Pen synchronisation establishes the spatial reference point",
+        "The prototype let fellow participants try the system at a demo station",
+        "Two backends and one frontend passed location data to configurable music controls",
+        "Open-source code invites further experiments with the pen",
+      ],
+      details: [
+        "Quest tracking needs the pen within the headset view",
+        "Interface plots the pen trajectory alongside band controls",
+        "Position felt more natural than velocity or acceleration",
+        "The trajectory plot uses a user-selected time window, such as the last two seconds",
+        "A track selector switches between individual musical sources",
+        "Negative drumbeat equalizer values disable that track",
+        "The demo mapped x to drums and y/z to frequency bands of a Mozart piece",
+        "Velocity and acceleration were tested directly and with 10/100 ms averages",
+        "Seamless reference-point recalibration was not completed in the proof of concept",
+      ],
+    },
     importance: 6,
     highlighted: true,
     categories: ["Hacker"],
@@ -859,6 +1074,23 @@ Final note: Osaka is extremely humid. You aren't prepared. You cannot prepare. J
   },
   {
     slug: "european-defense-tech-2025-munich",
+    // Concise monitor notes, grounded in the full account below.
+    exhibitNotes: {
+      overview: [
+        "Combined an existing radar with drone-detection AI",
+        "Helped bring the hardware into the demo setting",
+        "Implemented AI for drone detection and classification",
+        "The design aimed to reduce the cost of the radar software-hardware bundle",
+        "Python supported the AI implementation",
+      ],
+      details: [
+        "Concept paired radar sensing with an interceptor drone",
+        "Pitch led to contacts in the defence sector",
+        "Technical details remain confidential",
+        "Emil owned the existing radar hardware and continued the project afterward",
+        "Further project enquiries are directed to Emil through the linked post",
+      ],
+    },
     importance: 3,
     categories: ["Hacker"],
     title: "Finalist at European Defense Tech Competition 2025 Munich",
@@ -909,6 +1141,25 @@ All for a safer Europe!`,
 
   {
     slug: "tech-berlin-ai-hackathon-2",
+    // Concise monitor notes, grounded in the full account below.
+    exhibitNotes: {
+      overview: [
+        "GraphRAG connects political events to portfolio exposure",
+        "Knowledge graphs and LLMs explain economic consequences",
+        "Compared new scenarios with similar historical cases",
+        "Inputs included political events such as elections and changes in law",
+        "The SaaS vision included integration with brokers such as Scalable Capital",
+        "Interactive explanations made political-economic causalities easier to explore",
+      ],
+      details: [
+        "Used Mistral AI, OpenAI and Neo4j",
+        "Nuxt.js interface supports interactive what-if questions",
+        "Aimed to flag portfolio risks and opportunities",
+        "Example what-if scenario: the long-run economic effect of France leaving the EU",
+        "Python and FastAPI were part of the backend stack",
+        "Similar historical cases informed projected consequences for financial markets",
+      ],
+    },
     importance: 2,
     categories: ["Hacker"],
     title:
@@ -982,6 +1233,21 @@ We built an innovative GraphRAG solution using Mistral AI, OpenAI, and Neo4j to 
   },
   {
     slug: "huawei-agorize-2024",
+    // Concise monitor notes, grounded in the full account below.
+    exhibitNotes: {
+      overview: [
+        "Used multi-view pinna images as the model input",
+        "Estimated listener-specific head-related transfer functions",
+        "Related spatial-audio estimates to listener anatomy",
+        "The team brought together Turkish-German University alumni",
+      ],
+      details: [
+        "Compared solutions through an accuracy-score leaderboard",
+        "Machine learning supported the HRTF estimation task",
+        "Method details documented in the attached slides",
+        "Collaborated with Fırat Fuat Olcay and Serdar Pehlivan",
+      ],
+    },
     importance: 5,
     categories: ["Hacker"],
     title:
@@ -1034,6 +1300,19 @@ We built an innovative GraphRAG solution using Mistral AI, OpenAI, and Neo4j to 
   },
   {
     slug: "masters-thesis",
+    // Concise monitor notes, grounded in the full account below.
+    exhibitNotes: {
+      overview: [
+        "Trained one offline-RL policy for unseen environment dynamics",
+        "TEA adds latent dynamics representations to the state space",
+        "Sequence encoders capture environment-specific characteristics",
+        "Autoencoders were examples of sequence encoders for the dynamics representation",
+      ],
+      details: [
+        "Used encodings to improve transfer to new dynamics",
+        "Compared against policies using unmodified states",
+      ],
+    },
     importance: 7,
     categories: ["Project"],
     title:
@@ -1064,6 +1343,25 @@ We built an innovative GraphRAG solution using Mistral AI, OpenAI, and Neo4j to 
   },
   {
     slug: "lauzhack-2024",
+    // Concise monitor notes, grounded in the full account below.
+    exhibitNotes: {
+      overview: [
+        "VR classroom pairs an MX Ink pen with Muse 2 EEG",
+        "Falling focus triggers simulated handwriting degradation",
+        "Virtual exam papers align with the physical desk",
+        "The immersive VR environment replicates a real classroom",
+        "Built with C# and Unity for the VR environment",
+        "Handwriting feedback encourages students to recover focus when concentration drops",
+      ],
+      details: [
+        "Teachers edit questions live through Google Docs",
+        "Question updates appear instantly in the VR classroom",
+        "Designed to train calm, attentive exam behaviour",
+        "Teacher-student interaction supports tasks such as live math problem-solving",
+        "Meta Quest 3 was part of the spatial-computing setup",
+        "Better resilience under exam pressure was a goal, not a claimed longitudinal result",
+      ],
+    },
     importance: 3,
     categories: ["Hacker"],
     title: "Finalist at LauzHack 2024: VR Classroom for Focus Improvement",
@@ -1109,6 +1407,28 @@ We built an innovative GraphRAG solution using Mistral AI, OpenAI, and Neo4j to 
 
   {
     slug: "salzburg-tourism-2024", // Unique slug for each project
+    // Concise monitor notes, grounded in the full account below.
+    exhibitNotes: {
+      overview: [
+        "Muse 2 records EEG while visitors view hobby-related images",
+        "Extracted concentration and emotion features per image",
+        "EEG features and neural networks estimate Big Five traits",
+        "Designed as an engaging tourism-marketing demonstration at a conference stand",
+        "Visual prompts use semi-abstract images related to potential hobbies",
+        "Each image is shown briefly, with features tracked for its one-second interval",
+        "Frontal alpha asymmetry is log(right_alpha) minus log(left_alpha)",
+        "Raw EEG joins the extracted features as input to neural-network processing",
+      ],
+      details: [
+        "LLM uses the EEG features and personality estimates",
+        "RAG retrieves destinations from Austrian travel datasets",
+        "Recommendations include an explanation from the LLM",
+        "This was the team's first EEG project, completed within a 24-hour event",
+        "Klados and colleagues provided inspiration for the EEG approach",
+        "Python and ReactJS supported the demonstration stack",
+        "The source repository stayed private at the request of team members",
+      ],
+    },
     importance: 8, // If less than 5, pink text
     highlighted: true,
     categories: ["Hacker"],
@@ -1176,6 +1496,29 @@ We built an innovative GraphRAG solution using Mistral AI, OpenAI, and Neo4j to 
   },
   {
     slug: "zurich-climathon-2024", // Unique slug for each project
+    // Concise monitor notes, grounded in the full account below.
+    exhibitNotes: {
+      overview: [
+        "Anonymous employee reviews of company sustainability",
+        "Survey questions structured around the SDGs",
+        "Designed for transparent employee-company dialogue",
+        "GreenDoor was conceived as a Glassdoor-style platform for sustainability",
+        "Employee feedback highlights both commitment and gaps in company practices",
+        "Public transparency is intended to encourage companies to improve",
+        "Employees and potential hires can explore company sustainability commitments",
+        "The platform aims to give companies insight into employee expectations",
+      ],
+      details: [
+        "Planned bot detection and authentication for reliable data",
+        "Freemium plan combined public access with premium analytics",
+        "Roadmap starts with a Zurich pilot and initial data collection",
+        "Planned partnerships with certification bodies and industry-ranking organisations",
+        "Premium features could advertise sustainability-focused job opportunities",
+        "Analytics were intended to forecast progress toward company sustainability targets",
+        "Geographic expansion and added features depend on growing data and revenue",
+        "Community-driven transparency is the longer-term motivation",
+      ],
+    },
     importance: 7, // If less than 5, pink text
     categories: ["Hacker"],
     title:
@@ -1222,6 +1565,22 @@ Our roadmap includes launching the platform in Zurich, gathering initial data, a
 
   {
     slug: "bayer-ai-2024", // Unique slug for each project
+    // Concise monitor notes, grounded in the full account below.
+    exhibitNotes: {
+      overview: [
+        "Tested an AI platform built on Google Cloud",
+        "Solved computer-vision and bioinformatics challenges",
+        "Discussed product capabilities with Bayer engineers",
+        "Worked directly with engineers who built and tested the platform",
+      ],
+      details: [
+        "Reported discovered bugs directly to the platform team",
+        "Kept bug details out of the public account",
+        "Python supported the challenge work",
+        "The event took place at Google's Munich office",
+        "Testing and quality assurance complemented the computer-vision tasks",
+      ],
+    },
     importance: 5, // If less than 5, pink text
     categories: ["Hacker"],
     title: "2nd Place at Bayer AI Innovation Platform Hackathon",
@@ -1261,6 +1620,22 @@ Our roadmap includes launching the platform in Zurich, gathering initial data, a
   },
   {
     slug: "dsag-ideathon-2024", // Unique slug for each project
+    // Concise monitor notes, grounded in the full account below.
+    exhibitNotes: {
+      overview: [
+        "Reinforcement learning analyses linked SAP transactions",
+        "Hierarchical PPO classifies transactions as fraud or not",
+        "Time-series graph data provides transaction context",
+        "Named the multi-transaction fraud-detection system HippoSAP",
+      ],
+      details: [
+        "Pitched the system to SAP users and partner companies",
+        "Discussed potential partnerships after the presentation",
+        "Python supported the RL and SAP-integration stack",
+        "Presented to a conference audience of more than 6,000 SAP-sector participants",
+        "The setting was the German-speaking SAP user community's annual conference",
+      ],
+    },
     importance: 5, // If less than 5, pink text
     categories: ["Hacker"],
     highlighted: true,
@@ -1305,6 +1680,23 @@ Our roadmap includes launching the platform in Zurich, gathering initial data, a
   },
   {
     slug: "circular-bsh-2024", // Unique slug for each project
+    // Concise monitor notes, grounded in the full account below.
+    exhibitNotes: {
+      overview: [
+        "X-ray scans of containers filled with old appliances",
+        "Automatic unloading followed by sensor and vision checks",
+        "RL chooses how to recover value from each appliance",
+        "The e-waste solution targeted B/S/H and other appliance-related businesses",
+        "Python and YOLO were part of the appliance-analysis stack",
+      ],
+      details: [
+        "Built and demonstrated two functional physical prototypes",
+        "Covered the e-waste process from scanning to value recovery",
+        "Paired the prototype with a roadmap and business plan",
+        "Sensor readings and computer vision identify the appliances before value decisions",
+        "The slide deck documents the roadmap and business case in more detail",
+      ],
+    },
     importance: 4, // If less than 5, pink text
     categories: ["Hacker"],
     title: "Best Business Opportunity Award Winner at Circular Hackfest",
@@ -1343,6 +1735,29 @@ Our roadmap includes launching the platform in Zurich, gathering initial data, a
   },
   {
     slug: "thuega-2024", // Unique slug for each project
+    // Concise monitor notes, grounded in the full account below.
+    exhibitNotes: {
+      overview: [
+        "Use forecasts to distribute load across battery, PV and grid",
+        "Optimise household energy costs under realistic constraints",
+        "Second optimisation targets landlord electricity sales",
+        "Addressed energy management for both single- and multiple-family households",
+        "Provided utility functions for tenants as well as landlords",
+        "Industry experts supplied real or realistic challenge data",
+        "The prototype separated two mathematical optimisation problems",
+        "The energy-management solution was called Bright Grid",
+      ],
+      details: [
+        "Interior-point optimisation with Moirai and neural forecasts",
+        "Mixed real and mocked data for the forecasting experiments",
+        "My work: full stack, cloud deployment and forecasting",
+        "Moirai was used for universal multivariate time-series forecasting",
+        "Interior-point methods were sufficient for the proof of concept",
+        "A later move to ADMM was considered, not implemented in the account",
+        "Deployed frontend and backend as separate Azure containers",
+        "ReactJS and Flask formed the frontend/backend application stack",
+      ],
+    },
     importance: 6, // If less than 5, pink text
     categories: ["Hacker"],
     title: "1st Place at Thüga Solutions Hackathon",
@@ -1392,6 +1807,19 @@ Our roadmap includes launching the platform in Zurich, gathering initial data, a
   },
   {
     slug: "solana-ideathon-2024", // Unique slug for each project
+    // Concise monitor notes, grounded in the full account below.
+    exhibitNotes: {
+      overview: [
+        "Concept accepts bets written in natural language",
+        "Peer-style bets challenge the usual house advantage",
+        "Designed a microbetting concept on the Solana network",
+      ],
+      details: [
+        "Proposed whale-funded AIs seek bets for liquidity pools",
+        "Decentralised oracles could orchestrate bet settlement",
+        "Proposed liquidity search targets newly opened bets meeting chosen conditions",
+      ],
+    },
     importance: 4, // If less than 5, pink text
     categories: ["Hacker"],
     title: "2nd Place at Solana Superteam Ideathon",
@@ -1425,6 +1853,27 @@ Our roadmap includes launching the platform in Zurich, gathering initial data, a
   },
   {
     slug: "six-swisshacks-2024", // Unique slug for each project
+    // Concise monitor notes, grounded in the full account below.
+    exhibitNotes: {
+      overview: [
+        "AI assesses sustainability frameworks and calculates KPIs",
+        "Peer analytics benchmarks company sustainability data",
+        "ChromaDB supports retrieval-augmented generation",
+        "The platform was called BizzWizz",
+        "KPI suggestions complemented framework assessment and calculation",
+        "Market tools sat alongside peer analytics and compliance guidance",
+        "Backend infrastructure was designed to handle large volumes of reporting data",
+      ],
+      details: [
+        "React web application with a Flask backend",
+        "My role: backend infrastructure and AI implementation",
+        "Designed to help companies navigate sustainability compliance",
+        "LLMs were integrated with the application backend",
+        "The concept was also presented to VCs and at the PointZero forum",
+        "Company-building discussions followed with Swiss Exchange business developers",
+        "The event was organised through the Swiss Financial Innovation Desk",
+      ],
+    },
     importance: 8, // If less than 5, pink text
     highlighted: true,
     categories: ["Hacker"],
@@ -1461,6 +1910,22 @@ Our roadmap includes launching the platform in Zurich, gathering initial data, a
   },
   {
     slug: "hackupc-2024", // Unique slug for each project
+    // Concise monitor notes, grounded in the full account below.
+    exhibitNotes: {
+      overview: [
+        "Embedded user interests and city descriptions",
+        "InterSystems IRIS Vector Search powers the travel assistant",
+        "Suggested alternative flight routes from those embeddings",
+        "The sponsor challenge centred on generative AI with IRIS Vector Search",
+      ],
+      details: [
+        "Matched similar-interest travellers to the same flight",
+        "Suggested cities likely to interest each traveller",
+        "My role: full-stack development and presentation",
+        "ReactJS and Flask supported the travel-planning application",
+        "The final presentation was improvised during the event",
+      ],
+    },
     importance: 5, // If less than 5, pink text
     categories: ["Hacker"],
     title: "3rd Place at HackUPC (Sponsor: Intersystems)",
@@ -1508,6 +1973,24 @@ Our roadmap includes launching the platform in Zurich, gathering initial data, a
   },
   {
     slug: "mdsi-bundesliga-2024", // Unique slug for each project
+    // Concise monitor notes, grounded in the full account below.
+    exhibitNotes: {
+      overview: [
+        "Rendered live-match players as spheres in a 3D view",
+        "Clustered players into offensive and defensive lines",
+        "Detected and counted breaks through those lines",
+        "The analysis considered upcoming line breaks, not only past counts",
+        "The aim was to use line-break information to evaluate game performance",
+      ],
+      details: [
+        "Predictive analysis with XGBoost and Random Forest",
+        "Configurable interface for exploring line-break behaviour",
+        "Code and further details restricted by confidentiality",
+        "Shapley-based analysis was among the explored data-mining methods",
+        "ThreeJS rendered the football view; ReactJS and Flask supported the app",
+        "Work ran on a confidential cluster that is no longer accessible to the team",
+      ],
+    },
     importance: 4, // If less than 5, pink text
     categories: ["Project"],
     title: "Proof of Concept: Detecting line-breaks in football matches",
@@ -1537,6 +2020,31 @@ Our roadmap includes launching the platform in Zurich, gathering initial data, a
   },
   {
     slug: "draeger-2023", // Unique slug for each project
+    // Concise monitor notes, grounded in the full account below.
+    exhibitNotes: {
+      overview: [
+        "VitalDB patient-sensor readings as the training input",
+        "Forecast shock at 30-second, 2.5-minute and 5-minute horizons",
+        "Shock index calculated as heart rate over systolic pressure",
+        "The public VitalDB data includes sensor readings from thousands of patients",
+        "A doctor on the team guided the choice of shock index",
+        "Hackathon tests reported accuracies of 70–90% for the developed methods",
+        "Demonstrated the forecast prototype live on a monitor",
+        "Explored different prediction models before prioritising the LSTM",
+        "Mexican-hat wavelets were explored to extract signal-frequency information",
+      ],
+      details: [
+        "LSTM prototype trained without GPU access",
+        "Wavelet feature extraction was explored but not completed",
+        "My work: AI brainstorming and signal transformations",
+        "Training mistakes could only be partly corrected near the deadline",
+        "Multithreading still did not finish all required signal transformations",
+        "Suitable pretrained autoencoders or embedders were difficult to find",
+        "More explainable prediction models were an intended direction",
+        "The source code remains confidential",
+        "Dräger colleagues shared domain expertise during the event",
+      ],
+    },
     importance: 5, // If less than 5, pink text
     categories: ["Hacker"],
     title: "2nd Place at Dräger hackathon",
@@ -1575,6 +2083,19 @@ Our roadmap includes launching the platform in Zurich, gathering initial data, a
   },
   {
     slug: "ethmunich-2023", // Unique slug for each project
+    // Concise monitor notes, grounded in the full account below.
+    exhibitNotes: {
+      overview: [
+        "NFT similarity combines attributes, text and image content",
+        "BERT embeds descriptions; ResNet embeds image content",
+        "Attribute rarity was considered alongside learned text and image embeddings",
+      ],
+      details: [
+        "Machine-learning methods offer multiple comparison options",
+        "Led the team building the similarity assistant",
+        "Python and Gateway FM RPC were part of the implementation stack",
+      ],
+    },
     importance: 8, // If less than 5, pink text
     categories: ["Hacker"],
     highlighted: true,
@@ -1615,6 +2136,18 @@ Our roadmap includes launching the platform in Zurich, gathering initial data, a
   },
   {
     slug: "msg-karlsruhe-2023", // Unique slug for each project
+    // Concise monitor notes, grounded in the full account below.
+    exhibitNotes: {
+      overview: [
+        "Route planning considers carbon emissions",
+        "Custom metrics compare efficiency and catastrophe score",
+        "The route-planning prototype was named Navigo",
+      ],
+      details: [
+        "Flask backend paired with a React interface",
+        "Not hosted live because of API costs",
+      ],
+    },
     importance: 6, // If less than 5, pink text
     categories: ["Hacker"],
     title: "1st Place at  MSG Code & Create Hackathon",
@@ -1657,6 +2190,24 @@ Our roadmap includes launching the platform in Zurich, gathering initial data, a
   },
   {
     slug: "bachelors-thesis", // Unique slug for each project
+    // Concise monitor notes, grounded in the full account below.
+    exhibitNotes: {
+      overview: [
+        "Siamese networks compare cat nose, face and whole images",
+        "Evaluated identity retrieval on 16 previously unseen cats",
+        "Each test cat had 4 to 20 example images",
+        "The motivation included identification of pets and stray animals",
+        "Image-based identity retrieval explored alternatives to ethically questionable methods",
+        "Implemented the Siamese-network approach with PyTorch",
+      ],
+      details: [
+        "Test identities were absent from the training phase",
+        "Evaluated ranked retrieval from rank 1 through rank 5",
+        "Scalability and end-user applications were future goals",
+        "The account reports very high ranked accuracies on this limited 16-cat test",
+        "Entrepreneurial plans meant the implementation stayed confidential",
+      ],
+    },
     importance: 6, // If less than 5, pink text
     categories: ["Project"],
     title: "Bachelor's Thesis: Cat identification using Noseprints",
@@ -1682,6 +2233,25 @@ Our roadmap includes launching the platform in Zurich, gathering initial data, a
   },
   {
     slug: "tgu-perfect-gpa", // Unique slug for each project
+    // Concise monitor notes, grounded in the full account below.
+    exhibitNotes: {
+      overview: [
+        "Studied computer science in a German-language programme",
+        "Consistently good grades across all courses",
+        "International lecturers joined through the Flying Faculty",
+        "The university was established through joint Turkish and German government intentions",
+        "The campus is in Istanbul while teaching is entirely in German",
+        "DAAD funding brings visiting lecturers from German universities",
+      ],
+      details: [
+        "Flying Faculty enables links to German university professors",
+        "Delivered the valedictorian speech at graduation",
+        "Received a commemorative hourglass from the rector",
+        "The academic network includes universities in Berlin, Aachen and Magdeburg",
+        "Consistency across courses mattered more than always being top of an individual class",
+        "I credit part of the milestone to studying at a relatively young university",
+      ],
+    },
     importance: 9, // If less than 5, pink text
     highlighted: true,
     categories: ["Project"],

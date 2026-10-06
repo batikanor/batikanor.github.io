@@ -34,7 +34,10 @@ import {arrivalResourceUrl, resolveArrivalRequest, arrivalAssetBudget, arrivalLa
 import {createArrivalLandingLayer} from './arrivalLandingLayer.js';
 import {createAchievementSceneLayer} from './achievementSceneLayer.js';
 import {ACHIEVEMENT_SCENE_CAMERA} from './achievementSceneData.js';
-import {createExhibitReader, exhibitInspectionCamera} from './exhibitReader.js';
+import {exhibitInspectionCamera, exhibitCameraHorizontalOffset} from './exhibitInspectionCamera.js';
+import {createExhibitGameControls} from './exhibitGameControls.js';
+import {warmExhibitGames} from './exhibitGameAttachment.js';
+import {exhibitGameCamera} from './exhibitGameCamera.js';
 import {createPersistentCache, MAPTERHORN_CACHE_TILE} from './persistentCache.js';
 import {terrainPolicy} from './terrainPolicy.js';
 import {destinationPatch,destinationLandingManifest,validateDestinationLandings,destinationCamera,qualityPlanForEvent,allQualityPreparationPlan,destinationAssetBudget} from './destinationImagery.js';
@@ -187,6 +190,7 @@ if(scaleElement)$('settings-scale').append(scaleElement);
 
 let activeCity = null;
 let activeEvent = null;
+let achievementFlightGeneration = 0;
 let imagery = PUBLIC_RELEASE ? 'esa' : 'eox';
 const tileWarmup = createTileWarmup({template:ESA_TILE,profile:arrivalProfile,
   urlForTile:tile=>arrivalResourceUrl(tile)??ESA_TILE.replaceAll('{z}',String(tile.z)).replaceAll('{x}',String(tile.x)).replaceAll('{y}',String(tile.y))});
@@ -196,6 +200,11 @@ const mapTransition = createMapTransition(map, {container:$('app'),detailSource:
   arrivalReady:()=>destinationQualityReady(),
   qualityRequired:()=>imagery==='esa'&&!!activeEvent&&!!destinationPatch(activeEvent.slug),
   onQualityTimeout:()=>{
+    if(activeEvent&&activeGameScene().gameIsActive()){framePhysicalGame();return;}
+    // The radar is an independently rendered exhibit. Keep its close arrival
+    // beside the open project notes so slow imagery cannot hide its click target.
+    if(activeEvent?.slug===HERO_VENUE_EVENT&&venueSceneSelected&&cityDetailOn
+      &&!$('detail').hidden&&map.getZoom()>=17)return;
     // A provider/decode failure is not permission to expose giant Sentinel
     // pixels. Keep navigation usable with an honest wide fallback instead.
     if(activeEvent&&!destinationQualityReady())map.easeTo({zoom:13.8,pitch:43,duration:0,animate:false});
@@ -278,8 +287,8 @@ const romeVenue = createRomeVenueChapter({onChange:()=>{syncSceneContext();updat
 // Unified photo-textured OSM roofs supersede Rome's older opaque flat massing.
 // The original Rome data and media stay intact, but are not double-rendered.
 romeVenue.setEnabled(false);
-let exhibitReader=null;
-const achievementScenes = createAchievementSceneLayer({achievements:orderedAchievements,onChange:()=>{updateCredits();exhibitReader?.sync();}});
+let gameControls=null;
+const achievementScenes = createAchievementSceneLayer({achievements:orderedAchievements,onChange:()=>{updateCredits();gameControls?.sync();}});
 const orthophoto=createArrivalLandingLayer({
   manifest:destinationLandingManifest({reduced:reducedPhotoTier}),
   manifestValidator:validateDestinationLandings,maxImageBytes:4_000_000,minZoom:13,
@@ -310,23 +319,42 @@ const heroVenue = createHeroVenueLayer({onScan:({phase})=>{
   else if(phase==='contact')status('Protective Radar · one contact detected; the quiet warning shield rises.');
   else if(phase==='complete')status('Protective Radar · scan complete. Activate it again to replay.');
 }});
-exhibitReader=createExhibitReader({map,
-  getScene:()=>activeEvent?.slug===HERO_VENUE_EVENT?heroVenue:achievementScenes,
-  getEvent:()=>activeEvent,
-  canRead:()=>venueSceneSelected&&imagery==='esa'&&cityDetailOn&&!drive.active&&$('detail').hidden&&!cvView.isOpen(),
-  onOpenProject:slug=>{const event=orderedAchievements.find(event=>event.slug===slug);if(event){showEventDetail(event);$('detail').hidden=false;exhibitReader.clear();}}
-});
-function inspectExhibit(){
-  if(!activeEvent||!venueSceneSelected)return;
-  finishDrive();closePopovers();$('detail').hidden=true;
-  if(imagery!=='esa')applyImagery('esa');
-  if(!cityDetailOn)$('city-detail-toggle').click();
-  const focus=activeEvent.slug===HERO_VENUE_EVENT?HERO_VENUE_LOCATION:achievementScenes.getExhibitFocus();
-  if(!focus)return;
-  mapTransition.cancel();map.stop();map.easeTo({...exhibitInspectionCamera(focus,$('map').clientWidth),duration:prefersReducedMotion?0:650});
-  status('Project exhibit. Approach the signs, or select Read excerpt to read the original explanation.');
+let gameFramePending=false;
+function requestGameFrame(){
+  if(gameFramePending)return;
+  gameFramePending=true;
+  queueMicrotask(()=>{gameFramePending=false;if(activeGameScene().gameIsActive())framePhysicalGame();});
 }
-$('inspect-exhibit').addEventListener('click',inspectExhibit);
+function canPlayProjectGame(){
+  if(!venueSceneSelected||imagery!=='esa'||!cityDetailOn||drive.active||cvView.isOpen()||!activeEvent)return false;
+  const hero=activeEvent.slug===HERO_VENUE_EVENT,focus=hero?HERO_VENUE_LOCATION:achievementScenes.getExhibitFocus(),center=map.getCenter();
+  return !!focus&&map.getZoom()>=(hero?17:15)&&distanceMetres([center.lng,center.lat],focus)<(hero?150:950);
+}
+function activeGameScene(){return activeEvent?.slug===HERO_VENUE_EVENT?heroVenue:achievementScenes;}
+function warmProjectGames(){return warmExhibitGames();}
+function closeProjectGame(){gameControls?.close();achievementScenes.stopGame();heroVenue.stopGame();}
+gameControls=createExhibitGameControls({map,getScene:activeGameScene,getEvent:()=>activeEvent,
+  canPlay:canPlayProjectGame,onStart:()=>{closePopovers();$('detail').hidden=true;framePhysicalGame();}
+});
+map.on('resize',()=>{gameControls.sync();requestGameFrame();});
+// Printed signs need no reading rail. Refit after actual header/credits wrapping
+// so the full play area remains clear without measuring chrome on every frame.
+const gameChromeObserver=typeof ResizeObserver==='undefined'?null:new ResizeObserver(requestGameFrame);
+for(const element of document.querySelectorAll('#map,.topbar,#journey,#journey-explore,.context-actions,.sources'))
+  gameChromeObserver?.observe(element);
+function framePhysicalGame(){
+  if(!activeEvent)return;
+  const scene=activeGameScene(),hero=activeEvent.slug===HERO_VENUE_EVENT,focus=scene.getExhibitFocus();
+  if(!focus)return;
+  const host=$('map'),headerBottom=document.querySelector('.topbar')?.getBoundingClientRect().bottom??72;
+  const bottoms=[$('journey'),$('journey-explore'),$('sources')].map(element=>element.getBoundingClientRect())
+    .filter(rect=>rect.width>0&&rect.height>0).map(rect=>rect.top);
+  const footerTop=bottoms.length?Math.min(...bottoms):host.clientHeight-114;
+  mapTransition.cancel();map.stop();map.easeTo({...exhibitGameCamera(focus,host.clientWidth,
+    {height:host.clientHeight,baseM:hero?0:scene.getExhibitBaseHeight(),scale:hero?1:scene.getExhibitScale(),hero,headerBottom,footerTop,
+      includeSigns:true}),
+    duration:prefersReducedMotion?0:550});
+}
 const markers = [];
 let journeyExplorer = null;
 
@@ -338,6 +366,10 @@ function warmEntryDestinations() {
   // Save Data. It is needed content, not speculative high-resolution imagery.
   void achievementScenes.prepareAll();
   if(!tileWarmup.profile.enabled)return;
+  // Prepare shared game code only; GPU objects exist only while playing one exhibit.
+  const warm=()=>{void warmProjectGames().catch(()=>{});};
+  if(window.requestIdleCallback)window.requestIdleCallback(warm,{timeout:5000});else setTimeout(warm,1500);
+
   const plan=allQualityPreparationPlan(orderedAchievements,{mobile:tileWarmup.profile.mobile});
   void tileWarmup.warm(plan).then(()=>persistentCache.prefetch(plan.map(arrivalResourceUrl).filter(Boolean),{priority:'idle'}));
   void persistentCache.prefetch(regionalPreparationUrls(),{priority:'idle'});
@@ -439,7 +471,7 @@ let refocusAfterCv=false;
 function openCvView({mapFocusSkipped=false}={}){
   refocusAfterCv=mapFocusSkipped||map.isMoving();
   if(map.isMoving())map.stop();
-  exhibitReader?.clear();cvView.open();
+  closeProjectGame();cvView.open();
 }
 $('cv-link').addEventListener('click',()=>{
   closePopovers();
@@ -632,6 +664,8 @@ function detailMapOffset(){
 }
 function keepCurrentEventVisible(){
   if($('detail').hidden||!activeEvent||drive.active)return;
+  const capsuleCamera=capsuleArrivalCamera(true);
+  if(capsuleCamera){map.easeTo({...capsuleCamera,duration:prefersReducedMotion?0:400});return;}
   const focus=activeEvent.slug===HERO_VENUE_EVENT
     ? document.querySelector('[data-venue-view="campus"][aria-pressed="true"]')
       ? [11.666954,48.262269] : HERO_VENUE_LOCATION
@@ -645,9 +679,28 @@ function keepCurrentEventVisible(){
     ||screenY<panelRect.top-12||screenY>panelRect.bottom+12)return;
   map.easeTo({center:focus,offset:detailMapOffset(),duration:prefersReducedMotion?0:400});
 }
+/** Frame the rooftop orb, not the old image centre, without oversampling photos. */
+function capsuleArrivalCamera(panelVisible=false){
+  if(!cityDetailOn||activeEvent?.slug===HERO_VENUE_EVENT||!achievementScenes.getStats().ready)return null;
+  const focus=achievementScenes.getExhibitFocus();if(!focus)return null;
+  const panelOffset=panelVisible?detailMapOffset():[0,0];
+  const framing={height:$('map').clientHeight,exhibitHeightM:achievementScenes.getExhibitHeight(),
+    exhibitScale:achievementScenes.getExhibitScale(),exhibitBaseM:achievementScenes.getExhibitBaseHeight(),
+    exhibitAccessBounds:achievementScenes.getStats().access?.bounds,
+    screenShiftX:panelOffset[0]};
+  const camera=exhibitInspectionCamera(focus,Math.max(320,$('map').clientWidth-2*Math.abs(panelOffset[0])),
+    framing);
+  const qualityCamera=qualityCameraOverrides.get(activeEvent.slug);
+  const fitted={...camera,zoom:Math.min(camera.zoom,qualityCamera?.zoom??camera.zoom)};
+  // A ground offset is magnified at roof height. Recompute at the final native
+  // quality zoom, and preserve fitted Y so the elevated crown remains visible.
+  fitted.offset=[exhibitCameraHorizontalOffset(fitted,framing),camera.offset[1]];
+  return fitted;
+}
 function selectEvent(event,{showDetail=false,historyMode='push',view=null,skipFly=false,chronologyNavigation=false}={}) {
   if(!event)return;
-  exhibitReader.clear();
+  const flightGeneration=++achievementFlightGeneration;
+  closeProjectGame();
   finishDrive();activeEvent=event;activeCity=byCity.get(keyOf(event));
   venueSceneSelected=true;
   achievementScenes.setFocus(event.slug===HERO_VENUE_EVENT?null:event.slug);
@@ -676,7 +729,6 @@ function selectEvent(event,{showDetail=false,historyMode='push',view=null,skipFl
   syncSceneContext();
   syncTerrain();
   heroVenue.setActive(isHero);$('scan-button').hidden=!isHero;
-  $('inspect-exhibit').hidden=false;
   const drivable=driveStarts.has(event.slug);
   $('drive-button').hidden=!drivable;$('drive-button').disabled=!drivable;
   $('drive-button').title=drivable?'Start the curated Garching driving demo':'Driving prototype currently available at Garching only';
@@ -684,19 +736,32 @@ function selectEvent(event,{showDetail=false,historyMode='push',view=null,skipFl
   // Native sampling sets the framing. Genuine surveyed 20 cm chapters can
   // be closer; a 10 m fallback must never masquerade as street-level imagery.
   if(!skipFly){
-  const flight=fly({center:[event.coordinates.lng,event.coordinates.lat],...qualityCamera,
-      ...(showDetail?{offset:detailMapOffset()}:{})},{chronologyNavigation});
-    if(restoreReliefAfterArrival){
-      if(flight?.then)void flight.then(resumeTerrainAfterFlight);
-      else resumeTerrainAfterFlight();
-    }
     showEventDetail(event);
+    $('detail').hidden=!showDetail;
+    const beginFlight=()=>{
+      if(flightGeneration!==achievementFlightGeneration||activeEvent?.slug!==event.slug||!venueSceneSelected||drive.active||cvView.isOpen())return;
+      const flight=fly(capsuleArrivalCamera(showDetail)??{center:[event.coordinates.lng,event.coordinates.lat],...qualityCamera,
+        ...(showDetail?{offset:detailMapOffset()}:{})},{chronologyNavigation});
+      if(restoreReliefAfterArrival){
+        if(flight?.then)void flight.then(resumeTerrainAfterFlight);else resumeTerrainAfterFlight();
+      }
+    };
+    if(!isHero&&cityDetailOn&&!achievementScenes.getStats().contextReady){
+      // The shared offline geography is usually ready during the entry screen.
+      // On a cold deep link, wait for its real host once instead of flying to
+      // the event point and moving the orb hundreds of metres out of view.
+      mapTransition.cancel();map.stop();let userMoved=false;
+      const cancelForUser=event=>{if(event.originalEvent)userMoved=true;};
+      map.on('movestart',cancelForUser);
+      void achievementScenes.prepareAll().then(()=>{map.off('movestart',cancelForUser);if(!userMoved)beginFlight();});
+    }else beginFlight();
   }else if(restoreReliefAfterArrival)resumeTerrainAfterFlight();
   $('detail').hidden=!showDetail;
   status(`${getProject(event.slug)?.title??event.title} · ${event.venue} · ${event.coordinates.lat.toFixed(5)}°, ${event.coordinates.lng.toFixed(5)}°`);
   warmAdjacentDestinations(event);
 }
 function showEventDetail(event) {
+  closeProjectGame();
   const root=$('detail');
   const isHero=event.slug===HERO_VENUE_EVENT;
   const scroll=detailPanel.render();
@@ -719,8 +784,6 @@ function showEventDetail(event) {
     scroll.insertBefore(controls,content);
   }
   scroll.scrollTop=0;
-  const inspect=document.createElement('button');inspect.type='button';inspect.className='inspect-project-exhibit';inspect.textContent='Inspect 3D exhibit';
-  inspect.addEventListener('click',inspectExhibit);scroll.insertBefore(inspect,content);
   bindDetail(root);
 }
 function bindDetail(root){
@@ -840,7 +903,8 @@ function initializeEventLayers(){
 }
 
 function showWholeEarth({historyMode='push'}={}){
-  exhibitReader.clear();$('inspect-exhibit').hidden=true;
+  achievementFlightGeneration++;
+  closeProjectGame();
   finishDrive();activeCity=null;$('detail').hidden=true;
   venueSceneSelected=false;
   achievementScenes.setFocus(null);
@@ -892,7 +956,7 @@ function applyImagery(next){
   map.setLayoutProperty('bavaria-imagery','visibility',imagery!=='nasa'?'visible':'none');
   map.setLayoutProperty('berlin-imagery','visibility',imagery!=='nasa'?'visible':'none');
   document.querySelectorAll('[data-imagery]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.imagery===imagery)));
-  updateCredits();exhibitReader.sync();
+  updateCredits();gameControls?.sync();
   if(imagery==='nasa'&&map.getZoom()>8)fly({center:map.getCenter(),zoom:8,pitch:50,bearing:map.getBearing()});
   status(imagery==='eox'
     ?'EOX Sentinel‑2 2024 · 10 m source, local research only under non-commercial license.'
@@ -913,7 +977,7 @@ $('city-detail-toggle').addEventListener('click',()=>{
   syncTerrain();
   $('city-detail-toggle').setAttribute('aria-pressed',String(cityDetailOn));
   $('city-detail-state').textContent=cityDetailOn?'ON':'OFF';
-  exhibitReader.sync();
+  gameControls?.sync();
   updateCredits();
   status(cityDetailOn
     ?'3D at every achievement: mapped footprints and trees, sourced local chapters, and illustrative project exhibits.'
@@ -928,6 +992,7 @@ $('scan-button').addEventListener('click',activateScan);
 function startDrive(){
   const e=activeEvent;
   if(!e||!driveStarts.has(e.slug))return;
+  closeProjectGame();
   if(imagery==='nasa')applyImagery('esa');
   const start=driveStarts.get(e.slug);
   drive.position=start?.position.slice()??[e.coordinates.lng,e.coordinates.lat];
@@ -984,7 +1049,7 @@ function tickDrive(now){
 window.addEventListener('keydown',e=>{
   const key=e.key.toLowerCase();
   if(e.key==='Escape'){
-    finishDrive();closePopovers();$('detail').hidden=true;exhibitReader.clear();
+    closeProjectGame();finishDrive();closePopovers();$('detail').hidden=true;
   }
   if(drive.active&&key==='c'&&!e.repeat&&!e.metaKey&&!e.ctrlKey&&!e.altKey
     &&!(e.target instanceof HTMLInputElement)&&!(e.target instanceof HTMLTextAreaElement)){
@@ -1074,9 +1139,10 @@ map.on('zoom',()=>{
   updateScanAvailability();
 });
 map.on('move',()=>{updateScanAvailability();updateMarkerVisibility();});
-map.on('moveend',updateCredits);
-map.on('move',()=>exhibitReader.sync());
-new MutationObserver(()=>exhibitReader.sync()).observe($('detail'),{attributes:true,attributeFilter:['hidden']});
+map.on('moveend',()=>{achievementScenes.refreshAccessGround();updateCredits();});
+// Reconcile active game input after the scene has rendered.
+map.on('render',()=>{gameControls?.sync();});
+new MutationObserver(()=>{gameControls?.sync();}).observe($('detail'),{attributes:true,attributeFilter:['hidden']});
 let lastError=0;
 map.on('error',e=>{
   const now=Date.now();if(now-lastError<2000)return;lastError=now;
@@ -1085,4 +1151,6 @@ map.on('error',e=>{
 });
 window.__earthEngine={map,cities,achievements,selectCity,selectEvent,drive,heroVenue,isometricRegions,romeVenue,achievementScenes,bavariaBuildings,arrivalLanding,orthophoto,
   destinationQualityReady,destinationAssetBudget,
+  projectGameStats:()=>activeGameScene().getGameStats(),gameControlStats:()=>gameControls?.getStats(),
+  startExhibitGame:()=>gameControls.start(),stopExhibitGame:()=>gameControls.close(),
   tileWarmupStats:()=>tileWarmup.stats(),arrivalAssetBudget,persistentCacheStats:()=>persistentCache.stats()};

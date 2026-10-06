@@ -1,4 +1,5 @@
 import {shouldShowIntro} from './introGate.js';
+import {readPortfolioRoute} from './portfolioRoute.js';
 import {finishIntro, hideIntroForDeepLink, waitForIntroEntry} from './intro.js';
 
 /**
@@ -19,7 +20,7 @@ function supportsWebGl2() {
 }
 
 async function startPortfolio() {
-  const view = new URLSearchParams(location.search).get('view');
+  const view = readPortfolioRoute(location.href).view === 'cv' ? 'cv' : new URLSearchParams(location.search).get('view');
   // The live CV is a document, not a map scene. Do not start MapLibre/Three or
   // thousands of tile requests behind PDF.js; slow devices otherwise hit the
   // preview timeout before the first page can render.

@@ -2,6 +2,7 @@ import './cvView.css';
 import { portfolioLinks } from './portfolioData.js';
 import { bindCvDownload, fetchCvPdfBlob } from './cvDownload.js';
 import { getProject } from './projectContent.js';
+import { cvDestinationUrl } from './portfolioRoute.js';
 import pdfWorkerUrl from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
 
 // Same live Google document used by batikanor.com/cv. Its current PDF is
@@ -161,13 +162,7 @@ export function createCvView({ root = document.body, onProjectLink } = {}) {
         const y2 = b * right + d * top + f;
         const link = document.createElement('a');
         link.className = 'cv-view-document-link';
-        const localUrl = new URL(window.location.href);
-        if (projectSlug) {
-          localUrl.searchParams.set('event', projectSlug);
-          localUrl.searchParams.delete('view');
-          localUrl.searchParams.delete('download');
-          localUrl.hash = '';
-        }
+        const localUrl = projectSlug ? cvDestinationUrl(window.location.href, projectSlug) : null;
         link.href = projectSlug ? localUrl.href : annotation.url;
         link.target = '_blank';
         link.rel = 'noopener noreferrer';

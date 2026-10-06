@@ -1,0 +1,3921 @@
+{
+  "sourceBytesSha256": "97def4fae292cd86c89bc2214c7cae41dd67163abed01aa95eb068aaf4134a52",
+  "originalProjectHashes": {
+    "tesla-gigathon-2026": "80aa9fee8de35d856351187dd5b17d5e6ea48667a0f0aad6163ce21a153e0c7b",
+    "hong-kong-talent-engage-eurotech-healthtech-2026": "93283a0aee4c0d7145c68f3ebf2633a82105293c304ba8c4e1dc2be296d2390f",
+    "decarbon-days-climathon-2026": "e6c36c9c04dff255abd03eae25d5cfd183c65b7659d0a5063084090fdf1aff4b",
+    "pdm-kill-the-search-bar-2026": "7cf90c3589190c08c600a1dffdf8cc4a506f6acf5d804d8fd5c2caab5c0fb741",
+    "zero-one-hack-supercompute-industrial-2026": "5fdc9bce1876ade6d803c10c60a9441a80051f1935e1a5d6689ef843781670f1",
+    "huawei-tech-arena-finland-2025": "0066c287bc3a35c0e2adbe3ff686e7bcb399bc1f75effdd493b695cd21d79deb",
+    "real-coin-map-2025": "12bd07558737aa0080152457af731d36f54d8f3194de54bb8a94224d9b108661",
+    "ethrome-2025": "f6df92d0bdfcd4bc8fec8fbfc298ced78584f8705625f28c81a1813bd5ab977f",
+    "nasa-space-apps-zurich-2025": "5f1d71414aba7b519019b952be24ef76716790b98da7174b7cee1d2da0258965",
+    "sui-hackathon-poland-2025": "aa55dd77f0263cac5557f4447dc8f4f2725c8b99ca7b7fa6b2ef5e061fe9ad87",
+    "decarbon-days-climathon-2025": "747ab029b5741c3ed68f356a479b86597e8d39248cd13dfcc648a6ccb2c2da6b",
+    "music-ai-osaka-2025": "2eb7d8caed34c4cf025003d85a7b4798445ae709813d1aaf87cd138b9d38d461",
+    "european-defense-tech-2025-munich": "28dd33160716ed44b581a077d2abeaad92d2d1b25a6ddb5ea290fc6b126619ec",
+    "tech-berlin-ai-hackathon-2": "cd32a5e798e5f92545f9d59e24697b0bb8d19caaec1ee415b5d777ef37e0ca46",
+    "huawei-agorize-2024": "41ec88458dfb0120b1137bc361ab4d5a16266a7205a8581e512e44a2e714b12f",
+    "masters-thesis": "a672117685c7563090e756f5c5b2b46c3ce03701c4387e93f77c86e921a38ba6",
+    "lauzhack-2024": "61f88a15726e8c537bf18a4e5e6f55b777a1d59af5cb0d00880e05ffe7b8e376",
+    "salzburg-tourism-2024": "af52750b6dfb378677171a1c6532ef49cd0d57036dac37d7b8c66765b72e59fb",
+    "zurich-climathon-2024": "4a3ab7a81e57899313d98fd2613155a1412ee80a01017ce93f8f863810ad6158",
+    "bayer-ai-2024": "287c3e958d3d5db5c40d8baea03319d2880800be811211358ec4781633f0c7a6",
+    "dsag-ideathon-2024": "9f56bdc4880bc9429509b029e6c789540762dbf1fa5ec8d61f4798a62b2e8414",
+    "circular-bsh-2024": "bc3c4b20974066e0bfd8f88bea0c4cdab78a1cc3ab0280e672f215dd9f5b0f9d",
+    "thuega-2024": "6ddf0d4c9e9998c217f8c74b0314e5bcca392ad4e7f291b82705ceb300078366",
+    "solana-ideathon-2024": "cb25eeb38e83cf1ecd5ca317e351a6d5652f3c6a6a09cc7b2d97999ff2d34265",
+    "six-swisshacks-2024": "4a455f5d0fc9a65dc034ee0ec5348dec423121f7874f54eb344c08fd26654787",
+    "hackupc-2024": "8b6a03a1c864d2586bf7e0666461de02ecabbaeb8a5efe5efa22868b74483396",
+    "mdsi-bundesliga-2024": "48347add18fe0b98194b7cecaa7787ea44fe1918c7daca42fbe44aea2637d31d",
+    "draeger-2023": "f813c4daffce57af1372ca6681dcc38f49b3f8da6cbe0e1799dbdf235f22d97f",
+    "ethmunich-2023": "52cd4b84983fbf8329469e89eded6a45f63ffeb05e17354de569261f3a5fcd85",
+    "msg-karlsruhe-2023": "62d7aaeaa5325eccbe636fc33bfde1286a23d7966ada975a73296a6b5053b426",
+    "bachelors-thesis": "1d24d21febce9c40a68ad1182be07bfd6a6109594710d24fcfe1956f4aeb3272",
+    "tgu-perfect-gpa": "bb49fb20d9aca0f2449d56be99a5e70dcba4aea11deb4bc4652000ac8990c093"
+  },
+  "projects": {
+    "tesla-gigathon-2026": {
+      "overview": [
+        {
+          "text": "Supply-chain and logistics challenge",
+          "evidence": [
+            {
+              "field": "shortDescription",
+              "quote": "a supply chain and logistics competition"
+            }
+          ]
+        },
+        {
+          "text": "Real Tesla data supplied for the competition",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "Real Tesla data was used during the competition"
+            }
+          ]
+        },
+        {
+          "text": "Data analytics in a manufacturing context",
+          "evidence": [
+            {
+              "field": "technologies",
+              "quote": "Data Analytics"
+            },
+            {
+              "field": "technologies",
+              "quote": "Manufacturing"
+            }
+          ]
+        },
+        {
+          "text": "Rapid prototyping alongside supply-chain analysis",
+          "evidence": [
+            {
+              "field": "technologies",
+              "quote": "Rapid Prototyping"
+            },
+            {
+              "field": "technologies",
+              "quote": "Supply Chain"
+            }
+          ]
+        }
+      ],
+      "details": [
+        {
+          "text": "Newly formed team; first-time collaborators",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "I teamed up with people I met for the first time"
+            }
+          ]
+        },
+        {
+          "text": "Technical details protected by comprehensive NDAs",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "we signed comprehensive NDAs"
+            }
+          ]
+        },
+        {
+          "text": "Factory photography was not permitted",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "Even taking photos inside the factory was not allowed"
+            }
+          ]
+        },
+        {
+          "text": "Organiser-provided footage will be added when available",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "I will update my website once it becomes available."
+            },
+            {
+              "field": "longDescription",
+              "quote": "wait for the organisers to provide more footage"
+            }
+          ]
+        }
+      ]
+    },
+    "hong-kong-talent-engage-eurotech-healthtech-2026": {
+      "overview": [
+        {
+          "text": "Estimated hemoglobin from conjunctiva images",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "We developed a way to estimate hemoglobin from conjunctiva images."
+            }
+          ]
+        },
+        {
+          "text": "Arranged online calls with Hong Kong elderly-care homes",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "reached out to residential care homes for the elderly in Hong Kong"
+            },
+            {
+              "field": "longDescription",
+              "quote": "booked a few online calls with them"
+            }
+          ]
+        },
+        {
+          "text": "Explored health-tech needs where anemia is prevalent",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "where anemia among elderly people is especially prevalent"
+            }
+          ]
+        },
+        {
+          "text": "Health-tech work began in Munich before the sponsored delegation",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "organized a hackathon in Munich"
+            },
+            {
+              "field": "longDescription",
+              "quote": "The prize led to a sponsored trip to Hong Kong and the Greater Bay Area"
+            }
+          ]
+        },
+        {
+          "text": "Built the concept with Ulaş, Cem and Muhammad Moiz",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "[Ulaş Mısırlıoğlu]"
+            },
+            {
+              "field": "longDescription",
+              "quote": "[Cem Araz]"
+            },
+            {
+              "field": "longDescription",
+              "quote": "[Muhammad Moiz]"
+            }
+          ]
+        },
+        {
+          "text": "The delegation included 20 winners and federation representatives",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "20-member delegation of hackathon winners and federation representatives"
+            }
+          ]
+        },
+        {
+          "text": "Qianhai and Nansha offered perspectives on the regional startup ecosystem",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "Qianhai in Shenzhen and Nansha in Guangzhou, exploring the region's research, technology and startup ecosystem"
+            }
+          ]
+        },
+        {
+          "text": "Met government, research and industry participants over shared conversations",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "valuable conversations with people across government, research and industry"
+            }
+          ]
+        },
+        {
+          "text": "Lunch with Chris Sun, Hong Kong's Secretary for Labour and Welfare",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "having lunch with and shaking hands with Mr Chris Sun"
+            },
+            {
+              "field": "longDescription",
+              "quote": "Hong Kong's Secretary for Labour and Welfare"
+            }
+          ]
+        }
+      ],
+      "details": [
+        {
+          "text": "Joined a delegation across Hong Kong and the Greater Bay Area",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "We travelled through Hong Kong, Qianhai in Shenzhen and Nansha in Guangzhou"
+            }
+          ]
+        },
+        {
+          "text": "Visited medical robotics, AI and transport research centres",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "research institutes, companies and founders working on AI, robotics, smart transport and biotechnology"
+            }
+          ]
+        },
+        {
+          "text": "Explored incubators and support programmes for founders",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "we learned about programmes and facilities for technology companies"
+            }
+          ]
+        },
+        {
+          "text": "CUHK's Multi-Scale Medical Robotics Centre was among the research visits",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "CUHK's Multi-Scale Medical Robotics Centre"
+            }
+          ]
+        },
+        {
+          "text": "Saw work at GoerTek, LimX Dynamics, 51WORLD and Tencent",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "GoerTek, Pinnacle Food, 51WORLD, LimX Dynamics"
+            },
+            {
+              "field": "longDescription",
+              "quote": "Tencent Headquarters"
+            }
+          ]
+        },
+        {
+          "text": "Experienced Pony.ai autonomous vehicles outside a pitch setting",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "We experienced Pony.ai's autonomous vehicles"
+            }
+          ]
+        },
+        {
+          "text": "Watched a drone food-delivery demonstration at Talent Park",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "saw a drone food delivery demonstration at Talent Park"
+            }
+          ]
+        },
+        {
+          "text": "HSITP visits included its VC Sandbox and Incubation Centre",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "HSITP's VC Sandbox and Incubation Centre"
+            }
+          ]
+        },
+        {
+          "text": "Cyberport showcased low-altitude applications and digital technology",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "Cyberport's Low-Altitude Economy Application Exhibition Hub and Digital Tech Centre"
+            }
+          ]
+        }
+      ]
+    },
+    "decarbon-days-climathon-2026": {
+      "overview": [
+        {
+          "text": "Supported a growing cross-border climate-tech event",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "the event grew, the submission and pitch qualities increased"
+            }
+          ]
+        },
+        {
+          "text": "Worked with BTU Cottbus and Zielona Gora partners",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "organised together with BTU Cottbus / Germany and Zielona Gora / Poland"
+            }
+          ]
+        },
+        {
+          "text": "Returned to mentor teams and evaluate pitches",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "For the second time, I was lead jury and mentor"
+            },
+            {
+              "field": "technologies",
+              "quote": "Pitch Evaluation"
+            }
+          ]
+        },
+        {
+          "text": "Submission and pitch quality increased as the event grew",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "the event grew, the submission and pitch qualities increased"
+            }
+          ]
+        },
+        {
+          "text": "Mentoring and pitch evaluation centred on climate tech and sustainability",
+          "evidence": [
+            {
+              "field": "technologies",
+              "quote": "Climate Tech"
+            },
+            {
+              "field": "technologies",
+              "quote": "Sustainability"
+            },
+            {
+              "field": "technologies",
+              "quote": "Mentoring"
+            },
+            {
+              "field": "technologies",
+              "quote": "Pitch Evaluation"
+            }
+          ]
+        }
+      ],
+      "details": [
+        {
+          "text": "Jury colleagues included politicians and academics",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "Matthias Ecke — Member of the European Parliament for Saxony"
+            },
+            {
+              "field": "longDescription",
+              "quote": "Prof. Dr. Roh Pin Lee — Chair of Decarbonization and Transformation of Industry"
+            },
+            {
+              "field": "longDescription",
+              "quote": "Daniela Hertzer — LEAG"
+            }
+          ]
+        },
+        {
+          "text": "Tesla sponsored Berlin Gigafactory tours for winning teams",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "Tesla became a sponsor, awarding winning teams with free tours of the Berlin Gigafactory"
+            }
+          ]
+        },
+        {
+          "text": "Presented the ceremonial cheque to the winning team",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "presenting the ceremonial award cheque to the winning team"
+            }
+          ]
+        },
+        {
+          "text": "Worked alongside jury colleagues from Climate KIC and LEAG",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "Lisa Janßen — Climate KIC"
+            },
+            {
+              "field": "longDescription",
+              "quote": "Daniela Hertzer — LEAG"
+            }
+          ]
+        },
+        {
+          "text": "The jury included BTU expertise in industrial decarbonisation",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "Chair of Decarbonization and Transformation of Industry, BTU Cottbus-Senftenberg"
+            }
+          ]
+        },
+        {
+          "text": "University of Zielona Góra contributed mechanical-engineering expertise",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "Assistant Professor at the Institute of Mechanical Engineering, University of Zielona Góra"
+            }
+          ]
+        },
+        {
+          "text": "Spree-Neiße-Bober Euroregion representatives also joined the jury",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "Chairman of the Spree-Neiße-Bober Euroregion"
+            },
+            {
+              "field": "longDescription",
+              "quote": "Managing Director of the German office of the Spree-Neiße-Bober Euroregion"
+            }
+          ]
+        }
+      ]
+    },
+    "pdm-kill-the-search-bar-2026": {
+      "overview": [
+        {
+          "text": "Rethought discovery, trust and digital interaction",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "rethinking how people discover, trust, and interact with digital platforms"
+            }
+          ]
+        },
+        {
+          "text": "Developed concepts to improve platform data quality",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "We built novel, creative, and lucrative concepts for improving data quality"
+            }
+          ]
+        },
+        {
+          "text": "Worked in a three-day, five-team hackathon",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "three days, five teams"
+            }
+          ]
+        },
+        {
+          "text": "Rapid prototyping framed the search and product-discovery challenge",
+          "evidence": [
+            {
+              "field": "technologies",
+              "quote": "Rapid Prototyping"
+            },
+            {
+              "field": "technologies",
+              "quote": "Search"
+            },
+            {
+              "field": "technologies",
+              "quote": "Product Discovery"
+            }
+          ]
+        },
+        {
+          "text": "The wider event explored AI-native platforms and real-time data experiences",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "ranging from AI-native platform ideas to real-time data experiences"
+            }
+          ]
+        },
+        {
+          "text": "Collaborated with Enrico Michael, Martin Trifonov and Richard M.",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "[Enrico Michael]"
+            },
+            {
+              "field": "longDescription",
+              "quote": "[Martin Trifonov]"
+            },
+            {
+              "field": "longDescription",
+              "quote": "[Richard M.]"
+            }
+          ]
+        }
+      ],
+      "details": [
+        {
+          "text": "Applied the challenge to the gelbeseiten.de platform",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "The hackathon was mainly about their [gelbeseiten.de]"
+            }
+          ]
+        },
+        {
+          "text": "Presented at a directory-media industry meetup",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "industry meetup"
+            },
+            {
+              "field": "longDescription",
+              "quote": "Verband deutscher Auskunfts- und Verzeichnismedien"
+            }
+          ]
+        },
+        {
+          "text": "Data-quality concepts remain confidential",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "concepts for improving data quality that are now confidential"
+            }
+          ]
+        },
+        {
+          "text": "Platform UX formed part of the search and discovery challenge",
+          "evidence": [
+            {
+              "field": "technologies",
+              "quote": "Platform UX"
+            },
+            {
+              "field": "technologies",
+              "quote": "Search"
+            }
+          ]
+        },
+        {
+          "text": "Concepts were presented alongside an industry-facing final ceremony",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "The final presentations and award ceremony took place"
+            }
+          ]
+        }
+      ]
+    },
+    "zero-one-hack-supercompute-industrial-2026": {
+      "overview": [
+        {
+          "text": "Synthetic semiconductor fabrication sequences as input",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "synthetic semiconductor fabrication process-sequence data"
+            }
+          ]
+        },
+        {
+          "text": "Trained and benchmarked models on Leonardo HPC",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "trained and benchmarked models on the Leonardo supercomputer"
+            }
+          ]
+        },
+        {
+          "text": "Predicted the next step in a fabrication sequence",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "next-step prediction"
+            }
+          ]
+        },
+        {
+          "text": "Infineon supplied the industrial challenge",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "Industrial track provided by [Infineon Technologies]"
+            }
+          ]
+        },
+        {
+          "text": "Combined sequence modelling, anomaly detection and supercomputing",
+          "evidence": [
+            {
+              "field": "technologies",
+              "quote": "Sequence Modeling"
+            },
+            {
+              "field": "technologies",
+              "quote": "Anomaly Detection"
+            },
+            {
+              "field": "technologies",
+              "quote": "Supercomputing"
+            }
+          ]
+        }
+      ],
+      "details": [
+        {
+          "text": "Completed missing steps in process sequences",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "sequence completion"
+            }
+          ]
+        },
+        {
+          "text": "Detected anomalies in fabrication-sequence data",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "anomaly detection"
+            }
+          ]
+        },
+        {
+          "text": "36-hour sprint of debugging and model training",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "After 36 hours of late nights, debugging, model training"
+            }
+          ]
+        },
+        {
+          "text": "Worked at the AI Factory Austria coworking hub in Vienna",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "[AI Factory Austria AI:AT]"
+            },
+            {
+              "field": "longDescription",
+              "quote": "Coworking Hub in Vienna"
+            }
+          ]
+        },
+        {
+          "text": "Four-person team with Morgan, Ariunzaya and Cristian",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "[Morgan Nihlmar]"
+            },
+            {
+              "field": "longDescription",
+              "quote": "[Ariunzaya Odontugs]"
+            },
+            {
+              "field": "longDescription",
+              "quote": "[Cristian Vortolomei]"
+            }
+          ]
+        },
+        {
+          "text": "The sprint included late-night debugging and sleeping at the venue",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "late nights, debugging, model training, and sleeping on the hard floors of the venue"
+            }
+          ]
+        }
+      ]
+    },
+    "huawei-tech-arena-finland-2025": {
+      "overview": [
+        {
+          "text": "Used Gralobe, my open-source globe component",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "an open-source library I developed"
+            },
+            {
+              "field": "longDescription",
+              "quote": "Gralobe is a globe component"
+            }
+          ]
+        },
+        {
+          "text": "Seamless transitions between 2D and 3D map views",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "seamless transitions between 2D and 3D views"
+            }
+          ]
+        },
+        {
+          "text": "Dynamic visualisation of global data for the web",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "visualize global data dynamically"
+            }
+          ]
+        },
+        {
+          "text": "Developed the globe library for map enthusiasts building web applications",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "designed to be a central tool for map enthusiasts in the web development space"
+            }
+          ]
+        }
+      ],
+      "details": [
+        {
+          "text": "React and TypeScript component stack",
+          "evidence": [
+            {
+              "field": "technologies",
+              "quote": "React"
+            },
+            {
+              "field": "technologies",
+              "quote": "TypeScript"
+            }
+          ]
+        },
+        {
+          "text": "Three.js and WebGL for 3D rendering",
+          "evidence": [
+            {
+              "field": "technologies",
+              "quote": "Three.js"
+            },
+            {
+              "field": "technologies",
+              "quote": "WebGL"
+            }
+          ]
+        },
+        {
+          "text": "Source repository and Gralobe demonstration link",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "[Gralobe](https://github.com/batikanor/gralobe)"
+            },
+            {
+              "field": "longDescription",
+              "quote": "https://gralobe.vercel.app/"
+            }
+          ]
+        },
+        {
+          "text": "The repository continues to evolve beyond the competition snapshot",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "The Gralobe repository is constantly changing"
+            }
+          ]
+        }
+      ]
+    },
+    "real-coin-map-2025": {
+      "overview": [
+        {
+          "text": "Visualised the average appearance of coins by mint",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "visualizing the average look of coins from certain mints"
+            }
+          ]
+        },
+        {
+          "text": "Located ancient coins and mints on a map",
+          "evidence": [
+            {
+              "field": "shortDescription",
+              "quote": "a dashboard visualizing ancient coins and mints"
+            },
+            {
+              "field": "longDescription",
+              "quote": "finding locations on a beautiful map"
+            }
+          ]
+        },
+        {
+          "text": "Applied AI, embeddings and LLMs to numismatic problems",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "AI, Embeddings, and LLMs to address numismatics and archeology problems"
+            }
+          ]
+        },
+        {
+          "text": "Also explored archaeological applications for AI-assisted analysis",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "address numismatics and archeology problems"
+            }
+          ]
+        }
+      ],
+      "details": [
+        {
+          "text": "Combined numismatic and geospatial data in a dashboard",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "state-of-the-art technology dashboard"
+            },
+            {
+              "field": "technologies",
+              "quote": "Numismatics"
+            },
+            {
+              "field": "technologies",
+              "quote": "Geospatial Data"
+            }
+          ]
+        },
+        {
+          "text": "Built a proof of concept for academic or industrial use",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "business cases for its realisation in academic or industrial contexts"
+            }
+          ]
+        },
+        {
+          "text": "Python supported the technical stack",
+          "evidence": [
+            {
+              "field": "technologies",
+              "quote": "Python"
+            }
+          ]
+        }
+      ]
+    },
+    "ethrome-2025": {
+      "overview": [
+        {
+          "text": "Pooled gift funds while hiding individual contributions",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "pool a gift amount, and let the recipient choose their own gifts while hiding individual contributions"
+            }
+          ]
+        },
+        {
+          "text": "Recipients chose their own gifts from the shared pool",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "let the recipient choose their own gifts"
+            }
+          ]
+        },
+        {
+          "text": "Used Web3 privacy tools and smart contracts",
+          "evidence": [
+            {
+              "field": "technologies",
+              "quote": "Privacy Tech"
+            },
+            {
+              "field": "technologies",
+              "quote": "Web3"
+            },
+            {
+              "field": "technologies",
+              "quote": "Smart Contracts"
+            }
+          ]
+        },
+        {
+          "text": "The name SecSanta combines the ideas of secure and secret gifting",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "SecSanta stands for 'secure' and/or 'secret' Santa."
+            }
+          ]
+        },
+        {
+          "text": "Solidity supported the smart-contract side of the privacy prototype",
+          "evidence": [
+            {
+              "field": "technologies",
+              "quote": "Solidity"
+            },
+            {
+              "field": "technologies",
+              "quote": "Smart Contracts"
+            }
+          ]
+        }
+      ],
+      "details": [
+        {
+          "text": "Built against ENS, IExec and Zama sponsor testnets",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "targeting sponsors ENS, IExec, and Zama"
+            },
+            {
+              "field": "longDescription",
+              "quote": "The app used the testnets of bounty sponsors"
+            }
+          ]
+        },
+        {
+          "text": "Proof of concept; not a mainnet deployment",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "it's unlikely to be deployed on mainnet anytime soon"
+            }
+          ]
+        },
+        {
+          "text": "Open-source code available on GitHub",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "The project is open source and the code is available on GitHub."
+            }
+          ]
+        },
+        {
+          "text": "Built for the privacy track rather than a conventional gifting checkout",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "submitted for the privacy track"
+            }
+          ]
+        },
+        {
+          "text": "The event connected us with Web3 builders in Rome",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "meet the builder space in Rome and make new Web3 friends"
+            }
+          ]
+        },
+        {
+          "text": "Further work and eventual deployment remained possible future directions",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "maybe we might work on it further and eventually deploy it"
+            }
+          ]
+        }
+      ]
+    },
+    "nasa-space-apps-zurich-2025": {
+      "overview": [
+        {
+          "text": "Helped teams use satellite and geography-based APIs",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "using satellite and geography-based APIs"
+            }
+          ]
+        },
+        {
+          "text": "Shared AI methods for space and Earth-science challenges",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "AI methods"
+            },
+            {
+              "field": "longDescription",
+              "quote": "teams tackling real-world space and earth science challenges"
+            }
+          ]
+        }
+      ],
+      "details": [
+        {
+          "text": "Advised participants on product-market fit",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "product-market fit matters"
+            }
+          ]
+        },
+        {
+          "text": "Shared lessons from comparable hackathon competitions",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "knowledge and experience in winning comparable competitions"
+            }
+          ]
+        }
+      ]
+    },
+    "sui-hackathon-poland-2025": {
+      "overview": [
+        {
+          "text": "Word-joining dApp built with my first Move smart contract",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "wrote my first Move smart contract, and built a word-joining dApp"
+            }
+          ]
+        },
+        {
+          "text": "Compose words, then mint them with a chosen image",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "mint the words you compose and put whatever image you want on them"
+            }
+          ]
+        },
+        {
+          "text": "Built solo while learning Sui and Move from scratch",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "I knew nothing about Sui or the Move language"
+            },
+            {
+              "field": "longDescription",
+              "quote": "I hacked solo"
+            }
+          ]
+        },
+        {
+          "text": "Joined after the event had started, without a prior application",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "It had already started that morning, I hadn't applied"
+            }
+          ]
+        },
+        {
+          "text": "Asked in the Telegram group to join late on Saturday",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "jumped into their Telegram group, and asked if I could join late on Saturday"
+            }
+          ]
+        },
+        {
+          "text": "Beginner questions were supported by the Sui team",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "endlessly patient with my beginner questions"
+            }
+          ]
+        },
+        {
+          "text": "ReactJS formed the application interface alongside Sui and Move",
+          "evidence": [
+            {
+              "field": "technologies",
+              "quote": "ReactJS"
+            },
+            {
+              "field": "technologies",
+              "quote": "Sui"
+            },
+            {
+              "field": "technologies",
+              "quote": "Move"
+            }
+          ]
+        }
+      ],
+      "details": [
+        {
+          "text": "Slush wallet, OpenRouter endpoints and devnet faucet tokens",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "you should have a slush wallet, and use the openrouter endpoints"
+            },
+            {
+              "field": "longDescription",
+              "quote": "You need some devnet faucet tokens"
+            }
+          ]
+        },
+        {
+          "text": "Demo images were not stored on IPFS",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "I didn't bother with IPFS, since this was just a demo"
+            }
+          ]
+        },
+        {
+          "text": "Devnet minting may require periodic contract redeployment",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "NFT minting functionality will break around once a month, unless I re-deploy the Move contract"
+            }
+          ]
+        },
+        {
+          "text": "Word composition starts by selecting a word in the interface",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "Start playing by clicking on a word"
+            }
+          ]
+        },
+        {
+          "text": "The demonstration was deployed on Sui devnet, not a production network",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "You can check it out live on devnet"
+            }
+          ]
+        },
+        {
+          "text": "Travelled to the event on the Kulturbahn and joined a paper-cutting session",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "traditional \"Scherenschnitte\" paper-cutting session on the train"
+            },
+            {
+              "field": "longDescription",
+              "quote": "\"Kulturbahn\" to Wroclaw"
+            }
+          ]
+        },
+        {
+          "text": "Stayed overnight at the venue before an early coding session",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "they even let me sleep on-site"
+            },
+            {
+              "field": "longDescription",
+              "quote": "6 AM wake-up call"
+            },
+            {
+              "field": "longDescription",
+              "quote": "it was time to start coding"
+            }
+          ]
+        }
+      ]
+    },
+    "decarbon-days-climathon-2025": {
+      "overview": [
+        {
+          "text": "Reviewed pitches with academics and industry partners",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "professors from both universities and industry partners as the other jury"
+            }
+          ]
+        },
+        {
+          "text": "Valued feasible first steps beyond the hackathon",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "more realistic and feasible first steps"
+            }
+          ]
+        },
+        {
+          "text": "Discussed climate and energy with partners and politicians",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "partners and politicians who are knowledgeable and interested in climate and energy"
+            }
+          ]
+        },
+        {
+          "text": "Cross-border collaboration brought together BTU Cottbus and Zielona Gora",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "BTU Cottbus University (Germany) and Zielona Gora University (Poland)"
+            }
+          ]
+        },
+        {
+          "text": "The winning team showed openness to improving during the competition",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "their openness to improve themselves throughout the competition"
+            }
+          ]
+        }
+      ],
+      "details": [
+        {
+          "text": "Winning team's proposal: RL for factory energy management",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "winning team, which presented a Reinforcement Learning-based solution to optimize energy usage"
+            }
+          ]
+        },
+        {
+          "text": "Their solution proposed balancing loads across factory machines",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "balance loads across multiple machines in factories"
+            }
+          ]
+        },
+        {
+          "text": "Presented prizes after the jury deliberated on pitches",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "After we thoroughly considered all pitches, I handed the prizes to the winning team"
+            }
+          ]
+        },
+        {
+          "text": "zweihelden and Neela-Medea Löder helped make the climathon possible",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "Thank you to zweihelden gmbh for making this possible."
+            },
+            {
+              "field": "longDescription",
+              "quote": "A special thank you to Neela-Medea Löder for her efforts in realizing the climathon."
+            }
+          ]
+        }
+      ]
+    },
+    "music-ai-osaka-2025": {
+      "overview": [
+        {
+          "text": "MX Ink pen position controls an audio equalizer",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "We designed the pen to function as an equalizer."
+            },
+            {
+              "field": "longDescription",
+              "quote": "Logitech's VR-pen, the MX Ink"
+            }
+          ]
+        },
+        {
+          "text": "Frequency bands map to the x, y or z motion axes",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "You map frequency bands to one of the x, y, or z axes"
+            }
+          ]
+        },
+        {
+          "text": "Spatial movements change the music in real time",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "move the pen around to hear the music change in real-time"
+            }
+          ]
+        },
+        {
+          "text": "Infrared emitters on the pen enable precise 3D tracking",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "The VR-pen features multiple infrared emitters, enabling precise 3D tracking"
+            }
+          ]
+        },
+        {
+          "text": "GPS and simple vision tracking were too imprecise for the intended musical control",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "We couldn't rely on GPS or simple computer vision tracking for this project"
+            },
+            {
+              "field": "longDescription",
+              "quote": "lack the precision required for applications like orchestral conducting or professional DJing"
+            }
+          ]
+        },
+        {
+          "text": "Pen synchronisation establishes the spatial reference point",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "establishing the reference point (0,0,0), which we address through VR pen synchronization"
+            }
+          ]
+        },
+        {
+          "text": "The prototype let fellow participants try the system at a demo station",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "let fellow participants interact with the system at a demo station we set up"
+            }
+          ]
+        },
+        {
+          "text": "Two backends and one frontend passed location data to configurable music controls",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "We implemented two 'backends' and one 'frontend'"
+            },
+            {
+              "field": "longDescription",
+              "quote": "location data flowed correctly to the source application where musical parameters could be configured"
+            }
+          ]
+        },
+        {
+          "text": "Open-source code invites further experiments with the pen",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "Our project is open source"
+            }
+          ]
+        }
+      ],
+      "details": [
+        {
+          "text": "Quest tracking needs the pen within the headset view",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "the pen's tracking depends on remaining within the Quest headset's field of vision"
+            }
+          ]
+        },
+        {
+          "text": "Interface plots the pen trajectory alongside band controls",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "a real-time plot showing the pen's trajectory in 3D space"
+            },
+            {
+              "field": "longDescription",
+              "quote": "On the right side, you see the equalizer with frequency bands"
+            }
+          ]
+        },
+        {
+          "text": "Position felt more natural than velocity or acceleration",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "Position matters: pen up, orchestra up."
+            },
+            {
+              "field": "longDescription",
+              "quote": "using pen velocity (direct, 10ms, 100ms averages) and even acceleration"
+            },
+            {
+              "field": "longDescription",
+              "quote": "concluded this felt unnatural for conductors"
+            }
+          ]
+        },
+        {
+          "text": "The trajectory plot uses a user-selected time window, such as the last two seconds",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "a user-defined time period (e.g., last 2 seconds)"
+            }
+          ]
+        },
+        {
+          "text": "A track selector switches between individual musical sources",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "a 'click me' button for selecting specific tracks"
+            }
+          ]
+        },
+        {
+          "text": "Negative drumbeat equalizer values disable that track",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "where values <0 disable the drumbeat"
+            }
+          ]
+        },
+        {
+          "text": "The demo mapped x to drums and y/z to frequency bands of a Mozart piece",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "mapped the x-dimension to a drumbeat and the z and y dimensions to some frequency bands for a Mozart piece"
+            }
+          ]
+        },
+        {
+          "text": "Velocity and acceleration were tested directly and with 10/100 ms averages",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "using pen velocity (direct, 10ms, 100ms averages) and even acceleration (direct, 10ms, 100ms averages)"
+            }
+          ]
+        },
+        {
+          "text": "Seamless reference-point recalibration was not completed in the proof of concept",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "we didn't advance our PoC enough to enable seamless reference point recalibration"
+            }
+          ]
+        }
+      ]
+    },
+    "european-defense-tech-2025-munich": {
+      "overview": [
+        {
+          "text": "Combined an existing radar with drone-detection AI",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "My teammate Emil had already built the radar system"
+            },
+            {
+              "field": "longDescription",
+              "quote": "provide the AI implementation to enable the detection and classification of drones"
+            }
+          ]
+        },
+        {
+          "text": "Helped bring the hardware into the demo setting",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "help get the system running in our demo setting"
+            }
+          ]
+        },
+        {
+          "text": "Implemented AI for drone detection and classification",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "provide the AI implementation to enable the detection and classification of drones"
+            }
+          ]
+        },
+        {
+          "text": "The design aimed to reduce the cost of the radar software-hardware bundle",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "radar system that doesn't cost hundreds of thousands of dollars"
+            }
+          ]
+        },
+        {
+          "text": "Python supported the AI implementation",
+          "evidence": [
+            {
+              "field": "technologies",
+              "quote": "Python"
+            },
+            {
+              "field": "technologies",
+              "quote": "AI"
+            }
+          ]
+        }
+      ],
+      "details": [
+        {
+          "text": "Concept paired radar sensing with an interceptor drone",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "guide the neutralization of a Shaheed drone using an interceptor drone"
+            }
+          ]
+        },
+        {
+          "text": "Pitch led to contacts in the defence sector",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "I made a very impressive pitch, after which I was contacted by multiple people"
+            },
+            {
+              "field": "longDescription",
+              "quote": "Ukrainian Ministry of Defense and Ukrainian/European defense companies"
+            }
+          ]
+        },
+        {
+          "text": "Technical details remain confidential",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "Due to the confidential nature of the sector, I cannot share any more details."
+            }
+          ]
+        },
+        {
+          "text": "Emil owned the existing radar hardware and continued the project afterward",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "My teammate Emil had already built the radar system"
+            },
+            {
+              "field": "longDescription",
+              "quote": "Emil is more focused on the project in the long run"
+            },
+            {
+              "field": "longDescription",
+              "quote": "continue the work"
+            }
+          ]
+        },
+        {
+          "text": "Further project enquiries are directed to Emil through the linked post",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "Contact him if you are interested in getting more information regarding the project."
+            }
+          ]
+        }
+      ]
+    },
+    "tech-berlin-ai-hackathon-2": {
+      "overview": [
+        {
+          "text": "GraphRAG connects political events to portfolio exposure",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "how political events like elections or law changes might affect your portfolio"
+            },
+            {
+              "field": "longDescription",
+              "quote": "GraphRAG solution"
+            }
+          ]
+        },
+        {
+          "text": "Knowledge graphs and LLMs explain economic consequences",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "leveraging a knowledge graph and an LLM to reason about the consequences"
+            }
+          ]
+        },
+        {
+          "text": "Compared new scenarios with similar historical cases",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "comparing them to previous cases with similar characteristics"
+            }
+          ]
+        },
+        {
+          "text": "Inputs included political events such as elections and changes in law",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "political events like elections or law changes"
+            }
+          ]
+        },
+        {
+          "text": "The SaaS vision included integration with brokers such as Scalable Capital",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "The vision of the SaaS platform, integrated with common brokers like Scalable Capital"
+            }
+          ]
+        },
+        {
+          "text": "Interactive explanations made political-economic causalities easier to explore",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "easily explained and interactive information"
+            },
+            {
+              "field": "longDescription",
+              "quote": "simplifying complex political and economic causalities"
+            }
+          ]
+        }
+      ],
+      "details": [
+        {
+          "text": "Used Mistral AI, OpenAI and Neo4j",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "using Mistral AI, OpenAI, and Neo4j"
+            }
+          ]
+        },
+        {
+          "text": "Nuxt.js interface supports interactive what-if questions",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "Nuxt.js platform that allows you to interact with future scenarios by prompting how 'x' might affect 'y'"
+            }
+          ]
+        },
+        {
+          "text": "Aimed to flag portfolio risks and opportunities",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "provide real-time warnings or opportunity reports"
+            }
+          ]
+        },
+        {
+          "text": "Example what-if scenario: the long-run economic effect of France leaving the EU",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "how France leaving the EU would affect its economy in the long run"
+            }
+          ]
+        },
+        {
+          "text": "Python and FastAPI were part of the backend stack",
+          "evidence": [
+            {
+              "field": "technologies",
+              "quote": "Python"
+            },
+            {
+              "field": "technologies",
+              "quote": "FastAPI"
+            }
+          ]
+        },
+        {
+          "text": "Similar historical cases informed projected consequences for financial markets",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "it could project similar outcomes"
+            },
+            {
+              "field": "longDescription",
+              "quote": "By comparing them to previous cases with similar characteristics"
+            }
+          ]
+        }
+      ]
+    },
+    "huawei-agorize-2024": {
+      "overview": [
+        {
+          "text": "Used multi-view pinna images as the model input",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "based on multi-view pinna images"
+            }
+          ]
+        },
+        {
+          "text": "Estimated listener-specific head-related transfer functions",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "precise individual HRTFs (head related transfer functions)"
+            }
+          ]
+        },
+        {
+          "text": "Related spatial-audio estimates to listener anatomy",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "associated with the listener's anthropometric data"
+            }
+          ]
+        },
+        {
+          "text": "The team brought together Turkish-German University alumni",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "we all did our bachelor's at the Turkish-German University in Istanbul"
+            }
+          ]
+        }
+      ],
+      "details": [
+        {
+          "text": "Compared solutions through an accuracy-score leaderboard",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "Winner teams were determined through a leaderboard of accuracy scores"
+            }
+          ]
+        },
+        {
+          "text": "Machine learning supported the HRTF estimation task",
+          "evidence": [
+            {
+              "field": "technologies",
+              "quote": "Machine Learning"
+            }
+          ]
+        },
+        {
+          "text": "Method details documented in the attached slides",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "check out the slides attached below"
+            }
+          ]
+        },
+        {
+          "text": "Collaborated with Fırat Fuat Olcay and Serdar Pehlivan",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "our team (Fırat Fuat Olcay, Serdar Pehlivan & me)"
+            }
+          ]
+        }
+      ]
+    },
+    "masters-thesis": {
+      "overview": [
+        {
+          "text": "Trained one offline-RL policy for unseen environment dynamics",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "training a single robust policy that generalizes effectively across environments with unseen dynamics"
+            }
+          ]
+        },
+        {
+          "text": "TEA adds latent dynamics representations to the state space",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "Trajectory Encoding Augmentation (TEA), which extends the state space by integrating latent representations of environmental dynamics"
+            }
+          ]
+        },
+        {
+          "text": "Sequence encoders capture environment-specific characteristics",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "obtained from sequence encoders, such as AutoEncoders"
+            },
+            {
+              "field": "longDescription",
+              "quote": "TEA captures critical, environment-specific characteristics"
+            }
+          ]
+        },
+        {
+          "text": "Autoencoders were examples of sequence encoders for the dynamics representation",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "sequence encoders, such as AutoEncoders"
+            }
+          ]
+        }
+      ],
+      "details": [
+        {
+          "text": "Used encodings to improve transfer to new dynamics",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "incorporating these encodings with TEA improves the transferability of a single policy"
+            }
+          ]
+        },
+        {
+          "text": "Compared against policies using unmodified states",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "surpassing methods that rely solely on unmodified states"
+            }
+          ]
+        }
+      ]
+    },
+    "lauzhack-2024": {
+      "overview": [
+        {
+          "text": "VR classroom pairs an MX Ink pen with Muse 2 EEG",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "Logitech MX Ink VR pen and a Muse 2 EEG headband"
+            }
+          ]
+        },
+        {
+          "text": "Falling focus triggers simulated handwriting degradation",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "if a decline is detected, simulated handwriting degradation occurs"
+            }
+          ]
+        },
+        {
+          "text": "Virtual exam papers align with the physical desk",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "virtual papers aligned to the physical desk"
+            }
+          ]
+        },
+        {
+          "text": "The immersive VR environment replicates a real classroom",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "The VR environment replicates a real classroom"
+            }
+          ]
+        },
+        {
+          "text": "Built with C# and Unity for the VR environment",
+          "evidence": [
+            {
+              "field": "technologies",
+              "quote": "C#"
+            },
+            {
+              "field": "technologies",
+              "quote": "Unity"
+            },
+            {
+              "field": "technologies",
+              "quote": "VR"
+            }
+          ]
+        },
+        {
+          "text": "Handwriting feedback encourages students to recover focus when concentration drops",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "encouraging the student to maintain concentration"
+            }
+          ]
+        }
+      ],
+      "details": [
+        {
+          "text": "Teachers edit questions live through Google Docs",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "Teachers can input or modify questions in real-time via a Google Docs document"
+            }
+          ]
+        },
+        {
+          "text": "Question updates appear instantly in the VR classroom",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "which updates instantly in the VR space"
+            }
+          ]
+        },
+        {
+          "text": "Designed to train calm, attentive exam behaviour",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "train students to remain calm and attentive under exam conditions"
+            }
+          ]
+        },
+        {
+          "text": "Teacher-student interaction supports tasks such as live math problem-solving",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "facilitating tasks such as math problem-solving"
+            }
+          ]
+        },
+        {
+          "text": "Meta Quest 3 was part of the spatial-computing setup",
+          "evidence": [
+            {
+              "field": "technologies",
+              "quote": "Meta Quest 3"
+            },
+            {
+              "field": "technologies",
+              "quote": "VR"
+            }
+          ]
+        },
+        {
+          "text": "Better resilience under exam pressure was a goal, not a claimed longitudinal result",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "We believe that regular use of 'MX Focus' can help students develop resilience"
+            },
+            {
+              "field": "longDescription",
+              "quote": "improve performance in high-pressure academic settings"
+            }
+          ]
+        }
+      ]
+    },
+    "salzburg-tourism-2024": {
+      "overview": [
+        {
+          "text": "Muse 2 records EEG while visitors view hobby-related images",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "You use a Muse 2 headband (see link 1) to collect EEG data from your visitor."
+            },
+            {
+              "field": "longDescription",
+              "quote": "the visitor is viewing semi-abstract images related to potential hobbies"
+            }
+          ]
+        },
+        {
+          "text": "Extracted concentration and emotion features per image",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "extracting simple features from the collected EEG data, such as how concentrated the visitor is in every brief moment, and how strong their emotions are"
+            },
+            {
+              "field": "longDescription",
+              "quote": "keeping track of these for the brief moments (1 sec) each image is shown"
+            }
+          ]
+        },
+        {
+          "text": "EEG features and neural networks estimate Big Five traits",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "raw EEG data passed through neural networks, we extract the 'big 5 personality traits'"
+            }
+          ]
+        },
+        {
+          "text": "Designed as an engaging tourism-marketing demonstration at a conference stand",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "Assume you are working for marketing of Austria to tourists"
+            },
+            {
+              "field": "longDescription",
+              "quote": "you are currently in a conference in Dubai"
+            },
+            {
+              "field": "longDescription",
+              "quote": "in your stand, with which you draw attention"
+            }
+          ]
+        },
+        {
+          "text": "Visual prompts use semi-abstract images related to potential hobbies",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "the visitor is viewing semi-abstract images related to potential hobbies"
+            }
+          ]
+        },
+        {
+          "text": "Each image is shown briefly, with features tracked for its one-second interval",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "brief moments (1 sec) each image is shown"
+            }
+          ]
+        },
+        {
+          "text": "Frontal alpha asymmetry is log(right_alpha) minus log(left_alpha)",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "frontal alpha asymmetry is calculated as: log(right_alpha) - log(left_alpha)"
+            }
+          ]
+        },
+        {
+          "text": "Raw EEG joins the extracted features as input to neural-network processing",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "data from step 2 and raw EEG data passed through neural networks"
+            }
+          ]
+        }
+      ],
+      "details": [
+        {
+          "text": "LLM uses the EEG features and personality estimates",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "We feed the data from steps 2 and 3 into an LLM"
+            }
+          ]
+        },
+        {
+          "text": "RAG retrieves destinations from Austrian travel datasets",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "fetch the recommended travel spot through RAG from aforementioned travel hotspots in austria datasets"
+            }
+          ]
+        },
+        {
+          "text": "Recommendations include an explanation from the LLM",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "The LLM also provides an explanation regarding the decision."
+            }
+          ]
+        },
+        {
+          "text": "This was the team's first EEG project, completed within a 24-hour event",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "This was the first time our team worked with EEG data, and we only had 24 hours"
+            }
+          ]
+        },
+        {
+          "text": "Klados and colleagues provided inspiration for the EEG approach",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "We've taken inspiration from Klados et al"
+            }
+          ]
+        },
+        {
+          "text": "Python and ReactJS supported the demonstration stack",
+          "evidence": [
+            {
+              "field": "technologies",
+              "quote": "Python"
+            },
+            {
+              "field": "technologies",
+              "quote": "ReactJS"
+            }
+          ]
+        },
+        {
+          "text": "The source repository stayed private at the request of team members",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "we private'd the repository due to the wishes of some of our team members"
+            }
+          ]
+        }
+      ]
+    },
+    "zurich-climathon-2024": {
+      "overview": [
+        {
+          "text": "Anonymous employee reviews of company sustainability",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "an anonymous platform to rate and review their companies' environmental and sustainability efforts"
+            }
+          ]
+        },
+        {
+          "text": "Survey questions structured around the SDGs",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "structuring survey questions around these objectives"
+            },
+            {
+              "field": "longDescription",
+              "quote": "Sustainable Development Goals (SDGs)"
+            }
+          ]
+        },
+        {
+          "text": "Designed for transparent employee-company dialogue",
+          "evidence": [
+            {
+              "field": "shortDescription",
+              "quote": "sustainability and climate-related discussions between employees and employers"
+            }
+          ]
+        },
+        {
+          "text": "GreenDoor was conceived as a Glassdoor-style platform for sustainability",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "GreenDoor operates as a \"Glassdoor for Sustainability,\""
+            }
+          ]
+        },
+        {
+          "text": "Employee feedback highlights both commitment and gaps in company practices",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "highlight their company's commitment—or lack thereof—to sustainable practices"
+            }
+          ]
+        },
+        {
+          "text": "Public transparency is intended to encourage companies to improve",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "encouraging companies to improve based on transparent feedback"
+            }
+          ]
+        },
+        {
+          "text": "Employees and potential hires can explore company sustainability commitments",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "inform potential employees"
+            }
+          ]
+        },
+        {
+          "text": "The platform aims to give companies insight into employee expectations",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "critical insights into employee expectations around sustainability"
+            }
+          ]
+        }
+      ],
+      "details": [
+        {
+          "text": "Planned bot detection and authentication for reliable data",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "advanced AI-based bot detection and authentication methods guarantee data reliability and user anonymity"
+            }
+          ]
+        },
+        {
+          "text": "Freemium plan combined public access with premium analytics",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "a freemium model, GreenDoor offers free public data access while monetizing through premium features"
+            },
+            {
+              "field": "longDescription",
+              "quote": "predictive analytics for companies"
+            }
+          ]
+        },
+        {
+          "text": "Roadmap starts with a Zurich pilot and initial data collection",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "launching the platform in Zurich, gathering initial data"
+            }
+          ]
+        },
+        {
+          "text": "Planned partnerships with certification bodies and industry-ranking organisations",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "we aim to partner with sustainability certification bodies and industry ranking organizations"
+            }
+          ]
+        },
+        {
+          "text": "Premium features could advertise sustainability-focused job opportunities",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "advertisement placements for sustainability-focused job positions"
+            }
+          ]
+        },
+        {
+          "text": "Analytics were intended to forecast progress toward company sustainability targets",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "predictive analytics for companies on meeting sustainability targets"
+            }
+          ]
+        },
+        {
+          "text": "Geographic expansion and added features depend on growing data and revenue",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "progressively expanding features and geographic reach as data volume and revenue grow"
+            }
+          ]
+        },
+        {
+          "text": "Community-driven transparency is the longer-term motivation",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "a community-driven approach to sustainable corporate transparency"
+            }
+          ]
+        }
+      ]
+    },
+    "bayer-ai-2024": {
+      "overview": [
+        {
+          "text": "Tested an AI platform built on Google Cloud",
+          "evidence": [
+            {
+              "field": "shortDescription",
+              "quote": "AI innovation platform built by Bayer based on Google Cloud Platform"
+            }
+          ]
+        },
+        {
+          "text": "Solved computer-vision and bioinformatics challenges",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "solving the great bioinformatics and computer vision related challenges"
+            }
+          ]
+        },
+        {
+          "text": "Discussed product capabilities with Bayer engineers",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "valuable discussions regarding the product and its capabilities"
+            }
+          ]
+        },
+        {
+          "text": "Worked directly with engineers who built and tested the platform",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "engineers from Bayer who've built and tested their AI Innovation Platform"
+            }
+          ]
+        }
+      ],
+      "details": [
+        {
+          "text": "Reported discovered bugs directly to the platform team",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "the bugs we've found on the app here, but we've reported them to the team"
+            }
+          ]
+        },
+        {
+          "text": "Kept bug details out of the public account",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "I don't think it'd be ethical for me to detail on the bugs we've found on the app here"
+            }
+          ]
+        },
+        {
+          "text": "Python supported the challenge work",
+          "evidence": [
+            {
+              "field": "technologies",
+              "quote": "Python"
+            }
+          ]
+        },
+        {
+          "text": "The event took place at Google's Munich office",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "The event was organised at Google's office in Munich."
+            }
+          ]
+        },
+        {
+          "text": "Testing and quality assurance complemented the computer-vision tasks",
+          "evidence": [
+            {
+              "field": "technologies",
+              "quote": "Test & Quality Assurance"
+            },
+            {
+              "field": "technologies",
+              "quote": "Computer Vision"
+            }
+          ]
+        }
+      ]
+    },
+    "dsag-ideathon-2024": {
+      "overview": [
+        {
+          "text": "Reinforcement learning analyses linked SAP transactions",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "reinforcement-learning based, multi-transaction supporting fraud detection system"
+            },
+            {
+              "field": "longDescription",
+              "quote": "transaction in an SAP system"
+            }
+          ]
+        },
+        {
+          "text": "Hierarchical PPO classifies transactions as fraud or not",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "Hierarchical Proximal Policy Optimization to tell if a transaction in an SAP system is fraud or not"
+            }
+          ]
+        },
+        {
+          "text": "Time-series graph data provides transaction context",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "time-series-graph data provided as context"
+            }
+          ]
+        },
+        {
+          "text": "Named the multi-transaction fraud-detection system HippoSAP",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "We called our system HippoSAP"
+            }
+          ]
+        }
+      ],
+      "details": [
+        {
+          "text": "Pitched the system to SAP users and partner companies",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "representatives from countless SAP user / partner companies"
+            }
+          ]
+        },
+        {
+          "text": "Discussed potential partnerships after the presentation",
+          "evidence": [
+            {
+              "field": "shortDescription",
+              "quote": "discussed partnership opportunities with many of them"
+            }
+          ]
+        },
+        {
+          "text": "Python supported the RL and SAP-integration stack",
+          "evidence": [
+            {
+              "field": "technologies",
+              "quote": "Python"
+            },
+            {
+              "field": "technologies",
+              "quote": "Reinforcement Learning"
+            },
+            {
+              "field": "technologies",
+              "quote": "SAP Integration"
+            }
+          ]
+        },
+        {
+          "text": "Presented to a conference audience of more than 6,000 SAP-sector participants",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "pitched it in front of 6000+ people"
+            }
+          ]
+        },
+        {
+          "text": "The setting was the German-speaking SAP user community's annual conference",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "DSAG Jahreskonferenz (German Speaking SAP Users Yearly Conference)"
+            }
+          ]
+        }
+      ]
+    },
+    "circular-bsh-2024": {
+      "overview": [
+        {
+          "text": "X-ray scans of containers filled with old appliances",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "Scanning containers full of old home appliances using X-Ray"
+            }
+          ]
+        },
+        {
+          "text": "Automatic unloading followed by sensor and vision checks",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "automatically unloading the containers, identifying appliances using sensors and computer vision"
+            }
+          ]
+        },
+        {
+          "text": "RL chooses how to recover value from each appliance",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "create best-possible value out of respective old appliances using reinforcement learning"
+            }
+          ]
+        },
+        {
+          "text": "The e-waste solution targeted B/S/H and other appliance-related businesses",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "improving the e-waste management process in B/S/H and other businesses"
+            }
+          ]
+        },
+        {
+          "text": "Python and YOLO were part of the appliance-analysis stack",
+          "evidence": [
+            {
+              "field": "technologies",
+              "quote": "Python"
+            },
+            {
+              "field": "technologies",
+              "quote": "YoLo"
+            }
+          ]
+        }
+      ],
+      "details": [
+        {
+          "text": "Built and demonstrated two functional physical prototypes",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "We created two functional physical prototypes and displayed them to the audience."
+            }
+          ]
+        },
+        {
+          "text": "Covered the e-waste process from scanning to value recovery",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "a holistic solution for improving the e-waste management process"
+            }
+          ]
+        },
+        {
+          "text": "Paired the prototype with a roadmap and business plan",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "We devised a realistic roadmap and business plan"
+            }
+          ]
+        },
+        {
+          "text": "Sensor readings and computer vision identify the appliances before value decisions",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "identifying appliances using sensors and computer vision"
+            }
+          ]
+        },
+        {
+          "text": "The slide deck documents the roadmap and business case in more detail",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "See the slide deck for more details."
+            }
+          ]
+        }
+      ]
+    },
+    "thuega-2024": {
+      "overview": [
+        {
+          "text": "Use forecasts to distribute load across battery, PV and grid",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "distributing the load across battery, PV, and grid using forecasted data"
+            }
+          ]
+        },
+        {
+          "text": "Optimise household energy costs under realistic constraints",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "minimising the energy cost"
+            },
+            {
+              "field": "longDescription",
+              "quote": "under reasonable constraints"
+            }
+          ]
+        },
+        {
+          "text": "Second optimisation targets landlord electricity sales",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "help the landlord increase their profits when selling electricity to the tenants"
+            }
+          ]
+        },
+        {
+          "text": "Addressed energy management for both single- and multiple-family households",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "single & multiple family households"
+            }
+          ]
+        },
+        {
+          "text": "Provided utility functions for tenants as well as landlords",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "provide the tenants and landlord(s) with utility functions"
+            }
+          ]
+        },
+        {
+          "text": "Industry experts supplied real or realistic challenge data",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "real and/or realistic data to work with from industry experts"
+            }
+          ]
+        },
+        {
+          "text": "The prototype separated two mathematical optimisation problems",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "we formulated 2 mathematical optimization problems"
+            }
+          ]
+        },
+        {
+          "text": "The energy-management solution was called Bright Grid",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "our solution called \"Bright Grid\""
+            }
+          ]
+        }
+      ],
+      "details": [
+        {
+          "text": "Interior-point optimisation with Moirai and neural forecasts",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "We mainly used interior-point methods for optimization"
+            },
+            {
+              "field": "longDescription",
+              "quote": "Moirai (universal multivariate time series forecasting), conventional neural networks"
+            }
+          ]
+        },
+        {
+          "text": "Mixed real and mocked data for the forecasting experiments",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "Our forecasts were made through both real and mocked data"
+            }
+          ]
+        },
+        {
+          "text": "My work: full stack, cloud deployment and forecasting",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "My role in the team was full stack development, cloud deployment, and universal forecasting experimentation."
+            }
+          ]
+        },
+        {
+          "text": "Moirai was used for universal multivariate time-series forecasting",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "Moirai (universal multivariate time series forecasting)"
+            }
+          ]
+        },
+        {
+          "text": "Interior-point methods were sufficient for the proof of concept",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "for we found them to be sufficient for PoC"
+            }
+          ]
+        },
+        {
+          "text": "A later move to ADMM was considered, not implemented in the account",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "We considered a later switch to ADMM."
+            }
+          ]
+        },
+        {
+          "text": "Deployed frontend and backend as separate Azure containers",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "We deployed on azure in two separate containers (BE, FE)."
+            }
+          ]
+        },
+        {
+          "text": "ReactJS and Flask formed the frontend/backend application stack",
+          "evidence": [
+            {
+              "field": "technologies",
+              "quote": "ReactJS"
+            },
+            {
+              "field": "technologies",
+              "quote": "Python Flask"
+            }
+          ]
+        }
+      ]
+    },
+    "solana-ideathon-2024": {
+      "overview": [
+        {
+          "text": "Concept accepts bets written in natural language",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "The system would also accept natural text bets"
+            }
+          ]
+        },
+        {
+          "text": "Peer-style bets challenge the usual house advantage",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "enable \"pinky-betting\" style bets where \"the house always wins\" principle can be challenged"
+            }
+          ]
+        },
+        {
+          "text": "Designed a microbetting concept on the Solana network",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "We prepared a microbetting solution that works on Solana."
+            }
+          ]
+        }
+      ],
+      "details": [
+        {
+          "text": "Proposed whale-funded AIs seek bets for liquidity pools",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "Liquidity pools can also be created through whale-funded AIs that are searching for newly opened bets that fulfil certain conditions."
+            }
+          ]
+        },
+        {
+          "text": "Decentralised oracles could orchestrate bet settlement",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "Closing of bets could be orchestrated through decentralised Oracles."
+            }
+          ]
+        },
+        {
+          "text": "Proposed liquidity search targets newly opened bets meeting chosen conditions",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "newly opened bets that fulfil certain conditions"
+            }
+          ]
+        }
+      ]
+    },
+    "six-swisshacks-2024": {
+      "overview": [
+        {
+          "text": "AI assesses sustainability frameworks and calculates KPIs",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "AI-driven framework assessments, KPI calculations"
+            }
+          ]
+        },
+        {
+          "text": "Peer analytics benchmarks company sustainability data",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "AI models for KPI suggestions and peer benchmark analytics"
+            }
+          ]
+        },
+        {
+          "text": "ChromaDB supports retrieval-augmented generation",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "ChromaDB for Retrieval-Augmented Generation (RAG)"
+            }
+          ]
+        },
+        {
+          "text": "The platform was called BizzWizz",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "developing BizzWizz"
+            }
+          ]
+        },
+        {
+          "text": "KPI suggestions complemented framework assessment and calculation",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "AI models for KPI suggestions"
+            }
+          ]
+        },
+        {
+          "text": "Market tools sat alongside peer analytics and compliance guidance",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "market tools, and peer analytics"
+            }
+          ]
+        },
+        {
+          "text": "Backend infrastructure was designed to handle large volumes of reporting data",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "scalable infrastructure to handle vast amounts of data"
+            }
+          ]
+        }
+      ],
+      "details": [
+        {
+          "text": "React web application with a Flask backend",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "React for the web app and Flask for the backend"
+            }
+          ]
+        },
+        {
+          "text": "My role: backend infrastructure and AI implementation",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "My role as the Back-End Developer included constructing the scalable infrastructure"
+            },
+            {
+              "field": "longDescription",
+              "quote": "implementing the AI models"
+            }
+          ]
+        },
+        {
+          "text": "Designed to help companies navigate sustainability compliance",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "navigate the complexities of sustainability compliance"
+            }
+          ]
+        },
+        {
+          "text": "LLMs were integrated with the application backend",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "integrated with llm(s)"
+            }
+          ]
+        },
+        {
+          "text": "The concept was also presented to VCs and at the PointZero forum",
+          "evidence": [
+            {
+              "field": "shortDescription",
+              "quote": "Also presented in front of VC & on PointZero forum."
+            }
+          ]
+        },
+        {
+          "text": "Company-building discussions followed with Swiss Exchange business developers",
+          "evidence": [
+            {
+              "field": "shortDescription",
+              "quote": "Talks ongoing with Swiss Exchange business developers regarding turning this idea into a company."
+            }
+          ]
+        },
+        {
+          "text": "The event was organised through the Swiss Financial Innovation Desk",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "Swiss Financial Innovation Desk (FIND)"
+            }
+          ]
+        }
+      ]
+    },
+    "hackupc-2024": {
+      "overview": [
+        {
+          "text": "Embedded user interests and city descriptions",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "embeddings of user interests and city descriptions"
+            }
+          ]
+        },
+        {
+          "text": "InterSystems IRIS Vector Search powers the travel assistant",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "InterSystems IRIS Vector Search"
+            }
+          ]
+        },
+        {
+          "text": "Suggested alternative flight routes from those embeddings",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "suggest alternative flight routes"
+            }
+          ]
+        },
+        {
+          "text": "The sponsor challenge centred on generative AI with IRIS Vector Search",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "Best use of GenAI using InterSystems IRIS Vector Search"
+            }
+          ]
+        }
+      ],
+      "details": [
+        {
+          "text": "Matched similar-interest travellers to the same flight",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "Users with similar interests might be recommended to take the same flight"
+            }
+          ]
+        },
+        {
+          "text": "Suggested cities likely to interest each traveller",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "flights to cities that they are likely to find interesting"
+            }
+          ]
+        },
+        {
+          "text": "My role: full-stack development and presentation",
+          "evidence": [
+            {
+              "field": "shortDescription",
+              "quote": "Role: Fullstack Dev., Presenter"
+            }
+          ]
+        },
+        {
+          "text": "ReactJS and Flask supported the travel-planning application",
+          "evidence": [
+            {
+              "field": "technologies",
+              "quote": "ReactJS"
+            },
+            {
+              "field": "technologies",
+              "quote": "Python Flask"
+            }
+          ]
+        },
+        {
+          "text": "The final presentation was improvised during the event",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "We improvised our presentation"
+            }
+          ]
+        }
+      ]
+    },
+    "mdsi-bundesliga-2024": {
+      "overview": [
+        {
+          "text": "Rendered live-match players as spheres in a 3D view",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "3D Visualisation app of football players as spheres during a live match"
+            }
+          ]
+        },
+        {
+          "text": "Clustered players into offensive and defensive lines",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "clustering the players in lines"
+            },
+            {
+              "field": "longDescription",
+              "quote": "lines (offensive/defensive)"
+            }
+          ]
+        },
+        {
+          "text": "Detected and counted breaks through those lines",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "determining when lines (offensive/defensive) have been broken"
+            },
+            {
+              "field": "longDescription",
+              "quote": "counting line breaks"
+            }
+          ]
+        },
+        {
+          "text": "The analysis considered upcoming line breaks, not only past counts",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "predicting when line breaks are expected to come"
+            }
+          ]
+        },
+        {
+          "text": "The aim was to use line-break information to evaluate game performance",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "how this information can be used to evaluate game performance"
+            }
+          ]
+        }
+      ],
+      "details": [
+        {
+          "text": "Predictive analysis with XGBoost and Random Forest",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "XGBoost, Random Forest, Shapley"
+            },
+            {
+              "field": "longDescription",
+              "quote": "further predictive analysis"
+            }
+          ]
+        },
+        {
+          "text": "Configurable interface for exploring line-break behaviour",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "providing an intuitive UI for configuration"
+            }
+          ]
+        },
+        {
+          "text": "Code and further details restricted by confidentiality",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "we cannot share some other details due to the confidentiality clause"
+            }
+          ]
+        },
+        {
+          "text": "Shapley-based analysis was among the explored data-mining methods",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "XGBoost, Random Forest, Shapley"
+            }
+          ]
+        },
+        {
+          "text": "ThreeJS rendered the football view; ReactJS and Flask supported the app",
+          "evidence": [
+            {
+              "field": "technologies",
+              "quote": "ThreeJS"
+            },
+            {
+              "field": "technologies",
+              "quote": "ReactJS"
+            },
+            {
+              "field": "technologies",
+              "quote": "Python Flask"
+            }
+          ]
+        },
+        {
+          "text": "Work ran on a confidential cluster that is no longer accessible to the team",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "special confidential cluster to which we don't have access anymore"
+            }
+          ]
+        }
+      ]
+    },
+    "draeger-2023": {
+      "overview": [
+        {
+          "text": "VitalDB patient-sensor readings as the training input",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "Using the VitalDB dataset where there is a great count of sensor readings of thousands of patients"
+            }
+          ]
+        },
+        {
+          "text": "Forecast shock at 30-second, 2.5-minute and 5-minute horizons",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "predict whether there'll be a 'shock' in the coming 30 seconds / 2.5 minutes / 5 minutes"
+            }
+          ]
+        },
+        {
+          "text": "Shock index calculated as heart rate over systolic pressure",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "measuring shock index (SI) as HRT / ART_SBP"
+            }
+          ]
+        },
+        {
+          "text": "The public VitalDB data includes sensor readings from thousands of patients",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "sensor readings of thousands of patients available online"
+            }
+          ]
+        },
+        {
+          "text": "A doctor on the team guided the choice of shock index",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "We had a doctor in the team who guided us towards measuring shock index"
+            }
+          ]
+        },
+        {
+          "text": "Hackathon tests reported accuracies of 70–90% for the developed methods",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "We reached test accuracies ranging from 70% to 90%"
+            }
+          ]
+        },
+        {
+          "text": "Demonstrated the forecast prototype live on a monitor",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "demonstrated them live using the aforementioned monitor"
+            }
+          ]
+        },
+        {
+          "text": "Explored different prediction models before prioritising the LSTM",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "For predictions we experimented with different models"
+            }
+          ]
+        },
+        {
+          "text": "Mexican-hat wavelets were explored to extract signal-frequency information",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "extract frequency information from some sensor readings using Mexican hat wavelet transformations"
+            }
+          ]
+        }
+      ],
+      "details": [
+        {
+          "text": "LSTM prototype trained without GPU access",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "without access to GPUs, we could only prepare our LSTM model in time"
+            }
+          ]
+        },
+        {
+          "text": "Wavelet feature extraction was explored but not completed",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "we couldn't transform all the necessary data within the given time"
+            },
+            {
+              "field": "longDescription",
+              "quote": "Mexican hat wavelet transformations"
+            }
+          ]
+        },
+        {
+          "text": "My work: AI brainstorming and signal transformations",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "mainly participating in AI brainstorming sessions and trying to implement respective transformations"
+            }
+          ]
+        },
+        {
+          "text": "Training mistakes could only be partly corrected near the deadline",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "we had made simple training mistakes"
+            },
+            {
+              "field": "longDescription",
+              "quote": "only -to some extent- fix in the last minutes of the event"
+            }
+          ]
+        },
+        {
+          "text": "Multithreading still did not finish all required signal transformations",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "we made use of as much multithreading as we could think"
+            },
+            {
+              "field": "longDescription",
+              "quote": "we couldn't transform all the necessary data within the given time"
+            }
+          ]
+        },
+        {
+          "text": "Suitable pretrained autoencoders or embedders were difficult to find",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "trouble finding pretrained autoencoders/embedders"
+            }
+          ]
+        },
+        {
+          "text": "More explainable prediction models were an intended direction",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "hopefully run explainable models"
+            }
+          ]
+        },
+        {
+          "text": "The source code remains confidential",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "The source code is confidential and thus cannot be shared here."
+            }
+          ]
+        },
+        {
+          "text": "Dräger colleagues shared domain expertise during the event",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "shared expertise on the domain"
+            }
+          ]
+        }
+      ]
+    },
+    "ethmunich-2023": {
+      "overview": [
+        {
+          "text": "NFT similarity combines attributes, text and image content",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "not only the rarities of certain attributes to consideration but also the embeddings of the description"
+            },
+            {
+              "field": "longDescription",
+              "quote": "contents (via ResNet) of the images"
+            }
+          ]
+        },
+        {
+          "text": "BERT embeds descriptions; ResNet embeds image content",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "description (via Bert)  and contents (via ResNet) of the images"
+            }
+          ]
+        },
+        {
+          "text": "Attribute rarity was considered alongside learned text and image embeddings",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "rarities of certain attributes"
+            }
+          ]
+        }
+      ],
+      "details": [
+        {
+          "text": "Machine-learning methods offer multiple comparison options",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "various machine learning methods to present the user with a multitude of options"
+            }
+          ]
+        },
+        {
+          "text": "Led the team building the similarity assistant",
+          "evidence": [
+            {
+              "field": "shortDescription",
+              "quote": "Role: Team Lead"
+            }
+          ]
+        },
+        {
+          "text": "Python and Gateway FM RPC were part of the implementation stack",
+          "evidence": [
+            {
+              "field": "technologies",
+              "quote": "Python"
+            },
+            {
+              "field": "technologies",
+              "quote": "Gateway FM RPC"
+            }
+          ]
+        }
+      ]
+    },
+    "msg-karlsruhe-2023": {
+      "overview": [
+        {
+          "text": "Route planning considers carbon emissions",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "CO-2 considering route planner"
+            }
+          ]
+        },
+        {
+          "text": "Custom metrics compare efficiency and catastrophe score",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "self calculated metrics that we called 'efficiency' and 'catastrophe score'"
+            }
+          ]
+        },
+        {
+          "text": "The route-planning prototype was named Navigo",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "route planner called Navigo"
+            }
+          ]
+        }
+      ],
+      "details": [
+        {
+          "text": "Flask backend paired with a React interface",
+          "evidence": [
+            {
+              "field": "technologies",
+              "quote": "Python Flask"
+            },
+            {
+              "field": "technologies",
+              "quote": "ReactJS"
+            }
+          ]
+        },
+        {
+          "text": "Not hosted live because of API costs",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "We aren't hosting it live due to api costs."
+            }
+          ]
+        }
+      ]
+    },
+    "bachelors-thesis": {
+      "overview": [
+        {
+          "text": "Siamese networks compare cat nose, face and whole images",
+          "evidence": [
+            {
+              "field": "shortDescription",
+              "quote": "Cat identification using noseprints and siamese networks."
+            },
+            {
+              "field": "longDescription",
+              "quote": "nose images, face images or whole images"
+            }
+          ]
+        },
+        {
+          "text": "Evaluated identity retrieval on 16 previously unseen cats",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "16 different test cats"
+            },
+            {
+              "field": "longDescription",
+              "quote": "without the model having been shown any example of their identity/class to the system in the training phase"
+            }
+          ]
+        },
+        {
+          "text": "Each test cat had 4 to 20 example images",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "for each of which there were 4 to 20 examples"
+            }
+          ]
+        },
+        {
+          "text": "The motivation included identification of pets and stray animals",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "identification of pets and stray animals"
+            }
+          ]
+        },
+        {
+          "text": "Image-based identity retrieval explored alternatives to ethically questionable methods",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "many methods, the ethicalness of which are questionable"
+            }
+          ]
+        },
+        {
+          "text": "Implemented the Siamese-network approach with PyTorch",
+          "evidence": [
+            {
+              "field": "technologies",
+              "quote": "Siamese Networks"
+            },
+            {
+              "field": "technologies",
+              "quote": "Pytorch"
+            }
+          ]
+        }
+      ],
+      "details": [
+        {
+          "text": "Test identities were absent from the training phase",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "without the model having been shown any example of their identity/class to the system in the training phase"
+            }
+          ]
+        },
+        {
+          "text": "Evaluated ranked retrieval from rank 1 through rank 5",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "rank-1 to rank-5 accuracies"
+            }
+          ]
+        },
+        {
+          "text": "Scalability and end-user applications were future goals",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "the aim is to make the system more scalable and use it in end-user applications"
+            }
+          ]
+        },
+        {
+          "text": "The account reports very high ranked accuracies on this limited 16-cat test",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "very high (99%, 100%, …) rank-1 to rank-5 accuracies"
+            },
+            {
+              "field": "longDescription",
+              "quote": "16 different test cats"
+            }
+          ]
+        },
+        {
+          "text": "Entrepreneurial plans meant the implementation stayed confidential",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "For the project has an entrepreneurial side to it, the implementation will be kept confidential"
+            }
+          ]
+        }
+      ]
+    },
+    "tgu-perfect-gpa": {
+      "overview": [
+        {
+          "text": "Studied computer science in a German-language programme",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "graduate from computer science (Informatik / Bilgisayar Mühendisliği) program of TGU"
+            },
+            {
+              "field": "longDescription",
+              "quote": "the lectures are 100% in German"
+            }
+          ]
+        },
+        {
+          "text": "Consistently good grades across all courses",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "I consistently got good grades from all classes I took"
+            }
+          ]
+        },
+        {
+          "text": "International lecturers joined through the Flying Faculty",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "this system that they call 'Flying Faculty', where half of our lecturers are coming from various german Universities through DAAD funding"
+            }
+          ]
+        },
+        {
+          "text": "The university was established through joint Turkish and German government intentions",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "founded through the shared intentions of the Turkish & German governments"
+            }
+          ]
+        },
+        {
+          "text": "The campus is in Istanbul while teaching is entirely in German",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "the university is located in Istanbul, the lectures are 100% in German"
+            }
+          ]
+        },
+        {
+          "text": "DAAD funding brings visiting lecturers from German universities",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "various german Universities through DAAD funding"
+            }
+          ]
+        }
+      ],
+      "details": [
+        {
+          "text": "Flying Faculty enables links to German university professors",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "network with professors from Berlin, Aachen, Magdeburg"
+            }
+          ]
+        },
+        {
+          "text": "Delivered the valedictorian speech at graduation",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "after my valedictorian speech"
+            }
+          ]
+        },
+        {
+          "text": "Received a commemorative hourglass from the rector",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "I was gifted a fancy hourglass from the rector"
+            }
+          ]
+        },
+        {
+          "text": "The academic network includes universities in Berlin, Aachen and Magdeburg",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "professors from Berlin, Aachen, Magdeburg"
+            }
+          ]
+        },
+        {
+          "text": "Consistency across courses mattered more than always being top of an individual class",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "I was rarely the best student of an invidividual class"
+            },
+            {
+              "field": "longDescription",
+              "quote": "I consistently got good grades from all classes I took"
+            }
+          ]
+        },
+        {
+          "text": "I credit part of the milestone to studying at a relatively young university",
+          "evidence": [
+            {
+              "field": "longDescription",
+              "quote": "TGU is a relatively young university, and I owe my success partially to that."
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "previousNoteCounts": {
+    "tesla-gigathon-2026": {
+      "overview": 3,
+      "details": 3
+    },
+    "hong-kong-talent-engage-eurotech-healthtech-2026": {
+      "overview": 3,
+      "details": 3
+    },
+    "decarbon-days-climathon-2026": {
+      "overview": 3,
+      "details": 3
+    },
+    "pdm-kill-the-search-bar-2026": {
+      "overview": 3,
+      "details": 3
+    },
+    "zero-one-hack-supercompute-industrial-2026": {
+      "overview": 3,
+      "details": 3
+    },
+    "huawei-tech-arena-finland-2025": {
+      "overview": 3,
+      "details": 3
+    },
+    "real-coin-map-2025": {
+      "overview": 3,
+      "details": 3
+    },
+    "ethrome-2025": {
+      "overview": 3,
+      "details": 3
+    },
+    "nasa-space-apps-zurich-2025": {
+      "overview": 2,
+      "details": 2
+    },
+    "sui-hackathon-poland-2025": {
+      "overview": 3,
+      "details": 3
+    },
+    "decarbon-days-climathon-2025": {
+      "overview": 3,
+      "details": 3
+    },
+    "music-ai-osaka-2025": {
+      "overview": 3,
+      "details": 3
+    },
+    "european-defense-tech-2025-munich": {
+      "overview": 3,
+      "details": 3
+    },
+    "tech-berlin-ai-hackathon-2": {
+      "overview": 3,
+      "details": 3
+    },
+    "huawei-agorize-2024": {
+      "overview": 3,
+      "details": 3
+    },
+    "masters-thesis": {
+      "overview": 3,
+      "details": 2
+    },
+    "lauzhack-2024": {
+      "overview": 3,
+      "details": 3
+    },
+    "salzburg-tourism-2024": {
+      "overview": 3,
+      "details": 3
+    },
+    "zurich-climathon-2024": {
+      "overview": 3,
+      "details": 3
+    },
+    "bayer-ai-2024": {
+      "overview": 3,
+      "details": 3
+    },
+    "dsag-ideathon-2024": {
+      "overview": 3,
+      "details": 3
+    },
+    "circular-bsh-2024": {
+      "overview": 3,
+      "details": 3
+    },
+    "thuega-2024": {
+      "overview": 3,
+      "details": 3
+    },
+    "solana-ideathon-2024": {
+      "overview": 2,
+      "details": 2
+    },
+    "six-swisshacks-2024": {
+      "overview": 3,
+      "details": 3
+    },
+    "hackupc-2024": {
+      "overview": 3,
+      "details": 3
+    },
+    "mdsi-bundesliga-2024": {
+      "overview": 3,
+      "details": 3
+    },
+    "draeger-2023": {
+      "overview": 3,
+      "details": 3
+    },
+    "ethmunich-2023": {
+      "overview": 2,
+      "details": 2
+    },
+    "msg-karlsruhe-2023": {
+      "overview": 2,
+      "details": 2
+    },
+    "bachelors-thesis": {
+      "overview": 3,
+      "details": 3
+    },
+    "tgu-perfect-gpa": {
+      "overview": 3,
+      "details": 3
+    }
+  },
+  "previousNoteHashes": {
+    "tesla-gigathon-2026": "9a59d05a0d742cb80dbb4b98c4e7565910dfb5365e48fb4ed4c406d6628341b8",
+    "hong-kong-talent-engage-eurotech-healthtech-2026": "c9cc4d0155df427d4954395c8ecf0182bd31bd935482d072c37297ad65faec88",
+    "decarbon-days-climathon-2026": "edae67a2a49ce3c362bcbe469e964dd7b00be55d98bdb8587a51617b95cf1877",
+    "pdm-kill-the-search-bar-2026": "c88fbe4834dfc3cc9269e26dfd588f26c6992efe8ee9b0cbd773bb6a55d5f58a",
+    "zero-one-hack-supercompute-industrial-2026": "ddf0c180bf10ecbc54b395664b92796342ff5c6bd56950d804dc9efe2ef19295",
+    "huawei-tech-arena-finland-2025": "53b2888978c5f2a1326a71edc7f52fc7022f50b5bc4687c1fd1a57822390a17d",
+    "real-coin-map-2025": "8197a5acb896c77b10882a9e3ad11b97126a4e7783e663fe097ef3697832589b",
+    "ethrome-2025": "c568dc10e54bf5d446b61e82cb72bc187cc193d2a03b57beaaef8c1766a994b1",
+    "nasa-space-apps-zurich-2025": "53956ae1473e3c967656e466e66d0ca3a7715ba79cf1216b3e6325d2196b0c13",
+    "sui-hackathon-poland-2025": "502ed3cb779653fc3cfb94c320a551e06fc97d644407ae45923406a717199d8d",
+    "decarbon-days-climathon-2025": "11e4b348eb524e3f8b9db943cca9d6e526cb9379ce9b89b43312eb40db096cd6",
+    "music-ai-osaka-2025": "f4c64322f664b124820b9e28cf4fba481f9c1c5281d9c24c0e13ce4a615a5792",
+    "european-defense-tech-2025-munich": "1c1a2c7363b0cd03c1ff422dd79627776867b6432e1766c672bca73752d62d36",
+    "tech-berlin-ai-hackathon-2": "92fbfbb05d099c9e05e88de7f3050c3dad76cee8a2940afe7aef1c33e16f216f",
+    "huawei-agorize-2024": "8d4f077dbb7b5493f44b57471b16970f8bf7437dce93579163d90ed1f66e98d3",
+    "masters-thesis": "c437512659b17825e1e6d53387a0b175c6b7a0f3526078fbc10becbbd682a00f",
+    "lauzhack-2024": "9a63aa4b780064a583b7a0e0c776d65c2741ffcccee0b1510b54222bc1dce055",
+    "salzburg-tourism-2024": "482802c445d5d242698ec78a17c358b1690139ea79b8eab894ad58889e3b233f",
+    "zurich-climathon-2024": "3edd93664e9cb94848d5269593fa2df9eadf7cb2e3acc60a06f65c1070ff0a71",
+    "bayer-ai-2024": "3d4ab54023e47588f6681558e53ad02c560617cdd0465d3321d884713b928cd4",
+    "dsag-ideathon-2024": "1e9ab9049ca4b64a2454bcc384a79563c6f3546b58f78fea08a99a8bc91528d2",
+    "circular-bsh-2024": "24a3bea9804164eddf75ef4059f6366ff1dd473b8e1f6632b91aadbbe75c840c",
+    "thuega-2024": "4090da61b58224b590073e74f508bdd818f579c067fa5645f1bff87e13c651ee",
+    "solana-ideathon-2024": "ac87355a1b342b1e7c3a13c6c3a67a85c9fd9ffa11368a2d7242581aef4fe5af",
+    "six-swisshacks-2024": "922054b6bf1679dc616c2057505acf417f9657f0049fcc497c674c6affcc828d",
+    "hackupc-2024": "7c0b785aaa6b6890f924cc09ee469b24fbcf318f0315ec7609dee070ca5488b7",
+    "mdsi-bundesliga-2024": "0837d906f5b65c6694519e369031f072046ed4644e3d591f22eb2a46119a4f51",
+    "draeger-2023": "64f54c3f0308ccef020634d5737a267f955948e6325746f88d5d1a3f1cc24d20",
+    "ethmunich-2023": "4fa26051c6371fb5b64e3371bf1b00ef8a2d05acdf3bed0a4c82fe40f1f97a78",
+    "msg-karlsruhe-2023": "5158a443e229d7aa48e17edeb79b2f4b59dd1c5d57661a24faa1bf33dedd567d",
+    "bachelors-thesis": "9e3f9b77e0907bb1cf9547dd089162b87929ebda9f854f3fcadd49105b40ac4b",
+    "tgu-perfect-gpa": "d26bd109e93e664d5cb01a28ae0fd6e744b74f39e68a56d96002e851441e877c"
+  },
+  "previousNoteTotals": {
+    "items": 183,
+    "characters": 9307
+  }
+}

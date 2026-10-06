@@ -6,38 +6,38 @@
  */
 
 export const EXHIBIT_MODELS = Object.freeze({
-  'tesla-gigathon-2026':{kind:'supply-chain-cell',parts:['roller conveyor','pallet racks','cargo pallets','logistics terminal']},
-  'hong-kong-talent-engage-eurotech-healthtech-2026':{kind:'conjunctiva-imaging',parts:['conjunctiva eye study','imaging camera','hemoglobin estimation screen']},
-  'decarbon-days-climathon-2026':{kind:'climate-jury-forum',parts:['jury desks','pitch display','factory energy demonstrator']},
-  'pdm-kill-the-search-bar-2026':{kind:'directory-discovery',parts:['discovery kiosk','directory cards','comparison display']},
-  'zero-one-hack-supercompute-industrial-2026':{kind:'semiconductor-cell',parts:['silicon wafer','process cell','sequence-monitoring terminal']},
-  'huawei-tech-arena-finland-2025':{kind:'globe-transition',parts:['desktop globe','flattened map display','map transition frames']},
-  'real-coin-map-2025':{kind:'numismatic-study',parts:['coin specimen trays','optical inspection station','mint map display']},
-  'ethrome-2025':{kind:'private-gifting',parts:['gift parcels','pooled contribution console','privacy lock']},
-  'nasa-space-apps-zurich-2025':{kind:'satellite-ground-station',parts:['satellite bus','solar panel wings','ground-station dish','geography terminal']},
-  'sui-hackathon-poland-2025':{kind:'word-minting-workbench',parts:['word-composition tiles','minted object cards','Move contract terminal']},
-  'decarbon-days-climathon-2025':{kind:'climate-jury-forum',parts:['jury desks','pitch display','factory energy demonstrator']},
-  'music-ai-osaka-2025':{kind:'vr-pen-equalizer',parts:['VR headset','tracked pen','frequency-band console','loudspeakers']},
-  'european-defense-tech-2025-munich':{kind:'radar-instrument',parts:['radar antenna','instrument rack','detection console']},
-  'tech-berlin-ai-hackathon-2':{kind:'portfolio-scenario-desk',parts:['portfolio dashboard','causal news cards','scenario display']},
-  'huawei-agorize-2024':{kind:'hrtf-pinna-capture',parts:['pinna study','multi-view camera arc','head-related audio display']},
-  'masters-thesis':{kind:'trajectory-policy-workbench',parts:['recorded trajectory display','latent encoder','shared policy','environment test boards']},
-  'lauzhack-2024':{kind:'vr-classroom',parts:['classroom desk','VR headset','EEG headband','tracked pen','aligned writing paper']},
-  'salzburg-tourism-2024':{kind:'eeg-tourism',parts:['EEG headband','recommendation kiosk','tourism route miniature']},
-  'zurich-climathon-2024':{kind:'employee-survey-station',parts:['anonymous survey kiosks','company sustainability display','feedback cards']},
-  'bayer-ai-2024':{kind:'bioinformatics-workbench',parts:['molecular study','image inspection table','computer-vision terminal']},
-  'dsag-ideathon-2024':{kind:'transaction-fraud-workbench',parts:['transaction documents','time-series monitor','fraud inspection gate']},
-  'circular-bsh-2024':{kind:'appliance-recovery-line',parts:['old appliances','X-ray inspection portal','sorting conveyor','recovery bins']},
-  'thuega-2024':{kind:'household-energy-grid',parts:['model households','PV panels','battery storage','grid controller']},
-  'solana-ideathon-2024':{kind:'microbetting-contract-table',parts:['agreement table','liquidity pool','oracle terminal']},
-  'six-swisshacks-2024':{kind:'sustainability-reporting-desk',parts:['report binder','KPI dashboard','framework document trays']},
-  'hackupc-2024':{kind:'flight-recommendation-table',parts:['city miniatures','flight routes','aircraft','interest-comparison kiosk']},
-  'mdsi-bundesliga-2024':{kind:'football-analysis-table',parts:['football pitch','player positions','defensive lines','line-break monitor']},
-  'draeger-2023':{kind:'patient-sensor-monitor',parts:['patient-monitor console','ECG-style signal','sensor channels','prediction display']},
-  'ethmunich-2023':{kind:'nft-similarity-workbench',parts:['paired image cards','feature-embedding racks','similarity comparison display']},
-  'msg-karlsruhe-2023':{kind:'co2-route-planner',parts:['road-route miniature','vehicle','alternative route','efficiency kiosk']},
-  'bachelors-thesis':{kind:'noseprint-identification',parts:['cat study','nose-image capture camera','paired siamese encoder racks','identity comparison']},
-  'tgu-perfect-gpa':{kind:'academic-study',parts:['open book','graduation cap','course-record display']},
+  'tesla-gigathon-2026':{kind:'supply-chain-cell',parts:['roller conveyor','pallet racks','cargo pallets','logistics terminal','pallet scanning arch','routing buffer lane','forklift with raised forks','loading bay routing diagram','treaded forklift tires','hydraulic mast pistons','rack cross-bracing']},
+  'hong-kong-talent-engage-eurotech-healthtech-2026':{kind:'conjunctiva-imaging',parts:['conjunctiva eye study','imaging camera','hemoglobin estimation screen','calibrated capture rig','image-to-estimate panels','adjustable imaging rail fittings','recessed imaging controls']},
+  'decarbon-days-climathon-2026':{kind:'climate-jury-forum',parts:['jury desks','pitch display','factory energy demonstrator','jury microphone consoles','ceremonial award cheque','jury chair armrests','framed presentation and cheque displays']},
+  'pdm-kill-the-search-bar-2026':{kind:'directory-discovery',parts:['discovery kiosk','directory cards','comparison display','public directory browsing shelves','data-quality comparison panels','directory frame rails','recessed directory controls']},
+  'zero-one-hack-supercompute-industrial-2026':{kind:'semiconductor-cell',parts:['silicon wafer','process cell','sequence-monitoring terminal','wafer cassette','articulated transfer gripper','HPC sequence rack','load-lock clamps','robot joint fasteners']},
+  'huawei-tech-arena-finland-2025':{kind:'globe-transition',parts:['desktop globe','flattened map display','map transition frames','unfolding projection strips','coordinate grid','globe trunnion bearings','coordinate table edging']},
+  'real-coin-map-2025':{kind:'numismatic-study',parts:['coin specimen trays','optical inspection station','mint map display','coin reliefs and milled rims','archival specimen drawers','optical gantry','specimen tray fittings','adjustable optical focus control']},
+  'ethrome-2025':{kind:'private-gifting',parts:['gift parcels','pooled contribution console','privacy lock','anonymous contribution slots','recipient choice cards','parcel lid seams','anonymous intake controls']},
+  'nasa-space-apps-zurich-2025':{kind:'satellite-ground-station',parts:['satellite bus','solar panel wings','ground-station dish','geography terminal','earth-observation optics','dish feed truss','geography tile table','panel hinge collars','satellite radiator fins','layered sensor optics']},
+  'sui-hackathon-poland-2025':{kind:'word-minting-workbench',parts:['word-composition tiles','minted object cards','Move contract terminal','word joining track','minted composition archive','minted-card retaining clips','composition input controls']},
+  'decarbon-days-climathon-2025':{kind:'climate-jury-forum',parts:['jury desks','pitch display','factory energy demonstrator','jury microphone consoles','factory load-balancing channels','jury chair armrests','framed presentation display']},
+  'music-ai-osaka-2025':{kind:'vr-pen-equalizer',parts:['VR headset','tracked pen','frequency-band console','loudspeakers','three-axis pen trajectory','frequency mapping selectors','arched adjustable headset strap','recessed infrared pen windows','loudspeaker diaphragms']},
+  'european-defense-tech-2025-munich':{kind:'radar-instrument',parts:['radar antenna','instrument rack','detection console','antenna feed supports','signal-processing instrument modules','antenna pivot brackets','instrument ventilation panels']},
+  'tech-berlin-ai-hackathon-2':{kind:'portfolio-scenario-desk',parts:['portfolio dashboard','causal news cards','scenario display','causal comparison connections','scenario selection workbench','framed scenario panels','scenario selector controls']},
+  'huawei-agorize-2024':{kind:'hrtf-pinna-capture',parts:['pinna study','multi-view camera arc','head-related audio display','camera calibration rails','multi-view image contact sheets','multi-view lens fittings','calibration rail clamps']},
+  'masters-thesis':{kind:'trajectory-policy-workbench',parts:['recorded trajectory display','latent encoder','shared policy','environment test boards','encoder-to-policy transfer bridge','varied-dynamics test mechanisms','mechanism pivot fittings','encoder ventilation fins']},
+  'lauzhack-2024':{kind:'vr-classroom',parts:['classroom desk','VR headset','EEG headband','tracked pen','aligned writing paper','teacher question display','focus-dependent handwriting comparison','arched adjustable headset strap','recessed infrared pen windows','question-display controls']},
+  'salzburg-tourism-2024':{kind:'eeg-tourism',parts:['EEG headband','recommendation kiosk','tourism route miniature','feature-extraction workbench','five personality feature channels','recommendation pipeline','headband electrode fittings','feature-channel selectors']},
+  'zurich-climathon-2024':{kind:'employee-survey-station',parts:['anonymous survey kiosks','company sustainability display','feedback cards','private survey partitions','sustainability comparison archive','survey console fittings','comparison drawer handles']},
+  'bayer-ai-2024':{kind:'bioinformatics-workbench',parts:['molecular study','image inspection table','computer-vision terminal','microscope capture rig','specimen slide rack','image-processing comparison panels','optical instrument vents','specimen slide clips']},
+  'dsag-ideathon-2024':{kind:'transaction-fraud-workbench',parts:['transaction documents','time-series monitor','fraud inspection gate','multi-transaction processing track','time-series context archive','inspection-gate controls','transaction archive handles']},
+  'circular-bsh-2024':{kind:'appliance-recovery-line',parts:['old appliances','X-ray inspection portal','sorting conveyor','recovery bins','appliance unloading gantry','sensor inspection heads','recovery sorting diverter','gantry gripper shoes','scanner retaining fittings']},
+  'thuega-2024':{kind:'household-energy-grid',parts:['model households','PV panels','battery storage','grid controller','household smart meters','battery inverter modules','forecast distribution channels','battery bus terminals','inverter controls']},
+  'solana-ideathon-2024':{kind:'microbetting-contract-table',parts:['agreement table','liquidity pool','oracle terminal','paired agreement lanes','oracle resolution bridge','agreement track rails','oracle resolution controls']},
+  'six-swisshacks-2024':{kind:'sustainability-reporting-desk',parts:['report binder','KPI dashboard','framework document trays','framework assessment cabinet','peer benchmark cards','binder clips','framework archive handles']},
+  'hackupc-2024':{kind:'flight-recommendation-table',parts:['city miniatures','flight routes','aircraft','interest-comparison kiosk','departure gate miniatures','interest-to-city embedding trays','aircraft nacelles','gate turnstile fittings']},
+  'mdsi-bundesliga-2024':{kind:'football-analysis-table',parts:['football pitch','player positions','defensive lines','line-break monitor','line-break path overlay','configurable line-break timeline','goal side frames and net grids','line-break console controls']},
+  'draeger-2023':{kind:'patient-sensor-monitor',parts:['patient-monitor console','ECG-style signal','sensor channels','prediction display','multichannel acquisition rack','three forecast-horizon modules','recessed acquisition controls','monitor foot fittings']},
+  'ethmunich-2023':{kind:'nft-similarity-workbench',parts:['paired image cards','feature-embedding racks','similarity comparison display','image-and-description comparison channels','ranked similarity trays','image retaining frames','paired comparison controls']},
+  'msg-karlsruhe-2023':{kind:'co2-route-planner',parts:['road-route miniature','vehicle','alternative route','efficiency kiosk','grade-separated route bridge','route impact comparison sliders','vehicle lights and sills','bridge lane markings']},
+  'bachelors-thesis':{kind:'noseprint-identification',parts:['cat study','nose-image capture camera','paired siamese encoder racks','identity comparison','macro-imaging calibration rig','paired noseprint comparison cards','macro-imaging vents','encoder face fittings']},
+  'tgu-perfect-gpa':{kind:'academic-study',parts:['open book','graduation cap','course-record display','graduation lectern','gifted hourglass','hourglass column collars','open-book binding']},
 });
 
 const SUBJECTS = new Set(['supply-chain','health-imaging','energy-forum','discovery-graph','semiconductor','globe','coins','gifting',
@@ -78,13 +78,31 @@ function headStudy(p,x,z,{headband=false,headset=false,y=2.9}={}) {
   }
   if(headset){
     p.box('dark',[x,y,z-.68],[1.55,.7,.55]);p.box('signal',[x,y,z-.98],[1.28,.48,.08]);
-    p.ring('metal',[x,y,z],.84,.06,[0,0,Math.PI/2]);
+    // A flat crown strap is a wearable assembly, not a metal torus through the
+    // face. Ten fitted segments preserve a smooth readable arch at this scale.
+    let prior=[x,y,z-.76];
+    for(let i=1;i<=10;i++){
+      const a=-Math.PI/2+i*Math.PI/10,next=[x,y+Math.cos(a)*1.04,z+Math.sin(a)*.76];
+      const dy=next[1]-prior[1],dz=next[2]-prior[2];
+      p.box('metal',[x,(prior[1]+next[1])/2,(prior[2]+next[2])/2],[.12,Math.hypot(dy,dz)*1.035,.045],[Math.atan2(dz,dy),0,0]);
+      prior=next;
+    }
+    for(const side of [-1,1])p.box('dark',[x+side*.75,y+.05,z-.1],[.1,.2,.32]);
   }
 }
 function sensorPen(p,x,y,z,{lean=.28}={}) {
+  const point=t=>[x-Math.sin(lean)*t,y+Math.cos(lean)*t,z];
   p.cylinder('paper',[x,y,z],.065,1.15,[0,0,lean]);
-  p.cylinder('dark',[x-.16,y+.49,z],.078,.18,[0,0,lean]);
-  for(const dy of [-.25,.05,.25])p.sphere('gold',[x+dy*.28,y+dy,z-.065],[.035,.035,.035]);
+  p.cylinder('dark',point(.49),.078,.18,[0,0,lean]);
+  // Flush infrared windows sit on the pen axis instead of floating gold
+  // beads. These precise recessed faces are cheaper and more recognizable.
+  for(const t of [-.25,.05,.25]){
+    const [px,py]=point(t);
+    p.box('dark',[px,py,z-.067],[.075,.082,.022],[0,0,lean]);
+    p.box('gold',[px,py,z-.082],[.047,.048,.014],[0,0,lean]);
+  }
+  p.cylinder('metal',point(-.43),.068,.085,[0,0,lean]);
+  p.cylinder('dark',point(-.56),.037,.11,[0,0,lean]);
 }
 function smallTree(p,x,z,h=1.5) {
   p.cylinder('metal',[x,1.13+h*.18,z],.035,h*.4);
@@ -170,6 +188,63 @@ function lock(p,x,y,z) {
   p.cylinder('dark',[x,y,z-.3],.09,.06,[Math.PI/2,0,0]);
 }
 
+/** Flat ribbon geometry: visible folds, not expensive tubular jewellery. */
+function ribbonLoop(p,x,y,z,side) {
+  const points=[[x,y,z],[x+side*.36,y+.32,z],[x+side*.64,y+.18,z],[x+side*.42,y-.04,z],[x,y,z]];
+  for(let i=1;i<points.length;i++){
+    const a=points[i-1],b=points[i],dx=b[0]-a[0],dy=b[1]-a[1];
+    p.box('gold',[(a[0]+b[0])/2,(a[1]+b[1])/2,z],[Math.hypot(dx,dy),.055,.18],[0,0,Math.atan2(dy,dx)]);
+  }
+}
+function cabinet(p,x,z,{w=1.5,h=2.4,d=1.0,rows=4}={}) {
+  p.box('metal',[x,1.13+h/2,z],[w,h,d]);
+  p.box('dark',[x,1.13+h/2,z-d/2-.026],[w-.14,h-.14,.05]);
+  for(let i=0;i<rows;i++){
+    const y=1.38+(h-.44)*(i+.5)/rows;
+    p.box('paper',[x,y,z-d/2-.058],[w-.3,(h-.6)/rows-.08,.035]);
+    p.box('gold',[x+w*.29,y,z-d/2-.086],[.12,.12,.026]);
+    for(let j=0;j<3;j++)p.box('dark',[x-w*.3+j*w*.14,y,z-d/2-.08],[.09,.04,.025]);
+  }
+}
+function opticalRig(p,x,z,{y=3.7,w=2.0}={}) {
+  for(const side of [-1,1]){
+    p.box('metal',[x+side*w/2,(1.95+y)/2,z],[.1,y-1.9,.1]);
+    p.box('dark',[x+side*w/2,1.94,z],[.55,.08,.45]);
+  }
+  p.box('metal',[x,y,z],[w+.25,.12,.14]);
+  p.box('dark',[x,y-.26,z],[.56,.4,.45]);
+  p.cylinder('metal',[x,y-.56,z],.2,.22);
+  p.cylinder('signal',[x,y-.69,z],.14,.04);
+}
+function cardRails(p,x,y,z,{w=2.1,count=4}={}) {
+  p.box('metal',[x,y-.12,z],[w+.18,.12,.74]);
+  for(let i=0;i<count;i++){
+    const dx=x-w/2+(i+.5)*w/count;
+    p.box('paper',[dx,y+.22,z],[w/count-.08,.58,.06]);
+    p.box('gold',[dx,y+.31,z-.042],[w/count-.17,.065,.025]);
+    p.box('dark',[dx,y+.14,z-.042],[w/count-.18,.04,.025]);
+  }
+}
+
+/** Recessed controls and machined edges share the existing material batch. */
+function instrumentFace(p,x,y,z,{w=1.2,h=.48,buttons=3}={}) {
+  p.box('metal',[x,y,z],[w+.08,h+.08,.065]);
+  p.box('dark',[x,y,z-.044],[w,h,.025]);
+  for(let i=0;i<buttons;i++){
+    const px=x-w*.34+i*w*.68/Math.max(1,buttons-1);
+    p.box(i===buttons-1?'gold':'paper',[px,y,z-.073],[w*.13,h*.38,.034]);
+    p.box('metal',[px,y-h*.28,z-.072],[w*.1,.018,.023]);
+  }
+}
+function radiator(p,x,y,z,{w=1.0,h=.75,bars=5}={}) {
+  p.box('dark',[x,y,z],[w,h,.045]);
+  for(let i=0;i<bars;i++)p.box('metal',[x,y-h*.38+i*h*.76/Math.max(1,bars-1),z-.04],[w*.86,.035,.035]);
+}
+function drawerGrip(p,x,y,z,w=1.0) {
+  p.box('dark',[x,y,z],[w,.13,.035]);
+  p.box('metal',[x,y,z-.052],[w*.75,.035,.1]);
+}
+
 function eegTourism(p) {
   headStudy(p,-4.2,-1.4,{headband:true});
   desk(p,-2.8,1.6,3.1,1.7);screen(p,-2.8,3.1,1.75,2.7,2.1);keyboard(p,-2.8,1.0);
@@ -225,6 +300,65 @@ function logistics(p) {
   for(const y of [1.65,3.05])for(const x of [-4.1,-2.45])p.box('paper',[x,y,3.25],[1.35,.65,1.1]);
   desk(p,4.3,-2.25,2.8,1.7);screen(p,4.3,3.0,-1.95,2.3,1.6);chart(p,4.3,3.0,-2.08,1.8,.95);
   p.box('gold',[4.3,3.8,-1.95],[2.0,.09,.1]);keyboard(p,4.3,-2.8);
+  // A public, generic supply-chain illustration, NOT Tesla's confidential
+  // factory layout, data, machinery or the team's undisclosed prototype.
+  // Scanning arch gives the moving-pallet lane a distinct engineered silhouette.
+  for(const z of [-1.22,1.22]){
+    p.box('paper',[-.65,2.8,z],[.38,2.75,.38]);
+    p.box('dark',[-.65,1.39,z],[.74,.13,.72]);
+    p.box('metal',[-.65,2.8,z-.21],[.14,2.35,.035]);
+  }
+  p.box('paper',[-.65,4.2,0],[.5,.3,2.82]);
+  p.box('dark',[-.65,3.94,0],[.37,.16,.7]);
+  p.box('signal',[-.65,3.84,0],[.26,.035,.44]);
+  for(const z of [-.97,.97])p.box('gold',[-.65,3.52,z],[.14,.55,.06]);
+  // Raised forks, overhead protection, mast rails and counterweight: a forklift
+  // rather than an arbitrary car/token. It is parked beside the buffer lane.
+  const fx=3.75,fz=2.55;
+  p.box('gold',[fx,1.52,fz],[1.65,.64,1.95]);
+  p.box('metal',[fx,1.12,fz],[1.75,.2,2.05]);
+  p.box('gold',[fx,1.94,fz+.73],[1.7,.48,.5]);
+  p.box('dark',[fx,2.07,fz+.1],[.65,.28,.6]);
+  p.box('dark',[fx,2.39,fz+.33],[.68,.67,.12]);
+  for(const side of [-1,1]){
+    for(const dz of [-.63,.63]){
+      p.cylinder('dark',[fx+side*.88,1.13,fz+dz],.32,.19,[0,0,Math.PI/2]);
+      p.cylinder('metal',[fx+side*.985,1.13,fz+dz],.16,.03,[0,0,Math.PI/2]);
+    }
+    p.box('metal',[fx+side*.63,2.57,fz+.52],[.1,1.43,.1]);
+    p.box('metal',[fx+side*.63,2.57,fz-.5],[.1,1.43,.1]);
+    p.box('dark',[fx+side*.48,2.41,fz-1.04],[.14,2.4,.18]);
+    p.box('metal',[fx+side*.48,2.41,fz-1.15],[.06,2.18,.055]);
+    p.box('metal',[fx+side*.45,1.82,fz-1.51],[.12,.1,1.04]);
+    p.box('metal',[fx+side*.45,2.02,fz-1.03],[.12,.48,.13]);
+  }
+  p.box('dark',[fx,3.35,fz],[1.55,.15,1.38]);
+  for(const dx of [-.53,0,.53])p.box('metal',[fx+dx,3.45,fz],[.045,.04,1.23]);
+  p.box('gold',[fx,2.04,fz-1.07],[1.18,.31,.2]);
+  p.rod('dark',[fx,2.2,fz-.34],[fx,2.61,fz-.22],.05);
+  p.cylinder('dark',[fx,2.66,fz-.22],.21,.04,[.4,0,0]);
+  // A right-angle transfer/buffer makes origin → inspection → storage legible.
+  p.box('metal',[.45,1.51,2.55],[2.45,.2,2.25]);
+  for(let i=0;i<6;i++)p.cylinder('dark',[.45,1.66,1.55+i*.36],.075,2.24,[0,0,Math.PI/2]);
+  for(const z of [1.46,3.66])p.box('metal',[.45,1.9,z],[2.45,.09,.08]);
+  for(const x of [-.55,1.45])p.box('metal',[x,1.15,2.55],[.11,.65,2.0]);
+  p.box('stone',[.4,1.84,2.55],[1.55,.16,1.35]);
+  for(const x of [-.03,.83])p.box('paper',[x,2.28,2.55],[.75,.72,1.18]);
+  for(const x of [-.03,.83])p.box('gold',[x,2.66,2.55],[.12,.04,1.2]);
+  for(let i=0;i<5;i++)p.box('gold',[1.9+i*.18,1.045,1.9],[.08,.025,.35],[0,-.5,0]);
+  // Low loading/routing diagram occupies the foreground without obstructing
+  // the original-prose signs or pretending these are real production metrics.
+  p.box('dark',[-.95,1.02,-2.4],[4.8,.12,2.2]);
+  for(let bay=0;bay<3;bay++){
+    const x=-2.5+bay*1.55;
+    for(const z of [-3.35,-1.5])p.box('paper',[x,1.095,z],[1.18,.018,.04]);
+    for(const dx of [-.6,.6])p.box('paper',[x+dx,1.095,-2.42],[.035,.018,1.85]);
+    p.box(bay===1?'gold':'signal',[x,1.115,-2.95],[.5,.022,.12]);
+    p.box('metal',[x,1.21,-2.4],[.83,.16,.85]);
+    for(const dx of [-.21,.21])p.box('paper',[x+dx,1.43,-2.4],[.38,.28,.67]);
+    p.box('gold',[x,1.59,-2.4],[.09,.035,.71]);
+  }
+  for(let i=0;i<4;i++)p.box('gold',[-.92,1.14,-1.32+i*.3],[.22,.04,.12]);
 }
 function conjunctiva(p) {
   desk(p,-2.9,-.5,5.6,2.75);
@@ -352,8 +486,8 @@ function satellite(p) {
   }
   p.cylinder('metal',[-1.8,1.9,-.4],.14,1.9);p.ring('gold',[-1.8,3.6,-.4],1.7,.03,[0,.4,.35]);
   // Ground station is a model of communication/geography APIs, not a launch.
-  p.cylinder('metal',[3.6,1.8,-2.05],.16,1.7);p.cylinder('paper',[3.6,2.8,-2.05],1.2,.12,[.8,0,0]);
-  p.ring('metal',[3.6,2.89,-2.05],1.23,.045,[.8,0,0]);p.rod('metal',[3.6,2.8,-2.05],[3.6,3.7,-2.6],.04);
+  p.cylinder('metal',[3.6,1.8,-.65],.16,1.7);p.cylinder('paper',[3.6,2.8,-.65],1.2,.12,[.8,0,0]);
+  p.ring('metal',[3.6,2.89,-.65],1.23,.045,[.8,0,0]);p.rod('metal',[3.6,2.8,-.65],[3.6,3.7,-1.2],.04);
   desk(p,3.5,2.1,3.5,1.65);screen(p,3.5,3.0,2.3,2.8,1.75);waveform(p,3.5,3.2,2.17,2.1,.4);keyboard(p,3.5,1.65);
 }
 function globeTransition(p) {
@@ -372,7 +506,9 @@ function coins(p) {
   for(let row=0;row<2;row++)for(let col=0;col<3;col++){
     const x=-4.5+col*1.9,z=-1.05+row*2.0;
     p.box('dark',[x,1.93,z],[1.5,.15,1.55]);p.cylinder('gold',[x,2.06,z],.54,.06);
-    p.ring('metal',[x,2.105,z],.44,.023);
+    // Raised solid rims retain the coin silhouette with fewer triangles than
+    // six miniature tori; those savings fund actual optical/archive objects.
+    p.cylinder('metal',[x,2.107,z],.53,.035);p.cylinder('gold',[x,2.13,z],.48,.024);
     p.box('paper',[x,2.03,z+.63],[.87,.025,.17]);
   }
   p.cylinder('metal',[-5.3,3.3,-1.7],.065,2.8);p.rod('metal',[-5.3,4.0,-1.7],[-3.7,4.0,-.6],.055);
@@ -386,7 +522,7 @@ function gifting(p) {
     const x=-4.7+i*2.15,h=1.2+i*.28,z=-.7+(i%2)*1.2;
     p.box(i%2?'signal':'paper',[x,1.2+h/2,z],[1.7,h,1.7]);p.box('gold',[x,1.2+h/2,z],[.13,h+.02,1.73]);
     p.box('gold',[x,1.24+h,z],[1.73,.08,.13]);
-    p.ring('gold',[x-.24,1.45+h,z],.23,.035,[0,.4,Math.PI/2]);p.ring('gold',[x+.24,1.45+h,z],.23,.035,[0,-.4,Math.PI/2]);
+    ribbonLoop(p,x,1.45+h,z,-1);ribbonLoop(p,x,1.45+h,z,1);
   }
   desk(p,3.2,1.1,4.1,2.4);screen(p,3.2,3.3,1.6,3.55,2.6);keyboard(p,3.2,.4);
   for(let i=0;i<3;i++)p.cylinder('gold',[2.15+i*1.05,2.74,1.46],.23,.04,[Math.PI/2,0,0]);
@@ -453,7 +589,7 @@ function ledger(p,slug) {
   }
   transactionDocs(p,-3.0,.35);
   for(let i=0;i<4;i++){
-    const z=-2.4+i*1.65;capsule(p,2.1,z,{height:1.55,w:1.1,d:1.0});
+    const z=-1.85+i*1.5;capsule(p,2.1,z,{height:1.55,w:1.1,d:1.0});
     p.box('signal',[2.1,2.15,z-.52],[.7,.76,.025]);
     if(i)p.rod('gold',[2.1,1.23,z-1.1],[2.1,1.23,z-.55],.1);
   }
@@ -481,7 +617,10 @@ function bioinformatics(p) {
   desk(p,-3.2,0,5.1,3.5);
   for(let i=0;i<9;i++){
     const angle=i*.73,y=2.05+i*.33,x=Math.cos(angle)*.72,z=Math.sin(angle)*.72;
-    p.sphere(i%2?'signal':'gold',[-3.2+x,y,z],[.16,.16,.16]);p.sphere(i%2?'gold':'signal',[-3.2-x,y,-z],[.16,.16,.16]);
+    // Flat complementary base-pair blocks make the molecular helix readable;
+    // expensive high-subdivision beads are unnecessary for this scale model.
+    p.box(i%2?'signal':'gold',[-3.2+x,y,z],[.25,.16,.29],[0,angle,0]);
+    p.box(i%2?'gold':'signal',[-3.2-x,y,-z],[.25,.16,.29],[0,angle,0]);
     p.rod('metal',[-3.2+x,y,z],[-3.2-x,y,-z],.035);
     if(i){const a=(i-1)*.73;p.rod('metal',[-3.2+Math.cos(a)*.72,y-.33,Math.sin(a)*.72],[-3.2+x,y,z],.035);p.rod('metal',[-3.2-Math.cos(a)*.72,y-.33,-Math.sin(a)*.72],[-3.2-x,y,-z],.035);}
   }
@@ -547,6 +686,718 @@ function radar(p) {
 }
 
 /**
+ * Second level of each authored demonstration: integrated equipment and a
+ * readable input → interpretation → outcome, not interchangeable ornaments.
+ * These are deliberately static museum-style illustrations. No made-up UI
+ * copy, measured signals, proprietary machinery or project outcomes appear.
+ */
+function addExhibitSystems(subject,p,slug) {
+  switch(subject) {
+    case 'supply-chain':break; // Complete handling workflow is built above.
+    case 'health-imaging':
+      if(slug==='draeger-2023') {
+        cabinet(p,.25,2.65,{w:2.15,h:2.15,d:.75,rows:3});
+        for(let channel=0;channel<3;channel++){
+          const x=-.55+channel*.8;
+          p.box('dark',[x,3.7,2.65],[.65,.28,.85]);
+          p.box(channel===2?'gold':'signal',[x,3.87,2.65],[.48,.025,.66]);
+          linePath(p,[[x,2.4,-.9],[x,1.22,.4],[x,1.22,2.15]],{material:'metal',radius:.025});
+        }
+        for(let i=0;i<3;i++){
+          p.box('metal',[-4.8,2.4-i*.38,-.49],[.24,.2,.035]);
+          p.box('gold',[-4.8,2.4-i*.38,-.516],[.1,.1,.02]);
+          waveform(p,3.8,3.3-i*.39,1.962,2.2,.19,{material:i===2?'gold':'paper',ecg:i===0});
+        }
+      }else{
+        opticalRig(p,-3.45,-.3,{y:4.85,w:2.95});
+        p.box('paper',[-.85,2.5,-.96],[.55,.82,.025]);
+        for(let i=0;i<4;i++)p.box(i%2?'red':'paper',[-.99+(i%2)*.27,2.69-Math.floor(i/2)*.35,-.99],[.19,.26,.024]);
+        cabinet(p,.6,2.7,{w:1.4,h:1.7,d:.85,rows:3});
+        linePath(p,[[-1.1,1.22,-.5],[.6,1.22,-.5],[.6,1.22,1.0],[2.0,1.22,1.0]],{material:'gold',radius:.045});
+        for(let i=0;i<5;i++)p.box(i===4?'gold':'red',[2.57+i*.46,3.74,1.495],[.24,.24+i*.035,.026]);
+      }
+      break;
+    case 'semiconductor':
+      // Synthetic process-sequence work is illustrated by the cassette →
+      // transfer cell → monitoring path and a compact HPC instrument rack.
+      cabinet(p,-2.7,2.5,{w:2.4,h:3.35,d:1.0,rows:5});
+      p.box('dark',[-.65,1.65,1.8],[1.35,1.1,1.3]);
+      for(let i=0;i<5;i++){
+        p.box('metal',[-.65,1.26+i*.19,1.8],[1.1,.035,1.2]);
+        p.cylinder('signal',[-.65,1.31+i*.19,1.8],.42,.025);
+      }
+      for(const point of [[1.7,3.4,-.25],[2.45,3.2,-1.5],[1.1,2.45,-1.5]])p.cylinder('gold',point,.22,.21,[Math.PI/2,0,0]);
+      p.box('metal',[1.08,2.35,-1.5],[.85,.12,.24]);
+      for(const side of [-1,1])p.box('dark',[1.08+side*.32,2.19,-1.5],[.08,.32,.28]);
+      for(let i=0;i<5;i++)p.box(i===3?'gold':'signal',[.05+i*.35,1.14,2.8],[.25,.04,.44]);
+      linePath(p,[[-.65,1.14,1.0],[-.65,1.14,.7],[1.7,1.14,.7],[1.7,1.14,-.25]],{material:'metal',radius:.035});
+      break;
+    case 'energy-forum':
+      if(slug==='six-swisshacks-2024') {
+        cabinet(p,-3.4,2.45,{w:3.2,h:2.8,d:1.0,rows:4});
+        cardRails(p,.6,1.55,-2.3,{w:3.4,count:4});
+        for(let i=0;i<4;i++)p.box('gold',[.6,1.15,-1.6+i*.33],[.3,.04,.12]);
+        for(let row=0;row<2;row++)for(let col=0;col<3;col++)p.box(row?'paper':'gold',[2.7+col*.88,2.28-row*.26,1.398],[.6,.13,.025]);
+      }else if(slug==='zurich-climathon-2024') {
+        for(const x of [-3.8,0,3.8])for(const side of [-1,1]){
+          p.box('metal',[x+side*1.05,2.3,-.1],[.07,1.6,1.75]);
+          p.box('paper',[x+side*1.04,2.3,-.32],[.055,1.4,1.2]);
+        }
+        cabinet(p,0,2.7,{w:3.9,h:2.6,d:1.0,rows:4});
+        for(const x of [-3.8,3.8])linePath(p,[[x,1.12,1.25],[x,1.12,2.7],[1.95*Math.sign(x),1.12,2.7]],{material:'gold',radius:.04});
+      }else{
+        for(const x of [-3.65,0,3.65]){
+          p.box('dark',[x+.75,1.98,-1.25],[.36,.14,.48]);
+          p.rod('metal',[x+.75,2.04,-1.25],[x+.64,2.49,-.95],.025);
+          p.box('dark',[x+.64,2.5,-.95],[.1,.12,.16]);
+          p.box('gold',[x-.75,1.94,-1.9],[.35,.04,.55]);
+        }
+        if(slug==='decarbon-days-climathon-2026'){
+          p.box('metal',[3.8,2.58,1.6],[.1,2.8,.15]);
+          p.box('paper',[3.8,3.67,1.6],[3.2,1.28,.075]);
+          for(let i=0;i<3;i++)p.box(i===2?'gold':'metal',[3.8,4.05-i*.35,1.55],[2.5-i*.45,.08,.025]);
+        }else{
+          for(let i=0;i<3;i++){
+            const x=-5.35+i*.6;
+            p.box('dark',[x,1.82,2.05],[.29,.44,.035]);
+            linePath(p,[[x,1.15,1.6],[x,1.15,.35],[0,1.15,.35]],{material:i===1?'gold':'metal',radius:.026});
+          }
+          cardRails(p,3.85,1.5,2.2,{w:2.7,count:3});
+        }
+      }
+      break;
+    case 'discovery-graph':
+      if(slug==='dsag-ideathon-2024') {
+        cabinet(p,-3.3,2.65,{w:3.3,h:2.55,d:1.0,rows:5});
+        for(let i=0;i<4;i++){
+          const x=-4.7+i*.93;p.box('dark',[x,1.16,-2.5],[.72,.12,.95]);
+          p.box(i===2?'gold':'paper',[x,1.25,-2.5],[.57,.06,.77]);
+          for(let j=0;j<3;j++)p.box('metal',[x,1.29,-2.75+j*.18],[.36,.015,.035]);
+        }
+        linePath(p,[[-1.75,1.14,-2.5],[-.7,1.14,-2.5],[-.7,1.14,.1]],{material:'gold',radius:.04});
+        for(let i=0;i<5;i++)p.box(i===2?'gold':'paper',[2.08+i*.6,2.27,1.35],[.42,.25,.025]);
+      }else{
+        cabinet(p,-3.6,2.4,{w:3.4,h:2.7,d:1.05,rows:3});
+        for(let i=0;i<4;i++)cardRails(p,-3.6,1.24+i*.62,1.83,{w:2.8,count:4});
+        p.box('dark',[.4,1.2,1.4],[1.6,.15,2.2]);
+        for(let i=0;i<3;i++){
+          p.box('paper',[.4,1.34,-.75+i*1.15],[1.1,.08,.8]);
+          p.box('gold',[.4,1.39,-.75+i*1.15],[.7,.035,.12]);
+        }
+      }
+      break;
+    case 'globe':
+      // Three curved-to-flat coordinate strips make the original Gralobe
+      // transition visible as an actual surface, not disconnected poles.
+      for(let strip=0;strip<3;strip++)for(let segment=0;segment<4;segment++){
+        const x=-.75+segment*.55,y=2.62+strip*.36+Math.sin(segment*.48)*.32,z=-1.7+strip*.7;
+        p.box(segment%2?'signal':'metal',[x,y,z],[.61,.045,.55],[0,0,.25-segment*.13]);
+        p.box('paper',[x,y+.036,z],[.51,.017,.027],[0,0,.25-segment*.13]);
+      }
+      for(const dx of [-1.5,-.5,.5,1.5])for(const dz of [-1.25,0,1.25]){
+        p.box((dx+dz)>0?'gold':'leaf',[2.7+dx,1.63,.1+dz],[.47,.08,.37]);
+      }
+      for(const x of [-4.75,-1.65])p.box('metal',[x,1.07,0],[.1,.13,3.0]);
+      p.box('metal',[-3.2,1.07,-1.4],[3.3,.13,.1]);
+      break;
+    case 'coins':
+      cabinet(p,-2.4,2.95,{w:4.4,h:2.4,d:.9,rows:3});
+      opticalRig(p,-3.7,-.6,{y:4.3,w:1.9});
+      for(let row=0;row<2;row++)for(let col=0;col<3;col++){
+        const x=-4.5+col*1.9,z=-1.05+row*2.0;
+        // Geometric relief studies, not invented historically identified coins.
+        p.box('metal',[x,2.154,z],[.19,.035,.35],[0,(col+row)*.4,0]);
+        p.box('metal',[x+.08,2.164,z-.18],[.13,.035,.15],[0,.3,0]);
+        for(let i=0;i<8;i++){
+          const a=i*Math.PI/4;
+          p.box('metal',[x+Math.sin(a)*.46,2.16,z+Math.cos(a)*.46],[.05,.014,.085],[0,a,0]);
+        }
+      }
+      p.box('dark',[3.6,1.13,-2.0],[3.5,.14,1.75]);
+      for(let i=0;i<4;i++){
+        const x=2.3+i*.85;p.box(i%2?'gold':'signal',[x,1.25,-2],[.54,.08,.65]);
+        if(i)p.box('metal',[x-.42,1.24,-2.0],[.35,.035,.035]);
+      }
+      break;
+    case 'gifting':
+      cabinet(p,3.4,2.85,{w:3.1,h:2.05,d:.8,rows:3});
+      for(let i=0;i<4;i++){
+        const x=-1.8+i*.87;
+        p.box('metal',[x,1.32,2.6],[.65,.28,.85]);
+        p.box('dark',[x,1.48,2.6],[.4,.035,.05]);
+        p.box('gold',[x,1.67,2.6],[.27,.28,.065]);
+        linePath(p,[[x,1.14,2.12],[x,1.14,1.6],[.6,1.14,1.6],[.6,1.14,-1.45]],{material:'metal',radius:.026});
+      }
+      cardRails(p,-3.1,1.3,2.65,{w:3.25,count:3});
+      for(let i=0;i<3;i++)p.box('gold',[2.15+i*1.05,2.26,1.435],[.24,.14,.028]);
+      break;
+    case 'satellite':
+      // Earth-observation/communication instruments represent mentoring and
+      // satellite API knowledge, not a spacecraft built by the author.
+      p.cylinder('dark',[-1.8,3.9,-1.38],.32,.5,[Math.PI/2,0,0]);
+      p.cylinder('signal',[-1.8,3.9,-1.65],.25,.045,[Math.PI/2,0,0]);
+      for(const dx of [-.58,.58])for(const dz of [-.52,.52]){
+        p.box('metal',[-1.8+dx,4.57,-.4+dz],[.1,.18,.1]);
+        p.box('dark',[-1.8+dx,2.57,-.4+dz],[.22,.18,.22]);
+      }
+      p.box('paper',[-1.8,4.63,-.4],[1.31,.08,1.28]);
+      for(const side of [-1,1]){
+        p.rod('metal',[-1.8+side*.75,3.2,-.4],[-1.8+side*3.65,3.56,-1.25],.025);
+        p.rod('metal',[-1.8+side*.75,3.2,-.4],[-1.8+side*3.65,3.56,.45],.025);
+      }
+      for(const dx of [-.7,.7])p.rod('metal',[3.6+dx,2.64,-.25],[3.6,3.7,-1.2],.025);
+      p.box('gold',[3.6,3.71,-1.2],[.18,.16,.25]);
+      p.box('dark',[-1.5,1.15,2.4],[4.6,.22,2.5]);
+      for(let row=0;row<2;row++)for(let col=0;col<3;col++){
+        const x=-3+col*1.5,z=1.84+row*1.13;
+        p.box((row+col)%2?'signal':'leaf',[x,1.3,z],[1.36,.06,1.0]);
+        p.box('gold',[x+.22,1.345,z-.2],[.36,.018,.29]);
+      }
+      break;
+    case 'spatial-audio':
+      if(slug==='huawei-agorize-2024') {
+        for(const z of [.9,2.05])p.box('metal',[-2.8,1.94,z],[4.65,.06,.07]);
+        for(let i=0;i<3;i++){
+          const x=-4.8+i*2,z=.9+Math.abs(i-1)*.6;
+          for(const dz of [-.18,.18])p.box('gold',[x,2.02,z+dz],[.34,.08,.065]);
+          p.box('metal',[x,3.49,z],[.32,.07,.36]);
+          p.box('dark',[x+.26,3.15,z-.39],[.09,.24,.16]);
+        }
+        cardRails(p,-2.65,1.33,2.8,{w:4.1,count:5});
+        for(let i=0;i<3;i++)waveform(p,3.6,2.94-i*.25,1.295,2.15,.15,{material:i===1?'gold':'paper'});
+      }else{
+        // A static spatial trajectory explains how pen x/y/z drives the EQ.
+        const origin=[-3,2.45,-1.85];
+        for(const end of [[-1.15,2.45,-1.85],[-3,4.45,-1.85],[-3,2.45,.1]])p.rod('metal',origin,end,.024);
+        linePath(p,[[-3.8,2.62,-1.7],[-3.6,3.17,-1.32],[-3.05,3.55,-1.1],[-2.45,3.9,-.85],[-1.8,3.36,-.5]],{material:'gold',radius:.027});
+        for(let i=0;i<9;i++)p.box(i%3===0?'gold':'paper',[-2.5+i*.46,1.97,-.3],[.14,.05,.18]);
+        for(const x of [3.1,5.0])for(let i=0;i<3;i++)p.box('metal',[x,1.45+i*.16,-.455],[.85,.032,.025]);
+        p.box('dark',[.2,1.14,2.5],[3.0,.17,1.3]);
+        for(let i=0;i<3;i++)p.box(i===1?'gold':'signal',[-.7+i*.9,1.29,2.5],[.69,.08,.95]);
+      }
+      break;
+    case 'finance-graph':
+      for(let i=0;i<3;i++){
+        const x=1.15+i*1.9;
+        linePath(p,[[x,1.13,-1.3],[x,1.13,1.3],[-.15,1.13,1.3]],{material:i===1?'gold':'metal',radius:.035});
+        p.box('metal',[x,1.06,-1.7],[1.9,.12,.82]);
+      }
+      p.box('dark',[-2.8,1.95,-.72],[2.8,.15,.4]);
+      for(let i=0;i<5;i++)p.box(i===3?'gold':'paper',[-3.9+i*.55,2.04,-.72],[.34,.07,.23]);
+      cardRails(p,3.6,1.94,2.35,{w:3.05,count:4});
+      cabinet(p,-3.15,2.85,{w:3.4,h:1.95,d:.85,rows:3});
+      break;
+    case 'trajectory-policy':
+      p.box('metal',[1,1.15,1.3],[1.6,.15,1.15]);
+      p.box('dark',[1,2.2,1.3],[1.3,2.0,.8]);
+      for(let i=0;i<4;i++)p.box(i===3?'gold':'signal',[1,1.65+i*.36,.88],[1.0,.15,.035]);
+      linePath(p,[[1,2.9,-.82],[1,2.9,.88]],{material:'gold',radius:.055});
+      linePath(p,[[-.4,1.12,.1],[-.4,1.12,1.3],[.32,1.12,1.3]],{material:'metal',radius:.04});
+      for(let i=0;i<3;i++){
+        const z=-2.6+i*2.6;
+        for(const side of [-1,1])p.box('metal',[4+side*1.26,1.4,z],[.045,.45,1.65]);
+        // Rear extension on the front test board keeps its mechanism clear
+        // when the user rotates past the wide, camera-facing prose panels.
+        const mechanismZ=i===0?z+1.5:z;
+        if(i===0){
+          p.box('metal',[4.82,1.22,z+.95],[.25,.08,1.25]);
+          p.box('metal',[4.82,1.8,mechanismZ],[.07,1.12,.07]);
+        }
+        p.box('gold',[4.82,2.4,mechanismZ],[.45,.13,.48]);
+        p.rod('metal',[4.82,2.4,mechanismZ],[4.45,3.5-i*.3,mechanismZ],.035);
+        p.box('paper',[4.45,3.5-i*.3,mechanismZ],[.19,.35,.22],[0,0,.25+i*.22]);
+        p.box('signal',[3.3,1.25,z],[.33,.04,.7]);
+      }
+      break;
+    case 'focus':
+      p.box('dark',[1.1,2.25,2.9],[2.8,1.85,.15]);
+      p.box('paper',[1.1,2.25,2.81],[2.58,1.63,.025]);
+      for(let i=0;i<4;i++)p.box(i===0?'gold':'metal',[1.1,2.83-i*.36,2.783],[2.0-i*.19,.065,.02]);
+      p.box('metal',[1.1,1.15,2.9],[.14,.6,.15]);
+      for(const z of [-.25,.4])linePath(p,[[-2.35,1.94,z],[-1.9,1.94,z+.1],[-1.55,1.94,z-.03]],{material:z>0?'gold':'metal',radius:z>0?.025:.014});
+      for(const x of [-4.67,-3.53])p.box('gold',[x,3.07,-.97],[.12,.16,.08]);
+      cabinet(p,-3.2,2.7,{w:2.3,h:1.55,d:.8,rows:3});
+      break;
+    case 'neural-route':
+      if(slug==='salzburg-tourism-2024') {
+        cabinet(p,-3.4,2.7,{w:2.6,h:2.6,d:.85,rows:3});
+        p.box('dark',[-.15,1.3,2.75],[2.0,.25,1.35]);
+        for(let feature=0;feature<5;feature++){
+          p.box(feature%2?'gold':'signal',[-.9+feature*.38,1.55+feature*.055,2.75],[.25,.25+feature*.11,.85]);
+        }
+        linePath(p,[[-3.38,1.14,2.2],[-3.38,1.14,1.2],[-.15,1.14,1.2],[-.15,1.14,2.03],[1.4,1.14,2.03]],{material:'gold',radius:.045});
+        for(const side of [-1,1])p.box('metal',[-4.2+side*.73,3.07,-1.6],[.08,.22,.22]);
+        p.box('paper',[4.6,1.75,.3],[1.0,.16,1.5]);
+        p.box('dark',[4.6,2.25,.95],[1.0,.85,.08]);
+      }else if(slug==='hackupc-2024') {
+        for(const x of [.3,3.9]){
+          p.box('metal',[x,1.6,-.85],[1.05,.9,.56]);
+          p.box('dark',[x,2.13,-.85],[.8,.1,.62]);
+          p.box('gold',[x,2.23,-.85],[.33,.07,.55]);
+        }
+        p.box('dark',[-3.5,1.18,2.75],[3.6,.15,1.5]);
+        for(let pair=0;pair<3;pair++)for(let side=0;side<2;side++){
+          const x=-4.7+pair*1.2,z=2.38+side*.7;
+          p.box(side?'gold':'signal',[x,1.33,z],[.83,.14,.45]);
+          for(let bit=0;bit<3;bit++)p.box('paper',[x-.23+bit*.23,1.415,z],[.1,.035,.15]);
+        }
+      }else{
+        p.box('stone',[2.1,1.75,1.3],[2.15,.14,.74]);
+        for(const x of [1.2,3.0])p.box('metal',[x,1.45,1.3],[.14,.52,.52]);
+        for(const z of [.96,1.65])p.box('metal',[2.1,1.95,z],[2.15,.06,.04]);
+        p.box('paper',[2.1,1.86,1.3],[1.85,.035,.075]);
+        cardRails(p,-3.6,1.3,2.6,{w:3.5,count:3});
+        for(let i=0;i<4;i++)p.box(i>1?'gold':'signal',[-4.45+i*.5,2.06,-.74],[.24,.05,.18]);
+      }
+      break;
+    case 'bioinformatics':
+      opticalRig(p,-.5,-.55,{y:4.2,w:1.7});
+      cabinet(p,-3.15,2.75,{w:3.5,h:2.05,d:.85,rows:3});
+      for(let i=0;i<5;i++){
+        const x=-4.4+i*.62;p.box('dark',[x,1.25,-2.6],[.46,.16,.82]);
+        p.box('paper',[x,1.36,-2.6],[.36,.06,.7]);p.box('signal',[x,1.4,-2.6],[.23,.02,.36]);
+      }
+      p.box('metal',[3.45,1.14,-1.5],[3.4,.16,2.1]);
+      for(let row=0;row<2;row++)for(let col=0;col<3;col++){
+        const x=2.4+col*1.06,z=-1.96+row*.96;
+        p.box((row+col)%2?'signal':'gold',[x,1.27,z],[.88,.07,.77]);
+        for(let i=0;i<3;i++)p.box('paper',[x+(i-1)*.19,1.315,z+(i%2)*.18],[.1,.025,.12]);
+      }
+      break;
+    case 'circular-appliances':
+      // Unloading gantry and actual recovery path expand the existing X-ray
+      // line; every module follows the source description's circular process.
+      for(const x of [-5.5,-1.9])p.box('metal',[x,3.2,.9],[.17,4.05,.17]);
+      p.box('gold',[-3.7,5.24,.9],[3.94,.19,.28]);
+      p.box('dark',[-3.5,5.04,.9],[.7,.27,.46]);
+      p.rod('metal',[-3.5,4.93,.9],[-3.5,3.85,.9],.055);
+      p.box('metal',[-3.5,3.8,.9],[1.1,.12,.24]);
+      for(const side of [-1,1])p.box('dark',[-3.5+side*.47,3.59,.9],[.08,.45,.27]);
+      for(const x of [-.75,1.1]){
+        p.box('dark',[x,4.02,-.92],[.44,.26,.2]);
+        p.box('gold',[x,3.86,-.93],[.25,.035,.14]);
+      }
+      p.box('metal',[2.85,1.54,.35],[1.7,.2,1.45]);
+      p.box('gold',[2.85,1.68,.35],[1.45,.06,.15],[0,.55,0]);
+      for(let i=0;i<3;i++){
+        const z=-2.3+i*2.2;
+        p.box('dark',[4.7,2.59,z],[1.5,.07,1.45]);
+        for(let part=0;part<3;part++)p.box(i===1?'signal':'metal',[4.3+part*.4,2.76,z],[.28,.3,.72],[0,i*.2,0]);
+      }
+      break;
+    case 'energy-grid':
+      for(const [x,z] of [[-4.25,-1.3],[-1.6,1.4]]){
+        p.box('metal',[x+.42,1.66,z-.69],[.26,.36,.07]);p.box('gold',[x+.42,1.66,z-.736],[.13,.14,.025]);
+      }
+      cabinet(p,2.1,.55,{w:1.1,h:2.45,d:.9,rows:3});
+      for(const z of [-1.7,-.6,.5])linePath(p,[[1.03,1.15,z],[1.35,1.15,z],[1.35,1.15,.55]],{material:'gold',radius:.04});
+      for(let i=0;i<4;i++)p.box(i===2?'gold':'signal',[3.25+i*.53,2.18,1.855],[.3,.3+i*.07,.025]);
+      p.box('dark',[-2.3,1.15,-2.8],[1.7,.18,.86]);
+      for(let i=0;i<3;i++)p.box('paper',[-2.8+i*.5,1.31,-2.8],[.32,.12,.55]);
+      break;
+    case 'linked-ledger':
+      if(slug==='sui-hackathon-poland-2025') {
+        p.box('dark',[-.25,1.18,2.8],[3.3,.16,1.35]);
+        for(let i=0;i<3;i++){
+          const x=-1.35+i*1.05;p.box('paper',[x,1.35,2.8],[.8,.16,.82]);
+          p.box('gold',[x,1.46,2.8],[.4,.035,.18]);
+          if(i)p.box('metal',[x-.54,1.36,2.8],[.2,.06,.16]);
+        }
+        cabinet(p,-3.05,2.9,{w:2.5,h:2.2,d:.6,rows:3});
+        for(const x of [1.55,2.45])p.box('metal',[x,1.06,0],[.06,.13,5.25]);
+      }else if(slug==='ethmunich-2023') {
+        cardRails(p,-3,1.28,2.75,{w:4.3,count:5});
+        for(const x of [-4.25,-1.75])linePath(p,[[x,1.16,-1.5],[x,1.16,-2.6],[2.5,1.16,-2.6]],{material:x< -3?'metal':'gold',radius:.03});
+        for(let i=0;i<4;i++){
+          p.box('metal',[2.5+i*.85,3.09,-1.4],[.65,.09,.85]);
+          p.box('signal',[2.5+i*.85,3.16,-1.4],[.36,.04,.55]);
+        }
+      }else{
+        for(const z of [-.85,.85]){
+          p.box('dark',[-2.8,1.12,z],[4.65,.15,.63]);
+          for(let i=0;i<4;i++)p.box(i%2?'gold':'paper',[-4.45+i*1.02,1.25,z],[.73,.08,.43]);
+        }
+        p.box('metal',[.45,2.15,.05],[.18,2.0,.18]);
+        p.box('gold',[.45,3.23,.05],[1.1,.17,1.3]);
+        linePath(p,[[-.5,1.14,2.8],[.45,1.14,2.8],[.45,1.14,.05],[1.5,1.14,.05]],{material:'gold',radius:.045});
+        cardRails(p,-3.1,1.36,2.7,{w:3.4,count:3});
+      }
+      break;
+    case 'football':
+      // Keep spherical players, as the source explicitly describes them.
+      linePath(p,[[-3.8,1.41,-1.8],[-2.35,1.41,-.9],[-1.1,1.41,.3],[.9,1.41,.1],[2.4,1.41,1.8]],{material:'gold',radius:.025});
+      for(let i=0;i<4;i++)p.box('paper',[1.0+i*.25,1.38,.1],[.09,.025,.36],[0,-.45,0]);
+      p.box('dark',[5.0,1.2,-1.65],[1.5,.18,2.1]);
+      for(let i=0;i<5;i++)p.box(i===2?'gold':'signal',[5,1.35,-2.4+i*.38],[1.12,.09,.19]);
+      for(const x of [-4.5,2.9])for(const z of [-3.25,3.25])p.box('metal',[x,1.31,z],[.17,.09,.2]);
+      break;
+    case 'noseprints':
+      opticalRig(p,-.9,-1.1,{y:3.5,w:1.12});
+      cardRails(p,-3.1,1.3,2.7,{w:4.0,count:4});
+      for(const z of [-1.4,1.1]){
+        p.box('metal',[2.0,3.14,z],[1.1,.12,1.88]);
+        p.box('paper',[2.0,3.22,z],[.82,.035,1.58]);
+        for(let i=0;i<3;i++)p.box(i===1?'gold':'signal',[2.0,3.265,z-.5+i*.48],[.5,.035,.18]);
+      }
+      linePath(p,[[-1.7,1.12,.0],[.85,1.12,.0],[.85,1.12,-1.4],[1.5,1.12,-1.4]],{material:'metal',radius:.035});
+      break;
+    case 'academia':
+      p.box('metal',[1.9,2.05,-1.8],[.16,1.9,.16]);
+      p.box('dark',[1.9,3.0,-1.8],[1.5,.12,1.1],[.2,0,0]);
+      p.box('paper',[1.9,3.1,-1.8],[1.1,.045,.76],[.2,0,0]);
+      for(const y of [1.35,3.25])p.box('metal',[-3.6,y,2.8],[1.2,.14,1.0]);
+      for(const dx of [-.43,.43])p.box('gold',[-3.6+dx,2.3,2.8],[.06,1.82,.06]);
+      // The rector's hourglass is explicitly mentioned in the source text.
+      if(typeof p.cone==='function'){
+        p.cone('paper',[-3.6,2.75,2.8],.44,.83,[Math.PI,0,0]);
+        p.cone('paper',[-3.6,1.86,2.8],.44,.83);
+      }else{
+        for(const y of [1.87,2.76])p.box('paper',[-3.6,y,2.8],[.61,.59,.61],[0,0,Math.PI/4]);
+      }
+      p.cylinder('gold',[-3.6,2.28,2.8],.055,.16);
+      break;
+    case 'radar':
+      for(const dx of [-1.1,1.1])p.rod('metal',[-2.6+dx,3.53,.35],[-2.6,4.6,-1.25],.033);
+      for(let i=0;i<3;i++){
+        p.box('paper',[.8,1.53+i*.73,-2.43],[1.1,.35,.025]);
+        for(let j=0;j<3;j++)p.box('gold',[.48+j*.31,1.54+i*.73,-2.456],[.11,.08,.025]);
+      }
+      p.box('dark',[-2.6,1.14,2.3],[3.2,.2,1.4]);
+      for(let i=0;i<3;i++)p.box('metal',[-3.55+i*.95,1.42,2.3],[.75,.32,1.0]);
+      break;
+  }
+}
+
+/**
+ * Close-up craftsmanship, not a second renderer or invented project copy.
+ * Machined collars, recessed interfaces, handles, trusses and fasteners make
+ * the existing explanatory objects feel assembled and usable at the 4× scale.
+ */
+function addExhibitCraft(subject,p,slug) {
+  switch(subject){
+    case 'supply-chain':{
+      const fx=3.75,fz=2.55;
+      for(const side of [-1,1]){
+        for(const dz of [-.63,.63])for(let block=0;block<6;block++){
+          const a=block*Math.PI/3;
+          p.box('dark',[fx+side*.88,1.13+Math.cos(a)*.322,fz+dz+Math.sin(a)*.322],[.21,.047,.19],[a,0,0]);
+        }
+        p.cylinder('metal',[fx+side*.29,2.16,fz-1.08],.045,1.18);
+        p.box('gold',[fx+side*.29,1.58,fz-1.08],[.15,.13,.18]);
+        p.box('metal',[fx+side*.91,1.67,fz+.02],[.22,.08,.63]);
+        for(let i=0;i<3;i++)p.box('dark',[fx+side*.91,1.724,fz-.19+i*.19],[.16,.022,.055]);
+      }
+      p.box('metal',[fx+.31,2.13,fz-.16],[.08,.34,.08],[0,0,-.17]);
+      p.box('dark',[fx+.28,2.32,fz-.16],[.14,.09,.14]);
+      p.box('dark',[fx,1.93,fz-.48],[.44,.06,.18],[.28,0,0]);
+      for(const y of [1.28,3.95])p.box('gold',[-3.25,y,3.86],[3.24,.045,.13]);
+      p.rod('metal',[-4.71,1.35,3.91],[-1.78,3.86,3.91],.025);
+      p.rod('metal',[-4.71,3.86,3.91],[-1.78,1.35,3.91],.025);
+      for(const x of [-4.53,3.38])for(const z of [-1.05,1.05])p.box('gold',[x,1.64,z],[.13,.13,.075]);
+      instrumentFace(p,-.66,3.3,1.0,{w:.27,h:.42,buttons:2});
+      break;
+    }
+    case 'health-imaging':
+      if(slug==='draeger-2023'){
+        instrumentFace(p,-3.85,2.07,-.625,{w:1.65,h:.24,buttons:4});
+        instrumentFace(p,.25,3.1,2.225,{w:1.7,h:.27,buttons:3});
+        radiator(p,3.8,2.16,2.07,{w:1.85,h:.27,bars:3});
+        for(let i=0;i<3;i++)p.box('paper',[-.8+i*.8,2.3,-.9],[.32,.06,.35]);
+        for(const x of [-4.5,-3.2])p.box('metal',[x,1.0,.72],[.2,.06,.24]);
+      }else{
+        radiator(p,-3.45,4.58,-.54,{w:.39,h:.22,bars:3});
+        instrumentFace(p,.6,2.82,2.214,{w:1.06,h:.28});
+        for(const side of [-1,1]){
+          p.box('metal',[-3.45+side*1.47,4.24,-.3],[.16,.34,.16]);
+          p.box('gold',[-3.45+side*1.47,4.26,-.398],[.095,.2,.036]);
+          p.box('dark',[-3.4+side*1.35,1.96,-.15],[.15,.09,1.7]);
+        }
+        p.box('metal',[-.9,3.8,-.975],[.28,.035,.035]);
+        drawerGrip(p,3.5,1.7,.31,1.6);
+      }
+      break;
+    case 'semiconductor':
+      for(const a of [0,Math.PI/2,Math.PI,Math.PI*1.5]){
+        const x=.15+Math.cos(a)*.77,y=2.3+Math.sin(a)*.77;
+        p.box('metal',[x,y,-2.26],[.16,.16,.075],[0,0,a]);
+        p.box('gold',[x,y,-2.311],[.085,.085,.035],[0,0,a]);
+      }
+      radiator(p,-2.7,4.12,1.94,{w:1.88,h:.25,bars:3});
+      drawerGrip(p,-.65,1.64,1.123,.8);
+      for(const point of [[1.7,3.4,-.25],[2.45,3.2,-1.5],[1.1,2.45,-1.5]]){
+        p.box('dark',[point[0],point[1],point[2]-.12],[.15,.15,.04]);
+        p.box('metal',[point[0],point[1],point[2]-.15],[.06,.06,.025]);
+      }
+      instrumentFace(p,3.9,2.05,1.03,{w:1.6,h:.24,buttons:4});
+      break;
+    case 'energy-forum':
+      if(slug==='six-swisshacks-2024'){
+        for(let row=0;row<4;row++)drawerGrip(p,-3.4,1.7+row*.53,1.905,1.55);
+        for(const x of [-4.67,-3.35])p.box('metal',[x,2.66,.08],[.1,.035,1.45]);
+        instrumentFace(p,3.6,2.08,.64,{w:2.35,h:.24,buttons:4});
+      }else if(slug==='zurich-climathon-2024'){
+        for(const x of [-3.8,0,3.8]){
+          instrumentFace(p,x,2.12,-.653,{w:1.35,h:.2});
+          p.box('metal',[x,1.32,-.15],[1.48,.08,.63]);
+          p.box('dark',[x,1.23,-.15],[1.28,.07,.48]);
+        }
+        for(let row=0;row<3;row++)drawerGrip(p,0,1.75+row*.48,2.14,2.5);
+      }else{
+        for(const x of [-3.65,0,3.65])for(const side of [-1,1]){
+          p.box('metal',[x+side*.6,1.54,-.8],[.075,.44,.08]);
+          p.box('dark',[x+side*.6,1.78,-.8],[.14,.1,.72]);
+        }
+        for(const x of [-2.74,2.74])p.box('metal',[x,4.25,3.41],[.08,2.62,.07]);
+        for(const y of [2.98,5.52])p.box('metal',[0,y,3.41],[5.55,.06,.07]);
+        if(slug==='decarbon-days-climathon-2026'){
+          for(const x of [2.24,5.36])p.box('gold',[x,3.67,1.551],[.035,1.16,.025]);
+          for(const y of [3.08,4.26])p.box('gold',[3.8,y,1.551],[3.14,.035,.025]);
+        }else instrumentFace(p,3.85,1.38,1.776,{w:1.9,h:.22,buttons:3});
+      }
+      break;
+    case 'discovery-graph':
+      if(slug==='dsag-ideathon-2024'){
+        for(let row=0;row<4;row++)drawerGrip(p,-3.3,1.6+row*.46,2.096,1.95);
+        instrumentFace(p,-3.2,3.34,-.22,{w:1.8,h:.24});
+        for(const x of [-4.8,-1.6])p.box('gold',[x,2.2,-.2],[.1,.33,.035]);
+      }else{
+        for(const x of [-4.2,-1.5,1.2]){
+          instrumentFace(p,x,1.36,-2.08,{w:1.7,h:.22});
+          for(const side of [-1,1])p.box('metal',[x+side*.99,2.47,-1.746],[.035,2.44,.025]);
+        }
+        for(let row=0;row<3;row++)drawerGrip(p,-3.6,1.63+row*.7,1.828,1.75);
+      }
+      break;
+    case 'globe':
+      for(const side of [-1,1]){
+        p.cylinder('metal',[-3.2+side*2.11,3.5,0],.11,.29,[0,0,Math.PI/2]);
+        p.box('dark',[-3.2+side*2.11,3.1,0],[.12,.64,.4]);
+        p.rod('metal',[-3.2+side*2.11,2.77,0],[-3.2+side*.61,1.24,0],.035);
+      }
+      for(const x of [.13,5.27])p.box('metal',[x,1.62,.1],[.045,.065,4.29]);
+      for(const z of [-2.045,2.245])p.box('metal',[2.7,1.62,z],[5.18,.065,.045]);
+      instrumentFace(p,2.7,1.22,-2.25,{w:2.25,h:.18,buttons:4});
+      break;
+    case 'coins':
+      for(let row=0;row<2;row++)for(let col=0;col<3;col++){
+        const x=-4.5+col*1.9,z=-1.05+row*2;
+        for(const dx of [-.725,.725])p.box('metal',[x+dx,2.02,z],[.035,.085,1.48]);
+        for(const dz of [-.72,.72])p.box('metal',[x,2.02,z+dz],[1.48,.085,.035]);
+        p.box('metal',[x-.105,2.176,z+.06],[.11,.028,.2],[0,.3+col*.2,0]);
+        p.box('metal',[x+.105,2.176,z+.06],[.11,.028,.2],[0,-.3-col*.2,0]);
+      }
+      instrumentFace(p,-3.7,3.92,-.845,{w:.37,h:.16,buttons:2});
+      p.cylinder('metal',[-3.36,4.02,-.6],.075,.14,[0,0,Math.PI/2]);
+      for(let row=0;row<3;row++)drawerGrip(p,-2.4,1.62+row*.65,2.433,2.4);
+      break;
+    case 'gifting':
+      for(let i=0;i<3;i++){
+        const x=-4.7+i*2.15,h=1.2+i*.28,z=-.7+(i%2)*1.2;
+        for(const side of [-1,1])p.box('metal',[x+side*.76,1.31+h,z],[.035,.032,1.46]);
+        p.box('gold',[x,1.27+h,z-.84],[.4,.16,.024]);
+      }
+      for(let row=0;row<3;row++)drawerGrip(p,3.4,1.63+row*.56,2.377,1.78);
+      for(const x of [2.15,3.2,4.25])p.box('metal',[x,2.08,1.463],[.29,.06,.045]);
+      instrumentFace(p,.6,1.21,-1.465,{w:.6,h:.19,buttons:2});
+      break;
+    case 'satellite':
+      for(const side of [-1,1])for(const z of [-.94,.14]){
+        p.box('paper',[-1.8+side*.7,3.6,z],[.065,1.82,.065]);
+        p.cylinder('gold',[-1.8+side*.87,3.6,z],.1,.2,[0,0,Math.PI/2]);
+        p.box('metal',[-1.8+side*.96,3.6,z],[.045,.3,.28]);
+      }
+      radiator(p,-1.8,2.99,-1.218,{w:1.08,h:.34,bars:4});
+      p.cylinder('metal',[-1.8,3.9,-1.58],.285,.065,[Math.PI/2,0,0]);
+      p.cylinder('dark',[-1.8,3.9,-1.688],.17,.027,[Math.PI/2,0,0]);
+      p.box('dark',[3.6,2.23,-.65],[.63,.17,.48]);
+      for(const dx of [-.27,.27])p.box('gold',[3.6+dx,2.32,-.65],[.08,.2,.27]);
+      instrumentFace(p,3.5,2.0,1.445,{w:2.25,h:.21,buttons:4});
+      break;
+    case 'spatial-audio':
+      if(slug==='huawei-agorize-2024'){
+        for(let i=0;i<3;i++){
+          const x=-4.8+i*2,z=.9+Math.abs(i-1)*.6;
+          p.cylinder('dark',[x,3.15,z-.514],.135,.06,[Math.PI/2,0,0]);
+          p.box('paper',[x-.22,3.15,z-.312],[.055,.39,.035]);
+          p.box('paper',[x+.22,3.15,z-.312],[.055,.39,.035]);
+          p.box('metal',[x,2.6,z],[.14,.15,.14]);
+          p.box('gold',[x+.105,2.6,z],[.1,.065,.065]);
+        }
+        instrumentFace(p,3.6,2.16,.374,{w:2.0,h:.2,buttons:4});
+        for(const side of [-1,1])p.box('metal',[-2.8+side*.98,1.95,0],[.055,.045,2.45]);
+      }else{
+        for(const x of [3.1,5.0]){
+          p.cylinder('dark',[x,2.4,-.548],.31,.045,[Math.PI/2,0,0]);
+          p.cylinder('metal',[x,2.4,-.593],.115,.046,[Math.PI/2,0,0]);
+          for(const dx of [-.51,.51])for(const y of [1.93,2.86])p.box('paper',[x+dx,y,-.463],[.055,.055,.038]);
+          for(let i=0;i<3;i++)p.box('metal',[x+.62,3.15+i*.17,.2],[.028,.035,.65]);
+        }
+        for(const x of [-2.77,1.57])p.box('metal',[x,2.0,-.26],[.045,.08,1.72]);
+        for(const z of [-1.12,.6])p.box('metal',[-.6,2.0,z],[4.38,.08,.045]);
+        instrumentFace(p,.2,1.46,1.821,{w:2.5,h:.23,buttons:5});
+      }
+      break;
+    case 'finance-graph':
+      instrumentFace(p,-2.8,2.08,-.815,{w:2.35,h:.21,buttons:4});
+      for(const x of [1.15,3.05,4.95]){
+        p.box('metal',[x-.68,2.65,-1.901],[.026,2.45,.027]);
+        p.box('metal',[x+.68,2.65,-1.901],[.026,2.45,.027]);
+        p.box('gold',[x,1.48,-1.901],[1.35,.027,.026]);
+      }
+      for(let row=0;row<3;row++)drawerGrip(p,-3.15,1.55+row*.53,2.358,1.95);
+      break;
+    case 'trajectory-policy':
+      instrumentFace(p,1,2.76,.864,{w:.91,h:.21,buttons:3});
+      radiator(p,1,4.13,-2.408,{w:1.04,h:.29,bars:3});
+      for(let i=0;i<3;i++){
+        const z=-2.6+i*2.6,mechanismZ=i===0?z+1.5:z;
+        p.box('dark',[4.82,2.4,mechanismZ],[.18,.18,.51]);
+        p.box('gold',[4.82,2.4,mechanismZ-.282],[.075,.075,.045]);
+        p.box('metal',[3.3,1.33,z],[.33,.1,.74]);
+        for(const dx of [-.085,.085])p.box('paper',[3.3+dx,1.4,z],[.045,.04,.46]);
+      }
+      instrumentFace(p,-3.1,2.08,-.855,{w:2.15,h:.21,buttons:4});
+      break;
+    case 'focus':
+      for(const side of [-1,1]){
+        p.box('metal',[-4.1+side*.53,2.9,-1.46],[.095,.11,.025]);
+        p.box('gold',[-4.1+side*.53,2.9,-1.478],[.034,.038,.011]);
+        p.box('dark',[-2.5+side*2.64,1.82,-.5],[.07,.12,2.52]);
+      }
+      instrumentFace(p,1.1,1.48,2.81,{w:1.85,h:.22});
+      for(let i=0;i<3;i++)drawerGrip(p,-3.2,1.36+i*.36,2.234,1.4);
+      p.box('metal',[-1.8,1.931,-1.32],[1.43,.02,.045]);
+      p.box('metal',[-1.8,1.931,.22],[1.43,.02,.045]);
+      break;
+    case 'neural-route':
+      if(slug==='salzburg-tourism-2024'){
+        for(const dx of [-.51,-.17,.17,.51]){
+          p.box('metal',[-4.2+dx,3.12,-.755],[.11,.16,.04]);
+          p.box('gold',[-4.2+dx,3.12,-.784],[.04,.063,.023]);
+        }
+        instrumentFace(p,-.15,1.5,2.05,{w:1.66,h:.17,buttons:5});
+        for(let row=0;row<3;row++)drawerGrip(p,-3.4,1.59+row*.68,2.211,1.5);
+        for(const z of [-3.13,3.13])p.box('metal',[2.65,1.25,z],[5.6,.025,.035]);
+      }else if(slug==='hackupc-2024'){
+        // Visible aircraft controls: tailplanes, paired engine nacelles and
+        // gate turnstiles. They illustrate routes, not a real airline fleet.
+        for(const side of [-1,1]){
+          p.cylinder('metal',[2.6+side*.61,3.85,.77],.13,.38,[Math.PI/2,0,0]);
+          p.box('gold',[2.6+side*.61,3.85,.553],[.13,.13,.03]);
+        }
+        for(const x of [.3,3.9]){
+          p.box('dark',[x,1.7,-1.154],[.41,.09,.037]);
+          p.box('paper',[x,1.81,-1.154],[.06,.065,.045]);
+        }
+        instrumentFace(p,-3.5,1.18,1.938,{w:2.7,h:.14,buttons:4});
+      }else{
+        for(const side of [-1,1]){
+          p.box('paper',[1.8+side*.24,1.58,-1.49],[.11,.11,.03]);
+          p.box('gold',[1.8+side*.24,1.58,-.113],[.11,.07,.03]);
+          p.box('metal',[1.8+side*.36,1.45,-.8],[.045,.1,.92]);
+        }
+        for(let i=0;i<5;i++)p.box('gold',[2.1,1.79,.98+i*.13],[.043,.025,.065]);
+        instrumentFace(p,-4,2.06,-.811,{w:1.9,h:.22,buttons:4});
+      }
+      break;
+    case 'bioinformatics':
+      radiator(p,-.5,3.95,-.797,{w:.43,h:.22,bars:3});
+      instrumentFace(p,3.45,1.21,-2.579,{w:2.0,h:.18,buttons:4});
+      for(let i=0;i<5;i++){
+        const x=-4.4+i*.62;
+        p.box('metal',[x-.19,1.365,-2.6],[.025,.048,.68]);
+        p.box('metal',[x+.19,1.365,-2.6],[.025,.048,.68]);
+      }
+      for(let row=0;row<3;row++)drawerGrip(p,-3.15,1.54+row*.57,2.266,1.95);
+      break;
+    case 'circular-appliances':
+      for(const x of [-.93,1.33])for(const y of [2.17,3.58])p.box('gold',[x,y,-.944],[.13,.13,.045]);
+      instrumentFace(p,.2,2.36,-.947,{w:1.48,h:.23,buttons:4});
+      radiator(p,-3.5,5.04,.644,{w:.5,h:.17,bars:3});
+      for(const side of [-1,1]){
+        p.box('metal',[-3.5+side*.47,3.37,.9],[.16,.075,.35]);
+        p.box('dark',[-3.5+side*.47,3.36,.66],[.11,.09,.1]);
+      }
+      p.box('metal',[2.85,1.64,-.35],[1.38,.11,.05]);
+      p.box('metal',[2.85,1.64,1.05],[1.38,.11,.05]);
+      break;
+    case 'energy-grid':
+      instrumentFace(p,2.1,2.86,.031,{w:.75,h:.25});
+      for(const z of [-1.7,-.6,.5]){
+        p.box('metal',[.7,2.49,z],[.64,.065,.58]);
+        for(const side of [-1,1])p.box('gold',[.7+side*.2,2.545,z],[.075,.055,.12]);
+      }
+      for(const [x,z] of [[-4.25,-1.3],[-1.6,1.4]]){
+        for(const dx of [-.67,.67])p.box('metal',[x+dx,2.67,z],[.027,.024,.8],[.18,0,0]);
+        p.box('paper',[x,2.72,z+.42],[1.3,.025,.035],[.18,0,0]);
+      }
+      radiator(p,4.1,2.12,.814,{w:1.7,h:.2,bars:3});
+      break;
+    case 'linked-ledger':
+      if(slug==='sui-hackathon-poland-2025'){
+        for(const z of [-2.35,0,2.35])for(const dx of [-.55,.55])for(const y of [1.48,3.01]){
+          p.box('metal',[2+dx,y,z-.162],[.12,.07,.029]);
+        }
+        for(let row=0;row<3;row++)drawerGrip(p,-3.05,1.65+row*.56,2.55,1.3);
+        instrumentFace(p,-.25,1.19,2.068,{w:1.95,h:.17});
+      }else if(slug==='ethmunich-2023'){
+        for(const x of [-4.25,-1.75]){
+          for(const dx of [-.83,.83])p.box('paper',[x+dx,2.45,-.542],[.035,1.38,.025]);
+          p.box('metal',[x,1.8,-.542],[1.65,.035,.025]);
+          instrumentFace(p,x,1.56,-.6,{w:1.3,h:.18,buttons:2});
+        }
+        instrumentFace(p,3.5,2.05,2.07,{w:2.2,h:.21,buttons:4});
+      }else{
+        for(const z of [-.85,.85]){
+          p.box('metal',[-2.8,1.23,z-.3],[4.3,.025,.035]);
+          p.box('metal',[-2.8,1.23,z+.3],[4.3,.025,.035]);
+        }
+        instrumentFace(p,.45,3.22,-.618,{w:.85,h:.11,buttons:2});
+        instrumentFace(p,4.45,1.77,-.018,{w:1.47,h:.23});
+      }
+      break;
+    case 'football':
+      for(const x of [-5.2,3.8]){
+        const back=x<0?x-.28:x+.28;
+        for(const z of [-.85,.85]){
+          p.box('metal',[(x+back)/2,1.35,z],[.28,.05,.035]);
+          p.box('paper',[back,1.66,z],[.035,.65,.035]);
+        }
+        for(let row=0;row<3;row++)p.box('paper',[back,1.45+row*.18,0],[.022,.022,1.63]);
+        for(let col=0;col<5;col++)p.box('paper',[back,1.65,-.72+col*.36],[.022,.52,.018]);
+      }
+      instrumentFace(p,5,1.34,-2.728,{w:1.05,h:.17,buttons:3});
+      break;
+    case 'noseprints':
+      radiator(p,-.9,3.24,-1.347,{w:.4,h:.21,bars:3});
+      instrumentFace(p,4.5,1.86,-.028,{w:1.35,h:.21,buttons:3});
+      for(const z of [-1.4,1.1]){
+        for(const dx of [-.41,.41])p.box('metal',[2+dx,2.03,z-.898],[.035,1.71,.032]);
+        drawerGrip(p,2,1.3,z-.919,.58);
+      }
+      for(let i=0;i<4;i++)p.box('metal',[-4.6+i*.98,1.52,2.67],[.085,.48,.085]);
+      break;
+    case 'academia':
+      for(const x of [-4.61,-2.99])p.box('gold',[x,2.155,0],[.05,.045,2.13]);
+      p.box('metal',[-3.8,2.2,0],[.035,.075,2.09]);
+      for(const side of [-1,1])p.box('metal',[-3.6+side*.43,1.48,2.8],[.15,.12,.16]);
+      for(const side of [-1,1])p.box('metal',[-3.6+side*.43,3.12,2.8],[.15,.12,.16]);
+      p.box('gold',[1.9,2.15,-1.894],[.5,.15,.035]);
+      instrumentFace(p,4.1,1.9,.578,{w:1.9,h:.18,buttons:4});
+      break;
+    case 'radar':
+      for(const dx of [-.45,.45]){
+        p.box('metal',[-2.6+dx,2.53,-.35],[.13,.18,.45]);
+        p.box('gold',[-2.6+dx,2.54,-.603],[.08,.08,.035]);
+      }
+      radiator(p,.8,3.54,-2.469,{w:1.01,h:.29,bars:3});
+      instrumentFace(p,3.7,2.08,.968,{w:2.55,h:.21,buttons:4});
+      for(let i=0;i<3;i++)drawerGrip(p,-3.55+i*.95,1.43,1.775,.5);
+      break;
+  }
+}
+
+/**
  * p = {box,sphere,cylinder,ring,rod,cone?}, already material-keyed/batched.
  * context = {slug,project}; the project is never changed or used as new copy.
  * Returns true when handled, false for unknown future subjects (host fallback).
@@ -580,6 +1431,8 @@ export function buildDetailedExhibit(subject,p,context={}) {
     case 'noseprints':noseprints(p);break;
     case 'academia':academia(p);break;
   }
+  addExhibitSystems(subject,p,slug);
+  addExhibitCraft(subject,p,slug);
   if(typeof context.onParts==='function')context.onParts(EXHIBIT_MODELS[slug]??null);
   return true;
 }

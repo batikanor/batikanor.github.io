@@ -1,9 +1,10 @@
 import * as THREE from 'three';
+import {createExhibitGameAttachment} from './exhibitGameAttachment.js';
 import * as maplibregl from 'maplibre-gl';
 import {mergeGeometries} from 'three/addons/utils/BufferGeometryUtils.js';
-import {distanceMetres} from './geo.js';
+import {distanceMetres,sampleTerrainElevation} from './geo.js';
 import {getProject} from './projectContent.js';
-import {createAchievementSigns, updateAchievementSigns, selectAchievementSignContent} from './achievementSigns.js';
+import {createAchievementSigns, updateAchievementSigns, selectAchievementSignContent, ACHIEVEMENT_GAME_SIGN_POSITIONS} from './achievementSigns.js';
 
 // Visually sited on the open lawn adjoining Unternehmertum's paved access area
 // in Bavarian DOP20 imagery, ~19 m from the curated car start. The event's
@@ -419,6 +420,7 @@ export function createHeroVenueLayer({lngLat = HERO_VENUE_LOCATION, onScan = () 
         panel.material.needsUpdate = true;
       }
       world.add(signs);
+      signs.visible=game.isActive();
     } catch (error) {
       // A browser denying 2D canvas must not prevent the existing radar/story
       // from working. Reader content still uses the actual authored project.
@@ -426,18 +428,28 @@ export function createHeroVenueLayer({lngLat = HERO_VENUE_LOCATION, onScan = () 
       console.warn('Native project signs unavailable; authored project content remains accessible.', error);
     }
   }
+  const gamePointVector=new THREE.Vector4(),gamePoint={x:0,y:0};let gameProjectionReady=false;
+  const game=createExhibitGameAttachment({getSlug:()=>visible?HERO_VENUE_EVENT:null,getHost:()=>world,
+    getDemo:()=>structure?[structure.root]:[],getSigns:()=>signs?.userData.panels?.map(panel=>panel.head)??[],getProjection:()=>layer.camera?.projectionMatrix,
+    getCanvas:()=>layer.map?.getCanvas(),canRender:()=>visible&&gameProjectionReady,
+    transformInput:input=>{const yaw=(layer.map?.getBearing?.()??0)*Math.PI/180;
+      return {x:input.x*Math.cos(yaw)-input.z*Math.sin(yaw),z:input.x*Math.sin(yaw)+input.z*Math.cos(yaw),activate:input.activate};},
+    onRepaint:()=>layer.map?.triggerRepaint(),onActiveChange:active=>{if(structure)structure.root.visible=!active;if(signs)signs.visible=active;}
+  });
   const layer = {
     id: 'earth-engine-hero-venue',
     type: 'custom',
     renderingMode: '3d',
     setActive(next) {
-      visible = !!next;
+      visible = !!next;gameProjectionReady=false;
+      if(!visible)game.stop();
       if (visible) ensureSigns();
       else { releaseSigns(); signsUnavailable = false; }
       if (!visible && phase === 'scanning') { phase = 'idle'; onScan({phase}); }
       this.map?.triggerRepaint();
     },
     triggerScan() {
+      if(game.isActive())game.stop();
       if (!visible || !this.map || this.map.getZoom() < 19.5) return false;
       const center = this.map.getCenter();
       if (distanceMetres([center.lng, center.lat], position) > 75) return false;
@@ -448,11 +460,32 @@ export function createHeroVenueLayer({lngLat = HERO_VENUE_LOCATION, onScan = () 
       this.map.triggerRepaint();
       return true;
     },
+    getGamePosition() { return visible ? heroLocalCoordinate(position,[2.96,-2.38]) : null; },
+    getGameScreenPosition() {
+      if(!visible||!gameProjectionReady||!this.camera||!this.map)return null;
+      const canvas=this.map.getCanvas(),width=canvas.clientWidth,height=canvas.clientHeight;
+      if(!(width>0&&height>0))return null;
+      gamePointVector.set(2.96,1.16,-2.38,1).applyMatrix4(this.camera.projectionMatrix);
+      if(!(gamePointVector.w>0))return null;
+      gamePoint.x=(gamePointVector.x/gamePointVector.w+1)*width/2;
+      gamePoint.y=(1-gamePointVector.y/gamePointVector.w)*height/2;
+      return gamePoint;
+    },
     getScanState() { return {phase}; },
+    startGame(slug){phase='idle';return game.start(slug);},
+    stopGame(){game.stop();},
+    resetGame(){game.reset();},
+    gameIsActive(){return game.isActive();},
+    gameClick(id,point){return game.click(id,point);},
+    gameHover(id){game.hover(id);},
+    gameInput(input){game.input(input);},
+    pickGameObject(point){return game.pick(point);},
+    getGameStats(){return game.getStats();},
     getSignContent() { return visible ? signs?.userData.content ?? signContent : null; },
-    getSignPositions() { return visible ? [-7, 7].map(east => heroLocalCoordinate(position, [east, -8])) : []; },
+    getSignPositions() { return visible&&game.isActive() ? ACHIEVEMENT_GAME_SIGN_POSITIONS.map(([east,,south])=>heroLocalCoordinate(position,[east,south])) : []; },
     getExhibitFocus() { return visible ? [...position] : null; },
     onAdd(map, gl) {
+      game.revive();
       this.map = map;
       this.camera = new THREE.Camera();
       this.scene = new THREE.Scene();
@@ -477,18 +510,20 @@ export function createHeroVenueLayer({lngLat = HERO_VENUE_LOCATION, onScan = () 
       ensureSigns();
     },
     render(gl, args) {
+      gameProjectionReady=false;
       if (!visible || !this.map || !structure || !this.renderer
         || !args.defaultProjectionData?.mainMatrix || this.map.getZoom() < 17
         || args.defaultProjectionData.projectionTransition > 0) return;
       if (signs) {
         const center = this.map.getCenter();
-        updateAchievementSigns(signs, {zoom: this.map.getZoom(),
+        updateAchievementSigns(signs, {visible: game.isActive(), zoom: this.map.getZoom(),
           distanceM: distanceMetres([center.lng, center.lat], position),
           // Convert public camera bearing to Hero's z=south basis, while the
           // shared panel implementation uses z=north. Poles remain stationary.
           bearing: 180 - (this.map.getBearing?.() ?? 42), pitch: this.map.getPitch?.() ?? 54});
       }
       const now = performance.now();
+      game.render(now);
       if (phase === 'scanning') {
         const elapsed = now - scanStart;
         const motionReduced = reducedMotion();
@@ -504,7 +539,7 @@ export function createHeroVenueLayer({lngLat = HERO_VENUE_LOCATION, onScan = () 
           onScan({phase});
         }
       } else if (phase === 'idle') structure.updateScan(SCAN_DURATION_MS);
-      const elevation = this.map.queryTerrainElevation(position) ?? 0;
+      const elevation = sampleTerrainElevation(this.map,position) ?? 0;
       const origin = maplibregl.MercatorCoordinate.fromLngLat(position, elevation + 0.06);
       const scale = origin.meterInMercatorCoordinateUnits();
       const model = new THREE.Matrix4()
@@ -514,10 +549,11 @@ export function createHeroVenueLayer({lngLat = HERO_VENUE_LOCATION, onScan = () 
         .multiply(new THREE.Matrix4().makeScale(-scale, scale, scale));
       this.camera.projectionMatrix = new THREE.Matrix4().fromArray(args.defaultProjectionData.mainMatrix).multiply(model);
       this.renderer.resetState();
-      this.renderer.render(this.scene, this.camera);
+      this.renderer.render(this.scene, this.camera);gameProjectionReady=true;
     },
     onRemove() {
-      releaseSigns();
+      game.destroy();
+      gameProjectionReady=false;releaseSigns();
       structure?.dispose();
       this.scene?.clear();
       this.renderer?.dispose();

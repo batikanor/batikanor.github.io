@@ -8,7 +8,9 @@ import * as maplibregl from 'maplibre-gl';
 import {ACHIEVEMENT_SCENE_SUBJECTS, ACHIEVEMENT_SCENE_CREDIT} from '../src/achievementSceneData.js';
 import {contestsAndActivities} from '../src/data/contestsAndActivities.js';
 import {authoredSignProse} from '../src/achievementSigns.js';
+import {CAPSULE_LAYOUT,CAPSULE_SCALE,CAPSULE_SIGN_POSITIONS} from '../src/achievementCapsule.js';
 import {validateAchievementContext,pointInFootprint,footprintIntersectsExhibit,chooseExhibitSite,
+  footprintPlanarDiameter,footprintInteriorAnchor,selectExhibitRoof,
   buildAchievementExhibit,buildAchievementGeography,disposeAchievementScene,
   validateAchievementRoofImagery,achievementRoofUv,
   createAchievementSceneLayer} from '../src/achievementSceneLayer.js';
@@ -105,22 +107,47 @@ test('context validator refuses incomplete coverage, fabricated origins, malform
   assert.throws(()=>validateAchievementContext(mutate(data=>data.chapters.pop()),achievements),/cover/);
   assert.throws(()=>validateAchievementContext(mutate(data=>data.chapters[0].origin[0]+=.01),achievements),/actual event/);
   assert.throws(()=>validateAchievementContext(mutate(data=>data.chapters[0].buildings[0].ring[0][0]=261),achievements),/footprint/);
+  assert.throws(()=>validateAchievementContext(mutate(data=>data.chapters[0].buildings[0].ring=[[0,0],[1,0],[2,0]]),achievements),/degenerate OSM footprint/);
   assert.throws(()=>validateAchievementContext(mutate(data=>data.chapters[0].buildings[0].height=Infinity),achievements),/height/);
   assert.throws(()=>validateAchievementContext(mutate(data=>data.chapters[0].source.sha256='unverified'),achievements),/provenance/);
 });
 
-test('illustrative exhibit siting respects mapped roofs when sufficient nearby open space exists',()=>{
+test('longest-roof selection uses true planar span, preserves mapped data and anchors inside concave footprints',()=>{
   const square=[[-15,-15],[15,-15],[15,15],[-15,15]];
   assert.equal(pointInFootprint([0,0],square),true);assert.equal(pointInFootprint([30,0],square),false);
-  const chapter={buildings:[{ring:square}]};const site=chooseExhibitSite(chapter);
-  assert.ok(Math.hypot(...site)<=100);assert.ok(Math.hypot(...site)>0);
-  for(const corner of [[-19,-15],[-19,15],[19,-15],[19,15],[0,0]])
-    assert.ok(!pointInFootprint([site[0]+corner[0],site[1]+corner[1]],square));
-  const empty=chooseExhibitSite({buildings:[]});
-  assert.ok(empty[0]<0 && empty[1]<0,'court should face the southwest default camera');
-  assert.ok(Math.abs(Math.hypot(...empty)-50)<1e-9);
+  const narrow=[[-25,-.5],[25,-.5],[25,.5],[-25,.5]];
+  const chapter={buildings:[{id:2,height:200,ring:square},{id:8,height:4,ring:narrow},{id:3,height:7,ring:[...narrow].reverse()}]};
+  const before=structuredClone(chapter),roof=selectExhibitRoof(chapter);
+  assert.equal(roof.building.id,3,'the longest footprint wins regardless of taller/larger competitors; ties use stable OSM ids');
+  assert.ok(Math.abs(roof.lengthM-Math.sqrt(2501))<1e-12);assert.ok(pointInFootprint(roof.site,roof.building.ring));
+  assert.equal(selectExhibitRoof({buildings:[...chapter.buildings].reverse()}).building.id,3);
+  assert.deepEqual(chooseExhibitSite(chapter),roof.site);assert.deepEqual(chapter,before);
+  assert.equal(selectExhibitRoof(null),null);assert.equal(selectExhibitRoof({buildings:[]}),null);
+  assert.deepEqual(chooseExhibitSite(null),[0,0],'missing data cannot fabricate a roof or camera-facing offset');
+  const concave=[[-5,-5],[5,-5],[5,5],[2,5],[2,-2],[-2,-2],[-2,5],[-5,5]];
+  assert.ok(!pointInFootprint([0,0],concave),'bounding-box centre is outside this real roof shape');
+  assert.ok(pointInFootprint(footprintInteriorAnchor(concave),concave),'triangulated fallback must sit in the actual roof');
+  assert.equal(footprintPlanarDiameter([[0,0],[0,0],[3,0],[1,0]]),3,'closed/collinear source vertices have an exact span');
   assert.equal(footprintIntersectsExhibit([0,0],[[-100,-1],[100,-1],[100,1],[-100,1]]),true,'narrow crossing building');
   assert.equal(footprintIntersectsExhibit([0,0],[[-1,-1],[1,-1],[1,1],[-1,1]]),true,'building wholly contained by court');
+});
+
+test('all pinned footprint diameters match independent exhaustive distances and each zone picks its longest real roof',()=>{
+  for(const chapter of context.chapters){
+    let maximum=0;
+    for(const building of chapter.buildings){
+      let squared=0;
+      for(let i=0;i<building.ring.length;i++)for(let j=i+1;j<building.ring.length;j++){
+        squared=Math.max(squared,(building.ring[i][0]-building.ring[j][0])**2+(building.ring[i][1]-building.ring[j][1])**2);
+      }
+      const expected=Math.sqrt(squared),actual=footprintPlanarDiameter(building.ring);
+      assert.ok(Math.abs(actual-expected)<1e-8,`${building.id}: calipers must measure the real planar diameter`);
+      maximum=Math.max(maximum,expected);
+    }
+    const roof=selectExhibitRoof(chapter);
+    assert.ok(Math.abs(roof.lengthM-maximum)<1e-8);assert.ok(chapter.buildings.includes(roof.building));
+    assert.ok(pointInFootprint(roof.site,roof.building.ring),'the selected anchor must be inside its actual roof footprint');
+  }
 });
 
 test('all no-network exhibits and actual footprint pockets stay under bounded GPU/draw budgets',()=>{
@@ -132,18 +159,51 @@ test('all no-network exhibits and actual footprint pockets stay under bounded GP
     assert.ok(stats.bytes<900_000,`${slug}: ${stats.bytes} bytes`);
     assert.ok(stats.draws<=10);
     assert.equal(scene.userData.triangles,stats.triangles);
-    const trees=scene.children.filter(object=>object.isInstancedMesh);
-    assert.equal(trees.length,2);assert.equal(trees[0].count,4);assert.equal(trees[1].count,12);
+    assert.ok(scene.userData.capsule,`${slug}: missing elevated capsule architecture`);
+    const glazing=scene.userData.glazing;
+    assert.ok(glazing?.isMesh&&glazing.material.isShaderMaterial,`${slug}: missing actual transparent capsule glazing`);
+    assert.equal(glazing.parent,scene);assert.equal(glazing.material.transparent,true);
+    assert.equal(glazing.material.depthWrite,false);
+    let authoredTrees=0;
+    scene.traverse(object=>{if(object.isInstancedMesh&&object.userData.authored)authoredTrees++;});
+    assert.equal(authoredTrees,0,'exhibits must not return to the same four decorative trees');
+    assert.equal(scene.userData.treeTriangles??0,0);
+    assert.deepEqual(scene.scale.toArray(),[4,4,4],'all authored architecture/props are fourfold; no geometry/network quality reduction');
     maxTriangles=Math.max(maxTriangles,stats.triangles);maxBytes=Math.max(maxBytes,stats.bytes);
     disposeAchievementScene(scene);assert.equal(scene.children.length,0);
   }
   for(const chapter of context.chapters){
     const scene=buildAchievementGeography(chapter),stats=geometryStats(scene);
+    assert.deepEqual(scene.scale.toArray(),[1,1,1],'actual mapped OSM geography must never inherit exhibit scaling');
     assert.ok(stats.draws<=4);assert.ok(scene.userData.triangles<26_000);
     assert.equal(scene.userData.triangles,stats.triangles);
+    const mappedTrees=scene.children.filter(object=>object.isInstancedMesh),treeCount=Math.min(chapter.trees.length,70);
+    assert.equal(mappedTrees.length,treeCount?2:0,'real mapped trees must not disappear with the decorative tree removal');
+    if(treeCount){assert.equal(mappedTrees[0].count,treeCount);assert.equal(mappedTrees[1].count,treeCount*3);}
+    assert.ok(mappedTrees.every(object=>object.userData.authored===false));
     assert.ok(stats.bytes<1_000_000);disposeAchievementScene(scene);
   }
   assert.ok(maxTriangles>3000);assert.ok(maxBytes>100_000);
+});
+
+test('every project keeps its elevated capsule and demonstration in surveyed compact mode',()=>{
+  for(const slug of subjects){
+    const scene=buildAchievementExhibit(slug,{compact:true}),stats=geometryStats(scene);
+    assert.equal(scene.userData.compact,true);assert.equal(scene.userData.illustrative,true);
+    assert.equal(scene.userData.subject,ACHIEVEMENT_SCENE_SUBJECTS[slug].subject);
+    assert.ok(scene.userData.capsule,`${slug}: surveyed context must not remove the capsule`);
+    assert.ok(scene.userData.glazing?.isMesh,`${slug}: compact capsule is not glazed`);
+    assert.equal(scene.userData.glazing.material.transparent,true);assert.equal(scene.userData.glazing.material.depthWrite,false);
+    assert.ok(scene.userData.capsule.layout.floorY>=5);assert.ok(scene.userData.capsule.layout.demonstrationLift>0);
+    assert.ok(stats.triangles<12_000,`${slug}: ${stats.triangles} compact triangles`);
+    assert.ok(stats.bytes<900_000,`${slug}: ${stats.bytes} compact geometry bytes`);
+    assert.ok(stats.draws<=10,`${slug}: ${stats.draws} compact material draws`);
+    assert.equal(scene.userData.triangles,stats.triangles);
+    const bounds=new THREE.Box3().setFromObject(scene);
+    assert.ok([bounds.min.x,bounds.min.y,bounds.min.z,bounds.max.x,bounds.max.y,bounds.max.z].every(Number.isFinite));
+    assert.ok(bounds.max.y>10,`${slug}: a ground plinth is not an elevated glass globe`);
+    disposeAchievementScene(scene);assert.equal(scene.children.length,0);
+  }
 });
 
 test('disposal releases geometry, every shared/unused material and instance buffers exactly once',()=>{
@@ -178,6 +238,31 @@ test('one active GPU scene only: rapid navigation, official context and city-det
     assert.throws(()=>layer.setFocus('made-up-event'),/Unknown/);
     layer.onRemove();assert.equal(renderer.disposals,1);
   }finally{globalThis.fetch=originalFetch;}
+});
+
+test('capsule glazing releases exactly once through navigation, surveyed rebuild, opt-out, home and removal',()=>{
+  const renderer=rendererFixture(),map=mapFixture();
+  const layer=createAchievementSceneLayer({achievements,rendererFactory:()=>renderer});
+  layer.setFocus(achievements[0].slug);layer.onAdd(map,{});
+  function observeGlazing(){
+    const root=layer.scene.children.find(object=>object.isGroup);
+    const structure=root.children.find(object=>object.userData.capsule);
+    const glazing=structure?.userData.glazing;
+    assert.ok(glazing?.isMesh,'the active scene must have its own capsule glazing');
+    let geometries=0,materials=0;
+    glazing.geometry.addEventListener('dispose',()=>geometries++);
+    glazing.material.addEventListener('dispose',()=>materials++);
+    return ()=>{assert.equal(geometries,1);assert.equal(materials,1);};
+  }
+  let released=observeGlazing();layer.setFocus(achievements[1].slug);released();
+  released=observeGlazing();layer.setOfficialContext(true);released();
+  assert.equal(layer.getStats().activeScenes,1);assert.equal(layer.getStats().surveyedContext,true);
+  released=observeGlazing();layer.setEnabled(false);released();
+  assert.equal(layer.getStats().activeScenes,0);layer.setEnabled(true);
+  released=observeGlazing();layer.setFocus(null);released();
+  assert.equal(layer.getStats().activeScenes,0);layer.setFocus(achievements[2].slug);
+  released=observeGlazing();layer.onRemove();released();
+  assert.equal(layer.getStats().activeScenes,0);assert.equal(renderer.disposals,1);
 });
 
 test('intro context preparation deduplicates and never uploads inactive scenes',async()=>{
@@ -241,19 +326,21 @@ test('MapLibre handedness keeps roof normals lit without moving source positions
 });
 
 
-test('court preference faces the selected camera and never shifts the true achievement origin',async()=>{
-  const facingNorth=chooseExhibitSite(null,{bearing:0});
-  assert.ok(Math.abs(facingNorth[0])<1e-9);assert.equal(facingNorth[1],-50);
-  const facingEast=chooseExhibitSite(null,{bearing:90});
-  assert.equal(facingEast[0],-50);assert.ok(Math.abs(facingEast[1])<1e-9);
-  assert.throws(()=>chooseExhibitSite(null,{targetDistanceM:150}),/preference/);
-  const before=structuredClone(achievements[0].coordinates);
-  const renderer=rendererFixture(),layer=createAchievementSceneLayer({achievements,rendererFactory:()=>renderer});
-  layer.setFocus(achievements[0].slug);layer.onAdd(mapFixture(),{});
-  const focus=layer.getExhibitFocus();
-  assert.ok(focus[0]<before.lng && focus[1]<before.lat,'focus is camera-facing southwest');
-  assert.deepEqual(achievements[0].coordinates,before);
-  layer.setFocus(null);assert.equal(layer.getExhibitFocus(),null);layer.onRemove();
+test('rooftop focus follows the longest mapped building without shifting the true achievement marker',async()=>{
+  const originalFetch=globalThis.fetch;globalThis.fetch=async()=>new Response(contextBytes);
+  try {
+    const before=structuredClone(achievements[0].coordinates),chapter=context.chapters.find(chapter=>chapter.slugs.includes(achievements[0].slug));
+    const renderer=rendererFixture(),layer=createAchievementSceneLayer({achievements,rendererFactory:()=>renderer});
+    layer.setFocus(achievements[0].slug);layer.onAdd(mapFixture(),{});
+    assert.deepEqual(layer.getExhibitFocus(),[before.lng,before.lat]);assert.equal(layer.getExhibitBaseHeight(),0,'no fabricated rooftop before pinned context');
+    await layer.prepareAll();
+    const focus=layer.getExhibitFocus(),roof=selectExhibitRoof(chapter),structure=layer.scene.children.find(object=>object.isGroup).children.find(object=>object.userData.capsule);
+    assert.deepEqual(structure.position.toArray(),[roof.site[0],roof.building.height+.15,roof.site[1]]);
+    assert.equal(layer.getStats().hostBuildingId,roof.building.id);assert.equal(layer.getExhibitScale(),CAPSULE_SCALE);
+    assert.ok(focus.every(Number.isFinite));assert.notDeepEqual(focus,[before.lng,before.lat]);
+    assert.deepEqual(achievements[0].coordinates,before);
+    layer.setFocus(null);assert.equal(layer.getExhibitFocus(),null);assert.equal(layer.getExhibitHeight(),0);layer.onRemove();
+  } finally {globalThis.fetch=originalFetch;}
 });
 
 
@@ -354,6 +441,119 @@ test('borrowed roof pixels get exactly one active GPU texture and synchronous re
   } finally {globalThis.fetch=originalFetch;}
 });
 
+test('every zone keeps its fourfold capsule on only the longest actual roof regardless of imagery and resets inactive heights',async()=>{
+  const originalFetch=globalThis.fetch;globalThis.fetch=async()=>new Response(contextBytes);
+  const renderer=rendererFixture(),map=mapFixture(),layer=createAchievementSceneLayer({achievements,rendererFactory:()=>renderer});
+  function structureAndLocalBounds(){
+    const root=layer.scene.children.find(object=>object.isGroup),structure=root.children.find(object=>object.userData.capsule);
+    assert.ok(structure,'active achievement must have its actual capsule geometry');
+    layer.scene.updateMatrixWorld(true);
+    // Undo only the renderer's handedness reflection, not the structure's roof
+    // elevation: inspection framing consumes height in the local metre basis.
+    const bounds=new THREE.Box3().setFromObject(structure).applyMatrix4(root.matrixWorld.clone().invert());
+    return {structure,bounds};
+  }
+  function assertFramingHeight(supportY){
+    const {structure,bounds}=structureAndLocalBounds();
+    assert.ok(Math.abs(structure.position.y-supportY)<1e-8,'only the selected longest mapped roof supplies the physical exhibit lift');
+    assert.ok(Math.abs(layer.getExhibitHeight()-((CAPSULE_LAYOUT.centerY+CAPSULE_LAYOUT.radius+.15)*CAPSULE_SCALE+supportY))<1e-8,
+      'framing includes the fourfold globe plus its actual roof lift and crown-rib margin');
+    // Cover the narrow exterior meridians too, not just the nominal glass.
+    assert.ok(layer.getExhibitHeight()>=bounds.max.y&&layer.getExhibitHeight()-bounds.max.y<.15*CAPSULE_SCALE,
+      'reported framing height must cover the actual elevated metal/glass crown');
+    assert.equal(layer.getStats().exhibitHeightM,layer.getExhibitHeight());
+    assert.equal(layer.getExhibitBaseHeight(),supportY);assert.equal(layer.getExhibitScale(),CAPSULE_SCALE);
+    assert.equal(layer.getSignHeight(),supportY+CAPSULE_SIGN_POSITIONS[0][1]*CAPSULE_SCALE);
+  }
+  try {
+    layer.setFocus(achievements[0].slug);layer.onAdd(map,{});
+    assertFramingHeight(0);await layer.prepareAll();
+    for(const {slug} of achievements){
+      const event=achievements.find(event=>event.slug===slug),chapter=context.chapters.find(chapter=>chapter.slugs.includes(slug));
+      assert.ok(event&&chapter,'regression must use a real portfolio event and pinned venue context');
+      const roof=selectExhibitRoof(chapter),supportY=roof.building.height+.15;
+      layer.setFocus(slug);
+      assert.equal(layer.getStats().texturedBuildings,0);assert.ok(layer.getStats().outlinedBuildings>0);
+      assert.equal(layer.getStats().hostBuildingId,roof.building.id);
+      assertFramingHeight(supportY); // The authored mapped roof exists even before photography arrives.
+      const fixture=roofImageryFixture(event.coordinates);
+      assert.equal(layer.setRoofImagery(slug,fixture),true);
+      assert.ok(layer.getStats().texturedBuildings>0);assert.equal(layer.getStats().activeRoofTextures,1);
+      assertFramingHeight(supportY);
+      layer.setRoofImagery(null,null);assert.equal(layer.getStats().activeRoofTextures,0);assertFramingHeight(supportY);
+      layer.setRoofImagery(slug,fixture);assertFramingHeight(supportY);
+      layer.setEnabled(false);assert.equal(layer.getExhibitHeight(),0);assert.equal(layer.getStats().exhibitHeightM,0);
+      assert.equal(layer.getExhibitBaseHeight(),0);assert.equal(layer.getExhibitScale(),0);assert.equal(layer.getSignHeight(),0);
+      layer.setEnabled(true);assertFramingHeight(supportY);
+      layer.setFocus(null);assert.equal(layer.getExhibitHeight(),0);assert.equal(layer.getStats().exhibitHeightM,0);
+      assert.equal(layer.getExhibitBaseHeight(),0);assert.equal(layer.getExhibitScale(),0);assert.equal(layer.getSignHeight(),0);
+      layer.setFocus(slug);assertFramingHeight(supportY); // Home releases imagery, never the pinned actual roof.
+      assert.equal(fixture.image.closes,0,'borrowed decoded imagery remains owned by its source layer');
+    }
+    layer.onRemove();assert.equal(layer.getExhibitHeight(),0);assert.equal(renderer.disposals,1);
+  } finally {
+    if(layer.scene)layer.onRemove();globalThis.fetch=originalFetch;
+  }
+});
+
+test('roof selection is cached once per pinned zone across navigation and surveyed rebuilds',async()=>{
+  const originalFetch=globalThis.fetch;globalThis.fetch=async()=>new Response(contextBytes);
+  const layer=createAchievementSceneLayer({achievements,rendererFactory:()=>rendererFixture()});
+  try {
+    layer.setFocus(achievements[0].slug);layer.onAdd(mapFixture(),{});
+    assert.equal(layer.getStats().roofSelectionBuilds,0);await layer.prepareAll();
+    assert.equal(layer.getStats().roofSelectionBuilds,1,'preparation and buildFocused share one longest-roof calculation');
+    const visited=new Set();
+    for(let pass=0;pass<2;pass++)for(const event of achievements){
+      visited.add(context.chapters.findIndex(chapter=>chapter.slugs.includes(event.slug)));
+      layer.setFocus(event.slug);layer.setOfficialContext(true);layer.setOfficialContext(false);
+      layer.setEnabled(false);layer.setEnabled(true);
+      assert.equal(layer.getStats().roofSelectionBuilds,visited.size,'return visits and context toggles must reuse the pinned roof selection');
+    }
+    assert.equal(visited.size,30);layer.onRemove();assert.equal(layer.getStats().roofSelectionBuilds,0);
+  } finally {if(layer.scene)layer.onRemove();globalThis.fetch=originalFetch;}
+});
+
+test('inside-globe reader pixels reuse the rendered projection and match actual elevated sign heads',async()=>{
+  const originalFetch=globalThis.fetch,originalDocument=globalThis.document;
+  globalThis.fetch=async()=>new Response(contextBytes);globalThis.document={createElement:()=>signCanvasFactory(1024,640)};
+  const event=achievements.find(event=>event.slug==='pdm-kill-the-search-bar-2026'),map=mapFixture();
+  map.center=event.coordinates;map.zoom=18;map.getCanvas=()=>({clientWidth:1280,clientHeight:720});
+  const layer=createAchievementSceneLayer({achievements,rendererFactory:()=>rendererFixture()});
+  const args={defaultProjectionData:{mainMatrix:new THREE.Matrix4().set(
+    2,.1,.4,-.2, .2,1.8,.5,-.1, .1,.2,.8,0, 0,0,0,1).toArray(),projectionTransition:0}};
+  try {
+    assert.equal(layer.getSignScreenPositions(),null);layer.setFocus(event.slug);layer.onAdd(map,{});
+    assert.equal(layer.getSignScreenPositions(),null,'initial identity camera is not a real MapLibre projection');
+    await layer.prepareAll();assert.equal(layer.getSignScreenPositions(),null);
+    layer.render({},args);assert.equal(layer.getSignScreenPositions(),null,'idle scene exposes no reader anchors');
+    await layer.startGame(event.slug);layer.render({},args);layer.scene.updateMatrixWorld(true);
+    const points=layer.getSignScreenPositions();assert.equal(points.length,2);
+    const root=layer.scene.children.find(object=>object.isGroup),structure=root.children.find(object=>object.userData.capsule);
+    const panels=structure.userData.signs.userData.panels,coordinates=layer.getSignPositions();
+    assert.deepEqual(structure.scale.toArray(),[4,4,4]);assert.ok(structure.position.y>0);
+    for(let i=0;i<panels.length;i++){
+      const expected=new THREE.Vector4(0,0,0,1).applyMatrix4(panels[i].head.matrixWorld).applyMatrix4(layer.camera.projectionMatrix);
+      assert.ok(expected.w>0);
+      assert.ok(Math.abs(points[i].x-(expected.x/expected.w+1)*1280/2)<1e-8,'CSS X must match the true scaled/roof-supported head');
+      assert.ok(Math.abs(points[i].y-(1-expected.y/expected.w)*720/2)<1e-8,'CSS Y must account for elevated head and reflected world basis');
+      assert.ok(coordinates[i].every(Number.isFinite));
+    }
+    assert.equal(layer.getSignScreenPositions(),points);const first=points[0],second=points[1];
+    layer.render({},args);assert.equal(layer.getSignScreenPositions(),points);
+    assert.equal(points[0],first);assert.equal(points[1],second,'render-time projections must reuse both point objects');
+    layer.camera.projectionMatrix.elements[15]=-1;assert.equal(layer.getSignScreenPositions(),null,'behind-camera points must not create stray reader buttons');
+    layer.render({},args);assert.equal(layer.getSignScreenPositions(),points);
+    map.zoom=12;layer.render({},args);assert.equal(layer.getSignScreenPositions(),null,'no projection for an inactive low-zoom scene');map.zoom=18;
+    layer.setEnabled(false);assert.equal(layer.getSignScreenPositions(),null);layer.setEnabled(true);
+    await layer.startGame(event.slug);
+    assert.equal(layer.getSignScreenPositions(),null,'a rebuilt scene waits for its actual custom draw');
+    layer.render({},args);assert.equal(layer.getSignScreenPositions(),points);
+    layer.setFocus(null);assert.equal(layer.getSignScreenPositions(),null);layer.onRemove();assert.equal(layer.getSignScreenPositions(),null);
+    assert.doesNotMatch(layer.getSignScreenPositions.toString(),/new\s+THREE\.|\.clone\(|getBoundingClientRect/,'render-time reader projection allocates no Three resources or DOM rectangle reads');
+  } finally {if(layer.scene)layer.onRemove();globalThis.fetch=originalFetch;globalThis.document=originalDocument;}
+});
+
 
 test('all fully textured mapped pockets remain bounded, and only the active image is retained',()=>{
   let maximumBytes=0;
@@ -373,20 +573,26 @@ test('all fully textured mapped pockets remain bounded, and only the active imag
 function signCanvasFactory(width,height){
   let font='10px Arial';
   const context={get font(){return font;},set font(value){font=value;},fillRect(){},strokeRect(){},
-    measureText(text){return {width:text.length*parseInt(font,10)*.52};},fillText(){}};
+    measureText(text){return {width:text.length*Number(font.match(/(\d+)px/)[1])*.52};},fillText(){}};
   return {width,height,getContext:()=>context};
 }
 test('all detailed exhibits and original explanation signs are complete and bounded together',()=>{
   for(const event of achievements){
     const root=buildAchievementExhibit(event.slug,{signOptions:{canvasFactory:signCanvasFactory}}),stats=geometryStats(root);
     assert.equal(root.userData.signs.userData.textures.length,2);
-    assert.equal(root.userData.signContent.source,'portfolio-authored');
+    assert.equal(root.userData.signContent.source,'portfolio-exhibit-notes');
     assert.equal(root.userData.signContent.title,authoredSignProse(contestsAndActivities.find(project=>project.slug===event.slug).title));
     assert.ok(stats.triangles<12_000,`${event.slug}: complete triangle count`);
     assert.ok(stats.draws<=15,`${event.slug}: material batch count including signs`);
     assert.ok(stats.bytes<900_000,`${event.slug}: geometry budget`);
     assert.equal(root.userData.triangles,stats.triangles);
     const signs=root.userData.signs,textures=[...signs.userData.textures];let disposals=0;
+    for(const [index,panel] of signs.userData.panels.entries()){
+      assert.ok(panel.plane.renderOrder>root.userData.glazing.renderOrder,'excerpts must render after glass instead of inheriting its tint');
+      assert.deepEqual(panel.head.position.toArray(),CAPSULE_SIGN_POSITIONS[index],'physical explanations belong inside the globe');
+      panel.plane.geometry.computeBoundingBox();
+      assert.ok(panel.head.position.y+panel.plane.geometry.boundingBox.min.y>=CAPSULE_LAYOUT.floorY,'interior panel clears the exhibition floor');
+    }
     textures.forEach(texture=>texture.addEventListener('dispose',()=>disposals++));
     disposeAchievementScene(root);assert.equal(disposals,2);assert.equal(root.children.length,0);
     assert.ok(textures.every(texture=>texture.image===null));assert.equal(root.userData.signs,null);
@@ -399,7 +605,7 @@ test('physical signs release on focus changes, 3D off, home and removal without 
     const renderer=rendererFixture(),layer=createAchievementSceneLayer({achievements,rendererFactory:()=>renderer});
     layer.setFocus(achievements[0].slug);layer.onAdd(mapFixture(),{});
     assert.equal(layer.getStats().activeSignTextures,2);assert.equal(layer.getStats().signTextureBytes,5_242_880);
-    assert.equal(layer.getSignPositions().length,2);assert.equal(layer.getSignContent().slug,achievements[0].slug);
+    assert.deepEqual(layer.getSignPositions(),[],'idle project exposes no reading markers');assert.equal(layer.getSignContent().slug,achievements[0].slug);
     layer.setFocus(achievements[1].slug);assert.equal(layer.getStats().activeSignTextures,2);
     assert.equal(layer.getSignContent().slug,achievements[1].slug);
     layer.setEnabled(false);assert.equal(layer.getStats().activeSignTextures,0);assert.deepEqual(layer.getSignPositions(),[]);
@@ -407,4 +613,61 @@ test('physical signs release on focus changes, 3D off, home and removal without 
     layer.setFocus(null);assert.equal(layer.getStats().activeSignTextures,0);assert.equal(layer.getSignContent(),null);
     layer.onRemove();assert.equal(layer.getStats().activeScenes,0);
   }finally{globalThis.document=originalDocument;}
+});
+
+test('physical achievement game shows source signs only during real game renders and releases each owned resource once',async()=>{
+  const originalDocument=globalThis.document;
+  globalThis.document={createElement:()=>signCanvasFactory(1024,640)};
+  const renderer=rendererFixture(),map=mapFixture();map.zoom=20;
+  const layer=createAchievementSceneLayer({achievements,rendererFactory:()=>renderer});
+  const args={defaultProjectionData:{mainMatrix:new THREE.Matrix4().toArray(),projectionTransition:0}};
+  function watchResources(root){
+    const resources=new Set();
+    root.traverse(object=>{
+      if(object.geometry)resources.add(object.geometry);
+      if(object.isInstancedMesh)resources.add(object);
+      for(const material of object.userData.materials??[])resources.add(material);
+      for(const texture of object.userData.textures??[])resources.add(texture);
+      for(const material of Array.isArray(object.material)?object.material:[object.material]){
+        if(!material)continue;resources.add(material);
+        if(material.map)resources.add(material.map);
+      }
+    });
+    const counts=new Map([...resources].map(resource=>[resource,0]));
+    for(const resource of resources)resource.addEventListener('dispose',()=>counts.set(resource,counts.get(resource)+1));
+    return expected=>{assert.ok(counts.size>0);for(const [resource,count]of counts)assert.equal(count,expected,`${resource.type??resource.constructor.name} disposal count`);};
+  }
+  try{
+    layer.setFocus(achievements[0].slug);layer.onAdd(map,{});layer.render({},args);
+    let structure;layer.scene.traverse(object=>{if(object.userData.capsule)structure=object;});
+    const signs=structure.userData.signs,content=layer.getSignContent(),textures=[...signs.userData.textures];
+    const originalDemo=[...structure.userData.staticMeshes],originalResources=watchResources(structure);
+    assert.equal(signs.visible,false,'idle exhibition has no source signs');
+    assert.equal(await layer.startGame(achievements[0].slug),true);
+    const gameRoot=structure.children.find(object=>object.userData.isExhibitGame),shell=structure.userData.gameShell;
+    assert.ok(gameRoot&&shell);
+    const gameResources=watchResources(gameRoot),shellResources=watchResources(shell);
+    assert.ok(gameRoot.getObjectByName('finite-completion-sparks')?.isInstancedMesh,'test observes real game instance ownership');
+    for(let frame=0;frame<3;frame++){
+      layer.render({},args);
+      assert.equal(signs.visible,true,`frame ${frame}: source signs belong only inside the active game`);
+      assert.ok(originalDemo.every(mesh=>!mesh.visible),'original demonstration remains hidden during play');
+      assert.equal(layer.getSignContent(),content,'game never rewrites the existing project/sign copy');
+    }
+    originalResources(0);gameResources(0);shellResources(0);
+    layer.stopGame();layer.render({},args);
+    assert.equal(structure.userData.signs,signs);
+    assert.equal(signs.visible,false);
+    assert.equal(layer.getSignContent(),content);
+    assert.deepEqual(signs.userData.textures,textures);
+    assert.ok(originalDemo.every(mesh=>mesh.visible));
+    assert.equal(structure.userData.gameShell,null);
+    assert.equal(gameRoot.parent,null);
+    gameResources(1);shellResources(1);originalResources(0);
+    layer.stopGame();gameResources(1);shellResources(1);
+    layer.onRemove();layer.onRemove();
+    originalResources(1);gameResources(1);shellResources(1);
+    assert.ok(textures.every(texture=>texture.image===null));
+    assert.equal(renderer.disposals,1);
+  }finally{if(layer.scene)layer.onRemove();globalThis.document=originalDocument;}
 });
