@@ -52,17 +52,6 @@ html.intro-active #app { opacity: 0; pointer-events: none; }
   background: #0c1c20d9;
   box-shadow: 0 25px 80px #020c10a8;
 }
-.intro-header {
-  display: flex;
-  align-items: center;
-  min-height: 61px;
-  padding-bottom: 20px;
-  border-bottom: 1px solid #eadfc44c;
-}
-.intro-brand { display: flex; flex-direction: column; gap: 5px; }
-.intro-brand strong { font-size: 25px; line-height: 1; letter-spacing: .012em; }
-.intro-brand small { color: #e3c89d; font-size: 12px; font-weight: 600; letter-spacing: .045em; }
-
 .intro-content {
   flex: 1;
   display: flex;
@@ -76,12 +65,21 @@ html.intro-active #app { opacity: 0; pointer-events: none; }
 .intro-primary h1 {
   max-width: 850px;
   margin: 0;
-  font: 500 clamp(56px, 5.5vw, 84px)/1.05 'Playfair Display', Georgia, serif;
+  font: 500 clamp(72px, 8.6vw, 112px)/1.05 'Playfair Display', Georgia, serif;
   letter-spacing: -.045em;
   text-wrap: balance;
   text-shadow: 0 12px 42px #0612166b;
 }
-.intro-primary h1::after {
+.intro-tagline {
+  margin: 14px 0 0;
+  color: #e3c89d;
+  font-size: clamp(16px, 1.7vw, 22px);
+  font-weight: 500;
+  line-height: 1.45;
+  letter-spacing: .02em;
+  text-wrap: balance;
+}
+.intro-primary::after {
   content: '';
   display: block;
   width: 68px;
@@ -152,14 +150,16 @@ html.intro-active #app { opacity: 0; pointer-events: none; }
 
 .intro-footer {
   position: relative;
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: center;
-  justify-content: center;
+  gap: 16px;
   min-height: 81px;
   padding-top: 20px;
   border-top: 1px solid #eadfc44c;
 }
-.intro-footer-links { position: absolute; left: 0; display: flex; align-items: center; gap: 25px; }
+.intro-footer-links { display: flex; flex-wrap: wrap; align-items: center; justify-self: start; gap: 12px 20px; }
+.intro-contact-links { display: inline-flex; align-items: center; gap: 20px; }
 .intro-footer-links a { color: #d6e2dc; font-size: 12px; font-weight: 600; text-decoration: none; white-space: nowrap; }
 .intro-footer-links a:hover { color: #eacb9a; text-decoration: underline; }
 .intro-load-status {
@@ -188,6 +188,7 @@ html.intro-active #app { opacity: 0; pointer-events: none; }
   white-space: normal;
 }
 .intro-enter {
+  grid-column: 2;
   flex: none;
   display: inline-flex;
   align-items: center;
@@ -218,12 +219,10 @@ html.intro-active #app { opacity: 0; pointer-events: none; }
     margin: 12px;
     padding: max(18px, env(safe-area-inset-top)) 18px 18px;
   }
-  .intro-header { min-height: 57px; padding-bottom: 17px; }
-  .intro-brand strong { font-size: 21px; }
-  .intro-brand small { font-size: 10px; }
   .intro-content { gap: 23px; padding: 34px 0 36px; }
-  .intro-primary h1 { font-size: clamp(45px, 11vw, 70px); }
-  .intro-primary h1::after { width: 52px; margin-top: 17px; }
+  .intro-primary h1 { font-size: clamp(58px, 16vw, 78px); }
+  .intro-tagline { margin-top: 11px; font-size: clamp(14px, 4vw, 18px); }
+  .intro-primary::after { width: 52px; margin-top: 17px; }
   .intro-facts-panel { padding: 19px; }
   .intro-facts-list { display: grid; grid-template-columns: minmax(0, 1fr); gap: 15px; }
   .intro-facts-list > li { grid-column: 1; grid-row: auto; font-size: 15px; line-height: 1.42; }
@@ -235,6 +234,7 @@ html.intro-active #app { opacity: 0; pointer-events: none; }
     position: sticky;
     bottom: -1px;
     z-index: 2;
+    display: flex;
     flex-direction: column;
     gap: 14px;
     margin: 0 -18px -18px;
@@ -242,10 +242,17 @@ html.intro-active #app { opacity: 0; pointer-events: none; }
     background: #0c1c20f5;
     backdrop-filter: blur(14px);
   }
-  .intro-footer-links { position: static; order: 1; gap: 24px; }
+  .intro-footer-links { align-self: stretch; order: 1; gap: 18px; }
+  .intro-contact-links { gap: 18px; }
   .intro-footer-links a { font-size: 11px; }
   .intro-enter { order: 2; min-width: 190px; min-height: 49px; font-size: 12px; }
   .intro-load-status.is-error { top: -29px; }
+}
+@media (max-width: 760px) and (max-height: 400px) {
+  .intro-content { gap: 18px; padding: 14px 0 24px; }
+  .intro-primary h1 { font-size: 58px; }
+  .intro-tagline { margin-top: 8px; font-size: 14px; }
+  .intro-primary::after { margin-top: 13px; }
 }
 @media (max-width: 360px) {
   .intro-frame { padding-left: 14px; padding-right: 14px; }
