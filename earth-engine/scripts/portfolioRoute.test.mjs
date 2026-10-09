@@ -1,9 +1,38 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {readPortfolioRoute, portfolioUrl, cvDestinationUrl} from '../src/portfolioRoute.js';
+import {readPortfolioRoute, portfolioUrl, cvDestinationUrl, portfolioProjectSlug} from '../src/portfolioRoute.js';
 import {initialMapCamera, ISOMETRIC_CAMERA, COTTBUS_HANGAR_CAMERA, preferLocalStart} from '../src/initialCamera.js';
 
 const slugs = new Set(['tesla-gigathon-2026', 'sui-hackathon-poland-2025']);
+
+test('PDF project links recognize current and legacy destinations and stay on the viewer origin', () => {
+  for (const host of ['batikanor.com', 'www.batikanor.com', 'staging.batikanor.com']) {
+    for (const destination of [
+      '/?event=tesla-gigathon-2026', '/#tesla-gigathon-2026',
+      '/projects#tesla-gigathon-2026', '/projects/#tesla-gigathon-2026',
+      '/index.html?event=tesla-gigathon-2026', '/projects/index.html#tesla-gigathon-2026',
+    ]) {
+      const slug = portfolioProjectSlug('https://' + host + destination, slugs);
+      assert.equal(slug, 'tesla-gigathon-2026');
+      const local = cvDestinationUrl('https://staging.batikanor.com/cv/en/?view=cv', slug);
+      assert.equal(local.href, 'https://staging.batikanor.com/?event=tesla-gigathon-2026');
+    }
+  }
+  assert.equal(portfolioProjectSlug('http://batikanor.com/?event=unknown#sui-hackathon-poland-2025', slugs), 'sui-hackathon-poland-2025');
+  assert.equal(portfolioProjectSlug('https://batikanor.com/#tesla%2Dgigathon%2D2026', slugs), 'tesla-gigathon-2026');
+});
+
+test('PDF link recognition leaves external, malformed and unknown destinations unchanged', () => {
+  for (const href of [
+    'https://example.com/?event=tesla-gigathon-2026',
+    'https://batikanor.com.example.com/#tesla-gigathon-2026',
+    'https://batikanor.com@other.example/#tesla-gigathon-2026',
+    'https://user@batikanor.com/#tesla-gigathon-2026',
+    'https://batikanor.com/certificates/file.pdf#tesla-gigathon-2026',
+    'https://batikanor.com/?event=unknown', 'https://batikanor.com/#cv',
+    'https://batikanor.com/#%ZZ', 'javascript:alert(1)', '/#tesla-gigathon-2026',
+  ]) assert.equal(portfolioProjectSlug(href, slugs), null, href);
+});
 
 test('old root and projects hashes still open the matching map story', () => {
   assert.deepEqual(readPortfolioRoute('https://batikanor.com/#tesla-gigathon-2026', slugs),

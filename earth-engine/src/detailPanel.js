@@ -1,6 +1,6 @@
 /**
- * A modeless project window. The map and chronology remain usable behind it;
- * only the dedicated handle starts a drag, never story text or embedded media.
+ * Project stories open as modeless reading windows above the chronology.
+ * Only the dedicated handle starts a drag, never story text or embedded media.
  */
 
 const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
@@ -18,6 +18,45 @@ export function clampPanelRect(rect, bounds) {
     width,
     height
   };
+}
+
+/** A right-aligned reading window that leaves the map visible on the left. */
+export function largePanelRect(bounds) {
+  const top = Math.max(bounds.top, Math.min(bounds.bottom - 1, bounds.readingTop ?? bounds.top));
+  const width = clamp((bounds.viewportWidth ?? bounds.right - bounds.left) * .7,
+    Math.min(bounds.minWidth ?? 280, bounds.right - bounds.left), bounds.right - bounds.left);
+  const height = clamp((bounds.viewportHeight ?? bounds.bottom - bounds.top) * .7,
+    Math.min(bounds.minHeight ?? 180, bounds.bottom - top), bounds.bottom - top);
+  return {x: bounds.right - width,
+    y: top + (bounds.bottom - top - height) / 2, width, height};
+}
+
+export function expandedPanelRect(bounds) {
+  return {x: bounds.left, y: bounds.top,
+    width: bounds.right - bounds.left, height: bounds.bottom - bounds.top};
+}
+
+/** Reserve the real, visible chronology rather than an assumed footer height. */
+export function reserveJourneySpace(bounds, journey, originY = 0) {
+  if (!journey || journey.hidden || journey.closest?.('[hidden]')) return bounds;
+  const rect = journey.getBoundingClientRect();
+  if (!(rect.width > 0 && rect.height > 0)) return bounds;
+  return {...bounds, journeyReserved: true,
+    bottom: Math.min(bounds.bottom, Math.max(bounds.top + 1, rect.top - originY - 12))};
+}
+
+export function reserveReadingTopbar(bounds, topbar, originY = 0) {
+  if (!topbar || topbar.hidden || topbar.closest?.('[hidden]')) return bounds;
+  const rect = topbar.getBoundingClientRect();
+  if (!(rect.width > 0 && rect.height > 0)) return bounds;
+  return {...bounds, readingTop: Math.max(bounds.top, Math.min(bounds.bottom - 1, rect.bottom - originY + 12))};
+}
+
+/** Keep short map windows resizable without inflating their initial reading view. */
+export function withCompactPanelMinimum(bounds, compactMinimum) {
+  const readingHeight = bounds.bottom - Math.max(bounds.top, bounds.readingTop ?? bounds.top);
+  if (!bounds.journeyReserved || readingHeight >= bounds.minHeight) return bounds;
+  return {...bounds, minHeight: Math.max(1, Math.min(bounds.minHeight, compactMinimum, readingHeight))};
 }
 
 /** Resize from the lower-left or lower-right corner, preserving the far edge. */
@@ -46,24 +85,39 @@ function element(tag, className, label, text) {
 
 export function createDetailPanel(root, {onGeometrySettled} = {}) {
   const app = root.parentElement;
-  let customized = false;
-  let lastRect = null;
-  let wasMobile = window.innerWidth <= 760;
+  let expanded = false;
+  let reading = true;
+  let floatingRect = null;
+  let restoreState = null;
   let reclampFrame = 0;
+  let toggleButton;
+  let dragHandle;
 
-  function bounds() {
+  function viewportBounds() {
     const frame = app.getBoundingClientRect();
-    const topbar = app.querySelector('.topbar').getBoundingClientRect();
-    const journey = app.querySelector('.journey').getBoundingClientRect();
-    const gutter = window.innerWidth <= 760 ? 8 : 12;
-    const top = Math.max(gutter, topbar.bottom - frame.top + 8);
-    const bottom = Math.max(top + 1, Math.min(frame.height - gutter, journey.top - frame.top - 8));
-    const right = Math.max(gutter + 1, frame.width - gutter);
     return {
-      left: gutter, top, right, bottom,
+      left: 0, top: 0, right: Math.max(1, frame.width), bottom: Math.max(1, frame.height),
+      viewportWidth: frame.width, viewportHeight: frame.height,
       minWidth: window.innerWidth <= 760 ? 280 : 320,
       minHeight: 180
     };
+  }
+
+  function bounds() {
+    const viewport = viewportBounds();
+    const gutter = window.innerWidth <= 760 ? 8 : 12;
+    const styles = window.getComputedStyle(root);
+    const safe = edge => Math.max(0, parseFloat(styles.getPropertyValue(`--detail-safe-${edge}`)) || 0);
+    const left = Math.min(gutter + safe('left'), viewport.right - 1);
+    const top = Math.min(gutter + safe('top'), viewport.bottom - 1);
+    const area = reserveJourneySpace({
+      ...viewport, left, top,
+      right: Math.max(left + 1, viewport.right - gutter - safe('right')),
+      bottom: Math.max(top + 1, viewport.bottom - gutter - safe('bottom'))
+    }, app.querySelector('#journey') ?? app.querySelector('.journey'), app.getBoundingClientRect().top);
+    const readingArea = reserveReadingTopbar(area, app.querySelector('.topbar'), app.getBoundingClientRect().top);
+    // The compact project toolbar is44px; retain32px of story scroll space.
+    return withCompactPanelMinimum(readingArea, 78);
   }
 
   function measuredRect() {
@@ -79,30 +133,72 @@ export function createDetailPanel(root, {onGeometrySettled} = {}) {
 
   function apply(rect) {
     const next = clampPanelRect(rect, bounds());
+    expanded = false;
+    reading = false;
+    restoreState = null;
+    write(next);
+    floatingRect = next;
+    updateControls();
+  }
+
+  function write(next) {
+    root.classList.remove('is-expanded');
+    root.classList.add('is-floating');
     root.style.left = `${next.x}px`;
     root.style.top = `${next.y}px`;
     root.style.width = `${next.width}px`;
     root.style.height = `${next.height}px`;
     root.style.right = 'auto';
     root.style.bottom = 'auto';
-    customized = true;
-    lastRect = next;
+  }
+
+  function updateControls() {
+    if (!toggleButton) return;
+    const label = expanded ? 'Restore project window' : 'Expand project window';
+    toggleButton.textContent = expanded ? '↙ Restore' : '⛶ Expand';
+    toggleButton.setAttribute('aria-label', label);
+    toggleButton.setAttribute('aria-pressed', String(expanded));
+    toggleButton.title = label;
+    dragHandle.disabled = false;
+    root.classList.toggle('is-expanded', expanded);
+    root.classList.toggle('is-floating', !expanded);
+    root.classList.toggle('is-reading', reading);
+    dragHandle.title = 'Drag to move · arrow keys to move · Home or double-click for reading view';
   }
 
   function reset(notify = false) {
-    for (const property of ['left', 'top', 'right', 'bottom', 'width', 'height']) {
-      root.style[property] = '';
-    }
-    customized = false;
-    lastRect = null;
+    const rect = largePanelRect(bounds());
+    expanded = false;
+    reading = true;
+    restoreState = null;
+    floatingRect = rect;
+    write(rect);
+    updateControls();
     if (notify) onGeometrySettled?.();
   }
 
+  function toggleExpanded() {
+    if (expanded) {
+      const previous = restoreState;
+      if (previous?.reading) reset();
+      else apply(previous?.rect ?? largePanelRect(bounds()));
+    } else {
+      restoreState = {rect: root.hidden ? floatingRect : measuredRect(), reading};
+      expanded = true;
+      reading = false;
+      write(expandedPanelRect(bounds()));
+      updateControls();
+    }
+    onGeometrySettled?.();
+  }
+
   function reclamp() {
-    if (!customized) return;
-    // Preserve a closed panel's reachable placement too: display:none has no
-    // measurable rect, but its last geometry may now exceed a smaller window.
-    apply(root.hidden ? lastRect : measuredRect());
+    if (expanded) {
+      if (restoreState) restoreState.rect = clampPanelRect(restoreState.rect, bounds());
+      write(expandedPanelRect(bounds()));
+      updateControls();
+    } else if (reading) reset();
+    else if (floatingRect) apply(root.hidden ? floatingRect : measuredRect());
   }
 
   function scheduleReclamp() {
@@ -120,7 +216,6 @@ export function createDetailPanel(root, {onGeometrySettled} = {}) {
     event.preventDefault();
     event.stopPropagation();
     const start = clampPanelRect(measuredRect(), bounds());
-    apply(start);
     const pointer = {x: event.clientX, y: event.clientY};
     let changed = false;
     handle.classList.add('is-dragging');
@@ -130,10 +225,14 @@ export function createDetailPanel(root, {onGeometrySettled} = {}) {
       if (moveEvent.pointerId !== event.pointerId) return;
       const dx = moveEvent.clientX - pointer.x;
       const dy = moveEvent.clientY - pointer.y;
-      changed ||= Math.abs(dx) + Math.abs(dy) > 2;
-      apply(mode === 'move'
+      if (!changed && Math.abs(dx) + Math.abs(dy) <= 2) return;
+      const next = mode === 'move'
         ? {...start, x: start.x + dx, y: start.y + dy}
-        : resizePanelRect(start, dx, dy, mode, bounds()));
+        : resizePanelRect(start, dx, dy, mode, bounds());
+      const clamped = clampPanelRect(next, bounds());
+      if (Object.keys(start).every(key => clamped[key] === start[key])) return;
+      changed = true;
+      apply(next);
     };
     const finish = endEvent => {
       if (endEvent.pointerId !== event.pointerId) return;
@@ -154,7 +253,7 @@ export function createDetailPanel(root, {onGeometrySettled} = {}) {
   function bindHandle(handle, mode) {
     handle.addEventListener('pointerdown', event => beginGesture(handle, mode, event));
     handle.addEventListener('keydown', event => {
-      if (event.key === 'Home' && mode === 'move') {
+      if (event.key === 'Home') {
         event.preventDefault();
         reset(true);
         return;
@@ -168,26 +267,29 @@ export function createDetailPanel(root, {onGeometrySettled} = {}) {
       const step = event.shiftKey ? 48 : 16;
       const dx = direction[0] * step;
       const dy = direction[1] * step;
-      const current = clampPanelRect(measuredRect(), bounds());
-      apply(mode === 'move'
+      const area = bounds();
+      const current = clampPanelRect(measuredRect(), area);
+      const next = mode === 'move'
         ? {...current, x: current.x + dx, y: current.y + dy}
-        : resizePanelRect(current, dx, dy, mode, bounds()));
+        : resizePanelRect(current, dx, dy, mode, area);
+      const clamped = clampPanelRect(next, area);
+      if (Object.keys(current).every(key => clamped[key] === current[key])) return;
+      apply(next);
       onGeometrySettled?.();
     });
   }
 
-  function render() {
+  function render({preserveGeometry = false} = {}) {
+    const preserve = preserveGeometry && Boolean(floatingRect || expanded);
     const chrome = element('div', 'detail-chrome');
-    const resetButton = element('button', 'detail-reset', 'Reset project panel size and position', '↺');
-    resetButton.title = 'Reset size and position';
-    resetButton.addEventListener('click', () => reset(true));
-    const dragHandle = element('button', 'detail-drag-handle', 'Move project panel', '⠿');
-    dragHandle.title = 'Drag to move · arrow keys to move · double-click to reset';
+    toggleButton = element('button', 'detail-reset');
+    toggleButton.addEventListener('click', toggleExpanded);
+    dragHandle = element('button', 'detail-drag-handle', 'Move project panel', '⠿');
     dragHandle.addEventListener('dblclick', () => reset(true));
     bindHandle(dragHandle, 'move');
     const close = element('button', 'close-detail', 'Close project details', '×');
     close.addEventListener('click', () => { root.hidden = true; });
-    chrome.append(resetButton, dragHandle, close);
+    chrome.append(toggleButton, dragHandle, close);
 
     const scroll = element('div', 'detail-scroll');
     const resizeLeft = element('button', 'detail-resize-handle detail-resize-left',
@@ -199,20 +301,21 @@ export function createDetailPanel(root, {onGeometrySettled} = {}) {
     resizeRight.title = 'Drag to resize · arrow keys to resize';
     bindHandle(resizeRight, 'se');
     root.replaceChildren(chrome, scroll, resizeLeft, resizeRight);
+    if (preserve) { reclamp(); updateControls(); }
+    else reset();
     return scroll;
   }
 
-  window.addEventListener('resize', () => {
-    const mobile = window.innerWidth <= 760;
-    if (mobile !== wasMobile) reset();
-    else scheduleReclamp();
-    wasMobile = mobile;
-  });
+  window.addEventListener('resize', scheduleReclamp);
   if (typeof ResizeObserver !== 'undefined') {
     const observer = new ResizeObserver(scheduleReclamp);
-    observer.observe(app.querySelector('.journey'));
-    observer.observe(app.querySelector('.sources'));
+    observer.observe(app);
+    for (const selector of ['.journey', '.sources']) {
+      const node = app.querySelector(selector);
+      if (node) observer.observe(node);
+    }
   }
 
-  return {render, reset, reclamp, getRect: () => root.hidden ? lastRect : measuredRect()};
+  return {render, reset, reclamp, isExpanded: () => expanded,
+    getRect: () => root.hidden ? expanded ? expandedPanelRect(bounds()) : floatingRect : measuredRect()};
 }

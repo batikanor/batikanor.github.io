@@ -9,6 +9,7 @@ import {dirname, join, resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {renderNoScriptIndex, renderSitemap, writeAchievementPages} from './achievement-seo.mjs';
 import {writeCvPages} from './cv-pages.mjs';
+import {writeLegacyProjectRoutes} from './legacy-project-routes.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 // The default remains the GitHub Pages release. Staging is a separate copy of
@@ -173,5 +174,6 @@ if (staging) {
 for (const [item, before] of checksums) {
   assert(await sha256(join(out, item)) === before, `Legacy output changed during overlay: ${item}`);
 }
+await writeLegacyProjectRoutes(out);
 if (staging) await rm(join(out, 'CNAME'));
-console.log(`Overlayed ${target} Earth homepage, both CV routes and ${assetFiles.length} built assets without changing ${preserved.length - (staging ? 1 : 0)} legacy routes/files.`);
+console.log(`Overlayed ${target} Earth homepage, both CV routes and ${assetFiles.length} built assets; preserved legacy content and added project-anchor compatibility.`);

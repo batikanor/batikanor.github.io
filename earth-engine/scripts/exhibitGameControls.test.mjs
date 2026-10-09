@@ -124,6 +124,33 @@ test('a stationary tap keeps its dock intent when a moving actor crosses the rel
   f.controls.destroy();
 });
 
+test('the first exhibit tap survives focus moving from a popup button to the canvas', () => {
+  const f = fixture(), popupButton = new Surface('BUTTON');
+  f.document.activeElement = popupButton;
+  f.canvas.focus = () => {
+    // Native blur does not bubble, but the window's capture listener still sees it.
+    f.window.fire('blur', {target: popupButton, relatedTarget: f.canvas});
+    f.document.activeElement = f.canvas;
+  };
+  const down = f.canvas.fire('pointerdown');
+  assert.equal(down.prevented, true);
+  assert.equal(f.controls.getStats().pointerActive, true);
+  assert.equal(f.captures.size, 1);
+  f.canvas.fire('pointerup');
+  assert.deepEqual(f.calls.starts, ['tesla-logistics']);
+  assert.equal(f.controls.getStats().active, true);
+  assert.equal(f.controls.getStats().pointerActive, false);
+  f.key('KeyW');
+  f.window.fire('blur');
+  assert.deepEqual(f.controls.getStats().heldKeys, []);
+  assert.deepEqual(f.calls.inputs.at(-1), {x: 0, z: 0, activate: false});
+  f.key('KeyA');
+  f.canvas.fire('blur');
+  assert.deepEqual(f.controls.getStats().heldKeys, []);
+  assert.deepEqual(f.calls.inputs.at(-1), {x: 0, z: 0, activate: false});
+  f.controls.destroy();
+});
+
 test('compatibility clicks from physical presses do not reach map markers; independent map clicks remain available', () => {
   const f = fixture();
   f.click();

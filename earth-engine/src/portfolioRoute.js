@@ -34,3 +34,14 @@ export function cvDestinationUrl(href, eventSlug = null) {
   if (eventSlug) url.searchParams.set('event', eventSlug);
   return url;
 }
+
+/** Recognize portfolio project links in a PDF while leaving external links alone. */
+export function portfolioProjectSlug(href, knownSlugs = new Set()) {
+  let url;
+  try { url = new URL(href); } catch { return null; }
+  if (!['http:', 'https:'].includes(url.protocol) || url.username || url.password
+    || !['batikanor.com', 'www.batikanor.com', 'staging.batikanor.com'].includes(url.hostname)) return null;
+  const path = url.pathname.replace(/\/index\.html$/, '').replace(/\/+$/, '');
+  if (path !== '' && path !== '/projects') return null;
+  return readPortfolioRoute(url.href, knownSlugs).eventSlug;
+}

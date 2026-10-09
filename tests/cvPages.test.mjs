@@ -10,6 +10,69 @@ import {cvDestinationUrl, readPortfolioRoute} from '../earth-engine/src/portfoli
 const pdfUrl = 'https://docs.google.com/document/d/1WJrlmn0cTgHiylnJaGbDYt_AX4li0fC8VFtORVIkh8w/export?format=pdf';
 const previewUrl = 'https://docs.google.com/document/d/1WJrlmn0cTgHiylnJaGbDYt_AX4li0fC8VFtORVIkh8w/preview?rm=minimal';
 const paths = ['/cv', '/cv/', '/cv/en', '/cv/en/'];
+
+test('bottom chronology switches away from the CV without a stale close refocus', async () => {
+  const source = await readFile(new URL('../earth-engine/src/main.js', import.meta.url), 'utf8');
+  const helper = source.match(/function navigateChronology\(direction\)\{[\s\S]*?\n\}/)?.[0];
+  assert.ok(helper);
+  for (const direction of ['previous', 'next']) {
+    const current = {slug: 'tesla-gigathon-2026'}, selected = {slug: direction}, actions = [];
+    const context = {orderedAchievements: [current, selected], activeEvent: current,
+      stepChronology: (_events, slug, value) => { assert.equal(slug, current.slug); assert.equal(value, direction); return selected; },
+      cvView: {isOpen: () => true, close: () => actions.push(['close CV', context.refocusAfterCv])},
+      selectEvent: (event, options) => actions.push(['select', event.slug, {...options}]), refocusAfterCv: true,
+    };
+    vm.runInNewContext(`${helper}; navigateChronology('${direction}');`, context);
+    assert.deepEqual(actions, [['close CV', false], ['select', direction, {showDetail: true, chronologyNavigation: true}]]);
+  }
+});
+
+test('chronology boundaries leave the current CV and project untouched', async () => {
+  const source = await readFile(new URL('../earth-engine/src/main.js', import.meta.url), 'utf8');
+  const helper = source.match(/function navigateChronology\(direction\)\{[\s\S]*?\n\}/)?.[0];
+  const context = {orderedAchievements: [], activeEvent: null, stepChronology: () => null,
+    cvView: {isOpen: () => { assert.fail('a disabled direction cannot close the CV'); }},
+    selectEvent: () => assert.fail('a boundary cannot select another project'), refocusAfterCv: true,
+  };
+  vm.runInNewContext(`${helper}; navigateChronology('previous');`, context);
+  assert.equal(context.refocusAfterCv, true);
+});
+
+test('opening the CV from the map preserves that map and records an in-place CV route', async () => {
+  const source = await readFile(new URL('../earth-engine/src/main.js', import.meta.url), 'utf8');
+  const handler = source.match(/\$\('cv-link'\)\.addEventListener\('click',\(\)=>\{[\s\S]*?\n\}\);/)?.[0];
+  assert.ok(handler, 'map CV action is registered');
+  const map = {}, actions = [], href = 'https://staging.batikanor.com/?event=tesla-gigathon-2026&utm_source=cv';
+  let click;
+  const window = {map, location: {href, assign() { assert.fail('opening a popup must not discard the map document'); }},
+    history: {pushState(_state, _title, url) { actions.push(['route', url.href]); window.location.href = url.href; }} };
+  const {portfolioUrl} = await import('../earth-engine/src/portfolioRoute.js');
+  vm.runInNewContext(handler, {
+    $: id => { assert.equal(id, 'cv-link'); return {addEventListener(type, fn) { assert.equal(type, 'click'); click = fn; }}; },
+    closePopovers: () => actions.push(['close menu']),
+    openCvView: () => actions.push(['open viewer']),
+    activeEvent: {slug: 'tesla-gigathon-2026'}, window, portfolioUrl,
+  });
+  click();
+  assert.equal(window.map, map);
+  assert.deepEqual(actions, [['close menu'], ['route', 'https://staging.batikanor.com/?event=tesla-gigathon-2026&utm_source=cv&view=cv'], ['open viewer']]);
+  assert.equal(readPortfolioRoute(window.location.href, new Set(['tesla-gigathon-2026'])).view, 'cv');
+});
+
+test('opening the CV exposes the map when the CV is resized instead of stacking project details underneath', async () => {
+  const source = await readFile(new URL('../earth-engine/src/main.js', import.meta.url), 'utf8');
+  const helper = source.match(/function openCvView\(\{mapFocusSkipped=false\}=\{\}\)\{[\s\S]*?\n\}/)?.[0];
+  assert.ok(helper);
+  const detail = {hidden: false}, actions = [];
+  vm.runInNewContext(`let refocusAfterCv=false; ${helper}; openCvView();`, {
+    map: {isMoving: () => true, stop: () => actions.push('stop map flight')},
+    closeProjectGame: () => actions.push('close game'),
+    $: id => { assert.equal(id, 'detail'); return detail; },
+    cvView: {open: () => { assert.equal(detail.hidden, true); actions.push('open CV'); }},
+  });
+  assert.deepEqual(actions, ['stop map flight', 'close game', 'open CV']);
+  assert.equal(detail.hidden, true);
+});
 const shell = (staging = false) => {
   const origin = `https://${staging ? 'staging.' : ''}batikanor.com`;
   return `<!doctype html><html lang="en"><head>

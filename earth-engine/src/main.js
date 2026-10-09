@@ -426,14 +426,17 @@ function renderJourney(){
   journeyExplorer?.sync();
 }
 renderJourney();
-$('journey-previous').addEventListener('click',()=>{
-  const event=stepChronology(orderedAchievements,activeEvent?.slug??null,'previous');
-  if(event)selectEvent(event,{showDetail:true,chronologyNavigation:true});
-});
-$('journey-next').addEventListener('click',()=>{
-  const event=stepChronology(orderedAchievements,activeEvent?.slug??null,'next');
-  if(event)selectEvent(event,{showDetail:true,chronologyNavigation:true});
-});
+function navigateChronology(direction){
+  const event=stepChronology(orderedAchievements,activeEvent?.slug??null,direction);
+  if(!event)return;
+  if(cvView.isOpen()){
+    refocusAfterCv=false;
+    cvView.close();
+  }
+  selectEvent(event,{showDetail:true,chronologyNavigation:true});
+}
+$('journey-previous').addEventListener('click',()=>navigateChronology('previous'));
+$('journey-next').addEventListener('click',()=>navigateChronology('next'));
 $('journey-current').addEventListener('click',()=>{
   const event=activeEvent??orderedAchievements[0];
   // The centre card doubles as an explicit refocus, even after free panning.
@@ -464,21 +467,22 @@ if(tileWarmup.profile.enabled&&!tileWarmup.profile.mobile){
 
 $('cv-download').href=portfolioLinks.cvPdf;
 bindCvDownload($('cv-download'));
-// PDF.js and a cross-continent map flight should not compete for the main
-// thread when the CV opens. In particular, a direct ?view=cv entry starts at
-// the globe and has no reason to render the selected venue behind a modal.
+// Pause an unfinished map flight while the CV opens above the current venue.
 let refocusAfterCv=false;
 function openCvView({mapFocusSkipped=false}={}){
   refocusAfterCv=mapFocusSkipped||map.isMoving();
   if(map.isMoving())map.stop();
-  closeProjectGame();cvView.open();
+  closeProjectGame();
+  $('detail').hidden=true;
+  cvView.open();
 }
 $('cv-link').addEventListener('click',()=>{
   closePopovers();
   const url=portfolioUrl(window.location.href,{eventSlug:activeEvent?.slug,view:'cv'});
-  // A full navigation selects the map-free bootstrap path for the PDF viewer.
-  // Keeping the map running behind a modal can starve PDF.js on slow devices.
-  window.location.assign(url.href);
+  // Keep the current map behind the large CV window; standalone CV aliases
+  // still use their lightweight document entry without loading a map.
+  window.history.pushState(null,'',url);
+  openCvView();
 });
 $('cv-view').addEventListener('close',()=>{
   if(readPortfolioRoute(window.location.href,knownSlugs).view==='cv'){
@@ -658,7 +662,7 @@ function detailMapOffset(){
     {area:bottomRoom*width,x:width/2,y:panel.y+panel.height+bottomRoom/2}
   ];
   const target=choices.reduce((best,choice)=>choice.area>best.area?choice:best);
-  const x=Math.max(-Math.min(420,width*.45),Math.min(Math.min(420,width*.45),target.x-width/2));
+  const x=Math.max(-width*.45,Math.min(width*.45,target.x-width/2));
   const y=Math.max(-Math.min(320,height*.45),Math.min(Math.min(320,height*.45),target.y-height/2));
   return [x,y];
 }
@@ -699,6 +703,10 @@ function capsuleArrivalCamera(panelVisible=false){
 }
 function selectEvent(event,{showDetail=false,historyMode='push',view=null,skipFly=false,chronologyNavigation=false}={}) {
   if(!event)return;
+  if(showDetail&&cvView.isOpen()){
+    refocusAfterCv=false;
+    cvView.close();
+  }
   const flightGeneration=++achievementFlightGeneration;
   closeProjectGame();
   finishDrive();activeEvent=event;activeCity=byCity.get(keyOf(event));
@@ -736,7 +744,7 @@ function selectEvent(event,{showDetail=false,historyMode='push',view=null,skipFl
   // Native sampling sets the framing. Genuine surveyed 20 cm chapters can
   // be closer; a 10 m fallback must never masquerade as street-level imagery.
   if(!skipFly){
-    showEventDetail(event);
+    showEventDetail(event,{preserveGeometry:chronologyNavigation&&showDetail&&!$('detail').hidden});
     $('detail').hidden=!showDetail;
     const beginFlight=()=>{
       if(flightGeneration!==achievementFlightGeneration||activeEvent?.slug!==event.slug||!venueSceneSelected||drive.active||cvView.isOpen())return;
@@ -760,11 +768,11 @@ function selectEvent(event,{showDetail=false,historyMode='push',view=null,skipFl
   status(`${getProject(event.slug)?.title??event.title} · ${event.venue} · ${event.coordinates.lat.toFixed(5)}°, ${event.coordinates.lng.toFixed(5)}°`);
   warmAdjacentDestinations(event);
 }
-function showEventDetail(event) {
+function showEventDetail(event,{preserveGeometry=false}={}) {
   closeProjectGame();
   const root=$('detail');
   const isHero=event.slug===HERO_VENUE_EVENT;
-  const scroll=detailPanel.render();
+  const scroll=detailPanel.render({preserveGeometry});
   const content=document.createElement('div');
   content.className='project-content-host';
   scroll.append(content);
@@ -930,6 +938,7 @@ $('world-button').addEventListener('click',()=>showWholeEarth());
 function showIntroduction({historyMode='push'}={}) {
   const url=portfolioUrl(window.location.href,{eventSlug:null,view:null});
   if(!mapReady){window.location.assign(url.href);return;}
+  refocusAfterCv=false;
   if(cvView.isOpen())cvView.close();
   if(historyMode!=='none'){
     window.history[historyMode==='replace'?'replaceState':'pushState']({earthIntroVisible:true},'',url);
@@ -1049,6 +1058,7 @@ function tickDrive(now){
 window.addEventListener('keydown',e=>{
   const key=e.key.toLowerCase();
   if(e.key==='Escape'){
+    if(cvView.isOpen())cvView.close();
     closeProjectGame();finishDrive();closePopovers();$('detail').hidden=true;
   }
   if(drive.active&&key==='c'&&!e.repeat&&!e.metaKey&&!e.ctrlKey&&!e.altKey

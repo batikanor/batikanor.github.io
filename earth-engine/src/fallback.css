@@ -39,7 +39,7 @@
 @media (max-width: 900px) { .fallback-mode .socials { display: none; } }
 @media (min-width: 761px) and (max-width: 980px) {
   .fallback-content { width: 100%; }
-  .fallback-mode .detail {
+  .fallback-mode .detail:not(.is-expanded):not(.is-floating) {
     top: auto; left: 18px; right: 18px; bottom: 100px;
     width: auto; height: min(50dvh, 500px);
   }
@@ -52,5 +52,5 @@
   .fallback-achievement { min-height: 66px; }
   .fallback-row-content strong { font-size: 13px; }
   .fallback-mode .journey { bottom: calc(10px + env(safe-area-inset-bottom, 0px)); }
-  .fallback-mode .detail { bottom: calc(79px + env(safe-area-inset-bottom, 0px)); }
+  .fallback-mode .detail:not(.is-expanded):not(.is-floating) { bottom: calc(79px + env(safe-area-inset-bottom, 0px)); }
 }

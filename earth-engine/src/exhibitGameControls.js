@@ -258,6 +258,11 @@ export function createExhibitGameControls({map, getScene, getEvent, canPlay, onS
   }
 
   function blur() { clearInput(); clearHover(); releasePointer(); }
+  function windowBlur(event) {
+    // Focusing the canvas blurs the previous popup control. That captured
+    // descendant event must not cancel the exhibit press we just accepted.
+    if (event.target === window) blur();
+  }
   function visibilityChange() { if (document.visibilityState === 'hidden') close(); }
   function doubleClick(event) { if (activeScene && event.target === canvas) consume(event); }
   function compatibilityClick(event) {
@@ -275,7 +280,7 @@ export function createExhibitGameControls({map, getScene, getEvent, canPlay, onS
     [canvas, 'lostpointercapture', pointerCancel], [canvas, 'keydown', keyDown],
     [canvas, 'blur', blur], [canvas, 'dblclick', doubleClick], [canvas, 'click', compatibilityClick],
     [document, 'keyup', keyUp],
-    [document, 'visibilitychange', visibilityChange], [window, 'blur', blur],
+    [document, 'visibilitychange', visibilityChange], [window, 'blur', windowBlur],
   ];
   for (const [target, name, handler] of bindings) target?.addEventListener(name, handler, true);
 
