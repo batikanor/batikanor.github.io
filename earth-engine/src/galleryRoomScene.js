@@ -353,9 +353,9 @@ export function createGalleryRoomScene({scene, projects, reducedMotion=false, vi
       surfaces,contentSurfaces:surfaces,components:[],subject};
     stations.set(project.slug,station);bays.push({group:bay,fittings,figure,masks,station,project});
   });
-  let layoutKey=null;
+  let layoutKey=null,layoutViewport=viewport;
   const resize=nextViewport=>{
-    const selected=nextViewport??viewport;
+    const selected=nextViewport??layoutViewport;
     const key=JSON.stringify([selected.width,selected.height,...['left','top','right','bottom'].map(name=>selected.dockBounds?.[name])]);
     if(key===layoutKey)return false;
     const plans=bays.map(bay=>galleryStationPlan(bay.project,selected));
@@ -363,7 +363,7 @@ export function createGalleryRoomScene({scene, projects, reducedMotion=false, vi
     for(const [index,bay]of bays.entries()) {
       const {station,masks,fittings,figure}=bay,{components,wallLayout}=plans[index];
       const x=index*spacing;
-      station.anchor[0]=x;station.spacing=spacing;bay.group.position.x=x;
+      station.index=index;station.anchor[0]=x;station.spacing=spacing;bay.group.position.x=x;
       for(const pose of components){
         const worldPose={...pose,position:[pose.position[0]+x,...pose.position.slice(1)]};
         if(station.surfaces[pose.id])Object.assign(station.surfaces[pose.id],worldPose);
@@ -404,7 +404,9 @@ export function createGalleryRoomScene({scene, projects, reducedMotion=false, vi
     walkBounds.min[0]=-spacing/2+.2;
     walkBounds.min[2]=plans[0].wallLayout.wallZ+.081;
     walkBounds.max[0]=(bays.length-1)*spacing+spacing/2+GALLERY_ROOM_LAYOUT.stationGap/2-.2;
-    root.updateMatrixWorld(true);layoutKey=key;return true;
+    root.updateMatrixWorld(true);layoutKey=key;
+    layoutViewport={...selected,...(selected.dockBounds?{dockBounds:{...selected.dockBounds}}:{})};
+    return true;
   };
   resize(viewport);
   // Broad neutral daylight keeps the stone planes related across corners;
@@ -429,7 +431,45 @@ export function createGalleryRoomScene({scene, projects, reducedMotion=false, vi
     root.updateMatrixWorld(true);
   };
   setActive(projects[0].slug);
-  return {root,stations,setActive,walkBounds,
+  const setOrder=orderedProjects=>{
+    if(destroyed)return false;
+    if(!Array.isArray(orderedProjects)||orderedProjects.length!==bays.length
+      ||[...orderedProjects].some(project=>!stations.has(project?.slug))
+      ||new Set(orderedProjects.map(project=>project.slug)).size!==stations.size)
+      throw new TypeError('Gallery order must contain the same unique project slugs');
+    if(orderedProjects.every((project,index)=>project.slug===bays[index].station.slug))return false;
+    const bySlug=new Map(bays.map(bay=>[bay.station.slug,bay]));
+    const previousLast=bays.at(-1),orderedBays=orderedProjects.map(project=>bySlug.get(project.slug));
+    const nextLast=orderedBays.at(-1);
+    if(previousLast!==nextLast)for(const name of ROOM_SURFACES){
+      // The last corridor tile includes the final sculpture niche. Move its
+      // existing geometry with that role rather than rebuilding GPU assets.
+      const before=previousLast.fittings.children.find(mesh=>mesh.material.name===`gallery-${name}`);
+      const after=nextLast.fittings.children.find(mesh=>mesh.material.name===`gallery-${name}`);
+      [before.geometry,after.geometry]=[after.geometry,before.geometry];
+    }
+    bays.splice(0,bays.length,...orderedBays);stations.clear();
+    for(const [index,bay]of bays.entries()){
+      const {station}=bay,x=index*station.spacing;
+      station.index=index;station.anchor[0]=x;bay.group.position.x=x;
+      for(const pose of station.components){
+        const mask=bay.masks.children.find(mesh=>mesh.userData.surface===pose.id&&mesh.userData.part==='aperture');
+        pose.position[0]=mask.position.x+x;
+      }
+      station.wallBounds.min[0]=x-station.wallLayout.worldWidth/2;
+      station.wallBounds.max[0]=x+station.wallLayout.worldWidth/2;
+      station.bounds.min[0]=x-station.spacing/2+.2;station.bounds.max[0]=x+station.spacing/2-.2;
+      for(const bounds of station.frontObjects){
+        const pose=station.surfaces[bounds.id];
+        bounds.min[0]=pose.position[0]-pose.worldWidth/2-pose.framePadding;
+        bounds.max[0]=pose.position[0]+pose.worldWidth/2+pose.framePadding;
+      }
+      station.camera[0]=station.lookAt[0]=x;
+      stations.set(station.slug,station);
+    }
+    setActive(activeSlug,true);return true;
+  };
+  return {root,stations,setActive,setOrder,walkBounds,
     stationAtPosition(x) {
       if(destroyed)return null;
       const value=Number(x);

@@ -14,19 +14,31 @@ const projects = JSON.parse(await readFile(new URL('../src/data/achievements.jso
 const radians = Math.PI / 180;
 const centers = [[52.39, 13.79], [48.14, 11.58], [22.28, 114.17], [34.61, 135.67], [41.14, 29.10], [0, 179]];
 const zooms = [1, 1.9, 3.61, 6.859, 13.0321, GALLERY_GLOBE_MAX_ZOOM];
+const responsiveViewports = [112, 144, 168, 180, 188, 220, 280, 336]
+  .map(size => ({width: size, height: size}));
+const viewports = [...responsiveViewports, {width: 336, height: 188}, {width: 168, height: 280}];
+const clickCenters = [...centers, [.4 / radians, 0], ...projects.map(project =>
+  [project.coordinates.lat, project.coordinates.lng])];
+const clickZooms = [...zooms.slice(0, -1), 32, 128, 320, GALLERY_GLOBE_MAX_ZOOM];
+const projectBySlug = new Map(projects.map(project => [project.slug, project]));
+const viewportFor = size => typeof size === 'number' ? {width: size, height: size} : size;
+const radiusFor = size => viewportFor(size).width <= 170 ? 21 : 25;
 
 function project(center, size, zoom) {
+  const {width, height} = viewportFor(size), diameter = Math.min(width, height);
   const rotation = new THREE.Quaternion().setFromEuler(new THREE.Euler(
     center[0] * radians, -Math.PI / 2 - center[1] * radians, 0, 'XYZ'));
-  const scale = size * zoom / (2 * 1.23);
+  // resize() extends the longer camera axis, so both axes use this same scale.
+  const scale = diameter * zoom / (2 * 1.23);
   return projects.map((project, index) => {
     const latitude = project.coordinates.lat * radians, longitude = project.coordinates.lng * radians;
     const position = new THREE.Vector3(
       Math.cos(latitude) * Math.cos(longitude), Math.sin(latitude),
       -Math.cos(latitude) * Math.sin(longitude)).multiplyScalar(1.018).applyQuaternion(rotation);
-    const x = size / 2 + position.x * scale, y = size / 2 - position.y * scale;
+    const x = width / 2 + position.x * scale, y = height / 2 - position.y * scale;
     return {slug: project.slug, x, y, active: index === 0,
-      visible: position.z > .015 && Math.hypot(x - size / 2, y - size / 2) <= size / 2 - 15};
+      front: position.z > .015,
+      visible: position.z > .015 && Math.hypot(x - width / 2, y - height / 2) <= diameter / 2 - 15};
   });
 }
 
@@ -34,7 +46,7 @@ const signature = groups => groups.map(group => group.members.map(member => memb
 
 function groupsFor(center, size, zoom) {
   const markers = project(center, size, zoom);
-  const groups = clusterGalleryGlobeMarkers(markers, {radius: size <= 170 ? 21 : 25});
+  const groups = clusterGalleryGlobeMarkers(markers, {radius: radiusFor(size)});
   return {markers, groups};
 }
 
@@ -81,26 +93,82 @@ test('chronological ordering does not change geographic group membership or clus
 });
 
 
-test('following the default European cluster reaches a city-sized chooser on phones and desktop', () => {
-  const latest = projects.find(project => project.slug === 'tesla-gigathon-2026');
-  const munichCount = projects.filter(project => project.city === 'Munich' && project.country === 'Germany').length;
-  for (const size of [150, 252]) {
-    let center = [latest.coordinates.lat, latest.coordinates.lng], zoom = 1, terminal = null;
-    for (let click = 0; click < 16; click++) {
-      const {groups} = groupsFor(center, size, zoom);
-      const cluster = groups.filter(group => group.count > 1).sort((a, b) => b.count - a.count)[0];
-      assert.ok(cluster, 'the main European group stays reachable while narrowing geography');
-      const members = cluster.members.map(member => projects.find(project => project.slug === member.slug));
-      const target = galleryGlobeClusterTarget(members, zoom);
-      assert.ok(target.zoom >= zoom && target.zoom <= GALLERY_GLOBE_MAX_ZOOM);
-      if (target.expand) { terminal = members; break; }
-      assert.ok(target.zoom > zoom, 'an unresolved cluster must make visible zoom progress');
-      center = [target.latitude, target.longitude];zoom = target.zoom;
+function assertClusterClick(cluster, zoom, viewport) {
+  const {width, height} = viewport, radius = radiusFor(viewport);
+  const members = cluster.members.map(member => projectBySlug.get(member.slug));
+  const slugs = new Set(members.map(member => member.slug));
+  const target = galleryGlobeClusterTarget(members, zoom, {...viewport, radius, allLocations: projects});
+  const center = [target.latitude, target.longitude];
+  const label = `${width}×${height}px / ${zoom}× / ${cluster.id}`;
+  assert.ok(Number.isFinite(target.zoom) && target.zoom >= zoom && target.zoom <= GALLERY_GLOBE_MAX_ZOOM,
+    `${label}: click zoom must remain bounded`);
+  const childrenAt = candidate => {
+    const state = groupsFor(center, viewport, candidate);
+    return {...state, children: state.groups.filter(group => group.members.some(member => slugs.has(member.slug)))};
+  };
+  if (target.expand) {
+    // For this fixed geographic center, projected distances grow linearly with
+    // zoom. The greatest zoom that retains every clicked member is therefore
+    // the strongest possible split, including other achievements in the scene.
+    const base = project(center, viewport, 1).filter(marker => slugs.has(marker.slug));
+    const extent = Math.max(...base.map(marker => Math.hypot(marker.x - width / 2, marker.y - height / 2)));
+    const fitZoom = Math.min(GALLERY_GLOBE_MAX_ZOOM,
+      (Math.min(width, height) / 2 - 15 - .25) / extent);
+    if (zoom < GALLERY_GLOBE_MAX_ZOOM && fitZoom >= zoom && base.every(marker => marker.front)) {
+      const fitted = childrenAt(fitZoom);
+      assert.ok(fitted.children.some(group => group.count >= cluster.count),
+        `${label}: chooser opened even though all clicked members can split visibly`);
     }
-    assert.ok(terminal, 'a bounded sequence of clicks must resolve the crowded European globe');
-    assert.ok(terminal.length >= 2 && terminal.length <= munichCount,
-      `${size}px chooser contains only a bounded local subset of Munich achievements`);
-    assert.deepEqual([...new Set(terminal.map(project => `${project.city}|${project.country}`))], ['Munich|Germany'],
-      'a terminal chooser should not still combine unrelated European cities');
+    return {target, children: []};
+  }
+  assert.ok(target.zoom > zoom, `${label}: a split must move beyond the current zoom`);
+  const {markers, children} = childrenAt(target.zoom);
+  assert.deepEqual(markers.filter(marker => slugs.has(marker.slug) && marker.visible)
+    .map(marker => marker.slug).sort(), [...slugs].sort(),
+  `${label}: clipping a clicked achievement is not a cluster split`);
+  assert.ok(children.length > 1, `${label}: the clicked cluster remains a single group`);
+  assert.ok(children.every(group => group.count < cluster.count),
+    `${label}: every resulting badge must have fewer members, including neighboring achievements`);
+  const unClipped = clusterGalleryGlobeMarkers(markers.filter(marker => slugs.has(marker.slug))
+    .map(marker => ({...marker, visible: true})), {radius});
+  assert.ok(unClipped.every(group => group.count < cluster.count),
+    `${label}: the complete original membership must split without relying on visibility filtering`);
+  return {target, children};
+}
+
+test('every real cluster click splits its badge or opens a necessary chooser at every responsive size', () => {
+  let checks = 0;
+  for (const viewport of viewports) for (const center of clickCenters) for (const zoom of clickZooms) {
+    for (const cluster of groupsFor(center, viewport, zoom).groups.filter(group => group.count > 1)) {
+      assertClusterClick(cluster, zoom, viewport);checks++;
+    }
+  }
+  assert.ok(checks > 1000, 'the regression covers complete real geography across mobile and desktop');
+});
+
+test('all branches from the actual entry and reset views resolve without repeated unchanged counts', () => {
+  const latest = projects[0], reset = [latest.coordinates.lat, latest.coordinates.lng];
+  for (const viewport of responsiveViewports) for (const center of [[.4 / radians, 0], reset]) {
+    const pending = groupsFor(center, viewport, 1).groups.filter(group => group.count > 1)
+      .map(cluster => ({cluster, zoom: 1, depth: 0}));
+    while (pending.length) {
+      const {cluster, zoom, depth} = pending.pop();
+      assert.ok(depth < projects.length, 'strictly decreasing membership bounds the number of clicks');
+      const {target, children} = assertClusterClick(cluster, zoom, viewport);
+      for (const child of children.filter(group => group.count > 1)) {
+        pending.push({cluster: child, zoom: target.zoom, depth: depth + 1});
+      }
+    }
+  }
+});
+
+test('the actual nine Munich achievements split on their first click at phone and desktop sizes', () => {
+  const munich = projects.filter(project => project.city === 'Munich' && project.country === 'Germany');
+  assert.equal(munich.length, 9, 'retain the reported nine-achievement regression');
+  const cluster = {id: munich.map(project => project.slug).sort().join('|'), count: munich.length,
+    members: munich.map(project => ({slug: project.slug}))};
+  for (const viewport of responsiveViewports) {
+    assert.equal(assertClusterClick(cluster, 32, viewport).target.expand, false,
+      `${viewport.width}px: the actual Munich group has a visible split before maximum zoom`);
   }
 });

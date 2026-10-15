@@ -4,6 +4,7 @@ const $ = id => document.getElementById(id);
 let pendingEntry = null;
 let resolveEntry = null;
 let enterBound = false;
+let entryDestination = 'map';
 
 function setIntroHistoryState(visible) {
   const current = history.state;
@@ -15,8 +16,24 @@ export function introHistoryVisible() {
   return history.state?.earthIntroVisible === true;
 }
 
+/** A chosen globe marker and the entry button share the same explicit gate. */
+export function requestIntroEntry({eventSlug=null}={}) {
+  if (!resolveEntry) return false;
+  const enter = $('intro-enter');
+  enter.disabled = true;
+  enter.querySelector('.intro-enter-label').textContent = 'Opening…';
+  $('intro-load-status').textContent = entryDestination==='gallery'?'Opening the gallery…':'Opening the map…';
+  setIntroHistoryState(false);
+  const resolve = resolveEntry;
+  resolveEntry = null;
+  pendingEntry = null;
+  resolve(eventSlug ? {eventSlug} : {});
+  return true;
+}
+
 /** Resolve only after an explicit activation; never start the map on a timer. */
 export function waitForIntroEntry({destination='map'}={}) {
+  entryDestination = destination;
   const screen = $('intro-screen');
   const enter = $('intro-enter');
   const app = $('app');
@@ -26,24 +43,14 @@ export function waitForIntroEntry({destination='map'}={}) {
   screen.inert = false;
   enter.hidden = false;
   enter.disabled = false;
-  enter.querySelector('.intro-enter-label').textContent = 'Enter';
+  enter.querySelector('.intro-enter-label').textContent = 'Explore achievements';
   $('intro-fallback-link').hidden = true;
   $('intro-load-status').textContent = '';
   $('intro-load-status').classList.remove('is-error');
   setIntroHistoryState(true);
   if (!enterBound) {
     enterBound = true;
-    enter.addEventListener('click', () => {
-      if (!resolveEntry) return;
-      enter.disabled = true;
-      enter.querySelector('.intro-enter-label').textContent = 'Opening…';
-      $('intro-load-status').textContent = destination==='gallery'?'Opening the gallery…':'Opening the map…';
-      setIntroHistoryState(false);
-      const resolve = resolveEntry;
-      resolveEntry = null;
-      pendingEntry = null;
-      resolve();
-    });
+    enter.addEventListener('click', () => requestIntroEntry());
   }
   // Native focus makes the sole transition discoverable to keyboard users.
   requestAnimationFrame(() => enter.focus({preventScroll:true}));

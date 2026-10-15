@@ -43,7 +43,7 @@ export default function Footer() {
             <p className="flex items-center gap-1">
               Made with{" "}
               <FaHeart className="footer-heart" /> by
-              Batıkan
+              <span>Batıkan<span className="portfolio-wordmark-accent">or</span></span>
             </p>
             <p className="mt-1">© {currentYear} All rights reserved</p>
           </div>

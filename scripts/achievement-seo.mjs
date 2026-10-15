@@ -122,7 +122,7 @@ export function renderAchievementPage(item, index, {staging = false} = {}) {
   const origin = staging ? stagingOrigin : productionOrigin;
   const canonical = `${origin}/achievements/${encodeURIComponent(item.slug)}/`;
   const map = `/?event=${encodeURIComponent(item.slug)}`;
-  const title = `${item.title} | Batıkan`;
+  const title = `${item.title} | Batıkanor`;
   const description = pageDescription(item);
   const location = [item.mapData?.venue, item.mapData?.city, item.mapData?.country]
     .filter(Boolean).filter((value, position, all) => all.indexOf(value) === position).join(' · ');
@@ -162,12 +162,12 @@ export function renderAchievementPage(item, index, {staging = false} = {}) {
   <meta property="og:title" content="${escapeHtml(title)}" />
   <meta property="og:description" content="${escapeHtml(description)}" />
   <meta property="og:image" content="${escapeHtml(image)}" />
-  <meta property="og:image:alt" content="${escapeHtml(item.gdrive_embed?.find(media => image.endsWith(media.url))?.abovePhotoCaption || 'Batıkan portfolio')}" />
+  <meta property="og:image:alt" content="${escapeHtml(item.gdrive_embed?.find(media => image.endsWith(media.url))?.abovePhotoCaption || 'Batıkanor portfolio')}" />
   <meta name="twitter:card" content="summary_large_image" />
   <script type="application/ld+json">${schema}</script>
   <link rel="stylesheet" href="/seo/achievement.css" />
 </head><body>
-  <header class="site-header"><a class="brand" href="/">Batıkan <small>Hacker · Developer · Entrepreneur</small></a><a class="map-link" href="${escapeHtml(map)}">Open on the map ↗</a></header>
+  <header class="site-header"><a class="brand" href="/" aria-label="Batıkanor">Batıkan<span class="portfolio-wordmark-accent">or</span><small>Hacker · Developer · Entrepreneur</small></a><a class="map-link" href="${escapeHtml(map)}">Open on the map ↗</a></header>
   <main><article>
     <p class="eyebrow">${escapeHtml(item.date || '')}${location ? ` · ${escapeHtml(location)}` : ''}</p>
     <h1>${escapeHtml(item.title)}</h1>
@@ -227,7 +227,7 @@ export function renderNoScriptIndex() {
     #seo-noscript a:focus-visible{outline:2px solid var(--portfolio-focus);outline-offset:4px}
     #seo-noscript li{margin:9px 0}#seo-noscript small{color:var(--portfolio-muted)}
     @media(max-width:650px){#seo-noscript{padding:30px 18px 50px}#seo-noscript h1{font-size:32px}#seo-noscript h2{font-size:22px}}
-  </style><main id="seo-noscript"><h1>Batıkan</h1><p>Hacker · Developer · Entrepreneur</p>
+  </style><main id="seo-noscript"><h1>Batıkan<span class="portfolio-wordmark-accent">or</span></h1><p>Hacker · Developer · Entrepreneur</p>
   <p>I’ve won prizes in 30+ competitions, acted as a juror and mentor several times, and worked in software, tooling, space tech, biotech, energy, finance and AI.</p>
   <p>This interactive map needs JavaScript. You can still read every achievement below, or visit my <a href="/cv/">CV</a> and <a href="/projects/">projects</a>.</p>
   <h2>Achievements</h2><ol>${achievementPages.map(item => `<li><a href="/achievements/${encodeURIComponent(item.slug)}/">${escapeHtml(item.title)}</a> <small>${escapeHtml(item.date || '')}</small></li>`).join('')}</ol>

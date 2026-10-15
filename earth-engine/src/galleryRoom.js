@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import {CSS3DRenderer} from 'three/addons/renderers/CSS3DRenderer.js';
 import achievements from './data/achievements.json';
 import {sortAchievementsNewestFirst, getChronologyState} from './chronology.js';
+import {sortAchievementsByImportance} from './achievementImportance.js';
 import {readPortfolioRoute, portfolioUrl} from './portfolioRoute.js';
 import {createGalleryRoomScene} from './galleryRoomScene.js';
 import {createGalleryRoomContent} from './galleryRoomContent.js';
@@ -10,10 +11,12 @@ import {createGalleryRoomPicker} from './galleryRoomPicker.js';
 import {overviewCameraPlan,surfaceCameraPlan,roomCameraFov,roomWalkingVector,roomTransitionDuration} from './galleryRoomCamera.js';
 import {renderGalleryRoomDom} from './galleryRoomDomView.js';
 import {createRoomJumpState, stepRoomJump} from './galleryRoomJump.js';
+import {decorateBrandLink} from './brandLinks.js';
+import {bindAchievementSummaryDownload} from './achievementSummaryDownload.js';
 import './galleryRoom.css';
 
-const ordered = sortAchievementsNewestFirst(achievements);
-const bySlug = new Map(ordered.map(project => [project.slug, project]));
+const defaultOrder = sortAchievementsNewestFirst(achievements);
+const bySlug = new Map(defaultOrder.map(project => [project.slug, project]));
 const knownSlugs = new Set(bySlug.keys());
 const el = (tag, className, text) => {
   const node=document.createElement(tag);
@@ -26,6 +29,7 @@ const svgArrow = direction => direction === 'previous' ? '←' : '→';
 /** Prepare the spatial gallery; a deferred room keeps intro focus until activate(). */
 export async function startGalleryRoom({deferActivation=false}={}) {
   window.__galleryRoom?.dispose?.();
+  let ordered=defaultOrder,sortMode='recent';
   document.documentElement.classList.remove('gallery-pending');
   if(!deferActivation)document.documentElement.classList.remove('intro-active');
   document.body.classList.add('gallery-room-active');
@@ -43,25 +47,33 @@ export async function startGalleryRoom({deferActivation=false}={}) {
   stage.append(backdrop);root.append(stage);
 
   const header=el('header','gallery-room-header');
-  const brand=el('a','gallery-room-brand','Batıkan');brand.href='/';
-  brand.setAttribute('aria-label','Batıkan — return to introduction');brand.title='Return to introduction';
+  const brand=el('a','gallery-room-brand');brand.href='/';
+  brand.append(el('span',null,'Batıkan'),el('span','portfolio-wordmark-accent','or'));
+  brand.setAttribute('aria-label','Batıkanor — return to introduction');brand.title='Return to introduction';
   const identity=el('div','gallery-room-identity');
   identity.append(brand,el('span','gallery-room-tagline','Hacker · Developer · Entrepreneur'));
   const links=el('nav','gallery-room-links');links.setAttribute('aria-label','Gallery controls, contact and documents');
   const returnButton=el('button','gallery-room-return','↶');returnButton.type='button';returnButton.hidden=true;
   returnButton.setAttribute('aria-label','Return to room');returnButton.title='Return to room';
   const cv=el('a',null,'CV');cv.href='/cv/';
+  const summaryDownload=el('button','gallery-room-summary-download');summaryDownload.id='gallery-summary-download';summaryDownload.type='button';
+  summaryDownload.setAttribute('aria-label','Download achievements summary (PDF)');summaryDownload.title='Download achievements summary (PDF)';
+  const summaryIcon=el('span','gallery-room-download-icon','↓');summaryIcon.setAttribute('aria-hidden','true');
+  summaryDownload.append(summaryIcon,el('span','gallery-room-summary-label','Achievements'),el('span','gallery-room-summary-mobile-label','Summary'));
+  const summaryStatus=el('p','gallery-room-export-status');summaryStatus.id='gallery-summary-status';summaryStatus.hidden=true;
   const email=el('a',null,'Email');email.href='mailto:batikanor@gmail.com';
-  const linkedIn=el('a',null,'LinkedIn ↗');linkedIn.href='https://linkedin.com/in/batikanor';linkedIn.target='_blank';linkedIn.rel='noopener noreferrer';
+  email.setAttribute('aria-label','Email');decorateBrandLink(email,'email');
+  const linkedIn=el('a',null,'LinkedIn');linkedIn.href='https://linkedin.com/in/batikanor';linkedIn.target='_blank';linkedIn.rel='noopener noreferrer';
+  linkedIn.setAttribute('aria-label','LinkedIn');decorateBrandLink(linkedIn,'linkedin');
   const lockButton=el('button','gallery-room-view-lock');lockButton.id='gallery-view-lock';lockButton.type='button';
-  links.append(returnButton,cv,email,linkedIn,lockButton);header.append(identity,links);root.append(header);
+  links.append(returnButton,cv,summaryDownload,email,linkedIn,lockButton);header.append(identity,links,summaryStatus);root.append(header);
 
   const dock=el('aside','gallery-room-dock');dock.setAttribute('aria-label','Globe and project navigation');
   const globeMount=el('div','gallery-room-globe-mount');globeMount.id='gallery-room-globe';
   const chronology=el('nav','gallery-room-chronology');chronology.setAttribute('aria-label','Project chronology');
   const previous=el('button','gallery-room-arrow',svgArrow('previous'));previous.id='gallery-previous';previous.type='button';
   previous.setAttribute('aria-label','Previous, newer project');previous.title='Newer project · ←';
-  const picker=createGalleryRoomPicker({projects:ordered,onSelect:selectProject});
+  const picker=createGalleryRoomPicker({projects:ordered,onSelect:selectProject,onSortChange:setSortMode});
   const next=el('button','gallery-room-arrow',svgArrow('next'));next.id='gallery-next';next.type='button';
   next.setAttribute('aria-label','Next, older project');next.title='Older project · →';
   chronology.append(previous,picker.element,next);dock.append(globeMount,chronology);root.append(dock);
@@ -96,6 +108,8 @@ export async function startGalleryRoom({deferActivation=false}={}) {
   const keys=new Set(),tapKeys=new Set(),lookTarget=new THREE.Vector3(),pointer=new THREE.Vector2(),raycaster=new THREE.Raycaster();
   let jumpState=createRoomJumpState(),jumpQueued=false;
   const abort=new AbortController(),signal=abort.signal;
+  bindAchievementSummaryDownload(summaryDownload,{status:summaryStatus,signal});
+  summaryDownload.addEventListener('click',()=>{clearMovementKeys();cancelDrag();},{signal});
   const content=createGalleryRoomContent({scene:cssScene,stations:room.stations,activeSlug:slug,
     baseHref:location.href,onFocusSurface:focusSurface,onProjectLink:selectProject,onReturnToRoom:returnToRoom});
   const globe=createGalleryRoomGlobe({container:globeMount,achievements:ordered,onSelect:selectProject});
@@ -179,6 +193,30 @@ export async function startGalleryRoom({deferActivation=false}={}) {
     const focused=currentSurface(focusKind);
     announce.textContent=project.title+'. '+project.city+', '+project.country+'. '+(focusKind?'Viewing '+(focused?.element?.getAttribute('aria-label')??focusKind)+'.':'Project room.');
   }
+  function refreshSortControls(){
+    root.dataset.sort=sortMode;
+    chronology.setAttribute('aria-label',sortMode==='recent'?'Achievements, more recent first':'Achievements, more important first');
+    const before=sortMode==='recent'?'newer':'more important',after=sortMode==='recent'?'older':'less important';
+    previous.setAttribute('aria-label',`Previous, ${before} achievement`);previous.title=`${before[0].toUpperCase()+before.slice(1)} achievement · ←`;
+    next.setAttribute('aria-label',`Next, ${after} achievement`);next.title=`${after[0].toUpperCase()+after.slice(1)} achievement · →`;
+    picker.setSortMode(sortMode);
+  }
+  function setSortMode(mode){
+    if(!active||disposed||!['recent','importance'].includes(mode)||mode===sortMode)return;
+    const intended=pendingSlug??slug;
+    cancelDrag();clearMovementKeys();resetJump();
+    if(teleportTimer){clearTimeout(teleportTimer);teleportTimer=null;}
+    pendingSlug=null;root.classList.remove('is-teleporting');animation=null;
+    ordered=mode==='importance'?sortAchievementsByImportance(defaultOrder):defaultOrder;sortMode=mode;
+    room.setOrder(ordered);content.resize(viewport());
+    picker.setProjects(ordered);refreshSortControls();
+    if(intended!==slug)setStation(intended);
+    else{
+      updateVisibleProjects();room.update?.(performance.now()/1000,0,slug);
+      applyPose(framePlan());refreshNavigation();
+    }
+    needsRender=true;
+  }
   function setStation(nextSlug){
     cancelDrag();
     slug=nextSlug;pendingSlug=null;focusKind=null;
@@ -218,7 +256,7 @@ export async function startGalleryRoom({deferActivation=false}={}) {
   previous.addEventListener('click',()=>step('previous'),{signal});next.addEventListener('click',()=>step('next'),{signal});
   returnButton.addEventListener('click',returnToRoom,{signal});
   lockButton.addEventListener('click',()=>{if(active){setViewLocked(!viewLocked);stage.focus({preventScroll:true});}},{signal});
-  addEventListener('popstate',()=>{if(!active)return;const route=readPortfolioRoute(location.href,knownSlugs);selectProject(route.eventSlug??ordered[0].slug,{history:false});},{signal});
+  addEventListener('popstate',()=>{if(!active)return;const route=readPortfolioRoute(location.href,knownSlugs);selectProject(route.eventSlug??defaultOrder[0].slug,{history:false});},{signal});
 
   const controlTarget=target=>target instanceof Element&&!!target.closest('button,a,input,select,textarea,iframe,[contenteditable],[data-gallery-surface],.gallery-room-dock,.gallery-room-header');
   addEventListener('keydown',event=>{
@@ -299,10 +337,13 @@ export async function startGalleryRoom({deferActivation=false}={}) {
   }
   addEventListener('resize',resize,{signal});
   focusKind=null;
-  resize();content.setActiveSlug(slug);content.setFocusedSurface?.(focusKind);updateVisibleProjects();room.update?.(0,0,slug);refreshNavigation();refreshViewLock();
+  resize();content.setActiveSlug(slug);content.setFocusedSurface?.(focusKind);updateVisibleProjects();room.update?.(0,0,slug);refreshNavigation();refreshViewLock();refreshSortControls();
 
-  function activate(){
+  function activate({eventSlug}={}){
     if(disposed||active)return;
+    // The introduction can choose a project after this inert room was prepared.
+    // Fit that station before exposing the room, without a default-project flash.
+    if(bySlug.has(eventSlug))setStation(eventSlug);
     active=true;root.inert=false;root.classList.remove('is-preparing');
     if(original)original.inert=true;
     clearMovementKeys();lastTime=0;resize();needsRender=true;
@@ -358,7 +399,7 @@ export async function startGalleryRoom({deferActivation=false}={}) {
     document.body.classList.remove('gallery-room-active');if(original)original.inert=false;
     if(window.__galleryRoom?.root===root)delete window.__galleryRoom;
   }
-  const api={root,camera,scene,content,room,globe,activate,dispose,setViewLocked,getStats:()=>({active,viewLocked,activeSlug:slug,pendingSlug,focusKind,transitioning:!!animation||!!teleportTimer,
+  const api={root,camera,scene,content,room,globe,activate,dispose,setViewLocked,setSortMode,getStats:()=>({active,viewLocked,sortMode,projectOrder:ordered.map(project=>project.slug),activeSlug:slug,pendingSlug,focusKind,transitioning:!!animation||!!teleportTimer,
     camera:camera.position.toArray(),lookTarget:lookTarget.toArray(),viewport:viewport(),frameCount,keys:[...keys],jump:{...jumpState},
     room:room.getStats?.(),globe:globe.getStats?.(),render:{calls:renderer.info.render.calls,triangles:renderer.info.render.triangles},disposed})};
   window.__galleryRoom=api;

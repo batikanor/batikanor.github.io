@@ -1,0 +1,70 @@
+/* Shared, compact native contact links across the introduction and rooms. */
+.portfolio-brand-link.portfolio-brand-link {
+  box-sizing: border-box;
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-height: 28px;
+  padding: 4px 8px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  font-family: var(--portfolio-font-body, sans-serif);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+  text-decoration: none;
+  transition: background-color .15s, border-color .15s;
+}
+.portfolio-brand-link.portfolio-brand-link-email {
+  border-color: #dadce0;
+  background: #f8f9fa;
+  color: #3c4043;
+  color-scheme: light;
+}
+.portfolio-brand-link.portfolio-brand-link-linkedin {
+  border-color: #0a66c2;
+  background: #0a66c2;
+  color: #fff;
+}
+.portfolio-brand-link.portfolio-brand-link-email:hover {
+  border-color: #bdc1c6;
+  background: #e8eaed;
+  color: #202124;
+  text-decoration: none;
+}
+.portfolio-brand-link.portfolio-brand-link-linkedin:hover {
+  border-color: #004182;
+  background: #004182;
+  color: #fff;
+  text-decoration: none;
+}
+.portfolio-brand-link .portfolio-brand-icon {
+  display: block;
+  flex: 0 0 15px;
+  width: 15px;
+  height: 15px;
+  overflow: visible;
+}
+.portfolio-brand-link:focus-visible {
+  outline: 2px solid var(--portfolio-focus, #bdd3df);
+  outline-offset: 3px;
+}
+@media (max-width: 749px) {
+  .portfolio-brand-link.portfolio-brand-link {
+    gap: 4px;
+    min-height: 24px;
+    padding: 3px 6px;
+    font-size: 10px;
+  }
+  .portfolio-brand-link .portfolio-brand-icon {
+    flex-basis: 14px;
+    width: 14px;
+    height: 14px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .portfolio-brand-link.portfolio-brand-link { transition: none; }
+}

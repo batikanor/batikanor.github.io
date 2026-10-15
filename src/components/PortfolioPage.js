@@ -11,10 +11,10 @@ const PortfolioPage = ({ children, pageTitle = "Portfolio" }) => {
     >
       <header className="portfolio-page-header mb-8 pb-5">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <a href="/">
+          <a href="/" aria-label="Batıkanor">
             <div className="group inline-block cursor-pointer">
               <h1 className="portfolio-brand mb-2 text-2xl tracking-tight transition-colors sm:text-3xl md:text-4xl">
-                <span className="gradient-text">Batıkan Bora Ormancı</span>
+                <span className="gradient-text">Batıkan<span className="portfolio-wordmark-accent">or</span></span>
               </h1>
               <div className="portfolio-brand-rule h-0.5 w-16 transition-all duration-300 group-hover:w-full"></div>
             </div>

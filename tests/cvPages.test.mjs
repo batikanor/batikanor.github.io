@@ -317,14 +317,15 @@ test('bootstrap dispatches all CV entries before WebGL detection or the map runt
   }
 });
 
-test('release-manifest bootstrap does not speculatively preload the map on CV routes', async () => {
+test('release-manifest bootstrap avoids map preloads on CV and live-project studio routes', async () => {
   const overlay = await readFile(new URL('../scripts/overlay-earth-homepage.mjs', import.meta.url), 'utf8');
   const replacement = overlay.match(/html\s*=\s*html\.replace\(entryTag,\s*(`\s*<script type="module">[\s\S]+?<\/script>`\s*)\);/);
   assert.ok(replacement, 'stable manifest bootstrap must remain extractable from the overlay');
   const markup = vm.runInNewContext(replacement[1]);
   const script = markup.match(/<script type="module">([\s\S]+)<\/script>/)[1].replace(/\bimport\(/g, 'importEntry(');
   for (const experience of ['', 'gallery']) for (const href of [...paths.map(path => `https://batikanor.com${path}?utm_source=friend`),
-    'https://batikanor.com/?view=cv', 'https://batikanor.com/#cv', 'https://batikanor.com/?view=cv&download=cv', 'https://batikanor.com/?download=cv']) {
+    'https://batikanor.com/?view=cv', 'https://batikanor.com/#cv', 'https://batikanor.com/?view=cv&download=cv', 'https://batikanor.com/?download=cv',
+    'https://batikanor.com/?view=live-projects', 'https://batikanor.com/?view=live-projects&project=cottbus']) {
     const preloads = [];
     const imports = [];
     await vm.runInNewContext(`(async () => {${script}})()`, {

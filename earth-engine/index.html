@@ -12,13 +12,16 @@
   <link rel="dns-prefetch" href="//wmts.terrascope.be" />
   <link rel="dns-prefetch" href="//wmtsod1.bayernwolke.de" />
   <link rel="dns-prefetch" href="//gdi.berlin.de" />
-  <title>Batıkan — Hacker · Developer · Entrepreneur</title>
+  <title>Batıkanor — Hacker · Developer · Entrepreneur</title>
   <style>
+    .live-projects-recovery { box-sizing: border-box; max-width: 720px; margin: auto; padding: 12vh 24px; color: var(--portfolio-text, #ece9e2); font-family: var(--portfolio-font-body, sans-serif); }
+    .live-projects-recovery a { display: block; width: fit-content; margin: 20px 0; color: var(--portfolio-link, #bdd3df); }
     html.cv-page #intro-screen, html.cv-page #app > :not(#cv-view-root) { display: none !important; }
     .gallery-loading { display: none; }
-    html.gallery-pending body { margin: 0; background: var(--portfolio-bg-raised, #444b4c); }
-    html.gallery-pending #app, html.gallery-pending #intro-screen { visibility: hidden; }
-    html.gallery-pending .gallery-loading {
+    html.gallery-pending body, html.live-projects-pending body { margin: 0; background: var(--portfolio-bg-raised, #444b4c); }
+    html.gallery-pending #app, html.gallery-pending #intro-screen,
+    html.live-projects-pending #app, html.live-projects-pending #intro-screen { visibility: hidden; }
+    html.gallery-pending .gallery-loading, html.live-projects-pending .gallery-loading {
       position: fixed; inset: 0; z-index: 35; display: grid; place-items: center;
       background: var(--portfolio-bg-raised, #444b4c); pointer-events: none;
     }
@@ -48,11 +51,14 @@
       try { hash = decodeURIComponent(url.hash.slice(1)); } catch { /* Ignore malformed old anchors. */ }
       const cv = ['/cv', '/cv/en'].includes(path) || url.searchParams.get('view') === 'cv'
         || url.searchParams.get('download') === 'cv' || hash === 'cv';
-      const gallery = (document.documentElement.dataset.portfolioExperience === 'gallery'
+      const liveProjects = url.searchParams.get('view') === 'live-projects' && !cv;
+      const gallery = !liveProjects && (document.documentElement.dataset.portfolioExperience === 'gallery'
         || url.searchParams.get('prototype') === 'room') && url.searchParams.get('experience') !== 'earth';
       if (gallery) document.documentElement.classList.add('gallery-experience');
       if (cv) document.documentElement.classList.add('cv-page');
-      if (path === '/' && !url.searchParams.has('event')
+      if (liveProjects) {
+        document.documentElement.classList.add('live-projects-pending');
+      } else if (path === '/' && !url.searchParams.has('event')
         && !url.searchParams.has('view') && !url.searchParams.has('download') && !url.hash) {
         document.documentElement.classList.add('intro-active');
       } else if (gallery && !cv
@@ -69,7 +75,7 @@
     <div class="intro-frame">
       <div class="intro-content">
         <div class="intro-primary">
-          <h1 id="intro-title">Batıkan</h1>
+          <h1 id="intro-title" aria-label="Batıkanor">Batıkan<span class="portfolio-wordmark-accent">or</span></h1>
           <p class="intro-tagline">Hacker · Developer · Entrepreneur</p>
         </div>
         <div class="intro-facts-panel">
@@ -87,12 +93,43 @@
           </ul>
         </div>
       </div>
-      <footer class="intro-footer">
-        <div class="intro-footer-links"><a href="/?view=cv">View CV ↗</a><span class="intro-contact-links"><a href="mailto:batikanor@gmail.com">Email ↗</a><a href="https://linkedin.com/in/batikanor" target="_blank" rel="noopener noreferrer">LinkedIn ↗</a></span></div>
-        <p id="intro-load-status" class="intro-load-status" role="status" aria-live="polite"></p>
-        <button id="intro-enter" class="intro-enter" type="button" disabled><span class="intro-enter-label">Enter</span><span class="intro-enter-arrow" aria-hidden="true">↗</span></button>
-        <a id="intro-fallback-link" class="intro-enter" href="/projects/" hidden>Open projects <span class="intro-enter-arrow" aria-hidden="true">↗</span></a>
-      </footer>
+      <div class="intro-bottom-row">
+        <div class="intro-exploration">
+          <div class="intro-live-choice">
+            <div class="intro-project-cloud" aria-hidden="true">
+              <svg class="intro-project-cloud-art" viewBox="0 0 320 270" focusable="false">
+                <defs>
+                  <path id="intro-maptheory-curve" d="M62 65C126 17 204 19 278 60" />
+                  <path id="intro-gralobe-curve" d="M89 103Q187 80 279 108" />
+                  <path id="intro-cottbus-curve" d="M47 222C111 255 218 255 279 217" />
+                </defs>
+                <image class="intro-project-mark-maptheory" href="/assets/intro-projects/maptheory.svg?v=618ba754db94" x="16" y="45" width="42" height="42" transform="rotate(-13 37 66)" />
+                <text class="intro-project-word-maptheory" fill="#f3f0e4" font-family="Arial, sans-serif" font-size="35" font-weight="800" letter-spacing="-1.4"><textPath href="#intro-maptheory-curve" startOffset="50%" text-anchor="middle">Map<tspan class="intro-maptheory-accent" fill="#2dd4bf">theory</tspan></textPath></text>
+                <text class="intro-project-word-gralobe" fill="#44aaff" font-family="Arial, sans-serif" font-size="30" font-weight="700"><textPath href="#intro-gralobe-curve" startOffset="50%" text-anchor="middle">gralobe</textPath></text>
+                <image class="intro-project-mark-space" href="/assets/intro-projects/space-cottbus.svg?v=63fc4767a4c0" x="91" y="116" width="182" height="60" transform="rotate(-8 182 146)" />
+                <g class="intro-project-mark-cottbus" transform="translate(15 199) rotate(-10 20 20)" stroke="#eabb79" stroke-width="1.7">
+                  <g transform="translate(6 1)"><rect width="19" height="19" transform="matrix(.57735 1 -.43 .74478 8.1002 -7.0754)" fill="#dc915a" /></g>
+                  <g transform="translate(0 9)"><rect width="19" height="19" transform="matrix(.57735 1 -.43 .74478 8.1002 -7.0754)" fill="#efd7a6" /></g>
+                  <g transform="translate(12 11)"><rect width="19" height="19" transform="matrix(.57735 1 -.43 .74478 8.1002 -7.0754)" fill="#a6bfae" /></g>
+                </g>
+                <text class="intro-project-word-cottbus" fill="#e8e6dc" font-family="Arial, sans-serif" font-size="29" font-weight="600" letter-spacing="-.6"><textPath href="#intro-cottbus-curve" startOffset="50%" text-anchor="middle">Map of Cottbus</textPath></text>
+              </svg>
+            </div>
+            <a id="intro-live-projects" class="intro-enter intro-enter-secondary" href="/?view=live-projects"><span>Explore live projects</span><span class="intro-enter-arrow" aria-hidden="true">↗</span></a>
+          </div>
+          <div class="intro-achievement-choice">
+            <div id="intro-achievements-map" class="intro-achievements-map" role="region" aria-label="Explore achievements on the interactive map"></div>
+            <p id="intro-load-status" class="intro-load-status" role="status" aria-live="polite"></p>
+            <div class="intro-actions">
+              <button id="intro-enter" class="intro-enter" type="button" disabled><span class="intro-enter-label">Explore achievements</span><span class="intro-enter-arrow" aria-hidden="true">↗</span></button>
+              <a id="intro-fallback-link" class="intro-enter" href="/projects/" hidden><span>Explore achievements</span><span class="intro-enter-arrow" aria-hidden="true">↗</span></a>
+            </div>
+          </div>
+        </div>
+        <footer class="intro-footer">
+          <div class="intro-footer-links"><a href="/?view=cv">View CV ↗</a><span class="intro-contact-links"><a class="portfolio-brand-link portfolio-brand-link-email" data-brand-link="email" href="mailto:batikanor@gmail.com"><svg class="portfolio-brand-icon" viewBox="0 0 48 48" aria-hidden="true" focusable="false" data-brand-icon="email"><path fill="#4285F4" d="M3 16.2 13 23.7V40H6a3 3 0 0 1-3-3V16.2Z" /><path fill="#34A853" d="m45 16.2-10 7.5V40h7a3 3 0 0 0 3-3V16.2Z" /><path fill="#EA4335" d="m35 11.2-11 8.25-11-8.25v12.5l11 8.25 11-8.25V11.2Z" /><path fill="#C5221F" d="M3 12.298V16.2l10 7.5V11.2L9.876 8.858C7.043 6.734 3 8.755 3 12.298Z" /><path fill="#FBBC04" d="M45 12.298V16.2l-10 7.5V11.2l3.124-2.342C40.957 6.734 45 8.755 45 12.298Z" /></svg><span class="portfolio-brand-label">Email ↗</span></a><a class="portfolio-brand-link portfolio-brand-link-linkedin" data-brand-link="linkedin" href="https://linkedin.com/in/batikanor" target="_blank" rel="noopener noreferrer"><svg class="portfolio-brand-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false" data-brand-icon="linkedin"><path fill="currentColor" d="M6.5 8.5H3V20h3.5V8.5ZM4.75 3a2 2 0 1 0 0 4 2 2 0 0 0 0-4ZM21 13.4c0-3.2-1.7-4.7-4-4.7a3.4 3.4 0 0 0-3.1 1.7V8.5h-3.5V20h3.5v-6.2c0-1.6.3-3.1 2.3-3.1s2 1.8 2 3.2V20H21v-6.6Z" /></svg><span class="portfolio-brand-label">LinkedIn ↗</span></a></span></div>
+        </footer>
+      </div>
     </div>
   </section>
   <div id="app">
@@ -100,9 +137,9 @@
     <div class="vignette" aria-hidden="true"></div>
 
     <header class="topbar">
-      <h1 class="sr-only">Batıkan — Hacker · Developer · Entrepreneur</h1>
+      <h1 class="sr-only">Batıkanor — Hacker · Developer · Entrepreneur</h1>
       <button id="world-button" class="wordmark" type="button" title="Return to the whole Earth" aria-label="Show the whole Earth">
-        <span class="wordmark-dot" aria-hidden="true"></span><span class="wordmark-copy"><strong>Batıkan</strong><small>Hacker · Developer · Entrepreneur</small></span>
+        <span class="wordmark-dot" aria-hidden="true"></span><span class="wordmark-copy"><strong>Batıkan<span class="portfolio-wordmark-accent">or</span></strong><small>Hacker · Developer · Entrepreneur</small></span>
       </button>
       <div class="topbar-actions">
         <button id="portfolio-toggle" class="topbar-button" type="button" aria-expanded="false" aria-controls="portfolio-panel">CV / PDF</button>

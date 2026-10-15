@@ -69,6 +69,112 @@ test('station, surface and mask identities survive responsive reflow without acc
   room.dispose();assert.equal(room.resize({width:1280,height:900}),false);
 });
 
+test('reordering all real achievements preserves active content and every existing scene resource',()=>{
+  const scene=new THREE.Scene(),room=createGalleryRoomScene({scene,projects});
+  const active=projects[15].slug,stations=room.stations,bounds=room.walkBounds;
+  room.setActive(active);
+  const snapshot=new Map([...stations].map(([slug,station])=>[slug,{station,surfaces:station.surfaces,
+    components:[...station.components],bay:room.root.getObjectByName(`gallery-station-${slug}`),
+    sculpture:room.root.getObjectByName(`gallery-sculpture-${slug}`),
+    authored:station.components.map(pose=>({pose,media:pose.media,links:pose.links,pixelRect:pose.pixelRect}))}]));
+  const geometries=new Set(),materials=new Set(),objects=new Set();let disposals=0;
+  room.root.traverse(node=>{objects.add(node);if(node.isMesh){geometries.add(node.geometry);materials.add(node.material);}});
+  for(const resource of [...geometries,...materials])resource.addEventListener('dispose',()=>disposals++);
+  const baseline=room.getStats();
+  const importance=[...projects].sort((a,b)=>b.importance-a.importance);
+  for(const order of [importance,[...projects].reverse(),projects]){
+    assert.equal(room.setOrder(order),true);assert.equal(room.setOrder([...order]),false);
+    assert.equal(room.stations,stations);assert.equal(room.walkBounds,bounds);
+    assert.deepEqual([...stations.keys()],order.map(project=>project.slug));
+    assert.equal(room.getStats().activeSlug,active);assert.equal(disposals,0,'sorting allocates and retires no GPU assets');
+    assert.equal(room.getStats().geometries,baseline.geometries);assert.equal(room.getStats().materials,baseline.materials);
+    const currentObjects=new Set(),currentGeometries=new Set(),currentMaterials=new Set();
+    room.root.traverse(node=>{currentObjects.add(node);if(node.isMesh){currentGeometries.add(node.geometry);currentMaterials.add(node.material);}});
+    assert.deepEqual(currentObjects,objects);assert.deepEqual(currentGeometries,geometries);assert.deepEqual(currentMaterials,materials);
+    const activeIndex=order.findIndex(project=>project.slug===active);
+    assert.deepEqual(room.visibleSlugs,order.slice(Math.max(0,activeIndex-1),activeIndex+2).map(project=>project.slug));
+    for(const [index,project]of order.entries()){
+      const saved=snapshot.get(project.slug),station=stations.get(project.slug);
+      assert.equal(station,saved.station);assert.equal(station.surfaces,saved.surfaces);
+      assert.equal(room.root.getObjectByName(`gallery-station-${project.slug}`),saved.bay);
+      assert.equal(room.root.getObjectByName(`gallery-sculpture-${project.slug}`),saved.sculpture);
+      assert.equal(station.index,index);assert.equal(station.anchor[0],index*station.spacing);
+      assert.equal(saved.bay.position.x,station.anchor[0]);assert.equal(room.stationAtPosition(station.anchor[0]),station);
+      for(const [componentIndex,pose]of station.components.entries()){
+        assert.equal(pose,saved.components[componentIndex]);
+        assert.equal(pose.media,saved.authored[componentIndex].media);assert.equal(pose.links,saved.authored[componentIndex].links);
+        assert.equal(pose.pixelRect,saved.authored[componentIndex].pixelRect);
+        const mask=saved.bay.getObjectByName('active-content-apertures').children.find(mesh=>
+          mesh.userData.surface===pose.id&&mesh.userData.part==='aperture');
+        assert.deepEqual(mask.getWorldPosition(new THREE.Vector3()).toArray(),pose.position);
+      }
+      if(index===order.length-1)continue;
+      const next=stations.get(order[index+1].slug),midpoint=(station.anchor[0]+next.anchor[0])/2;
+      assert.equal(room.stationAtPosition(midpoint-.001),station);assert.equal(room.stationAtPosition(midpoint),next);
+      for(const name of ['gallery-floor','gallery-ceiling']){
+        const tile=saved.bay.getObjectByName('gallery-architecture').children.find(mesh=>mesh.material.name===name);
+        const adjacent=snapshot.get(next.slug).bay.getObjectByName('gallery-architecture').children.find(mesh=>mesh.material.name===name);
+        assert.ok(Math.abs(new THREE.Box3().setFromObject(tile).max.x-new THREE.Box3().setFromObject(adjacent).min.x)<1e-5,
+          'terminal corridor extension moves to the new final station without a floor or ceiling gap');
+      }
+    }
+    assert.equal(room.stationAtPosition(-Infinity),stations.get(order[0].slug));
+    assert.equal(room.stationAtPosition(Infinity),stations.get(order.at(-1).slug));
+    assert.deepEqual(scene.children,[room.root]);
+  }
+  room.dispose();
+});
+
+test('reordered walls retain exact responsive poses, visible neighbors and global walking bounds',()=>{
+  const room=createGalleryRoomScene({scene:new THREE.Scene(),projects}),bounds=room.walkBounds;
+  const importance=[...projects].sort((a,b)=>b.importance-a.importance);
+  const active=projects[4].slug;room.setActive(active);
+  for(const [step,[width,height]]of [[1280,900],[390,844],[568,320],[1024,768]].entries()){
+    room.resize({width,height});const order=step%2?importance:[...projects].reverse();
+    assert.equal(room.setOrder(order),true);assert.equal(room.getStats().activeSlug,active);
+    assert.equal(room.resize(),false,'sorting retains the latest responsive viewport');
+    assert.equal(room.walkBounds,bounds);
+    for(const [index,project]of order.entries()){
+      const station=room.stations.get(project.slug),expected=galleryStationComponents(project,{width,height});
+      assert.equal(station.index,index);assert.equal(station.wallLayout.width,width);assert.equal(station.wallLayout.height,height);
+      assert.ok(station.bounds.min[0]>=bounds.min[0]&&station.bounds.max[0]<=bounds.max[0]);
+      assert.equal(room.stationAtPosition(station.anchor[0]),station);
+      const camera=arrival(station,width,height);
+      for(const [componentIndex,pose]of station.components.entries()){
+        assert.deepEqual(pose.position,[expected[componentIndex].position[0]+station.anchor[0],...expected[componentIndex].position.slice(1)]);
+        assert.deepEqual(pose.pixelRect,expected[componentIndex].pixelRect);
+      }
+      room.setActive(project.slug);
+      const visible=order.slice(Math.max(0,index-1),index+2).map(project=>project.slug);
+      assert.deepEqual(room.visibleSlugs,visible);
+      assert.ok(room.raycastable.every(mesh=>visible.includes(mesh.userData.gallerySlug)),'old adjacent walls cannot remain pickable');
+      for(const slug of visible){
+        const neighbor=room.stations.get(slug),pose=neighbor.surfaces.story;
+        const ray=new THREE.Raycaster(new THREE.Vector3(...pose.position).add(new THREE.Vector3(0,0,10)),new THREE.Vector3(0,0,-1));
+        assert.equal(ray.intersectObjects(room.raycastable,false)[0].object.userData.gallerySlug,slug);
+        const sculpture=room.root.getObjectByName(`gallery-sculpture-${slug}`);
+        assert.equal(projected(new THREE.Box3().setFromObject(sculpture),camera)
+          .intersectsBox(new THREE.Box2(new THREE.Vector2(-1,-1),new THREE.Vector2(1,1))),false);
+      }
+    }
+    room.setActive(active);
+  }
+  room.dispose();
+});
+
+test('invalid reorder inputs leave the original station order, assets and selected achievement untouched',()=>{
+  const room=createGalleryRoomScene({scene:new THREE.Scene(),projects});room.setActive(projects[10].slug);
+  const original=[...room.stations],stats=room.getStats(),holes=[...projects];delete holes[8];
+  for(const order of [null,{},[],projects.slice(1),[...projects,projects[0]],
+    [...projects.slice(0,-1),projects[0]],[...projects.slice(0,-1),{slug:'unrelated'}],holes]){
+    assert.throws(()=>room.setOrder(order),/same unique project slugs/);
+    assert.deepEqual([...room.stations],original);assert.deepEqual(room.getStats(),stats);
+  }
+  room.dispose();assert.equal(room.setOrder([...projects].reverse()),false);
+  assert.equal(room.setOrder(null),false);assert.equal(room.root.children.length,0);
+  assert.equal(room.getStats().destroyed,true);assert.deepEqual(room.raycastable,[]);
+});
+
 test('active and immediate neighboring walls expose aligned apertures and native pick faces across all switches',()=>{
   const room=createGalleryRoomScene({scene:new THREE.Scene(),projects,reducedMotion:true});
   for(const project of projects){

@@ -71,12 +71,12 @@ export default function Home() {
     <div className="space-y-12">
       {/* Hero Section - Floats directly over the interactive full-screen topographic map */}
       <section className="relative min-h-[92vh] flex flex-col justify-between py-6 sm:py-10 pointer-events-none">
-        {/* Top bar with Batıkan in top-left */}
+        {/* Top bar with Batıkanor in top-left */}
         <div className="w-full flex items-start justify-between px-2 sm:px-6 pt-2">
-          {/* Top Left: Batıkan */}
+          {/* Top Left: Batıkanor */}
           <div className="pointer-events-auto flex flex-col">
             <h1 className="text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-black tracking-[-0.05em] leading-none select-none">
-              <span className="hero-name inline-block">Batıkan</span>
+              <span className="hero-name inline-block">Batıkan<span className="portfolio-wordmark-accent">or</span></span>
             </h1>
             <p className="text-xs sm:text-sm md:text-base text-[#e2d5c5]/90 font-bold tracking-[0.22em] uppercase mt-3">
               Hacker • Developer • Entrepreneur

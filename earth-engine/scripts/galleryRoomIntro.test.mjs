@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import vm from 'node:vm';
 import {shouldShowIntro} from '../src/introGate.js';
-import {readPortfolioRoute} from '../src/portfolioRoute.js';
+import {readPortfolioRoute,portfolioUrl} from '../src/portfolioRoute.js';
 
 const achievements=JSON.parse(readFileSync(new URL('../src/data/achievements.json',import.meta.url),'utf8'));
 const html=readFileSync(new URL('../index.html',import.meta.url),'utf8');
@@ -33,8 +33,10 @@ const settle=()=>new Promise(resolve=>setImmediate(resolve));
 function deferred(){let resolve,reject;const promise=new Promise((yes,no)=>{resolve=yes;reject=no;});return{promise,resolve,reject};}
 
 function fixture({href='https://staging.batikanor.com/',experience='gallery',webgl=true,
-  autoRuntime=true,readyOnImport=false,importError=null,mapImportError=null}={}){
-  const calls={imports:[],start:[],activate:[],finish:[],wait:[],cv:0,errors:[],replaced:[],focus:[],disposed:0,gpuContexts:0};
+  autoRuntime=true,readyOnImport=false,importError=null,mapImportError=null,liveImportError=null,
+  autoIntroMap=true,introMapImportError=null}={}){
+  const calls={imports:[],start:[],activate:[],activateSelection:[],finish:[],wait:[],cv:0,liveProjects:0,
+    errors:[],replaced:[],focus:[],disposed:0,gpuContexts:0,introMapStart:[],introMapDisposed:0};
   const listeners=new Map(),timers=new Map(),rafs=new Map();let clock=0,nextId=0,done=false;
   function target(id){
     const own=new Map();
@@ -44,7 +46,7 @@ function fixture({href='https://staging.batikanor.com/',experience='gallery',web
       focus(){calls.focus.push(id);},querySelector(){return label;}};
   }
   const label={textContent:'Enter'};
-  const nodes=Object.fromEntries(['intro-screen','intro-enter','app','intro-fallback-link','intro-load-status','journey-current','status'].map(id=>[id,target(id)]));
+  const nodes=Object.fromEntries(['intro-screen','intro-enter','intro-achievements-map','app','intro-fallback-link','intro-load-status','journey-current','status'].map(id=>[id,target(id)]));
   nodes['intro-enter'].disabled=/<button\b[^>]*id="intro-enter"[^>]*\bdisabled(?:\s|>)/.test(html);
   nodes['intro-fallback-link'].hidden=true;
   const classList=classes(),documentElement={dataset:{portfolioExperience:experience},classList};
@@ -55,17 +57,18 @@ function fixture({href='https://staging.batikanor.com/',experience='gallery',web
     if(!listeners.has(name))listeners.set(name,[]);listeners.get(name).push({handler,once:!!options.once});
   };
   const removeEventListener=(name,handler)=>listeners.set(name,(listeners.get(name)||[]).filter(item=>item.handler!==handler));
-  const emit=name=>{
+  const emit=(name,details={})=>{
     for(const item of [...listeners.get(name)||[]]){
-      if(item.once)removeEventListener(name,item.handler);item.handler({type:name});
+      if(item.once)removeEventListener(name,item.handler);item.handler({type:name,...details});
     }
   };
-  const startup=deferred();
-  const api={root:{inert:true},activate(){
+  const startup=deferred(),introMapImport=deferred();let introMapSelect;
+  const api={root:{inert:true},activate(options={}){
     calls.activate.push({introHidden:nodes['intro-screen'].hidden,introActive:classList.contains('intro-active'),appInert:nodes.app.inert});
+    calls.activateSelection.push(options.eventSlug??null);
     this.root.inert=false;
   },dispose(){calls.disposed++;nodes.app.inert=false;}};
-  const context=vm.createContext({URL,URLSearchParams,shouldShowIntro,readPortfolioRoute,achievements,location,history,
+  const context=vm.createContext({URL,URLSearchParams,shouldShowIntro,readPortfolioRoute,portfolioUrl,achievements,location,history,
     console:{error(...items){calls.errors.push(items);}},
     document:{documentElement,getElementById:id=>nodes[id],createElement(tag){
       assert.equal(tag,'canvas');return{getContext(name){assert.equal(name,'webgl2');calls.gpuContexts++;
@@ -89,6 +92,18 @@ function fixture({href='https://staging.batikanor.com/',experience='gallery',web
         }};
       }
       if(path==='./cvOnly.js')return{startCvOnly(){calls.cv++;}};
+      if(path==='./liveProjects.js'){
+        if(liveImportError)throw liveImportError;
+        return{startLiveProjects(){calls.liveProjects++;return {dispose(){}};}};
+      }
+      if(path==='./introAchievementMap.js'){
+        if(introMapImportError)throw introMapImportError;
+        if(!autoIntroMap)await introMapImport.promise;
+        return {startIntroAchievementMap(options){
+          calls.introMapStart.push(options);introMapSelect=options.onSelect;
+          return {dispose(){calls.introMapDisposed++;}};
+        }};
+      }
       if(path==='./main.js'){if(mapImportError)throw mapImportError;return{};}
       throw new Error(`Unexpected runtime import: ${path}`);
     }
@@ -110,7 +125,10 @@ function fixture({href='https://staging.batikanor.com/',experience='gallery',web
     async enter(){const enter=nodes['intro-enter'];if(!enter.disabled&&!enter.hidden)enter.dispatch('click');await settle();},
     async ready(name='gallery-room-ready'){emit(name);await settle();},
     async resolveRuntime(){startup.resolve(api);await settle();},
-    async rejectRuntime(error=new Error('renderer startup failed')){startup.reject(error);await settle();}
+    async rejectRuntime(error=new Error('renderer startup failed')){startup.reject(error);await settle();},
+    async resolveIntroMap(){introMapImport.resolve();await settle();},
+    async selectAchievement(slug){assert.equal(typeof introMapSelect,'function','the entry map has mounted');introMapSelect(slug);await settle();},
+    async pagehide({persisted=false}={}){emit('pagehide',{persisted});await settle();}
   };
 }
 
@@ -156,6 +174,106 @@ test('a room and useful frame prepared before Enter remain inert until explicit 
   assert.deepEqual(f.calls.activate,[{introHidden:true,introActive:false,appInert:true}]);
   assert.equal(f.calls.focus.includes('journey-current'),false,'hidden classic chronology never takes gallery focus');
   await f.enter();await f.ready();assert.equal(f.calls.activate.length,1);
+});
+
+test('the entry map loads after the first paint with all achievements and never enters on its own',async()=>{
+  const f=fixture({readyOnImport:true});
+  assert.equal(f.calls.imports.includes('./introAchievementMap.js'),false);
+  await f.frame();assert.equal(f.calls.introMapStart.length,0,'the introduction paints before the map starts');
+  await f.frame();assert.equal(f.calls.introMapStart.length,1);
+  const options=f.calls.introMapStart[0];
+  assert.equal(options.container,f.nodes['intro-achievements-map']);
+  assert.equal(options.achievements,achievements,'the preview receives the same authored achievement data');
+  assert.equal(typeof options.onSelect,'function');
+  await f.advance(20000);assert.equal(f.calls.activate.length,0);assert.equal(f.done,false);
+  await f.enter();assert.equal(f.calls.activate.length,1);assert.deepEqual(f.calls.activateSelection,[null]);
+  assert.equal(f.calls.introMapDisposed,1,'ordinary entry releases the entry map');
+});
+
+test('an entry-map selection waits for both gallery preparation and its useful frame before opening that project',async()=>{
+  const f=fixture({autoRuntime:false,href:'https://staging.batikanor.com/?utm_source=friend'});
+  await f.paint();await f.selectAchievement('decarbon-days-climathon-2026');
+  assert.equal(f.nodes['intro-enter'].disabled,true);assert.equal(f.history.state.earthIntroVisible,false);
+  assert.equal(new URL(f.location.href).searchParams.get('event'),'decarbon-days-climathon-2026');
+  assert.equal(new URL(f.location.href).searchParams.get('utm_source'),'friend');
+  assert.equal(f.calls.introMapDisposed,1);assert.equal(f.calls.activate.length,0);
+  assert.equal(f.nodes['intro-screen'].hidden,false,'the intro remains until the selected room is ready');
+  await f.resolveRuntime();assert.equal(f.calls.activate.length,0,'prepared API without its first frame cannot enter');
+  await f.ready();assert.equal(f.done,true);
+  assert.deepEqual(f.calls.activateSelection,['decarbon-days-climathon-2026']);
+  assert.deepEqual(f.calls.activate,[{introHidden:true,introActive:false,appInert:true}]);
+  await f.selectAchievement('tesla-gigathon-2026');await f.enter();
+  assert.equal(f.calls.activate.length,1,'stale map callbacks and repeated entry cannot select twice');
+});
+
+test('an entry-map selection after gallery readiness enters directly at the selected achievement',async()=>{
+  const f=fixture({readyOnImport:true});await f.paint();
+  await f.selectAchievement('tesla-gigathon-2026');
+  assert.equal(f.done,true);assert.deepEqual(f.calls.activateSelection,['tesla-gigathon-2026']);
+  assert.equal(f.calls.introMapDisposed,1);assert.equal(f.nodes['intro-screen'].hidden,true);
+  assert.deepEqual(f.calls.finish,[{keepAppInert:true,focusTarget:null}]);
+});
+
+test('no-GPU entry-map selection opens that achievement’s authored page and preserves tracking',async()=>{
+  const f=fixture({webgl:false,href:'https://staging.batikanor.com/?utm_source=friend'});
+  await f.paint();assert.equal(f.calls.introMapStart.length,1);assert.equal(f.calls.start.length,0);
+  assert.equal(f.calls.replaced.length,0,'the fallback does not enter itself');
+  await f.selectAchievement('tesla-gigathon-2026');
+  assert.equal(f.done,true);assert.deepEqual(f.calls.replaced,[
+    'https://staging.batikanor.com/achievements/tesla-gigathon-2026/?utm_source=friend'
+  ]);
+  assert.equal(f.calls.introMapDisposed,1);assert.equal(f.calls.activate.length,0);
+});
+
+test('entry-map loading failure keeps the existing achievements button usable',async()=>{
+  const f=fixture({readyOnImport:true,introMapImportError:new Error('preview unavailable')});await f.paint();
+  assert.equal(f.nodes['intro-enter'].hidden,false);assert.equal(f.nodes['intro-enter'].disabled,false);
+  assert.equal(f.nodes['intro-screen'].hidden,false);assert.equal(f.calls.activate.length,0);
+  await f.enter();assert.equal(f.done,true);assert.deepEqual(f.calls.activateSelection,[null]);
+});
+
+test('entry, failed gallery startup and pagehide dispose the entry map without reviving a late import',async()=>{
+  for(const cause of['entry','failure','pagehide']){
+    const f=fixture({readyOnImport:true,autoRuntime:cause!=='failure',autoIntroMap:false});await f.paint();
+    assert.equal(f.calls.imports.includes('./introAchievementMap.js'),true);assert.equal(f.calls.introMapStart.length,0);
+    if(cause==='entry')await f.enter();
+    if(cause==='pagehide')await f.pagehide();
+    if(cause==='failure')await f.rejectRuntime();
+    await f.resolveIntroMap();assert.equal(f.calls.introMapStart.length,0,`${cause} cancels the pending entry-map mount`);
+  }
+  for(const cause of['failure','pagehide']){
+    const f=fixture({autoRuntime:false});await f.paint();assert.equal(f.calls.introMapStart.length,1);
+    if(cause==='failure')await f.rejectRuntime();else await f.pagehide();
+    assert.equal(f.calls.introMapDisposed,1,`${cause} releases the mounted map`);
+    await f.pagehide();assert.equal(f.calls.introMapDisposed,1,'cleanup is idempotent');
+  }
+});
+
+test('a browser-history snapshot keeps the entry map usable and still cleans up on real navigation',async()=>{
+  const restored=fixture({readyOnImport:true});await restored.paint();
+  await restored.pagehide({persisted:true});
+  assert.equal(restored.calls.introMapDisposed,0,'a BFCache snapshot preserves the live entry globe');
+  assert.equal((restored.listeners.get('pagehide')||[]).length,1,'the lifecycle handler survives the snapshot');
+  assert.equal(restored.nodes['intro-screen'].hidden,false);assert.equal(restored.calls.activate.length,0);
+  await restored.selectAchievement('tesla-gigathon-2026');
+  assert.equal(restored.done,true);assert.deepEqual(restored.calls.activateSelection,['tesla-gigathon-2026']);
+  assert.equal(restored.calls.introMapDisposed,1,'entry after restoration releases the globe normally');
+
+  const leaving=fixture();await leaving.paint();await leaving.pagehide({persisted:true});
+  assert.equal(leaving.calls.introMapDisposed,0);
+  await leaving.pagehide({persisted:false});
+  assert.equal(leaving.calls.introMapDisposed,1,'later real navigation releases a previously cached globe');
+  assert.equal((leaving.listeners.get('pagehide')||[]).length,0);
+  await leaving.pagehide({persisted:false});assert.equal(leaving.calls.introMapDisposed,1,'cleanup remains idempotent');
+});
+
+test('failed gallery preparation retains the selected achievement in its authored recovery link',async()=>{
+  const f=fixture({autoRuntime:false});await f.paint();await f.selectAchievement('tesla-gigathon-2026');
+  await f.rejectRuntime();
+  assert.equal(f.calls.activate.length,0);assert.equal(f.nodes['intro-screen'].hidden,false);
+  assert.equal(f.nodes['intro-fallback-link'].hidden,false);
+  assert.equal(f.nodes['intro-fallback-link'].href,'https://staging.batikanor.com/achievements/tesla-gigathon-2026/');
+  assert.equal(f.calls.introMapDisposed,1);
 });
 
 test('Enter before preparation still waits for both the runtime API and the first useful room frame',async()=>{
@@ -227,6 +345,39 @@ test('CV aliases and downloads bypass the room, intro and GPU checks',async()=>{
   }
 });
 
+test('live project studio opens directly without a GPU, gallery preparation or map imports',async()=>{
+  for(const experience of['gallery','earth'])for(const webgl of[true,false]){
+    const f=fixture({experience,webgl,href:'https://staging.batikanor.com/?view=live-projects&project=cottbus'});
+    await settle();
+    assert.equal(f.done,true);assert.equal(f.calls.liveProjects,1);
+    assert.deepEqual(f.calls.imports,['./liveProjects.js']);assert.equal(f.calls.gpuContexts,0);
+    assert.equal(f.calls.wait.length,0);assert.equal(f.calls.start.length,0);
+    assert.equal(f.nodes['intro-screen'].hidden,true);assert.equal(f.nodes.app.inert,false);
+    for(const name of['intro-active','gallery-pending','gallery-experience','live-projects-pending'])
+      assert.equal(f.classList.contains(name),false,name);
+  }
+  const c=classify('https://staging.batikanor.com/?view=live-projects');
+  assert.equal(c.contains('live-projects-pending'),true);
+  assert.equal(c.contains('gallery-experience'),false);assert.equal(c.contains('gallery-pending'),false);
+});
+
+test('CV aliases retain priority over a stale live-project studio parameter',async()=>{
+  for(const path of['/cv/?view=live-projects','/cv/en/?view=live-projects','/?view=live-projects#cv','/?view=live-projects&download=cv']){
+    const f=fixture({href:`https://staging.batikanor.com${path}`,webgl:false});await settle();
+    assert.deepEqual(f.calls.imports,['./cvOnly.js']);assert.equal(f.calls.cv,1);
+    assert.equal(f.calls.liveProjects,0);assert.equal(f.calls.gpuContexts,0);
+  }
+});
+
+test('failed live-project lazy loading leaves useful direct project links and no loading trap',async()=>{
+  const f=fixture({href:'https://staging.batikanor.com/?view=live-projects',liveImportError:new Error('offline')});
+  await settle();assert.equal(f.done,true);assert.equal(f.calls.errors.length,1);
+  assert.equal(f.calls.gpuContexts,0);assert.deepEqual(f.calls.imports,['./liveProjects.js']);
+  for(const host of['maptheory.org','spacecottbus.com','cottbus.maptheory.org','gralobe.maptheory.org'])
+    assert.ok(f.nodes.app.innerHTML.includes(`https://${host}/`));
+  assert.equal(f.classList.contains('live-projects-pending'),false);
+});
+
 test('retired list-view URLs normalize without losing project, CV, hash or tracking information',async()=>{
   for(const experience of['gallery','earth'])for(const suffix of[
     '?view=list','?view=list&event=tesla-gigathon-2026&utm_source=old',
@@ -246,7 +397,8 @@ test('no-GPU homepages keep the introduction until Enter, then open existing pro
   for(const experience of['gallery','earth']){
     const f=fixture({experience,webgl:false,href:'https://staging.batikanor.com/?utm_source=friend'});await f.paint();
     assert.deepEqual(f.calls.wait,[experience==='gallery'?'gallery':'map']);assert.equal(f.calls.start.length,0);
-    assert.deepEqual(f.calls.imports,[]);assert.equal(f.nodes['intro-screen'].hidden,false);
+    assert.deepEqual(f.calls.imports,experience==='gallery'?['./introAchievementMap.js']:[]);
+    assert.equal(f.nodes['intro-screen'].hidden,false);
     assert.equal(f.done,false);assert.deepEqual(f.calls.replaced,[]);
     await f.advance(20000);assert.deepEqual(f.calls.replaced,[]);assert.equal(f.calls.finish.length,0);
     await f.enter();assert.equal(f.done,true);

@@ -125,10 +125,16 @@ test('cluster targets use real geography, the short seam, and bounded zoom with 
   const seam = [{coordinates: {lat: 10, lng: 179}}, {coordinates: {lat: 10, lng: -179}}];
   const target = galleryGlobeClusterTarget(seam, 1);
   near(Math.abs(target.longitude), 180);assert.ok(target.latitude > 10 && target.latitude < 10.01);
-  assert.equal(target.zoom, 1.9);assert.equal(target.expand, false);
+  assert.ok(target.zoom > 1 && target.zoom <= GALLERY_GLOBE_MAX_ZOOM);assert.equal(target.expand, false);
+  const rotation = new THREE.Quaternion().setFromEuler(new THREE.Euler(target.pitch, target.yaw, 0, 'XYZ'));
+  const seamPoints = seam.map(location => new THREE.Vector3(...galleryGlobeCoordinate(
+    location.coordinates.lat, location.coordinates.lng, 1.018)).applyQuaternion(rotation));
+  assert.ok(Math.hypot(seamPoints[0].x - seamPoints[1].x, seamPoints[0].y - seamPoints[1].y)
+    * 336 / (2 * 1.23) * target.zoom > 25,
+    'the target crosses the actual grouping threshold instead of making an arbitrary zoom step');
   const coincident = [{coordinates: {lat: 48.1, lng: 11.5}}, {coordinates: {lat: 48.1, lng: 11.5}}];
-  assert.equal(galleryGlobeClusterTarget(coincident, 1).expand, false, 'first click visibly zooms even a collocated cluster');
-  assert.equal(galleryGlobeClusterTarget(coincident, 1.9).expand, true, 'the next click exposes both projects');
+  assert.equal(galleryGlobeClusterTarget(coincident, 1).expand, true, 'a first click exposes genuinely coincident projects');
+  assert.equal(galleryGlobeClusterTarget(coincident, 1).zoom, 1, 'an impossible split does not trigger an empty zoom');
   assert.equal(galleryGlobeClusterTarget(seam, GALLERY_GLOBE_MAX_ZOOM).zoom, GALLERY_GLOBE_MAX_ZOOM);
   assert.equal(galleryGlobeClusterTarget(seam, GALLERY_GLOBE_MAX_ZOOM).expand, true);
   assert.throws(() => galleryGlobeClusterTarget([]), TypeError);
@@ -137,16 +143,37 @@ test('cluster targets use real geography, the short seam, and bounded zoom with 
 test('a numbered cluster zooms without selecting a room, while collocated projects open choices', () => {
   const focusSource = source.slice(source.indexOf('  function focusCluster(cluster)'), source.indexOf('  function changeZoom(factor)'));
   const calls = [];
-  const context = vm.createContext({locations: projects, zoom: 1, live: {}, galleryGlobeClusterTarget,
+  const context = vm.createContext({locations: projects, zoom: 1, width: 336, height: 336, live: {}, galleryGlobeClusterTarget,
+    window: {performance: {now: () => 100}}, advanceFlight() {}, flight: null, updateClusters() {}, requestRender() {},
     cancelGesture() {}, flyTo: target => calls.push({kind: 'zoom', target}),
     showClusterList: cluster => calls.push({kind: 'choices', cluster}), hideClusterList() {},
     onSelect: slug => calls.push({kind: 'select', slug})});
   new vm.Script(focusSource).runInContext(context);
-  const members = projects.slice(0, 3).map(project => ({slug: project.slug}));
-  context.focusCluster({count: 3, members});
+  const members = projects.filter(project => project.city === 'Munich' && project.country === 'Germany')
+    .map(project => ({slug: project.slug}));
+  context.focusCluster({count: members.length, members});
   assert.equal(calls.length, 1);assert.equal(calls[0].kind, 'zoom');assert.ok(calls[0].target.zoom > 1);
-  context.zoom = GALLERY_GLOBE_MAX_ZOOM;context.focusCluster({count: 3, members});
-  assert.deepEqual(calls.map(call => call.kind), ['zoom', 'zoom', 'choices']);
+  context.zoom = GALLERY_GLOBE_MAX_ZOOM;context.focusCluster({count: members.length, members});
+  assert.deepEqual(calls.map(call => call.kind), ['zoom', 'choices'], 'terminal clusters open a chooser without another flight');
+});
+
+test('a native cluster re-click samples and cancels the live flight before computing another target', () => {
+  const focusSource = source.slice(source.indexOf('  function focusCluster(cluster)'), source.indexOf('  function changeZoom(factor)'));
+  const calls = [];
+  const context = vm.createContext({locations: projects, zoom: 1, width: 150, height: 150, live: {}, flight: {pending: true},
+    window: {performance: {now: () => 350}}, cancelGesture() {},
+    advanceFlight(time) {calls.push(['sample', time]);context.zoom = 120;},
+    galleryGlobeClusterTarget(members, zoom, options) {
+      calls.push(['target', zoom]);assert.equal(context.flight, null);
+      assert.equal(options.width, 150);assert.equal(options.height, 150);assert.equal(options.allLocations, projects);
+      return galleryGlobeClusterTarget(members, zoom, options);
+    },
+    flyTo(target) {calls.push(['flight', target.zoom]);}, showClusterList() {}, hideClusterList() {}, updateClusters() {}, requestRender() {}});
+  new vm.Script(focusSource).runInContext(context);
+  const members = projects.filter(project => project.city === 'Munich' && project.country === 'Germany').map(project => ({slug: project.slug}));
+  context.focusCluster({count: members.length, members});
+  assert.deepEqual(calls.slice(0, 2), [['sample', 350], ['target', 120]]);
+  assert.equal(calls[2][0], 'flight');assert.ok(calls[2][1] > 120);
 });
 
 // Run actual DOM/event wiring and Three camera math without requiring a GPU in Node.
@@ -212,6 +239,156 @@ function globeDocument(size = 336, {reducedMotion = true} = {}) {
     descendants: (host = container) => {const all = [];const visit = item => {for (const child of item.children) {all.push(child);visit(child);}};visit(host);return all;}};
 }
 
+function assertClusterSplit(globe, clickedMembers) {
+  const slugs = new Set(clickedMembers.map(member => member.slug));
+  const markers = globe.getMarkerPositions().filter(marker => slugs.has(marker.slug));
+  assert.equal(markers.length, slugs.size);
+  assert.ok(markers.every(marker => marker.visible), 'splitting must preserve every clicked achievement inside the circular viewport');
+  const children = globe.getClusters().filter(group => group.members.some(member => slugs.has(member.slug)));
+  assert.ok(children.length >= 2, 'one click must visibly subdivide the clicked group');
+  assert.ok(children.every(group => group.count < clickedMembers.length), 'no resulting scene group retains the original count');
+  assert.equal(children.reduce((count, group) => count + group.members.filter(member => slugs.has(member.slug)).length, 0), slugs.size);
+}
+
+function munichClusterFixture(size) {
+  const munich = projects.filter(project => project.city === 'Munich' && project.country === 'Germany');
+  assert.equal(munich.length, 9, 'exercise the actual nine-achievement group reported by the owner');
+  const fixture = globeDocument(size), selections = [];
+  const globe = createFixtureGlobe({container: fixture.container, achievements: projects,
+    initialSlug: munich[0].slug, onSelect: slug => selections.push(slug)});
+  const id = munich.map(project => project.slug).sort().join('|');
+  const zoomOut = fixture.descendants().filter(element => element.classList.contains('gallery-room-globe-tool'))[1];
+  let cluster;
+  for (let step = 0; step < 16; step++) {
+    cluster = globe.getClusters().find(group => group.id === id);
+    if (cluster) break;
+    zoomOut.dispatch('click');
+  }
+  assert.ok(cluster, `the actual Munich group must be reachable in the complete 32-project scene at ${size}px`);
+  return {fixture, globe, cluster, selections};
+}
+
+test('one native badge or canvas click splits all nine Munich achievements on tiny, phone and desktop globes', async t => {
+  for (const size of [112, 150, 252, 336]) for (const reducedMotion of [true, false]) for (const route of ['native badge', 'canvas hit']) {
+    await t.test(`${size}px, ${reducedMotion ? 'reduced motion' : 'animated'}, ${route}`, () => {
+      const {fixture, globe, cluster, selections} = munichClusterFixture(size);
+      try {
+        const before = globe.getStats();
+        const motion = fixture.window.matchMedia();motion.matches = reducedMotion;motion.dispatch('change');
+        if (route === 'native badge') {
+          const badge = fixture.descendants().find(element => element.classList.contains('gallery-room-globe-cluster')
+            && element.dataset.clusterId === cluster.id);
+          assert.ok(badge);badge.dispatch('click');
+        } else {
+          const canvas = fixture.descendants().find(element => element.classList.contains('gallery-room-globe-canvas'));
+          const event = {isPrimary: true, button: 0, pointerId: 1, clientX: cluster.x, clientY: cluster.y};
+          canvas.dispatch('pointerdown', event);canvas.dispatch('pointerup', event);
+        }
+        if (!reducedMotion) {
+          assert.equal(globe.getStats().flying, true, 'an animated cluster move remains a normal globe flight');
+          fixture.tick(1000);
+        }
+        assertClusterSplit(globe, cluster.members);
+        const after = globe.getStats();
+        assert.ok(after.zoom > before.zoom && after.zoom <= GALLERY_GLOBE_MAX_ZOOM);
+        assert.equal(after.flying, false);assert.equal(after.clusterListOpen, false, 'distinct Munich places split before offering a chooser');
+        assert.equal(after.activeSlug, before.activeSlug);assert.deepEqual(selections, [], 'cluster navigation does not select a room achievement');
+        assert.equal(after.width, size);assert.equal(after.height, size);
+      } finally {globe.dispose();}
+      assert.equal(fixture.pending.size, 0);
+    });
+  }
+});
+
+test('a native badge re-click during animation samples the same live view as an already rendered frame', () => {
+  const cases = [munichClusterFixture(150), munichClusterFixture(150)];
+  const badge = item => item.fixture.descendants().find(element => element.classList.contains('gallery-room-globe-cluster')
+    && element.dataset.clusterId === item.cluster.id);
+  try {
+    for (const item of cases) {
+      const motion = item.fixture.window.matchMedia();motion.matches = false;motion.dispatch('change');
+      badge(item).dispatch('click');
+    }
+    cases[0].fixture.advanceTime(100);cases[1].fixture.tick(100);
+    assert.ok(badge(cases[0]) && badge(cases[1]), 'the still-unsplit native badge can be activated during its flight');
+    for (const item of cases) badge(item).dispatch('click');
+    for (const key of ['pitch', 'yaw', 'zoom']) near(cases[0].globe.getStats()[key], cases[1].globe.getStats()[key]);
+    for (const item of cases) {
+      item.fixture.tick(1000);assertClusterSplit(item.globe, item.cluster.members);
+      assert.equal(item.globe.getStats().flying, false);assert.deepEqual(item.selections, []);
+    }
+  } finally {cases.forEach(item => item.globe.dispose());}
+});
+
+test('genuinely coincident real achievements open focused native choices on their first click without zooming', () => {
+  // Locate a real shared coordinate rather than assuming all Munich venues coincide.
+  const first = projects.find(project => projects.some(other => other.slug !== project.slug
+    && other.coordinates.lat === project.coordinates.lat && other.coordinates.lng === project.coordinates.lng));
+  const coincident = projects.filter(project => project.coordinates.lat === first.coordinates.lat && project.coordinates.lng === first.coordinates.lng);
+  assert.ok(coincident.length >= 2);
+  const fixture = globeDocument(150), selections = [];
+  const globe = createFixtureGlobe({container: fixture.container, achievements: coincident, initialSlug: null,
+    onSelect: slug => selections.push(slug)});
+  try {
+    const badge = fixture.descendants().find(element => element.classList.contains('gallery-room-globe-cluster'));
+    assert.ok(badge);badge.dispatch('click');
+    assert.equal(globe.getStats().zoom, 1);assert.equal(globe.getStats().flying, false);
+    assert.equal(globe.getStats().clusterListOpen, true);assert.deepEqual(selections, []);
+    const choices = fixture.descendants().filter(element => element.classList.contains('gallery-room-globe-cluster-item'));
+    assert.deepEqual(choices.map(choice => choice.textContent), coincident.map(project => project.title));
+    assert.equal(fixture.document.activeElement, choices[0]);
+    choices[1].dispatch('click');assert.deepEqual(selections, [coincident[1].slug]);
+    assert.equal(globe.getStats().clusterListOpen, false);
+  } finally {globe.dispose();}
+});
+
+test('an unselected entrance globe starts worldwide without a project flight or city imagery', () => {
+  for (const reducedMotion of [true, false]) {
+    const fixture = globeDocument(240, {reducedMotion});
+    const globe = createFixtureGlobe({container: fixture.container, achievements: projects, initialSlug: null});
+    try {
+      fixture.tick(0);fixture.tick(1000);
+      const stats = globe.getStats();
+      assert.equal(stats.activeSlug, null);assert.equal(stats.zoom, 1);assert.equal(stats.flying, false);
+      assert.equal(stats.imagery, 'world');assert.equal(stats.detailRequests, 0);
+      assert.equal(fixture.images.length, 1, 'only the shared satellite world image is requested before a choice');
+      assert.ok(stats.clusters > 0, 'the actual projects are available through worldwide clusters');
+      assert.equal(stats.width, 240);assert.equal(stats.height, 240);
+    } finally {globe.dispose();}
+    assert.equal(fixture.pending.size, 0);
+  }
+});
+
+test('the worldwide native chooser has an empty prompt so its first achievement can be selected', () => {
+  const fixture = globeDocument(), selections = [];
+  const globe = createFixtureGlobe({container: fixture.container, achievements: projects,
+    initialSlug: null, onSelect: slug => selections.push(slug)});
+  try {
+    const chooser = fixture.descendants().find(element => element.classList.contains('gallery-room-globe-locations'));
+    assert.equal(chooser.children.length, projects.length + 1);
+    const [prompt, first] = chooser.children;
+    assert.equal(prompt.value, '');assert.equal(prompt.disabled, true);assert.equal(prompt.selected, true);
+    assert.equal(prompt.textContent, 'Choose an achievement');
+    assert.equal(first.value, projects[0].slug);
+    assert.deepEqual(chooser.children.slice(1).map(option => option.value), projects.map(project => project.slug));
+    chooser.value = projects[0].slug;chooser.dispatch('change');
+    assert.deepEqual(selections, [projects[0].slug], 'the first project dispatches the same native selection as every other option');
+    assert.equal(globe.getStats().activeSlug, null, 'only the gallery decides when to focus a selected project');
+  } finally {globe.dispose();}
+});
+
+test('ordinary gallery globes retain the first active project and fitted satellite view by default', () => {
+  const fixture = globeDocument(), globe = createFixtureGlobe({container: fixture.container, achievements: projects});
+  try {
+    const chooser = fixture.descendants().find(element => element.classList.contains('gallery-room-globe-locations'));
+    assert.equal(chooser.children.length, projects.length);
+    assert.equal(chooser.value, projects[0].slug);
+    assert.equal(globe.getStats().activeSlug, projects[0].slug);
+    assert.equal(globe.getStats().zoom, GALLERY_GLOBE_PROJECT_ZOOM);
+    assert.ok(globe.getStats().detailRequests > 0);
+  } finally {globe.dispose();}
+});
+
 test('native cluster, zoom, keyboard, chooser and reset wiring preserve the fixed phone viewport', () => {
   const fixture = globeDocument(188), selections = [];
   const globe = createFixtureGlobe({container: fixture.container, achievements: projects, onSelect: slug => selections.push(slug)});
@@ -223,7 +400,9 @@ test('native cluster, zoom, keyboard, chooser and reset wiring preserve the fixe
   assert.equal(find('gallery-room-globe-locations').children.length, 32);
   const cluster = fixture.descendants().filter(element => element.classList.contains('gallery-room-globe-cluster'))
     .sort((a, b) => Number(b.textContent) - Number(a.textContent))[0];
-  cluster.dispatch('click');assert.equal(globe.getStats().zoom, 1.9);assert.deepEqual(selections, []);
+  const clickedMembers = globe.getClusters().find(group => group.id === cluster.dataset.clusterId).members;
+  cluster.dispatch('click');assert.ok(globe.getStats().zoom > initial.zoom);assert.deepEqual(selections, []);
+  assertClusterSplit(globe, clickedMembers);
   assert.equal(globe.getStats().activeSlug, initial.activeSlug);
   assert.equal(globe.getStats().width, 188);assert.equal(globe.getStats().height, 188);
   tools[2].dispatch('click');assert.equal(globe.getStats().zoom, 1);

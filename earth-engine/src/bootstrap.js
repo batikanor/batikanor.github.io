@@ -1,7 +1,7 @@
 import {shouldShowIntro} from './introGate.js';
-import {readPortfolioRoute} from './portfolioRoute.js';
+import {readPortfolioRoute, portfolioUrl} from './portfolioRoute.js';
 import achievements from './data/achievements.json';
-import {finishIntro, hideIntroForDeepLink, waitForIntroEntry} from './intro.js';
+import {finishIntro, hideIntroForDeepLink, waitForIntroEntry, requestIntroEntry} from './intro.js';
 
 /**
  * Do not load the large map runtime on browsers that cannot create WebGL2.
@@ -77,16 +77,51 @@ async function prepareGallery(deferActivation=false) {
   return {kind:'gallery', gallery:await startGalleryRoom({deferActivation})};
 }
 
+/** Load only for a visible gallery intro; navigation also cancels a late import. */
+function prepareIntroAchievementMap() {
+  const container=document.getElementById('intro-achievements-map');
+  if (!container) return () => {};
+  let disposed=false,map=null;
+  const onPageHide=event=>{if(!event.persisted)dispose();};
+  const dispose=()=>{
+    if(disposed)return;
+    disposed=true;
+    removeEventListener('pagehide',onPageHide);
+    map?.dispose();
+    if(window.__introAchievementMap===map)delete window.__introAchievementMap;
+  };
+  // A browser-history snapshot resumes this same bootstrap and map on Back.
+  addEventListener('pagehide',onPageHide);
+  import('./introAchievementMap.js').then(({startIntroAchievementMap})=>{
+    if(disposed || !document.documentElement.classList.contains('intro-active'))return;
+    map=startIntroAchievementMap({container,achievements,
+      onSelect:eventSlug=>requestIntroEntry({eventSlug})});
+    window.__introAchievementMap=map;
+  }).catch(error=>{
+    if(disposed)return;
+    console.error('The introduction globe could not load; Explore achievements is still available.',error);
+    container.hidden=true;
+    dispose();
+  });
+  return dispose;
+}
+
 async function enterGalleryFromIntro() {
   const entered = waitForIntroEntry({destination:'gallery'});
+  let entryRequested=false;
+  entered.then(()=>{entryRequested=true;});
   let ready;
   const firstGalleryFrame = new Promise(resolve => { ready=resolve; });
   addEventListener('gallery-room-ready',ready,{once:true});
   // Show the released introduction before preparing the inert room beneath it.
   await firstPaint();
+  const disposeIntroMap=entryRequested ? () => {} : prepareIntroAchievementMap();
   const destinationPromise = prepareGallery(true).catch(error => {
     console.error('The gallery could not start; the projects page is still available.',error);
     removeEventListener('gallery-room-ready',ready);
+    disposeIntroMap();
+    const introMap=document.getElementById('intro-achievements-map');
+    if(introMap)introMap.hidden=true;
     window.__galleryRoom?.dispose?.();
     document.getElementById('app').inert=true;
     const status=document.getElementById('intro-load-status');
@@ -94,17 +129,21 @@ async function enterGalleryFromIntro() {
     status.classList.add('is-error');
     document.getElementById('intro-enter').hidden=true;
     const fallback=document.getElementById('intro-fallback-link');
+    fallback.href=staticDestination();
     fallback.hidden=false;
     fallback.focus({preventScroll:true});
     return {kind:'error'};
   });
-  await entered;
+  const selection=await entered;
+  const eventSlug=knownSlugs.has(selection?.eventSlug) ? selection.eventSlug : null;
+  if(eventSlug)history.replaceState({...history.state,earthIntroVisible:false,eventSlug},'',portfolioUrl(location.href,{eventSlug}));
+  disposeIntroMap();
   const destination = await destinationPromise;
   if (destination.kind==='gallery') {
     await Promise.race([firstGalleryFrame,new Promise(resolve=>setTimeout(resolve,10000))]);
     removeEventListener('gallery-room-ready',ready);
     finishIntro({keepAppInert:true,focusTarget:null});
-    destination.gallery.activate();
+    destination.gallery.activate(eventSlug ? {eventSlug} : undefined);
   } else {
     removeEventListener('gallery-room-ready',ready);
     if (destination.kind==='static') openStaticPortfolio();
@@ -120,10 +159,33 @@ async function start() {
     location.replace(url.href);
     return;
   }
+  const route = readPortfolioRoute(location.href);
+  // Live projects are a separate, lightweight studio: no GPU or map runtime.
+  // CV/download links still win over a stale view parameter.
+  if (url.searchParams.get('view') === 'live-projects' && route.view !== 'cv' && !route.downloadCv) {
+    hideIntroForDeepLink();
+    document.documentElement.classList.remove('gallery-pending', 'gallery-experience');
+    try {
+      const {startLiveProjects} = await import('./liveProjects.js');
+      window.__liveProjects = startLiveProjects();
+    } catch (error) {
+      console.error('The live-project studio could not start.', error);
+      document.getElementById('app').innerHTML = `<main class="live-projects-recovery">
+        <a href="/">← Batıkan<span class="portfolio-wordmark-accent">or</span></a><h1>Explore live projects</h1>
+        <p>The studio could not load. You can still visit each project directly.</p>
+        <a href="https://maptheory.org/">Maptheory ↗</a>
+        <a href="https://spacecottbus.com/">NASA Space Apps Cottbus ↗</a>
+        <a href="https://cottbus.maptheory.org/">Map of Cottbus ↗</a>
+        <a href="https://gralobe.maptheory.org/">Gralobe ↗</a>
+        <a href="/?view=world">Explore achievements →</a></main>`;
+    } finally {
+      document.documentElement.classList.remove('live-projects-pending');
+    }
+    return;
+  }
   const roomRequested = (document.documentElement.dataset.portfolioExperience === 'gallery'
     || url.searchParams.get('prototype') === 'room') && url.searchParams.get('experience') !== 'earth';
   if(roomRequested)document.documentElement.classList.add('gallery-experience');
-  const route = readPortfolioRoute(location.href);
   if (roomRequested && route.view !== 'cv' && !route.downloadCv) {
     if(shouldShowIntro(location.href)) {
       await enterGalleryFromIntro();

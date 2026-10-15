@@ -9,11 +9,14 @@ import {overviewCameraPlan,surfaceCameraPlan,roomCameraFov,roomWalkingVector,roo
 import {renderGalleryRoomDom} from '../src/galleryRoomDomView.js';
 import {createRoomJumpState,stepRoomJump} from '../src/galleryRoomJump.js';
 import {sortAchievementsNewestFirst,getChronologyState} from '../src/chronology.js';
+import {sortAchievementsByImportance} from '../src/achievementImportance.js';
 import {readPortfolioRoute,portfolioUrl} from '../src/portfolioRoute.js';
+import {bindAchievementSummaryDownload} from '../src/achievementSummaryDownload.js';
 
 // Exercise the shipped pointer handlers and render loop with real camera,
 // projection, physical frames and raycasting; only browser scheduling is fake.
 const source=await readFile(new URL('../src/galleryRoom.js',import.meta.url),'utf8');
+const brandLinksSource=await readFile(new URL('../src/brandLinks.js',import.meta.url),'utf8');
 const dragSource=source.slice(source.indexOf('  let drag=null;'),source.indexOf('  reducedQuery.addEventListener'));
 const renderSource=source.slice(source.indexOf('  function render(time)'),source.indexOf('  function dispose()'));
 const movementSource=source.slice(source.indexOf('  function clearMovementKeys()'),source.indexOf('  function currentStation()'));
@@ -92,33 +95,42 @@ function integratedMovement(f){
 
 // Run the actual startup and public API with native scene/camera math. Only
 // browser surfaces, scheduling and GPU rendering are replaced in this fixture.
-function startupFixture({reducedMotion=true}={}){
-  const pending=new Map(),timers=new Map(),events=[],pushed=[],replaced=[],resizes=[];
-  let sequence=0,clock=0;
+function startupFixture({reducedMotion=true,loadSummaryExporter}={}){
+  const pending=new Map(),timers=new Map(),events=[],pushed=[],replaced=[],resizes=[],globeSelections=[];
+  let sequence=0,clock=0,picker;
   class Target{
     constructor(){this.listeners=new Map();}
     addEventListener(type,callback,options){
       if(!this.listeners.has(type))this.listeners.set(type,new Set());this.listeners.get(type).add(callback);
-      options?.signal?.cleanups.push(()=>this.listeners.get(type).delete(callback));
+      if(options?.signal?.aborted){this.listeners.get(type).delete(callback);return;}
+      options?.signal?.addEventListener('abort',()=>this.removeEventListener(type,callback),{once:true});
     }
+    removeEventListener(type,callback){this.listeners.get(type)?.delete(callback);}
     dispatch(type,values={}){
-      const event={target:this,preventDefault(){this.prevented=true;},stopPropagation(){},...values};
+      const event={target:this,preventDefault(){this.prevented=true;},stopPropagation(){this.propagationStopped=true;},...values};
       for(const callback of this.listeners.get(type)??[])callback(event);return event;
     }
   }
   const document=new Target();
   class Element extends Target{
     constructor(tag){
-      super();this.tagName=tag.toUpperCase();this.children=[];this.className='';this.dataset={};this.attributes=new Map();this.captures=new Set();
+      super();this.ownerDocument=document;this.tagName=tag.toUpperCase();this.children=[];this.className='';this.dataset={};this.attributes=new Map();this.captures=new Set();this.disabled=false;this.hidden=false;
       this.classList={contains:value=>this.className.split(' ').includes(value),
         add:(...values)=>{this.className=[...new Set([...this.className.split(' ').filter(Boolean),...values])].join(' ');},
         remove:(...values)=>{this.className=this.className.split(' ').filter(value=>!values.includes(value)).join(' ');}};
     }
+    get textContent(){return this.children.length?this.children.map(child=>child.textContent).join(''):(this._textContent??'');}
+    set textContent(value){for(const child of this.children)child.parent=null;this.children=[];this._textContent=String(value);}
     append(...children){for(const child of children){this.children.push(child);child.parent=this;}}
+    replaceChildren(...children){for(const child of this.children)child.parent=null;this.children=[];this._textContent='';this.append(...children);}
     setAttribute(name,value){this.attributes.set(name,String(value));}
     getAttribute(name){return this.attributes.get(name)??null;}
+    removeAttribute(name){this.attributes.delete(name);}
     closest(){return ['BUTTON','A','INPUT','SELECT','TEXTAREA','IFRAME'].includes(this.tagName)?this:null;}
+    get isConnected(){return this===document.body||!!this.parent?.isConnected;}
     focus(){document.activeElement=this;this.focusCount=(this.focusCount??0)+1;}
+    showModal(){this.open=true;this.modalOpenCount=(this.modalOpenCount??0)+1;}
+    close(){this.open=false;this.dispatch('close');}
     setPointerCapture(id){this.captures.add(id);}
     hasPointerCapture(id){return this.captures.has(id);}
     releasePointerCapture(id){this.captures.delete(id);}
@@ -130,6 +142,7 @@ function startupFixture({reducedMotion=true}={}){
   }
   document.documentElement=new Element('html');document.documentElement.classList.add('intro-active','gallery-pending');
   document.body=new Element('body');document.hidden=false;document.createElement=tag=>new Element(tag);
+  document.createElementNS=(_namespace,tag)=>new Element(tag);
   const original=new Element('div');original.id='app';original.inert=true;
   const enter=new Element('button');enter.id='intro-enter';document.body.append(original,enter);enter.focus();
   document.getElementById=id=>{
@@ -142,36 +155,48 @@ function startupFixture({reducedMotion=true}={}){
     render(scene,camera){scene.updateMatrixWorld(true);camera.updateMatrixWorld(true);this.info.render.calls++;}
   }
   class CssRenderer{constructor(){this.domElement=new Element('div');}setSize(){}render(){}}
-  class Abort{constructor(){this.signal={cleanups:[]};}abort(){this.signal.cleanups.forEach(cleanup=>cleanup());}}
-  const window=new Target(),reducedQuery=new Target();reducedQuery.matches=reducedMotion;
+  const window=new Target(),reducedQuery=new Target();reducedQuery.matches=reducedMotion;document.defaultView=window;
   const context=vm.createContext({
     THREE:{...THREE,WebGLRenderer:Renderer},CSS3DRenderer:CssRenderer,achievements:projects,
-    sortAchievementsNewestFirst,getChronologyState,readPortfolioRoute,portfolioUrl,createGalleryRoomScene,
+    sortAchievementsNewestFirst,sortAchievementsByImportance,getChronologyState,readPortfolioRoute,portfolioUrl,createGalleryRoomScene,
     overviewCameraPlan,surfaceCameraPlan,roomCameraFov,roomWalkingVector,roomTransitionDuration,
-    renderGalleryRoomDom,createRoomJumpState,stepRoomJump,document,window,Element,AbortController:Abort,Event,
+    renderGalleryRoomDom,createRoomJumpState,stepRoomJump,document,window,Element,AbortController,Event,
+    bindAchievementSummaryDownload:(button,options)=>bindAchievementSummaryDownload(button,{...options,...(loadSummaryExporter?{loadExporter:loadSummaryExporter}:{})}),
     location:{href:'https://staging.batikanor.com/'},innerWidth:1280,innerHeight:900,devicePixelRatio:1,
     matchMedia:()=>reducedQuery,performance:{now:()=>clock},
-    createGalleryRoomPicker:()=>({element:new Element('div'),setActive(){},close(){},dispose(){}}),
+    createGalleryRoomPicker:({projects,onSortChange})=>(picker={element:new Element('div'),projects,
+      setActive(slug){this.activeSlug=slug;},setProjects(projects){this.projects=projects;},
+      setSortMode(mode){this.sortMode=mode;},changeSort(mode){onSortChange(mode);},close(){},dispose(){}}),
     createGalleryRoomContent:({stations,activeSlug,onFocusSurface,onReturnToRoom})=>{
       const content={activeSlug,stationSurfaces:new Map(),focusedSurface:null,
-        setActiveSlug(slug){this.activeSlug=slug;},setFocusedSurface(kind){this.focusedSurface=kind;},setVisibleSlugs(){},
+        setActiveSlug(slug){this.activeSlug=slug;},setFocusedSurface(kind){this.focusedSurface=kind;},setVisibleSlugs(slugs){this.visibleSlugs=slugs;},
         resize(viewport){resizes.push({...viewport});sync();},dispose(){},
         approach(kind){onFocusSurface(this.stationSurfaces.get(this.activeSlug)?.[kind]);},returnToRoom:onReturnToRoom};
       const sync=()=>{content.stationSurfaces=new Map([...stations].map(([slug,item])=>[slug,Object.fromEntries(
         Object.entries(item.surfaces).map(([kind,pose])=>[kind,{...pose,slug,kind}]))]));};
       sync();return content;
     },
-    createGalleryRoomGlobe:()=>({setActive(){},resize(){},dispose(){}}),
+    createGalleryRoomGlobe:()=>({setActive(slug){globeSelections.push(slug);},resize(){},dispose(){},
+      getStats:()=>({activeSlug:globeSelections.at(-1)})}),
     requestAnimationFrame:callback=>{pending.set(++sequence,callback);return sequence;},cancelAnimationFrame:id=>pending.delete(id),
     setTimeout:callback=>{timers.set(++sequence,callback);return sequence;},clearTimeout:id=>timers.delete(id),
     addEventListener:(...args)=>window.addEventListener(...args),dispatchEvent:event=>{events.push(event.type);window.dispatch(event.type);}
   });
   context.history={pushState(_state,_title,url){context.location.href=url.href;pushed.push(url.searchParams.get('event'));},
     replaceState(_state,_title,url){context.location.href=url.href;replaced.push(url.searchParams.get('event'));}};
+  new vm.Script(brandLinksSource.replace(/^import .*;\n/gm,'').replace(/^export /gm,'')).runInContext(context);
   new vm.Script(source.replace(/^import .*;\n/gm,'').replace(/^export /gm,'')).runInContext(context);
-  return {context,document,enter,original,pending,timers,events,pushed,replaced,resizes,
+  return {context,document,enter,original,pending,timers,events,pushed,replaced,resizes,globeSelections,get picker(){return picker;},
     tick(time){clock=time;const callbacks=[...pending.values()];pending.clear();callbacks.forEach(callback=>callback(time));},
-    key(key,details={}){return window.dispatch('keydown',{key,code:key===' '?'Space':'Key'+key.toUpperCase(),target:document.activeElement,...details});},
+    key(key,details={}){
+      let event={key,code:key===' '?'Space':'Key'+key.toUpperCase(),target:document.activeElement,...details};
+      // Native keyboard events reach a modal's ancestor handler before window.
+      for(let node=event.target;node;node=node.parent){
+        if(!node.listeners?.has('keydown'))continue;
+        event=node.dispatch('keydown',event);if(event.propagationStopped)return event;
+      }
+      return window.dispatch('keydown',event);
+    },
     popstate(slug){context.location.href=portfolioUrl(context.location.href,{eventSlug:slug}).href;window.dispatch('popstate');}};
 }
 
@@ -233,6 +258,57 @@ test('explicit activation refits the prepared gallery, focuses its stage and ena
   assert.equal(f.pending.size,0);
 });
 
+test('an entrance map choice exposes the chosen wall, content, globe and fitted camera before stage input',async()=>{
+  const f=startupFixture(),api=await f.context.startGalleryRoom({deferActivation:true});
+  try{
+    f.tick(0);f.tick(16.7);
+    const prepared=api.getStats(),chosen=projects.find(project=>project.slug!==prepared.activeSlug).slug;
+    const stage=f.document.getElementById('gallery-room-stage');
+    assert.equal(f.key('ArrowRight').prevented,undefined);
+    f.context.innerWidth=390;f.context.innerHeight=844;
+    let focusSnapshot;
+    const focus=stage.focus.bind(stage);
+    stage.focus=()=>{
+      const active=api.getStats(),station=api.room.stations.get(chosen);
+      const plan=overviewCameraPlan(station,active.viewport,roomCameraFov(390));
+      assert.equal(active.activeSlug,chosen);assert.equal(api.content.activeSlug,chosen);
+      assert.equal(active.globe.activeSlug,chosen);
+      assert.equal(active.focusKind,null);assert.equal(active.pendingSlug,null);assert.equal(active.transitioning,false);
+      assert.deepEqual(active.camera,plan.position,'the selected wall is fitted before the stage receives focus');
+      assert.deepEqual(active.lookTarget,plan.target);
+      assert.equal(api.camera.aspect,390/844);
+      focusSnapshot=active;focus();
+    };
+    api.activate({eventSlug:chosen});
+    assert.ok(focusSnapshot);assert.equal(f.document.activeElement,stage);
+    assert.equal(api.root.inert,false);assert.equal(api.root.classList.contains('is-preparing'),false);
+    assert.equal(f.globeSelections.at(-1),chosen);
+    assert.deepEqual(f.pushed,[]);assert.deepEqual(f.replaced,[],'entry selection does not invent navigation history');
+    const selections=f.globeSelections.length,resizes=f.resizes.length,focuses=stage.focusCount;
+    api.activate({eventSlug:prepared.activeSlug});
+    assert.equal(api.getStats().activeSlug,chosen,'repeated activation cannot replace the selected achievement');
+    assert.equal(f.globeSelections.length,selections);assert.equal(f.resizes.length,resizes);assert.equal(stage.focusCount,focuses);
+    assert.equal(f.key(' ').prevented,true,'jump input becomes available after the selected wall is exposed');
+  }finally{api.dispose();}
+});
+
+test('an unknown entrance choice preserves the prepared project and cannot alter an active or disposed room',async()=>{
+  const f=startupFixture(),api=await f.context.startGalleryRoom({deferActivation:true});
+  const prepared=api.getStats();
+  try{
+    api.activate({eventSlug:'not-a-known-achievement'});
+    const active=api.getStats();
+    assert.equal(active.active,true);assert.equal(active.activeSlug,prepared.activeSlug);
+    assert.equal(api.content.activeSlug,prepared.activeSlug);assert.equal(active.globe.activeSlug,prepared.activeSlug);
+    assert.deepEqual(active.camera,prepared.camera);assert.deepEqual(f.pushed,[]);assert.deepEqual(f.replaced,[]);
+    api.activate({eventSlug:projects.at(-1).slug});
+    assert.equal(api.getStats().activeSlug,prepared.activeSlug);
+  }finally{api.dispose();}
+  api.activate({eventSlug:projects.at(-1).slug});
+  assert.equal(api.getStats().active,false);assert.equal(api.getStats().activeSlug,prepared.activeSlug);
+  assert.equal(f.pending.size,0);
+});
+
 test('default startup keeps deep links immediately active',async()=>{
   const f=startupFixture(),slug=projects[3].slug;f.context.location.href=portfolioUrl(f.context.location.href,{eventSlug:slug}).href;
   const api=await f.context.startGalleryRoom();
@@ -242,6 +318,91 @@ test('default startup keeps deep links immediately active',async()=>{
     f.document.getElementById('gallery-room-stage').focus();
     assert.equal(f.key('ArrowRight').prevented,true);assert.notEqual(api.getStats().activeSlug,slug);
   }finally{api.dispose();}
+});
+
+test('the achievement header configures its PDF lazily without stage input and exposes accessible branded contact links',async()=>{
+  let loads=0,exportOptions,finishRendering;
+  const saved=[];
+  const f=startupFixture({loadSummaryExporter:async()=>{
+    loads++;
+    return {exportProjectsPdf:options=>{exportOptions=options;return new Promise(resolve=>{finishRendering=resolve;});}};
+  }});
+  const api=await f.context.startGalleryRoom();
+  const button=f.document.getElementById('gallery-summary-download'),status=f.document.getElementById('gallery-summary-status');
+  const find=(element,predicate)=>predicate(element)?element:element.children.map(child=>find(child,predicate)).find(Boolean);
+  let dialog;
+  try{
+    const header=api.root.children.find(child=>child.className==='gallery-room-header');
+    const nav=header.children.find(child=>child.tagName==='NAV');
+    const email=nav.children.find(child=>child.href==='mailto:batikanor@gmail.com');
+    const linkedIn=nav.children.find(child=>child.href==='https://linkedin.com/in/batikanor');
+    assert.equal(nav.children.indexOf(button),nav.children.findIndex(child=>child.textContent==='CV')+1,'the report is next to CV');
+    assert.equal(button.getAttribute('aria-label'),'Download achievements summary (PDF)');
+    for(const [link,brand,label]of[[email,'email','Email'],[linkedIn,'linkedin','LinkedIn']]){
+      assert.equal(link.tagName,'A');assert.equal(link.getAttribute('aria-label'),label);
+      assert.equal(link.classList.contains(`portfolio-brand-link-${brand}`),true);
+      assert.equal(link.children[0].tagName,'SVG');assert.equal(link.children[0].getAttribute('aria-hidden'),'true');
+      assert.equal(link.children[0].getAttribute('data-brand-icon'),brand);
+      assert.equal(link.children[1].textContent.startsWith(label),true,'visible native link labels remain available');
+    }
+    assert.equal(email.children[0].children.length,5,'Gmail uses its complete multicolor mark');
+    assert.equal(linkedIn.target,'_blank');assert.match(linkedIn.rel,/noopener/);
+    assert.equal(loads,0,'preparing or viewing achievements never loads the PDF engine');
+    assert.equal(button.getAttribute('aria-haspopup'),'dialog');
+    assert.equal(button.getAttribute('aria-controls'),null,'options are not created during gallery startup');
+    const initial=api.getStats(),stage=f.document.getElementById('gallery-room-stage');button.focus();
+    for(const key of['w',' ','ArrowRight'])assert.equal(f.key(key).prevented,undefined,'native header controls never become movement keys');
+    api.setViewLocked(false);stage.focus();f.key('w');
+    stage.dispatch('pointerdown',{button:0,isPrimary:true,pointerId:7,clientX:100,clientY:100});
+    assert.equal(api.getStats().keys.length,1);assert.equal(stage.captures.has(7),true);
+    button.focus();button.dispatch('click');
+    assert.equal(loads,0,'opening options must not import or render a PDF');
+    assert.equal(api.getStats().keys.length,0,'opening PDF options releases held movement');
+    assert.equal(stage.captures.size,0,'opening PDF options releases the room drag');
+    dialog=f.document.getElementById(button.getAttribute('aria-controls'));
+    assert.equal(dialog.tagName,'DIALOG');assert.equal(dialog.open,true);
+    assert.equal(button.getAttribute('aria-expanded'),'true');
+    const images=find(dialog,child=>child.name==='include-images');
+    const scale=find(dialog,child=>child.name==='image-size');
+    const compress=find(dialog,child=>child.name==='compress-pdf');
+    const strength=find(dialog,child=>child.name==='compression-strength');
+    const form=find(dialog,child=>child.tagName==='FORM');
+    const innerStatus=find(dialog,child=>child.className==='achievement-summary-status');
+    assert.equal(images.checked,true,'the illustrated report is enabled by default');
+    assert.equal(scale.value,'100');assert.equal(compress.checked,true);assert.equal(strength.value,'10');
+    assert.equal(f.document.activeElement,images,'the modal focuses its native first option');
+    for(const key of['w',' ','ArrowRight']){
+      const event=f.key(key);assert.equal(event.propagationStopped,true);assert.equal(event.prevented,undefined);
+    }
+    const stageFocuses=stage.focusCount;
+    const escape=f.key('Escape');assert.equal(escape.prevented,true);assert.equal(escape.propagationStopped,true);
+    assert.equal(dialog.open,false);assert.equal(button.getAttribute('aria-expanded'),'false');
+    assert.equal(f.document.activeElement,button);assert.equal(stage.focusCount,stageFocuses,'Escape closes only the options dialog');
+    assert.equal(loads,0,'dismissing options never loads the PDF engine');
+    button.dispatch('click');button.dispatch('click');
+    assert.equal(dialog.open,true);assert.equal(dialog.modalOpenCount,2,'repeated clicks do not create or reopen a second modal');
+    scale.value='60';scale.dispatch('input');strength.value='70';strength.dispatch('input');
+    compress.checked=false;compress.dispatch('input');images.checked=false;images.dispatch('input');
+    assert.equal(form.dispatch('submit').prevented,true);form.dispatch('submit');
+    await new Promise(resolve=>setImmediate(resolve));
+    assert.equal(loads,1);assert.equal(button.disabled,true);assert.equal(button.getAttribute('aria-busy'),'true');
+    assert.equal(exportOptions.includeImages,false);assert.equal(exportOptions.imageScale,.6);
+    assert.equal(exportOptions.compressPdf,false);assert.equal(exportOptions.compressionStrength,.7);assert.equal(exportOptions.save,false);
+    assert.equal(exportOptions.signal.aborted,false);
+    exportOptions.onProgress({index:3,total:32});assert.equal(innerStatus.textContent,'Preparing achievement 4 of 32…');
+    assert.equal(innerStatus.getAttribute('aria-live'),'polite');assert.equal(innerStatus.hidden,false);
+    finishRendering({save:async name=>saved.push(name)});
+    await new Promise(resolve=>setImmediate(resolve));
+    assert.deepEqual(saved,['batikan-achievements-summary.pdf']);assert.equal(button.disabled,false);
+    assert.equal(button.getAttribute('aria-busy'),null);assert.equal(status.textContent,'Achievements summary downloaded.');
+    assert.equal(status.getAttribute('aria-live'),'polite');assert.equal(dialog.open,false);
+    assert.equal(f.document.activeElement,button,'downloading restores its native trigger focus');
+    assert.equal(api.getStats().activeSlug,initial.activeSlug);assert.deepEqual(api.getStats().camera,initial.camera);
+    assert.equal(api.getStats().keys.length,0);assert.equal(api.getStats().jump.height,0);assert.deepEqual(f.pushed,[]);
+  }finally{api.dispose();}
+  assert.equal(dialog.isConnected,false,'disposing the room removes its modal');
+  button.dispatch('click');await new Promise(resolve=>setImmediate(resolve));
+  assert.equal(loads,1,'disposing the room removes the real download listener');
 });
 
 test('the initial view lock blocks walking and looking, keeps Space jumping, and unlocks through its native button',async()=>{
@@ -534,4 +695,87 @@ test('jumping across a station boundary preserves airborne height and the global
     m.key('keydown',key);f.context.render(1033.3333334);m.key('keyup',key);
     assert.equal(camera.position.x,edge,'the endpoint is bounded by the complete corridor');
   }
+});
+
+test('importance order preserves the current focused achievement and synchronizes selector, walls, counter order and arrows',async()=>{
+  const recent=sortAchievementsNewestFirst(projects),important=sortAchievementsByImportance(recent),chosen=recent[4].slug;
+  const f=startupFixture();f.context.location.href=portfolioUrl(f.context.location.href,{eventSlug:chosen}).href;
+  const api=await f.context.startGalleryRoom();
+  try{
+    assert.equal(api.getStats().sortMode,'recent');
+    assert.deepEqual([...api.getStats().projectOrder],recent.map(project=>project.slug));
+    const station=api.room.stations.get(chosen),href=f.context.location.href,globeCount=f.globeSelections.length;
+    api.content.approach('story');f.picker.element.focus();
+    f.picker.changeSort('importance');
+    const index=important.findIndex(project=>project.slug===chosen),neighbors=important.slice(Math.max(0,index-1),index+2).map(project=>project.slug);
+    assert.equal(api.getStats().activeSlug,chosen);assert.equal(api.getStats().sortMode,'importance');
+    assert.equal(api.getStats().focusKind,'story');assert.equal(api.getStats().viewLocked,true);
+    assert.deepEqual([...api.getStats().projectOrder],important.map(project=>project.slug));
+    assert.deepEqual([...f.picker.projects].map(project=>project.slug),important.map(project=>project.slug));
+    assert.equal(f.picker.activeSlug,chosen);assert.equal(f.picker.sortMode,'importance');
+    assert.equal(api.room.stations.get(chosen),station);assert.equal(station.index,index);
+    assert.deepEqual([...api.room.stations.keys()],important.map(project=>project.slug));
+    assert.deepEqual([...api.content.visibleSlugs],neighbors);assert.deepEqual(api.room.visibleSlugs,neighbors);
+    assert.equal(api.content.stationSurfaces.get(chosen).story.position[0],station.surfaces.story.position[0]);
+    assert.equal(f.context.location.href,href);assert.deepEqual(f.pushed,[]);assert.deepEqual(f.replaced,[]);
+    assert.equal(f.globeSelections.length,globeCount);assert.equal(f.document.activeElement,f.picker.element,'sorting does not steal native control focus');
+    const expected=surfaceCameraPlan(api.content.stationSurfaces.get(chosen).story,api.getStats().viewport,api.camera.fov);
+    for(let axis=0;axis<3;axis++)assert.ok(Math.abs(api.camera.position.toArray()[axis]-expected.position[axis])<1e-8);
+    f.document.getElementById('gallery-next').dispatch('click');
+    const adjacent=important[index+1].slug;assert.equal(api.getStats().activeSlug,adjacent);
+    assert.deepEqual(f.pushed,[adjacent]);
+    f.picker.changeSort('recent');
+    assert.equal(api.getStats().activeSlug,adjacent);assert.equal(api.getStats().sortMode,'recent');
+    assert.deepEqual([...api.room.stations.keys()],recent.map(project=>project.slug));
+    assert.deepEqual([...api.getStats().projectOrder],recent.map(project=>project.slug));
+    assert.deepEqual(f.pushed,[adjacent],'sort changes do not add project history entries');
+  }finally{api.dispose();}
+});
+
+test('sorting during a pending project change commits that selected achievement once and retains order through browser history',async()=>{
+  const recent=sortAchievementsNewestFirst(projects),important=sortAchievementsByImportance(recent);
+  const f=startupFixture({reducedMotion:false}),api=await f.context.startGalleryRoom();
+  try{
+    f.document.getElementById('gallery-next').dispatch('click');
+    const pending=api.getStats().pendingSlug;assert.equal(pending,recent[1].slug);assert.equal(f.timers.size,1);
+    f.picker.changeSort('importance');
+    assert.equal(api.getStats().activeSlug,pending);assert.equal(api.getStats().pendingSlug,null);assert.equal(f.timers.size,0);
+    assert.equal(api.getStats().transitioning,false);assert.deepEqual(f.pushed,[pending]);assert.deepEqual(f.replaced,[]);
+    assert.equal(new URL(f.context.location.href).searchParams.get('event'),pending);
+    assert.equal(api.room.stations.get(pending).index,important.findIndex(project=>project.slug===pending));
+    f.popstate(recent[0].slug);
+    const callbacks=[...f.timers.values()];f.timers.clear();callbacks.forEach(callback=>callback());
+    assert.equal(api.getStats().activeSlug,recent[0].slug);assert.equal(api.getStats().sortMode,'importance');
+    assert.deepEqual([...api.getStats().projectOrder],important.map(project=>project.slug));
+    assert.deepEqual(f.pushed,[pending],'Back does not introduce an extra entry');
+  }finally{api.dispose();}
+});
+
+test('deferred and disposed galleries cannot be reordered by old controls or their public API',async()=>{
+  const f=startupFixture(),api=await f.context.startGalleryRoom({deferActivation:true});
+  const originalOrder=[...api.getStats().projectOrder];
+  try{
+    f.picker.changeSort('importance');assert.equal(api.getStats().sortMode,'recent');
+    assert.deepEqual([...api.getStats().projectOrder],originalOrder);
+    api.activate();api.setSortMode('importance');assert.equal(api.getStats().sortMode,'importance');
+    const order=[...api.getStats().projectOrder];api.dispose();
+    f.picker.changeSort('recent');api.setSortMode('recent');
+    assert.equal(api.getStats().sortMode,'importance');assert.deepEqual([...api.getStats().projectOrder],order);
+    assert.equal(f.pending.size,0);assert.equal(f.timers.size,0);
+  }finally{api.dispose();}
+});
+
+test('Back to the original bare gallery URL restores its original achievement after importance sorting',async()=>{
+  const recent=sortAchievementsNewestFirst(projects),important=sortAchievementsByImportance(recent);
+  const f=startupFixture(),api=await f.context.startGalleryRoom();
+  try{
+    assert.notEqual(recent[0].slug,important[0].slug);
+    f.picker.changeSort('importance');assert.equal(api.getStats().activeSlug,recent[0].slug);
+    f.document.getElementById('gallery-next').dispatch('click');
+    assert.notEqual(api.getStats().activeSlug,recent[0].slug);assert.equal(f.pushed.length,1);
+    f.popstate(null);
+    assert.equal(new URL(f.context.location.href).searchParams.get('event'),null);
+    assert.equal(api.getStats().activeSlug,recent[0].slug);
+    assert.equal(api.getStats().sortMode,'importance');assert.equal(f.pushed.length,1);
+  }finally{api.dispose();}
 });

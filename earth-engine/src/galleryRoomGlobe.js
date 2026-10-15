@@ -64,23 +64,59 @@ export function pickGalleryGlobeCluster(groups, point, {radius = 16} = {}) {
     .filter(group => group.distance <= radius).sort((a, b) => a.distance - b.distance)[0] ?? null;
 }
 
-/** A spherical mean keeps a seam-crossing cluster centered over the Pacific. */
-export function galleryGlobeClusterTarget(locations, zoom = 1) {
+/** Center real geography, then find a zoom that visibly splits the clicked group. */
+export function galleryGlobeClusterTarget(locations, zoom = 1, {
+  width = 336, height = width, radius = width <= 170 ? 21 : 25, allLocations = locations,
+} = {}) {
   if (!locations.length) throw new TypeError('A globe cluster needs locations');
+  if (![zoom, width, height, radius].every(value => Number.isFinite(value) && value > 0)) {
+    throw new TypeError('A globe cluster needs a positive zoom and viewport');
+  }
   const center = new THREE.Vector3();
   for (const location of locations) center.add(new THREE.Vector3(...galleryGlobeCoordinate(
     location.coordinates.lat, location.coordinates.lng)));
   if (center.lengthSq() < 1e-10) center.fromArray(galleryGlobeCoordinate(
     locations[0].coordinates.lat, locations[0].coordinates.lng));
   center.normalize();
-  let spread = 0;
-  for (const location of locations) spread = Math.max(spread, center.angleTo(new THREE.Vector3(
-    ...galleryGlobeCoordinate(location.coordinates.lat, location.coordinates.lng))));
   const latitude = Math.asin(center.y) / RADIANS, longitude = Math.atan2(-center.z, center.x) / RADIANS;
-  return {...galleryGlobeRotation(latitude, longitude),
-    zoom: Math.min(GALLERY_GLOBE_MAX_ZOOM, Math.max(1, zoom) * 1.9),
-    expand: zoom >= GALLERY_GLOBE_MAX_ZOOM - .01 || zoom >= 1.8 && spread < .001,
-    latitude, longitude};
+  const rotation = galleryGlobeRotation(latitude, longitude);
+  const quaternion = new THREE.Quaternion().setFromEuler(new THREE.Euler(rotation.pitch, rotation.yaw, 0, 'XYZ'));
+  const memberKeys = new Set(locations.map(location => location.slug ?? location));
+  const sceneLocations = [...new Map([...locations, ...allLocations].map(location => [location.slug ?? location, location])).values()];
+  const points = sceneLocations.map((location, index) => {
+    const position = new THREE.Vector3(...galleryGlobeCoordinate(location.coordinates.lat, location.coordinates.lng, 1.018))
+      .applyQuaternion(quaternion);
+    return {slug: location.slug ?? `cluster-point-${index}`, x: position.x, y: -position.y, z: position.z,
+      member: memberKeys.has(location.slug ?? location)};
+  });
+  const members = points.filter(point => point.member), memberSlugs = new Set(members.map(point => point.slug));
+  const scale = Math.min(width, height) / (2 * 1.23), disc = Math.min(width, height) / 2 - 15;
+  const currentZoom = THREE.MathUtils.clamp(zoom, 1, GALLERY_GLOBE_MAX_ZOOM);
+  const target = {...rotation, latitude, longitude, zoom: currentZoom, expand: true};
+  if (members.some(point => point.z <= .015) || disc <= .25) return target;
+  // Retain every clicked location: clipping a marker is not a successful split.
+  const extent = Math.max(...members.map(point => Math.hypot(point.x, point.y)));
+  const ceiling = Math.min(GALLERY_GLOBE_MAX_ZOOM, extent > 0 ? (disc - .25) / (scale * extent) : GALLERY_GLOBE_MAX_ZOOM);
+  const splits = candidate => {
+    const markers = points.map(point => ({slug: point.slug, x: point.x * scale * candidate, y: point.y * scale * candidate,
+      visible: point.z > .015 && Math.hypot(point.x, point.y) * scale * candidate <= disc}));
+    const groups = clusterGalleryGlobeMarkers(markers, {radius});
+    const children = groups.filter(group => group.members.some(member => memberSlugs.has(member.slug)));
+    const retained = children.reduce((count, group) => count
+      + group.members.filter(member => memberSlugs.has(member.slug)).length, 0);
+    return retained === members.length && children.length > 1
+      && children.every(group => group.count < locations.length);
+  };
+  if (ceiling <= currentZoom || !splits(ceiling)) return target;
+  let lower = currentZoom, upper = ceiling;
+  if (!splits(lower)) {
+    for (let step = 0; step < 24; step++) {
+      const middle = (lower + upper) / 2;
+      if (splits(middle)) upper = middle;else lower = middle;
+    }
+  } else upper = lower;
+  // Leave a little separation beyond the exact graph threshold, avoiding edge flicker.
+  return {...target, zoom: Math.min(ceiling, Math.max(currentZoom * 1.1, upper * 1.1)), expand: false};
 }
 
 /** Tiny shared locations remain at their real positions, with repeat-click cycling. */
@@ -135,7 +171,8 @@ export function galleryGlobeSatelliteGeometry(bounds, segments = 32) {
 }
 
 /** A standalone geographic navigator; zoom always stays inside its original canvas. */
-export function createGalleryRoomGlobe({container, achievements, onSelect = () => {}, textureUrl = TEXTURE_URL}) {
+export function createGalleryRoomGlobe({container, achievements, onSelect = () => {}, textureUrl = TEXTURE_URL,
+  initialSlug = achievements?.[0]?.slug}) {
   if (!container?.ownerDocument || !Array.isArray(achievements) || !achievements.length) {
     throw new TypeError('The gallery globe needs a container and project locations');
   }
@@ -155,7 +192,7 @@ export function createGalleryRoomGlobe({container, achievements, onSelect = () =
   canvas.className = 'gallery-room-globe-canvas';
   canvas.tabIndex = 0;
   canvas.setAttribute('role', 'img');
-  canvas.setAttribute('aria-label', 'Project globe. Drag or use arrow keys to rotate. Click a numbered cluster to zoom. Plus and minus zoom; Home resets. Tab reaches cluster controls and the location list.');
+  canvas.setAttribute('aria-label', 'Project globe. Drag or use arrow keys to rotate. Explore numbered clusters to zoom or choose a project. Plus and minus zoom; Home resets. Tab reaches cluster controls and the location list.');
   const clusterLayer = document.createElement('div');clusterLayer.className = 'gallery-room-globe-clusters';
   const tools = document.createElement('div');tools.className = 'gallery-room-globe-tools';
   tools.setAttribute('role', 'group');tools.setAttribute('aria-label', 'Globe view controls');
@@ -178,6 +215,11 @@ export function createGalleryRoomGlobe({container, achievements, onSelect = () =
   const select = document.createElement('select');
   select.className = 'gallery-room-globe-locations';
   select.setAttribute('aria-label', 'Choose a project by geographic location');
+  if (initialSlug === null) {
+    const placeholder = document.createElement('option');placeholder.value = '';
+    placeholder.textContent = 'Choose an achievement';placeholder.disabled = true;placeholder.selected = true;
+    select.append(placeholder);
+  }
   for (const location of locations) {
     const option = document.createElement('option');
     option.value = location.slug;
@@ -350,7 +392,7 @@ export function createGalleryRoomGlobe({container, achievements, onSelect = () =
       }
       if (button.textContent !== `${cluster.count}`) button.textContent = `${cluster.count}`;
       const cities = [...new Set(cluster.members.map(member => locations.find(item => item.slug === member.slug)?.city).filter(Boolean))];
-      const label = `${cluster.count} projects near ${cities.slice(0, 2).join(' / ') || 'this location'}. ${zoom >= GALLERY_GLOBE_MAX_ZOOM - .01 ? 'Show projects' : 'Zoom into cluster'}`;
+      const label = `${cluster.count} projects near ${cities.slice(0, 2).join(' / ') || 'this location'}. Explore cluster`;
       const current = cluster.active ? 'location' : 'false', left = `${cluster.x}px`, top = `${cluster.y}px`;
       if (button.getAttribute('aria-label') !== label) button.setAttribute('aria-label', label);
       if (button.getAttribute('aria-current') !== current) button.setAttribute('aria-current', current);
@@ -429,12 +471,16 @@ export function createGalleryRoomGlobe({container, achievements, onSelect = () =
     hoverSlug = null;if (!preservePick) previousPick = null;updateClusters();requestRender();
   }
   function focusCluster(cluster) {
-    cancelGesture();
+    cancelGesture();advanceFlight(window.performance.now());flight = null;
     const members = cluster.members.map(member => locations.find(item => item.slug === member.slug));
-    const target = galleryGlobeClusterTarget(members, zoom);
-    live.textContent = `${cluster.count} projects. Zooming into ${[...new Set(members.map(member => member.city).filter(Boolean))].slice(0, 3).join(', ')}.`;
-    flyTo(target);
-    if (target.expand) showClusterList(cluster);else hideClusterList();
+    const target = galleryGlobeClusterTarget(members, zoom, {width, height, allLocations: locations});
+    if (target.expand) {
+      live.textContent = `${cluster.count} nearby projects. Choose an achievement.`;
+      updateClusters();showClusterList(cluster);requestRender();
+    } else {
+      live.textContent = `${cluster.count} projects. Zooming into ${[...new Set(members.map(member => member.city).filter(Boolean))].slice(0, 3).join(', ')}.`;
+      hideClusterList();flyTo(target);
+    }
   }
   function changeZoom(factor) {
     cancelGesture();advanceFlight(window.performance.now());hideClusterList();flyTo({zoom: zoom * factor});
@@ -637,7 +683,7 @@ export function createGalleryRoomGlobe({container, achievements, onSelect = () =
     container.classList.add('is-fallback');canvas.tabIndex = -1;
     canvas.setAttribute('aria-hidden', 'true');
   }
-  resize();setActive(locations[0].slug);
+  resize();if (initialSlug != null) setActive(initialSlug);
 
   function dispose() {
     if (disposed) return;

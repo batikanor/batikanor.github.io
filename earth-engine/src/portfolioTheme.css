@@ -17,6 +17,7 @@
   --portfolio-text-secondary: #d2d7d6;
   --portfolio-muted: #b9c5c8;
   --portfolio-accent: #c6b7a1;
+  --portfolio-wordmark-accent: #d7bf95;
   --portfolio-accent-strong: #bcae98;
   --portfolio-accent-hover: #d9cbb5;
   --portfolio-on-accent: #252b2d;
@@ -27,3 +28,4 @@
   --portfolio-radius: 4px;
   --portfolio-shadow: 0 16px 48px #19222440;
 }
+.portfolio-wordmark-accent { color: var(--portfolio-wordmark-accent); }

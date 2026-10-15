@@ -320,3 +320,46 @@ It does not touch edge sites or production. If a new domain vhost itself is
 bad, remove only `/srv/apps/maptheory/shared/caddy-sites/batikanor-staging-domain.caddy`
 after inspecting it, then validate and reload the whole edge Caddy config;
 leave the pre-existing `batikanor-staging.caddy`/`sslip.io` fragment alone.
+
+## Live-project studio — 15 October 2026
+
+The entry screen now offers **Explore achievements** and **Explore live projects**.
+The latter opens `/?view=live-projects`, a lightweight studio with no map/globe,
+map preload or WebGL requirement. Its project shelf selects Maptheory, Space
+Cottbus and boomtown cottbus; each has an original interactive illustration,
+short factual description and a direct link to its live site. Project selections
+are addressable through the `project` query parameter. Keyboard navigation and
+reduced motion are supported. CV/download aliases retain priority.
+
+Embed/media labels use compact body typography, including focused and mobile
+views. Original project prose, captions, credits and photo proportions remain.
+Current evidence: `release-handoffs/gallery-live-projects-20261015`. This is a
+staging-only refinement; the production Pages release pin remains unchanged.
+
+### Actual website previews — 15 October 2026
+
+The owner rejected the illustrative project sculptures. The live-project view
+now embeds each selected site's real entry screen instead. Only one iframe is
+mounted at a time, with a 1280×800 viewport scaled to the available preview
+space. A native full-preview link opens the normal website in a new tab; iframe
+interaction is disabled so the preview cannot capture that click. Keep actual
+site previews rather than introducing substitute illustrations.
+
+Space Cottbus uses `https://spacecottbus.com/?portfolio-preview=1` only inside
+the iframe. Its Hetzner edge allows that root-query variant to be framed only
+by `https://staging.batikanor.com`; normal pages/assets keep their original
+frame-deny policy. Preview clicks still go to `https://spacecottbus.com/`.
+When a future production promotion is explicitly requested, verify and extend
+this narrow preview-only allowlist to the canonical production portfolio origin
+before release, without permitting arbitrary framing or changing normal pages.
+Evidence: `release-handoffs/gallery-live-site-previews-20261015`.
+
+### Concise project marketing — 15 October 2026
+
+Live-project panels now show a project name, a short native bullet list and its
+URL beside the actual website preview. Category lines, redundant section labels,
+mottos and narrative marketing paragraphs are removed. Cottbus is labelled
+**Map of Cottbus** in the portfolio. Space Cottbus uses the owner's requested
+points: the biggest space event in Cottbus's history, an official NASA Space Apps
+hackathon, and the owner's ongoing organisation as Cottbus Local Lead.
+Evidence: `release-handoffs/gallery-project-marketing-20261015`.

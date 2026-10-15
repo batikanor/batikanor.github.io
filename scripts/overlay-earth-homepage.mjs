@@ -104,7 +104,7 @@ html = html.replace(entryTag, `<script type="module">
     const {entry, mapEntry, roomEntry} = await response.json();
     if (!/^\\/assets\\/index-[A-Za-z0-9_-]+\\.js$/.test(entry)) throw new Error('Invalid Earth release entry');
     // Start the large map download alongside the small bootstrap, not after
-    // it. CV and retired list aliases avoid this speculative runtime work.
+    // it. CV, live-project studio and retired list aliases avoid this work.
     const path = location.pathname.replace(/\\/index\\.html$/, '').replace(/\\/+$/, '');
     let hash = '';
     try { hash = decodeURIComponent(location.hash.slice(1)); } catch { /* Ignore malformed old anchors. */ }
@@ -113,7 +113,7 @@ html = html.replace(entryTag, `<script type="module">
     const query = new URLSearchParams(location.search);
     const room = (document.documentElement.dataset.portfolioExperience === 'gallery' || query.get('prototype') === 'room') && query.get('experience') !== 'earth';
     const runtime = room ? roomEntry : mapEntry;
-    if (view !== 'cv' && view !== 'list' && !query.has('download') && /^\\/assets\\/(?:main|galleryRoom)-[A-Za-z0-9_-]+\\.js$/.test(runtime || '')) {
+    if (view !== 'cv' && view !== 'list' && view !== 'live-projects' && !query.has('download') && /^\\/assets\\/(?:main|galleryRoom)-[A-Za-z0-9_-]+\\.js$/.test(runtime || '')) {
       const preload = document.createElement('link');
       preload.rel = 'modulepreload'; preload.href = runtime; preload.crossOrigin = 'anonymous';
       document.head.append(preload);
@@ -139,22 +139,22 @@ html = html.replace('</head>', `  <link rel="canonical" href="https://${staging 
   <link rel="icon" href="/favicon.ico" sizes="any" />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://${staging ? 'staging.' : ''}batikanor.com/" />
-  <meta property="og:title" content="Batıkan — Hacker · Developer · Entrepreneur" />
+  <meta property="og:title" content="Batıkanor — Hacker · Developer · Entrepreneur" />
   <meta property="og:description" content="Batıkan Bora Ormancı’s portfolio: competition wins, projects, software work and an interactive Earth map." />
   <meta property="og:image" content="https://${staging ? 'staging.' : ''}batikanor.com/seo/batikan-social.png" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
-  <meta property="og:image:alt" content="Batıkan — Hacker · Developer · Entrepreneur" />
+  <meta property="og:image:alt" content="Batıkanor — Hacker · Developer · Entrepreneur" />
   <meta name="twitter:card" content="summary_large_image" />
   <script type="application/ld+json">${JSON.stringify({
     '@context': 'https://schema.org', '@graph': [{
       '@type': 'WebSite', '@id': `https://${staging ? 'staging.' : ''}batikanor.com/#website`,
       url: `https://${staging ? 'staging.' : ''}batikanor.com/`,
-      name: 'Batıkan — Hacker · Developer · Entrepreneur'
+      name: 'Batıkanor — Hacker · Developer · Entrepreneur'
     }, {
       '@type': 'ProfilePage', '@id': `https://${staging ? 'staging.' : ''}batikanor.com/#profile`,
       url: `https://${staging ? 'staging.' : ''}batikanor.com/`,
-      name: 'Batıkan — Hacker · Developer · Entrepreneur',
+      name: 'Batıkanor — Hacker · Developer · Entrepreneur',
       isPartOf: {'@id': `https://${staging ? 'staging.' : ''}batikanor.com/#website`},
       mainEntity: {
         '@type': 'Person', name: 'Batıkan Bora Ormancı',
