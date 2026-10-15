@@ -4,7 +4,7 @@ import {mkdtemp, readFile, rm} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {
-  achievementPages, escapeHtml, renderAchievementPage, renderNoScriptIndex, renderSitemap, writeAchievementPages
+  achievementPages, achievementStyles, escapeHtml, renderAchievementPage, renderNoScriptIndex, renderSitemap, writeAchievementPages
 } from '../scripts/achievement-seo.mjs';
 
 test('every achievement has a distinct crawlable production page and sitemap URL', () => {
@@ -71,5 +71,23 @@ test('writes all static pages without needing Next, map JS or external services'
     assert.match(stylesheet, /@media\(max-width:650px\)/);
   } finally {
     await rm(directory, {recursive: true, force: true});
+  }
+});
+
+test('standalone reading views include the shared theme and self-hosted font faces', async () => {
+  const fonts = await readFile(new URL('../earth-engine/src/portfolioFonts.css', import.meta.url), 'utf8');
+  const theme = (await readFile(new URL('../earth-engine/src/portfolioTheme.css', import.meta.url), 'utf8'))
+    .replace(/^@import\s+[^;]+;\s*/gm, '');
+  const noScript = renderNoScriptIndex();
+  for (const stylesheet of [achievementStyles, noScript]) {
+    assert.ok(stylesheet.includes(fonts), 'font faces must survive standalone page generation');
+    assert.ok(stylesheet.includes(theme), 'reading views must use the shared portfolio theme');
+    assert.doesNotMatch(stylesheet, /@import\s/);
+    assert.doesNotMatch(stylesheet, /url\(['"]?https?:/);
+  }
+  for (const [, fontPath] of fonts.matchAll(/url\('([^']+)'\)/g)) {
+    assert.ok(fontPath.startsWith('/fonts/'));
+    const font = await readFile(new URL(`../earth-engine/public${fontPath}`, import.meta.url));
+    assert.ok(font.length > 1000, fontPath);
   }
 });

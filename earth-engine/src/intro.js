@@ -16,7 +16,7 @@ export function introHistoryVisible() {
 }
 
 /** Resolve only after an explicit activation; never start the map on a timer. */
-export function waitForIntroEntry() {
+export function waitForIntroEntry({destination='map'}={}) {
   const screen = $('intro-screen');
   const enter = $('intro-enter');
   const app = $('app');
@@ -37,7 +37,7 @@ export function waitForIntroEntry() {
       if (!resolveEntry) return;
       enter.disabled = true;
       enter.querySelector('.intro-enter-label').textContent = 'Opening…';
-      $('intro-load-status').textContent = 'Opening the map…';
+      $('intro-load-status').textContent = destination==='gallery'?'Opening the gallery…':'Opening the map…';
       setIntroHistoryState(false);
       const resolve = resolveEntry;
       resolveEntry = null;
@@ -51,14 +51,14 @@ export function waitForIntroEntry() {
   return pendingEntry;
 }
 
-export function finishIntro() {
+export function finishIntro({keepAppInert=false,focusTarget=$('journey-current')}={}) {
   const screen = $('intro-screen');
   const app = $('app');
   document.documentElement.classList.remove('intro-active');
   screen.inert = true;
-  app.inert = false;
+  app.inert = keepAppInert;
   screen.hidden = true;
-  $('journey-current')?.focus({preventScroll:true});
+  focusTarget?.focus({preventScroll:true});
 }
 
 export function hideIntroForDeepLink() {

@@ -1,0 +1,29 @@
+@import './portfolioFonts.css';
+
+/* Shared by the introduction, gallery, reading pages, CV and legacy shell.
+   Keep typography sizes local: a physical 3D board and a document have
+   different reading distances, but belong to the same visual family. */
+:root {
+  color-scheme: dark;
+  --portfolio-font-body: 'DM Sans', system-ui, -apple-system, sans-serif;
+  --portfolio-font-display: 'Playfair Display', Georgia, serif;
+  --portfolio-bg: #3b4345;
+  --portfolio-bg-raised: #444b4c;
+  --portfolio-surface: #2c3435;
+  --portfolio-surface-deep: #253033;
+  --portfolio-surface-hover: #3b484d;
+  --portfolio-text: #ece9e2;
+  --portfolio-text-strong: #f4f1e9;
+  --portfolio-text-secondary: #d2d7d6;
+  --portfolio-muted: #b9c5c8;
+  --portfolio-accent: #c6b7a1;
+  --portfolio-accent-strong: #bcae98;
+  --portfolio-accent-hover: #d9cbb5;
+  --portfolio-on-accent: #252b2d;
+  --portfolio-link: #bdd3df;
+  --portfolio-focus: #bdd3df;
+  --portfolio-border: #778285;
+  --portfolio-border-soft: #77828570;
+  --portfolio-radius: 4px;
+  --portfolio-shadow: 0 16px 48px #19222440;
+}

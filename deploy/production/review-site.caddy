@@ -1,0 +1,11 @@
+# Hetzner review origin for verifying the production artifact before DNS cutover.
+batikanor-production.157.180.20.129.sslip.io {
+    encode zstd gzip
+    header {
+        X-Robots-Tag "noindex, nofollow, noarchive"
+        X-Content-Type-Options "nosniff"
+        Referrer-Policy "same-origin"
+        -Server
+    }
+    reverse_proxy batikanor-production-web:8080
+}

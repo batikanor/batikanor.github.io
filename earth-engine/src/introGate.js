@@ -1,4 +1,4 @@
-/** Keep shared project, CV, list and world links immediately addressable. */
+/** Keep shared project, CV and world links immediately addressable. */
 export function shouldShowIntro(href) {
   const url = new URL(href);
   const path = url.pathname.replace(/\/+$/, '') || '/';
@@ -7,9 +7,4 @@ export function shouldShowIntro(href) {
     && !url.searchParams.has('view')
     && !url.searchParams.has('download')
     && !url.hash;
-}
-
-/** The list fallback may prewarm, but must not open an event behind the intro. */
-export function shouldInitializeFallbackNeutral(href, introActive) {
-  return !!introActive && shouldShowIntro(href);
 }

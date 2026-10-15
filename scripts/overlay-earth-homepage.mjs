@@ -15,10 +15,20 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 // The default remains the GitHub Pages release. Staging is a separate copy of
 // the same Next export, so preparing a preview cannot overwrite the artifact
 // used by the production workflow or its CNAME.
-const target = process.env.EARTH_DEPLOY_TARGET || 'production';
+function earthDeploymentOptions(env) {
+  const target = env.EARTH_DEPLOY_TARGET || 'production';
+  if (!['production', 'staging'].includes(target)) throw new Error(`Unknown Earth deployment target: ${target}`);
+  const requested = env.EARTH_PORTFOLIO_EXPERIENCE;
+  if (requested !== undefined && !['earth', 'gallery'].includes(requested))
+    throw new Error(`Unknown portfolio experience: ${requested}`);
+  const preview = env.EARTH_ROOM_PROTOTYPE === 'true';
+  if (preview && requested === 'earth') throw new Error('Conflicting Earth and gallery deployment settings');
+  if (preview && target === 'production' && requested !== 'gallery')
+    throw new Error('Production gallery requires EARTH_PORTFOLIO_EXPERIENCE=gallery');
+  return {target, staging: target === 'staging', gallery: requested === 'gallery' || preview};
+}
+const {target, staging, gallery} = earthDeploymentOptions(process.env);
 const assert = (condition, message) => { if (!condition) throw new Error(message); };
-assert(target === 'production' || target === 'staging', `Unknown Earth deployment target: ${target}`);
-const staging = target === 'staging';
 const baseOut = join(root, 'out');
 const out = staging ? join(root, 'staging-dist') : baseOut;
 const earth = join(root, 'earth-engine', 'dist');
@@ -81,22 +91,31 @@ assert(entryMatch && await exists(join(earth, entryMatch[1].slice(1))),
 const entryScript=await readFile(join(earth,entryMatch[1].slice(1)),'utf8');
 const mapEntryMatch=entryScript.match(/\.\/(main-[A-Za-z0-9_-]+\.js)/);
 assert(mapEntryMatch&&await exists(join(earth,'assets',mapEntryMatch[1])), 'Could not resolve current map runtime');
+const roomEntryMatch=entryScript.match(/\.\/(galleryRoom-[A-Za-z0-9_-]+\.js)/);
+if(gallery) {
+  assert(roomEntryMatch&&await exists(join(earth,'assets',roomEntryMatch[1])), 'Could not resolve gallery-room prototype runtime');
+  html=html.replace('<html lang="en">','<html lang="en" data-portfolio-experience="gallery">');
+  assert(html.includes('data-portfolio-experience="gallery"'), 'Gallery startup marker missing');
+}
 html = html.replace(entryTag, `<script type="module">
   try {
     const response = await fetch('/assets/earth-current.json?t=' + Date.now(), {cache: 'no-store'});
     if (!response.ok) throw new Error('Earth release manifest unavailable');
-    const {entry, mapEntry} = await response.json();
+    const {entry, mapEntry, roomEntry} = await response.json();
     if (!/^\\/assets\\/index-[A-Za-z0-9_-]+\\.js$/.test(entry)) throw new Error('Invalid Earth release entry');
     // Start the large map download alongside the small bootstrap, not after
-    // it. CV/list routes deliberately avoid this speculative runtime work.
+    // it. CV and retired list aliases avoid this speculative runtime work.
     const path = location.pathname.replace(/\\/index\\.html$/, '').replace(/\\/+$/, '');
     let hash = '';
     try { hash = decodeURIComponent(location.hash.slice(1)); } catch { /* Ignore malformed old anchors. */ }
     const cvRoute = path === '/cv' || path === '/cv/en' || hash === 'cv';
     const view = cvRoute ? 'cv' : new URLSearchParams(location.search).get('view');
-    if (view !== 'cv' && view !== 'list' && /^\\/assets\\/main-[A-Za-z0-9_-]+\\.js$/.test(mapEntry || '')) {
+    const query = new URLSearchParams(location.search);
+    const room = (document.documentElement.dataset.portfolioExperience === 'gallery' || query.get('prototype') === 'room') && query.get('experience') !== 'earth';
+    const runtime = room ? roomEntry : mapEntry;
+    if (view !== 'cv' && view !== 'list' && !query.has('download') && /^\\/assets\\/(?:main|galleryRoom)-[A-Za-z0-9_-]+\\.js$/.test(runtime || '')) {
       const preload = document.createElement('link');
-      preload.rel = 'modulepreload'; preload.href = mapEntry; preload.crossOrigin = 'anonymous';
+      preload.rel = 'modulepreload'; preload.href = runtime; preload.crossOrigin = 'anonymous';
       document.head.append(preload);
     }
     await import(entry);
@@ -160,7 +179,8 @@ for (const directory of ['assets', 'data', 'fonts', 'photos', 'certificates', 'o
 assert(await exists(join(earth,'earth-cache-sw.js')),'Earth cache worker missing from build');
 await copyFile(join(earth,'earth-cache-sw.js'),join(out,'earth-cache-sw.js'));
 await writeFile(join(out, 'assets', 'earth-current.json'),
-  JSON.stringify({entry: entryMatch[1],mapEntry:`/assets/${mapEntryMatch[1]}`}) + '\n');
+  JSON.stringify({entry: entryMatch[1],mapEntry:`/assets/${mapEntryMatch[1]}`,
+    ...(gallery?{roomEntry:`/assets/${roomEntryMatch[1]}`,experience:'gallery-room-prototype'}:{})}) + '\n');
 await writeFile(join(out, 'index.html'), html);
 await writeAchievementPages(out, {staging});
 await writeCvPages(out, html, {staging});

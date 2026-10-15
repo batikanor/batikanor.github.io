@@ -1,0 +1,1541 @@
+{
+  "checkedAt": "2026-10-13T14:45:33.678364+00:00",
+  "provider": "EOX IT Services GmbH",
+  "sourceLayer": "s2cloudless",
+  "acquisitionYears": [
+    2016,
+    2017
+  ],
+  "license": "https://creativecommons.org/licenses/by/4.0/",
+  "licenseEvidence": [
+    "https://eox.at/2025/03/sentinel-2-cloudless-2024/",
+    "https://cloudless.eox.at/pricing",
+    "https://creativecommons.org/licenses/by/4.0/"
+  ],
+  "attribution": "Sentinel-2 cloudless - https://s2maps.eu by EOX IT Services GmbH (Contains modified Copernicus Sentinel data 2016 & 2017)",
+  "processing": "Bounded WMS EPSG:4326 exports; original JPEG bytes retained.",
+  "global": {
+    "id": "world",
+    "level": "world",
+    "bounds": [
+      -180,
+      -90,
+      180,
+      90
+    ],
+    "width": 4096,
+    "height": 2048,
+    "url": "/assets/gallery/satellite/world.jpg",
+    "revision": "fac28ad648fa"
+  },
+  "smallGlobal": {
+    "id": "world-small",
+    "level": "world",
+    "bounds": [
+      -180,
+      -90,
+      180,
+      90
+    ],
+    "width": 2048,
+    "height": 1024,
+    "url": "/assets/gallery/satellite/world-small.jpg",
+    "revision": "5a11b4b09704"
+  },
+  "regions": [
+    {
+      "id": "city-00",
+      "city": "Gr\u00fcnheide",
+      "country": "Germany",
+      "latitude": 52.391331,
+      "longitude": 13.79215,
+      "slugs": [
+        "tesla-gigathon-2026"
+      ],
+      "levels": [
+        {
+          "id": "city-00-region",
+          "level": "region",
+          "bounds": [
+            10.51488537916252,
+            50.391331,
+            17.06941462083748,
+            54.391331
+          ],
+          "width": 1024,
+          "height": 1024,
+          "minimumZoom": 44,
+          "url": "/assets/gallery/satellite/city-00-region.jpg",
+          "revision": "d268548f21e1"
+        },
+        {
+          "id": "city-00-city",
+          "level": "city",
+          "bounds": [
+            13.136697075832503,
+            51.991331,
+            14.447602924167496,
+            52.791331
+          ],
+          "width": 2048,
+          "height": 2048,
+          "minimumZoom": 190,
+          "url": "/assets/gallery/satellite/city-00-city.jpg",
+          "revision": "f483e0d75cd4"
+        }
+      ]
+    },
+    {
+      "id": "city-01",
+      "city": "Hong Kong",
+      "country": "Hong Kong",
+      "latitude": 22.2796020939,
+      "longitude": 114.1718383764,
+      "slugs": [
+        "hong-kong-talent-engage-eurotech-healthtech-2026"
+      ],
+      "levels": [
+        {
+          "id": "city-01-region",
+          "level": "region",
+          "bounds": [
+            112.0104817580978,
+            20.2796020939,
+            116.33319499470221,
+            24.2796020939
+          ],
+          "width": 1024,
+          "height": 1024,
+          "minimumZoom": 44,
+          "url": "/assets/gallery/satellite/city-01-region.jpg",
+          "revision": "ae581beeb468"
+        },
+        {
+          "id": "city-01-city",
+          "level": "city",
+          "bounds": [
+            113.73956705273956,
+            21.8796020939,
+            114.60410970006045,
+            22.679602093899998
+          ],
+          "width": 2048,
+          "height": 2048,
+          "minimumZoom": 190,
+          "url": "/assets/gallery/satellite/city-01-city.jpg",
+          "revision": "64aafb776ef5"
+        }
+      ]
+    },
+    {
+      "id": "city-02",
+      "city": "Cottbus",
+      "country": "Germany",
+      "latitude": 51.77132669218959,
+      "longitude": 14.313602658669996,
+      "slugs": [
+        "decarbon-days-climathon-2026",
+        "decarbon-days-climathon-2025"
+      ],
+      "levels": [
+        {
+          "id": "city-02-region",
+          "level": "region",
+          "bounds": [
+            11.081548933807424,
+            49.77132669218959,
+            17.545656383532567,
+            53.77132669218959
+          ],
+          "width": 1024,
+          "height": 1024,
+          "minimumZoom": 44,
+          "url": "/assets/gallery/satellite/city-02-region.jpg",
+          "revision": "e4780916fe8f"
+        },
+        {
+          "id": "city-02-city",
+          "level": "city",
+          "bounds": [
+            13.667191913697481,
+            51.37132669218959,
+            14.960013403642511,
+            52.17132669218959
+          ],
+          "width": 2048,
+          "height": 2048,
+          "minimumZoom": 190,
+          "url": "/assets/gallery/satellite/city-02-city.jpg",
+          "revision": "abaae3a50693"
+        }
+      ]
+    },
+    {
+      "id": "city-03",
+      "city": "Berlin",
+      "country": "Germany",
+      "latitude": 52.513354,
+      "longitude": 13.41995,
+      "slugs": [
+        "pdm-kill-the-search-bar-2026",
+        "real-coin-map-2025",
+        "tech-berlin-ai-hackathon-2"
+      ],
+      "levels": [
+        {
+          "id": "city-03-region",
+          "level": "region",
+          "bounds": [
+            10.13359243466297,
+            50.513354,
+            16.70630756533703,
+            54.513354
+          ],
+          "width": 1024,
+          "height": 1024,
+          "minimumZoom": 44,
+          "url": "/assets/gallery/satellite/city-03-region.jpg",
+          "revision": "1ca848510e72"
+        },
+        {
+          "id": "city-03-city",
+          "level": "city",
+          "bounds": [
+            12.762678486932593,
+            52.113354,
+            14.077221513067407,
+            52.913354
+          ],
+          "width": 2048,
+          "height": 2048,
+          "minimumZoom": 190,
+          "url": "/assets/gallery/satellite/city-03-city.jpg",
+          "revision": "f9e110a94f57"
+        }
+      ]
+    },
+    {
+      "id": "city-04",
+      "city": "Vienna",
+      "country": "Austria",
+      "latitude": 48.1882,
+      "longitude": 16.4038,
+      "slugs": [
+        "zero-one-hack-supercompute-industrial-2026"
+      ],
+      "levels": [
+        {
+          "id": "city-04-region",
+          "level": "region",
+          "bounds": [
+            13.40388693465637,
+            46.1882,
+            19.40371306534363,
+            50.1882
+          ],
+          "width": 1024,
+          "height": 1024,
+          "minimumZoom": 44,
+          "url": "/assets/gallery/satellite/city-04-region.jpg",
+          "revision": "6517b3603a02"
+        },
+        {
+          "id": "city-04-city",
+          "level": "city",
+          "bounds": [
+            15.803817386931275,
+            47.7882,
+            17.003782613068726,
+            48.5882
+          ],
+          "width": 2048,
+          "height": 2048,
+          "minimumZoom": 190,
+          "url": "/assets/gallery/satellite/city-04-city.jpg",
+          "revision": "b754debbec47"
+        }
+      ]
+    },
+    {
+      "id": "city-05",
+      "city": "Helsinki",
+      "country": "Finland",
+      "latitude": 60.2205,
+      "longitude": 24.9438,
+      "slugs": [
+        "huawei-tech-arena-finland-2025"
+      ],
+      "levels": [
+        {
+          "id": "city-05-region",
+          "level": "region",
+          "bounds": [
+            20.91692827630806,
+            58.2205,
+            28.97067172369194,
+            62.2205
+          ],
+          "width": 1024,
+          "height": 1024,
+          "minimumZoom": 44,
+          "url": "/assets/gallery/satellite/city-05-region.jpg",
+          "revision": "cb366119778f"
+        },
+        {
+          "id": "city-05-city",
+          "level": "city",
+          "bounds": [
+            24.13842565526161,
+            59.8205,
+            25.74917434473839,
+            60.6205
+          ],
+          "width": 2048,
+          "height": 2048,
+          "minimumZoom": 190,
+          "url": "/assets/gallery/satellite/city-05-city.jpg",
+          "revision": "80ceeff85b64"
+        }
+      ]
+    },
+    {
+      "id": "city-06",
+      "city": "Rome",
+      "country": "Italy",
+      "latitude": 41.8678291,
+      "longitude": 12.4791336,
+      "slugs": [
+        "ethrome-2025"
+      ],
+      "levels": [
+        {
+          "id": "city-06-region",
+          "level": "region",
+          "bounds": [
+            9.793439358764715,
+            39.8678291,
+            15.164827841235287,
+            43.8678291
+          ],
+          "width": 1024,
+          "height": 1024,
+          "minimumZoom": 44,
+          "url": "/assets/gallery/satellite/city-06-region.jpg",
+          "revision": "ab37442555e4"
+        },
+        {
+          "id": "city-06-city",
+          "level": "city",
+          "bounds": [
+            11.941994751752944,
+            41.4678291,
+            13.016272448247058,
+            42.2678291
+          ],
+          "width": 2048,
+          "height": 2048,
+          "minimumZoom": 190,
+          "url": "/assets/gallery/satellite/city-06-city.jpg",
+          "revision": "04a5d4c96e64"
+        }
+      ]
+    },
+    {
+      "id": "city-07",
+      "city": "Zurich",
+      "country": "Switzerland",
+      "latitude": 47.4096,
+      "longitude": 8.538499999999999,
+      "slugs": [
+        "nasa-space-apps-zurich-2025",
+        "zurich-climathon-2024",
+        "six-swisshacks-2024"
+      ],
+      "levels": [
+        {
+          "id": "city-07-region",
+          "level": "region",
+          "bounds": [
+            5.583210395844297,
+            45.4096,
+            11.493789604155701,
+            49.4096
+          ],
+          "width": 1024,
+          "height": 1024,
+          "minimumZoom": 44,
+          "url": "/assets/gallery/satellite/city-07-region.jpg",
+          "revision": "be1e379335bd"
+        },
+        {
+          "id": "city-07-city",
+          "level": "city",
+          "bounds": [
+            7.947442079168859,
+            47.0096,
+            9.12955792083114,
+            47.809599999999996
+          ],
+          "width": 2048,
+          "height": 2048,
+          "minimumZoom": 190,
+          "url": "/assets/gallery/satellite/city-07-city.jpg",
+          "revision": "55380448984f"
+        }
+      ]
+    },
+    {
+      "id": "city-08",
+      "city": "Wroclaw",
+      "country": "Poland",
+      "latitude": 51.107883,
+      "longitude": 17.038538,
+      "slugs": [
+        "sui-hackathon-poland-2025"
+      ],
+      "levels": [
+        {
+          "id": "city-08-region",
+          "level": "region",
+          "bounds": [
+            13.853094090645623,
+            49.107883,
+            20.223981909354375,
+            53.107883
+          ],
+          "width": 1024,
+          "height": 1024,
+          "minimumZoom": 44,
+          "url": "/assets/gallery/satellite/city-08-region.jpg",
+          "revision": "6921b635eea9"
+        },
+        {
+          "id": "city-08-city",
+          "level": "city",
+          "bounds": [
+            16.401449218129123,
+            50.707883,
+            17.675626781870875,
+            51.507883
+          ],
+          "width": 2048,
+          "height": 2048,
+          "minimumZoom": 190,
+          "url": "/assets/gallery/satellite/city-08-city.jpg",
+          "revision": "23f6f5b357ce"
+        }
+      ]
+    },
+    {
+      "id": "city-09",
+      "city": "Nara",
+      "country": "Japan",
+      "latitude": 34.6128,
+      "longitude": 135.6682,
+      "slugs": [
+        "music-ai-osaka-2025"
+      ],
+      "levels": [
+        {
+          "id": "city-09-region",
+          "level": "region",
+          "bounds": [
+            133.23809436558912,
+            32.6128,
+            138.0983056344109,
+            36.6128
+          ],
+          "width": 1024,
+          "height": 1024,
+          "minimumZoom": 44,
+          "url": "/assets/gallery/satellite/city-09-region.jpg",
+          "revision": "3e81748791a8"
+        },
+        {
+          "id": "city-09-city",
+          "level": "city",
+          "bounds": [
+            135.18217887311783,
+            34.2128,
+            136.1542211268822,
+            35.0128
+          ],
+          "width": 2048,
+          "height": 2048,
+          "minimumZoom": 190,
+          "url": "/assets/gallery/satellite/city-09-city.jpg",
+          "revision": "ba80c361d8e9"
+        }
+      ]
+    },
+    {
+      "id": "city-10",
+      "city": "Munich",
+      "country": "Germany",
+      "latitude": 48.198800000000006,
+      "longitude": 11.601199999999999,
+      "slugs": [
+        "european-defense-tech-2025-munich",
+        "huawei-agorize-2024",
+        "masters-thesis",
+        "bayer-ai-2024",
+        "circular-bsh-2024",
+        "thuega-2024",
+        "solana-ideathon-2024",
+        "mdsi-bundesliga-2024",
+        "ethmunich-2023"
+      ],
+      "levels": [
+        {
+          "id": "city-10-region",
+          "level": "region",
+          "bounds": [
+            8.600666279986948,
+            46.198800000000006,
+            14.60173372001305,
+            50.198800000000006
+          ],
+          "width": 1024,
+          "height": 1024,
+          "minimumZoom": 44,
+          "url": "/assets/gallery/satellite/city-10-region.jpg",
+          "revision": "1d6e3be994a1"
+        },
+        {
+          "id": "city-10-city",
+          "level": "city",
+          "bounds": [
+            11.001093255997388,
+            47.79880000000001,
+            12.20130674400261,
+            48.598800000000004
+          ],
+          "width": 2048,
+          "height": 2048,
+          "minimumZoom": 190,
+          "url": "/assets/gallery/satellite/city-10-city.jpg",
+          "revision": "8886be1e0306"
+        }
+      ]
+    },
+    {
+      "id": "city-11",
+      "city": "Lausanne",
+      "country": "Switzerland",
+      "latitude": 46.5191,
+      "longitude": 6.5668,
+      "slugs": [
+        "lauzhack-2024"
+      ],
+      "levels": [
+        {
+          "id": "city-11-region",
+          "level": "region",
+          "bounds": [
+            3.6602994833169635,
+            44.5191,
+            9.473300516683036,
+            48.5191
+          ],
+          "width": 1024,
+          "height": 1024,
+          "minimumZoom": 44,
+          "url": "/assets/gallery/satellite/city-11-region.jpg",
+          "revision": "b08150684287"
+        },
+        {
+          "id": "city-11-city",
+          "level": "city",
+          "bounds": [
+            5.985499896663392,
+            46.1191,
+            7.148100103336607,
+            46.9191
+          ],
+          "width": 2048,
+          "height": 2048,
+          "minimumZoom": 190,
+          "url": "/assets/gallery/satellite/city-11-city.jpg",
+          "revision": "fdbf32f632bc"
+        }
+      ]
+    },
+    {
+      "id": "city-12",
+      "city": "Salzburg",
+      "country": "Austria",
+      "latitude": 47.8014,
+      "longitude": 13.0448,
+      "slugs": [
+        "salzburg-tourism-2024"
+      ],
+      "levels": [
+        {
+          "id": "city-12-region",
+          "level": "region",
+          "bounds": [
+            10.067291302068249,
+            45.8014,
+            16.022308697931752,
+            49.8014
+          ],
+          "width": 1024,
+          "height": 1024,
+          "minimumZoom": 44,
+          "url": "/assets/gallery/satellite/city-12-region.jpg",
+          "revision": "a9fc17825ff4"
+        },
+        {
+          "id": "city-12-city",
+          "level": "city",
+          "bounds": [
+            12.44929826041365,
+            47.4014,
+            13.64030173958635,
+            48.2014
+          ],
+          "width": 2048,
+          "height": 2048,
+          "minimumZoom": 190,
+          "url": "/assets/gallery/satellite/city-12-city.jpg",
+          "revision": "d078e77b17d9"
+        }
+      ]
+    },
+    {
+      "id": "city-13",
+      "city": "Leipzig",
+      "country": "Germany",
+      "latitude": 51.3397,
+      "longitude": 12.3731,
+      "slugs": [
+        "dsag-ideathon-2024"
+      ],
+      "levels": [
+        {
+          "id": "city-13-region",
+          "level": "region",
+          "bounds": [
+            9.1715722278968,
+            49.3397,
+            15.574627772103202,
+            53.3397
+          ],
+          "width": 1024,
+          "height": 1024,
+          "minimumZoom": 44,
+          "url": "/assets/gallery/satellite/city-13-region.jpg",
+          "revision": "b4695d7b399a"
+        },
+        {
+          "id": "city-13-city",
+          "level": "city",
+          "bounds": [
+            11.73279444557936,
+            50.9397,
+            13.013405554420642,
+            51.7397
+          ],
+          "width": 2048,
+          "height": 2048,
+          "minimumZoom": 190,
+          "url": "/assets/gallery/satellite/city-13-city.jpg",
+          "revision": "4bddb405362f"
+        }
+      ]
+    },
+    {
+      "id": "city-14",
+      "city": "Barcelona",
+      "country": "Spain",
+      "latitude": 41.3851,
+      "longitude": 2.1734,
+      "slugs": [
+        "hackupc-2024"
+      ],
+      "levels": [
+        {
+          "id": "city-14-region",
+          "level": "region",
+          "bounds": [
+            -0.4922607490211668,
+            39.3851,
+            4.839060749021167,
+            43.3851
+          ],
+          "width": 1024,
+          "height": 1024,
+          "minimumZoom": 44,
+          "url": "/assets/gallery/satellite/city-14-region.jpg",
+          "revision": "280415799545"
+        },
+        {
+          "id": "city-14-city",
+          "level": "city",
+          "bounds": [
+            1.6402678501957666,
+            40.9851,
+            2.706532149804233,
+            41.7851
+          ],
+          "width": 2048,
+          "height": 2048,
+          "minimumZoom": 190,
+          "url": "/assets/gallery/satellite/city-14-city.jpg",
+          "revision": "f2fa7172129e"
+        }
+      ]
+    },
+    {
+      "id": "city-15",
+      "city": "L\u00fcbeck",
+      "country": "Germany",
+      "latitude": 53.8655,
+      "longitude": 10.6866,
+      "slugs": [
+        "draeger-2023"
+      ],
+      "levels": [
+        {
+          "id": "city-15-region",
+          "level": "region",
+          "bounds": [
+            7.294945887649861,
+            51.8655,
+            14.07825411235014,
+            55.8655
+          ],
+          "width": 1024,
+          "height": 1024,
+          "minimumZoom": 44,
+          "url": "/assets/gallery/satellite/city-15-region.jpg",
+          "revision": "273040d81a28"
+        },
+        {
+          "id": "city-15-city",
+          "level": "city",
+          "bounds": [
+            10.008269177529973,
+            53.4655,
+            11.364930822470027,
+            54.265499999999996
+          ],
+          "width": 2048,
+          "height": 2048,
+          "minimumZoom": 190,
+          "url": "/assets/gallery/satellite/city-15-city.jpg",
+          "revision": "8826476fe7b3"
+        }
+      ]
+    },
+    {
+      "id": "city-16",
+      "city": "Karlsruhe",
+      "country": "Germany",
+      "latitude": 49.0069,
+      "longitude": 8.4037,
+      "slugs": [
+        "msg-karlsruhe-2023"
+      ],
+      "levels": [
+        {
+          "id": "city-16-region",
+          "level": "region",
+          "bounds": [
+            5.354771417370586,
+            47.0069,
+            11.452628582629416,
+            51.0069
+          ],
+          "width": 1024,
+          "height": 1024,
+          "minimumZoom": 44,
+          "url": "/assets/gallery/satellite/city-16-region.jpg",
+          "revision": "39867371730c"
+        },
+        {
+          "id": "city-16-city",
+          "level": "city",
+          "bounds": [
+            7.793914283474118,
+            48.6069,
+            9.013485716525883,
+            49.4069
+          ],
+          "width": 2048,
+          "height": 2048,
+          "minimumZoom": 190,
+          "url": "/assets/gallery/satellite/city-16-city.jpg",
+          "revision": "c2b299480576"
+        }
+      ]
+    },
+    {
+      "id": "city-17",
+      "city": "Beykoz",
+      "country": "Turkey",
+      "latitude": 41.1428,
+      "longitude": 29.1001,
+      "slugs": [
+        "bachelors-thesis",
+        "tgu-perfect-gpa"
+      ],
+      "levels": [
+        {
+          "id": "city-17-region",
+          "level": "region",
+          "bounds": [
+            26.444311874163333,
+            39.1428,
+            31.75588812583667,
+            43.1428
+          ],
+          "width": 1024,
+          "height": 1024,
+          "minimumZoom": 44,
+          "url": "/assets/gallery/satellite/city-17-region.jpg",
+          "revision": "8c3b03d99498"
+        },
+        {
+          "id": "city-17-city",
+          "level": "city",
+          "bounds": [
+            28.568942374832666,
+            40.7428,
+            29.631257625167336,
+            41.5428
+          ],
+          "width": 2048,
+          "height": 2048,
+          "minimumZoom": 190,
+          "url": "/assets/gallery/satellite/city-17-city.jpg",
+          "revision": "022c55c86a28"
+        }
+      ]
+    }
+  ],
+  "files": [
+    {
+      "id": "world",
+      "level": "world",
+      "bounds": [
+        -180,
+        -90,
+        180,
+        90
+      ],
+      "width": 4096,
+      "height": 2048,
+      "url": "/assets/gallery/satellite/world.jpg",
+      "revision": "fac28ad648fa",
+      "sourceUrl": "https://tiles.maps.eox.at/wms?service=WMS&request=GetMap&version=1.1.1&layers=s2cloudless&styles=&format=image%2Fjpeg&srs=EPSG%3A4326&bbox=-180.000000000%2C-90.000000000%2C180.000000000%2C90.000000000&width=4096&height=2048",
+      "bytes": 985147,
+      "sha256": "fac28ad648fa155eea5e4faead43caf1207307ac7761e8c346376c7fc36af5e6",
+      "mime": "image/jpeg"
+    },
+    {
+      "id": "world-small",
+      "level": "world",
+      "bounds": [
+        -180,
+        -90,
+        180,
+        90
+      ],
+      "width": 2048,
+      "height": 1024,
+      "url": "/assets/gallery/satellite/world-small.jpg",
+      "revision": "5a11b4b09704",
+      "sourceUrl": "https://tiles.maps.eox.at/wms?service=WMS&request=GetMap&version=1.1.1&layers=s2cloudless&styles=&format=image%2Fjpeg&srs=EPSG%3A4326&bbox=-180.000000000%2C-90.000000000%2C180.000000000%2C90.000000000&width=2048&height=1024",
+      "bytes": 286762,
+      "sha256": "5a11b4b097043f84a6e0f9155b89045102445894f9cde8a690553fb52479bc02",
+      "mime": "image/jpeg"
+    },
+    {
+      "id": "city-00-region",
+      "level": "region",
+      "bounds": [
+        10.51488537916252,
+        50.391331,
+        17.06941462083748,
+        54.391331
+      ],
+      "width": 1024,
+      "height": 1024,
+      "minimumZoom": 44,
+      "url": "/assets/gallery/satellite/city-00-region.jpg",
+      "revision": "d268548f21e1",
+      "sourceUrl": "https://tiles.maps.eox.at/wms?service=WMS&request=GetMap&version=1.1.1&layers=s2cloudless&styles=&format=image%2Fjpeg&srs=EPSG%3A4326&bbox=10.514885379%2C50.391331000%2C17.069414621%2C54.391331000&width=1024&height=1024",
+      "bytes": 212177,
+      "sha256": "d268548f21e1fbb1f2d2833610017b62279000ed47b6d1fa55b24c65081b6433",
+      "mime": "image/jpeg"
+    },
+    {
+      "id": "city-00-city",
+      "level": "city",
+      "bounds": [
+        13.136697075832503,
+        51.991331,
+        14.447602924167496,
+        52.791331
+      ],
+      "width": 2048,
+      "height": 2048,
+      "minimumZoom": 190,
+      "url": "/assets/gallery/satellite/city-00-city.jpg",
+      "revision": "f483e0d75cd4",
+      "sourceUrl": "https://tiles.maps.eox.at/wms?service=WMS&request=GetMap&version=1.1.1&layers=s2cloudless&styles=&format=image%2Fjpeg&srs=EPSG%3A4326&bbox=13.136697076%2C51.991331000%2C14.447602924%2C52.791331000&width=2048&height=2048",
+      "bytes": 660267,
+      "sha256": "f483e0d75cd45185fefd950687c0d46c05c1739af5b388228b76706bf6a2bd46",
+      "mime": "image/jpeg"
+    },
+    {
+      "id": "city-01-region",
+      "level": "region",
+      "bounds": [
+        112.0104817580978,
+        20.2796020939,
+        116.33319499470221,
+        24.2796020939
+      ],
+      "width": 1024,
+      "height": 1024,
+      "minimumZoom": 44,
+      "url": "/assets/gallery/satellite/city-01-region.jpg",
+      "revision": "ae581beeb468",
+      "sourceUrl": "https://tiles.maps.eox.at/wms?service=WMS&request=GetMap&version=1.1.1&layers=s2cloudless&styles=&format=image%2Fjpeg&srs=EPSG%3A4326&bbox=112.010481758%2C20.279602094%2C116.333194995%2C24.279602094&width=1024&height=1024",
+      "bytes": 168312,
+      "sha256": "ae581beeb468d297000dd8f233c1f35317a7eff311a0bb52445d24c3f13ff6ba",
+      "mime": "image/jpeg"
+    },
+    {
+      "id": "city-01-city",
+      "level": "city",
+      "bounds": [
+        113.73956705273956,
+        21.8796020939,
+        114.60410970006045,
+        22.679602093899998
+      ],
+      "width": 2048,
+      "height": 2048,
+      "minimumZoom": 190,
+      "url": "/assets/gallery/satellite/city-01-city.jpg",
+      "revision": "64aafb776ef5",
+      "sourceUrl": "https://tiles.maps.eox.at/wms?service=WMS&request=GetMap&version=1.1.1&layers=s2cloudless&styles=&format=image%2Fjpeg&srs=EPSG%3A4326&bbox=113.739567053%2C21.879602094%2C114.604109700%2C22.679602094&width=2048&height=2048",
+      "bytes": 663578,
+      "sha256": "64aafb776ef52cdd5fc12340692add63d07e966825bedf4ad3b3d64ff706460d",
+      "mime": "image/jpeg"
+    },
+    {
+      "id": "city-02-region",
+      "level": "region",
+      "bounds": [
+        11.081548933807424,
+        49.77132669218959,
+        17.545656383532567,
+        53.77132669218959
+      ],
+      "width": 1024,
+      "height": 1024,
+      "minimumZoom": 44,
+      "url": "/assets/gallery/satellite/city-02-region.jpg",
+      "revision": "e4780916fe8f",
+      "sourceUrl": "https://tiles.maps.eox.at/wms?service=WMS&request=GetMap&version=1.1.1&layers=s2cloudless&styles=&format=image%2Fjpeg&srs=EPSG%3A4326&bbox=11.081548934%2C49.771326692%2C17.545656384%2C53.771326692&width=1024&height=1024",
+      "bytes": 220571,
+      "sha256": "e4780916fe8f2016cd90df12f53b32a2d9a88c79b0cc0fb1044fdbb497a26d78",
+      "mime": "image/jpeg"
+    },
+    {
+      "id": "city-02-city",
+      "level": "city",
+      "bounds": [
+        13.667191913697481,
+        51.37132669218959,
+        14.960013403642511,
+        52.17132669218959
+      ],
+      "width": 2048,
+      "height": 2048,
+      "minimumZoom": 190,
+      "url": "/assets/gallery/satellite/city-02-city.jpg",
+      "revision": "abaae3a50693",
+      "sourceUrl": "https://tiles.maps.eox.at/wms?service=WMS&request=GetMap&version=1.1.1&layers=s2cloudless&styles=&format=image%2Fjpeg&srs=EPSG%3A4326&bbox=13.667191914%2C51.371326692%2C14.960013404%2C52.171326692&width=2048&height=2048",
+      "bytes": 649551,
+      "sha256": "abaae3a5069304b17efcf0a4c04530edf14f2439560089cde3d90c3bb4e336b9",
+      "mime": "image/jpeg"
+    },
+    {
+      "id": "city-03-region",
+      "level": "region",
+      "bounds": [
+        10.13359243466297,
+        50.513354,
+        16.70630756533703,
+        54.513354
+      ],
+      "width": 1024,
+      "height": 1024,
+      "minimumZoom": 44,
+      "url": "/assets/gallery/satellite/city-03-region.jpg",
+      "revision": "1ca848510e72",
+      "sourceUrl": "https://tiles.maps.eox.at/wms?service=WMS&request=GetMap&version=1.1.1&layers=s2cloudless&styles=&format=image%2Fjpeg&srs=EPSG%3A4326&bbox=10.133592435%2C50.513354000%2C16.706307565%2C54.513354000&width=1024&height=1024",
+      "bytes": 208302,
+      "sha256": "1ca848510e7238cbc27fd5085473c6de39dc1c409cf0608bbb94500bd158ac7b",
+      "mime": "image/jpeg"
+    },
+    {
+      "id": "city-03-city",
+      "level": "city",
+      "bounds": [
+        12.762678486932593,
+        52.113354,
+        14.077221513067407,
+        52.913354
+      ],
+      "width": 2048,
+      "height": 2048,
+      "minimumZoom": 190,
+      "url": "/assets/gallery/satellite/city-03-city.jpg",
+      "revision": "f9e110a94f57",
+      "sourceUrl": "https://tiles.maps.eox.at/wms?service=WMS&request=GetMap&version=1.1.1&layers=s2cloudless&styles=&format=image%2Fjpeg&srs=EPSG%3A4326&bbox=12.762678487%2C52.113354000%2C14.077221513%2C52.913354000&width=2048&height=2048",
+      "bytes": 668521,
+      "sha256": "f9e110a94f5774b8055a66ea6c00e7c06cfce200e25935558701a7fb5367c2dd",
+      "mime": "image/jpeg"
+    },
+    {
+      "id": "city-04-region",
+      "level": "region",
+      "bounds": [
+        13.40388693465637,
+        46.1882,
+        19.40371306534363,
+        50.1882
+      ],
+      "width": 1024,
+      "height": 1024,
+      "minimumZoom": 44,
+      "url": "/assets/gallery/satellite/city-04-region.jpg",
+      "revision": "6517b3603a02",
+      "sourceUrl": "https://tiles.maps.eox.at/wms?service=WMS&request=GetMap&version=1.1.1&layers=s2cloudless&styles=&format=image%2Fjpeg&srs=EPSG%3A4326&bbox=13.403886935%2C46.188200000%2C19.403713065%2C50.188200000&width=1024&height=1024",
+      "bytes": 211883,
+      "sha256": "6517b3603a023cf1b6f7c8b7974fa245c52cd3628e027544a3ba4f4c87a354b7",
+      "mime": "image/jpeg"
+    },
+    {
+      "id": "city-04-city",
+      "level": "city",
+      "bounds": [
+        15.803817386931275,
+        47.7882,
+        17.003782613068726,
+        48.5882
+      ],
+      "width": 2048,
+      "height": 2048,
+      "minimumZoom": 190,
+      "url": "/assets/gallery/satellite/city-04-city.jpg",
+      "revision": "b754debbec47",
+      "sourceUrl": "https://tiles.maps.eox.at/wms?service=WMS&request=GetMap&version=1.1.1&layers=s2cloudless&styles=&format=image%2Fjpeg&srs=EPSG%3A4326&bbox=15.803817387%2C47.788200000%2C17.003782613%2C48.588200000&width=2048&height=2048",
+      "bytes": 720552,
+      "sha256": "b754debbec47969e199c7a1463931f4df85ce15592b16e3b8c09fb8d062682c7",
+      "mime": "image/jpeg"
+    },
+    {
+      "id": "city-05-region",
+      "level": "region",
+      "bounds": [
+        20.91692827630806,
+        58.2205,
+        28.97067172369194,
+        62.2205
+      ],
+      "width": 1024,
+      "height": 1024,
+      "minimumZoom": 44,
+      "url": "/assets/gallery/satellite/city-05-region.jpg",
+      "revision": "cb366119778f",
+      "sourceUrl": "https://tiles.maps.eox.at/wms?service=WMS&request=GetMap&version=1.1.1&layers=s2cloudless&styles=&format=image%2Fjpeg&srs=EPSG%3A4326&bbox=20.916928276%2C58.220500000%2C28.970671724%2C62.220500000&width=1024&height=1024",
+      "bytes": 148563,
+      "sha256": "cb366119778fcfa2329fb220326e7b73a8c38287ce031cca86488703136e7c4d",
+      "mime": "image/jpeg"
+    },
+    {
+      "id": "city-05-city",
+      "level": "city",
+      "bounds": [
+        24.13842565526161,
+        59.8205,
+        25.74917434473839,
+        60.6205
+      ],
+      "width": 2048,
+      "height": 2048,
+      "minimumZoom": 190,
+      "url": "/assets/gallery/satellite/city-05-city.jpg",
+      "revision": "80ceeff85b64",
+      "sourceUrl": "https://tiles.maps.eox.at/wms?service=WMS&request=GetMap&version=1.1.1&layers=s2cloudless&styles=&format=image%2Fjpeg&srs=EPSG%3A4326&bbox=24.138425655%2C59.820500000%2C25.749174345%2C60.620500000&width=2048&height=2048",
+      "bytes": 510804,
+      "sha256": "80ceeff85b64876e9400e6099c11f9cd09d84d9b79ce2f72f52ce59baed682d5",
+      "mime": "image/jpeg"
+    },
+    {
+      "id": "city-06-region",
+      "level": "region",
+      "bounds": [
+        9.793439358764715,
+        39.8678291,
+        15.164827841235287,
+        43.8678291
+      ],
+      "width": 1024,
+      "height": 1024,
+      "minimumZoom": 44,
+      "url": "/assets/gallery/satellite/city-06-region.jpg",
+      "revision": "ab37442555e4",
+      "sourceUrl": "https://tiles.maps.eox.at/wms?service=WMS&request=GetMap&version=1.1.1&layers=s2cloudless&styles=&format=image%2Fjpeg&srs=EPSG%3A4326&bbox=9.793439359%2C39.867829100%2C15.164827841%2C43.867829100&width=1024&height=1024",
+      "bytes": 124088,
+      "sha256": "ab37442555e46b785d91a5005c9584bd77c5510a54880d2e299d75d6766d0a0f",
+      "mime": "image/jpeg"
+    },
+    {
+      "id": "city-06-city",
+      "level": "city",
+      "bounds": [
+        11.941994751752944,
+        41.4678291,
+        13.016272448247058,
+        42.2678291
+      ],
+      "width": 2048,
+      "height": 2048,
+      "minimumZoom": 190,
+      "url": "/assets/gallery/satellite/city-06-city.jpg",
+      "revision": "04a5d4c96e64",
+      "sourceUrl": "https://tiles.maps.eox.at/wms?service=WMS&request=GetMap&version=1.1.1&layers=s2cloudless&styles=&format=image%2Fjpeg&srs=EPSG%3A4326&bbox=11.941994752%2C41.467829100%2C13.016272448%2C42.267829100&width=2048&height=2048",
+      "bytes": 694091,
+      "sha256": "04a5d4c96e64d977f2d3913466256e52177d9b3e9a622892fae77af7fd86a415",
+      "mime": "image/jpeg"
+    },
+    {
+      "id": "city-07-region",
+      "level": "region",
+      "bounds": [
+        5.583210395844297,
+        45.4096,
+        11.493789604155701,
+        49.4096
+      ],
+      "width": 1024,
+      "height": 1024,
+      "minimumZoom": 44,
+      "url": "/assets/gallery/satellite/city-07-region.jpg",
+      "revision": "be1e379335bd",
+      "sourceUrl": "https://tiles.maps.eox.at/wms?service=WMS&request=GetMap&version=1.1.1&layers=s2cloudless&styles=&format=image%2Fjpeg&srs=EPSG%3A4326&bbox=5.583210396%2C45.409600000%2C11.493789604%2C49.409600000&width=1024&height=1024",
+      "bytes": 245150,
+      "sha256": "be1e379335bdb60238b817952534248fe026124471b9bd873b876908426df6f0",
+      "mime": "image/jpeg"
+    },
+    {
+      "id": "city-07-city",
+      "level": "city",
+      "bounds": [
+        7.947442079168859,
+        47.0096,
+        9.12955792083114,
+        47.809599999999996
+      ],
+      "width": 2048,
+      "height": 2048,
+      "minimumZoom": 190,
+      "url": "/assets/gallery/satellite/city-07-city.jpg",
+      "revision": "55380448984f",
+      "sourceUrl": "https://tiles.maps.eox.at/wms?service=WMS&request=GetMap&version=1.1.1&layers=s2cloudless&styles=&format=image%2Fjpeg&srs=EPSG%3A4326&bbox=7.947442079%2C47.009600000%2C9.129557921%2C47.809600000&width=2048&height=2048",
+      "bytes": 733513,
+      "sha256": "55380448984f7dd8f03d85e26e2debae3782281aede10f638e4b692911482f9c",
+      "mime": "image/jpeg"
+    },
+    {
+      "id": "city-08-region",
+      "level": "region",
+      "bounds": [
+        13.853094090645623,
+        49.107883,
+        20.223981909354375,
+        53.107883
+      ],
+      "width": 1024,
+      "height": 1024,
+      "minimumZoom": 44,
+      "url": "/assets/gallery/satellite/city-08-region.jpg",
+      "revision": "6921b635eea9",
+      "sourceUrl": "https://tiles.maps.eox.at/wms?service=WMS&request=GetMap&version=1.1.1&layers=s2cloudless&styles=&format=image%2Fjpeg&srs=EPSG%3A4326&bbox=13.853094091%2C49.107883000%2C20.223981909%2C53.107883000&width=1024&height=1024",
+      "bytes": 211438,
+      "sha256": "6921b635eea9652eb076169cb93a438c9f5047ada0526cf1321b1da0ed898637",
+      "mime": "image/jpeg"
+    },
+    {
+      "id": "city-08-city",
+      "level": "city",
+      "bounds": [
+        16.401449218129123,
+        50.707883,
+        17.675626781870875,
+        51.507883
+      ],
+      "width": 2048,
+      "height": 2048,
+      "minimumZoom": 190,
+      "url": "/assets/gallery/satellite/city-08-city.jpg",
+      "revision": "23f6f5b357ce",
+      "sourceUrl": "https://tiles.maps.eox.at/wms?service=WMS&request=GetMap&version=1.1.1&layers=s2cloudless&styles=&format=image%2Fjpeg&srs=EPSG%3A4326&bbox=16.401449218%2C50.707883000%2C17.675626782%2C51.507883000&width=2048&height=2048",
+      "bytes": 702504,
+      "sha256": "23f6f5b357cee91dbce4727fada5cdd9809db961d218d3147664426071a7790e",
+      "mime": "image/jpeg"
+    },
+    {
+      "id": "city-09-region",
+      "level": "region",
+      "bounds": [
+        133.23809436558912,
+        32.6128,
+        138.0983056344109,
+        36.6128
+      ],
+      "width": 1024,
+      "height": 1024,
+      "minimumZoom": 44,
+      "url": "/assets/gallery/satellite/city-09-region.jpg",
+      "revision": "3e81748791a8",
+      "sourceUrl": "https://tiles.maps.eox.at/wms?service=WMS&request=GetMap&version=1.1.1&layers=s2cloudless&styles=&format=image%2Fjpeg&srs=EPSG%3A4326&bbox=133.238094366%2C32.612800000%2C138.098305634%2C36.612800000&width=1024&height=1024",
+      "bytes": 212872,
+      "sha256": "3e81748791a85d05e7517780ff92219efbbb02311ec650c2c6376d1e7f80e102",
+      "mime": "image/jpeg"
+    },
+    {
+      "id": "city-09-city",
+      "level": "city",
+      "bounds": [
+        135.18217887311783,
+        34.2128,
+        136.1542211268822,
+        35.0128
+      ],
+      "width": 2048,
+      "height": 2048,
+      "minimumZoom": 190,
+      "url": "/assets/gallery/satellite/city-09-city.jpg",
+      "revision": "ba80c361d8e9",
+      "sourceUrl": "https://tiles.maps.eox.at/wms?service=WMS&request=GetMap&version=1.1.1&layers=s2cloudless&styles=&format=image%2Fjpeg&srs=EPSG%3A4326&bbox=135.182178873%2C34.212800000%2C136.154221127%2C35.012800000&width=2048&height=2048",
+      "bytes": 1255534,
+      "sha256": "ba80c361d8e94f2bc6fbe24fada427fc4d8b3047ae9999a8010cc76c69ab19e9",
+      "mime": "image/jpeg"
+    },
+    {
+      "id": "city-10-region",
+      "level": "region",
+      "bounds": [
+        8.600666279986948,
+        46.198800000000006,
+        14.60173372001305,
+        50.198800000000006
+      ],
+      "width": 1024,
+      "height": 1024,
+      "minimumZoom": 44,
+      "url": "/assets/gallery/satellite/city-10-region.jpg",
+      "revision": "1d6e3be994a1",
+      "sourceUrl": "https://tiles.maps.eox.at/wms?service=WMS&request=GetMap&version=1.1.1&layers=s2cloudless&styles=&format=image%2Fjpeg&srs=EPSG%3A4326&bbox=8.600666280%2C46.198800000%2C14.601733720%2C50.198800000&width=1024&height=1024",
+      "bytes": 242604,
+      "sha256": "1d6e3be994a1d6b5e287d99f8c9faaa2b218fadda65944116f55b01f7e657baa",
+      "mime": "image/jpeg"
+    },
+    {
+      "id": "city-10-city",
+      "level": "city",
+      "bounds": [
+        11.001093255997388,
+        47.79880000000001,
+        12.20130674400261,
+        48.598800000000004
+      ],
+      "width": 2048,
+      "height": 2048,
+      "minimumZoom": 190,
+      "url": "/assets/gallery/satellite/city-10-city.jpg",
+      "revision": "8886be1e0306",
+      "sourceUrl": "https://tiles.maps.eox.at/wms?service=WMS&request=GetMap&version=1.1.1&layers=s2cloudless&styles=&format=image%2Fjpeg&srs=EPSG%3A4326&bbox=11.001093256%2C47.798800000%2C12.201306744%2C48.598800000&width=2048&height=2048",
+      "bytes": 740625,
+      "sha256": "8886be1e0306ef960b64babc2a17bfd4f9537c4323fce744573a210f446f1aa2",
+      "mime": "image/jpeg"
+    },
+    {
+      "id": "city-11-region",
+      "level": "region",
+      "bounds": [
+        3.6602994833169635,
+        44.5191,
+        9.473300516683036,
+        48.5191
+      ],
+      "width": 1024,
+      "height": 1024,
+      "minimumZoom": 44,
+      "url": "/assets/gallery/satellite/city-11-region.jpg",
+      "revision": "b08150684287",
+      "sourceUrl": "https://tiles.maps.eox.at/wms?service=WMS&request=GetMap&version=1.1.1&layers=s2cloudless&styles=&format=image%2Fjpeg&srs=EPSG%3A4326&bbox=3.660299483%2C44.519100000%2C9.473300517%2C48.519100000&width=1024&height=1024",
+      "bytes": 239695,
+      "sha256": "b081506842871dd4d7197c9fada3096d86c4c42a4a764739050a0861d039eb2d",
+      "mime": "image/jpeg"
+    },
+    {
+      "id": "city-11-city",
+      "level": "city",
+      "bounds": [
+        5.985499896663392,
+        46.1191,
+        7.148100103336607,
+        46.9191
+      ],
+      "width": 2048,
+      "height": 2048,
+      "minimumZoom": 190,
+      "url": "/assets/gallery/satellite/city-11-city.jpg",
+      "revision": "fdbf32f632bc",
+      "sourceUrl": "https://tiles.maps.eox.at/wms?service=WMS&request=GetMap&version=1.1.1&layers=s2cloudless&styles=&format=image%2Fjpeg&srs=EPSG%3A4326&bbox=5.985499897%2C46.119100000%2C7.148100103%2C46.919100000&width=2048&height=2048",
+      "bytes": 719586,
+      "sha256": "fdbf32f632bcec1701d93a70b0297c8a6e22aeff8f277b386ebbdac2187f13de",
+      "mime": "image/jpeg"
+    },
+    {
+      "id": "city-12-region",
+      "level": "region",
+      "bounds": [
+        10.067291302068249,
+        45.8014,
+        16.022308697931752,
+        49.8014
+      ],
+      "width": 1024,
+      "height": 1024,
+      "minimumZoom": 44,
+      "url": "/assets/gallery/satellite/city-12-region.jpg",
+      "revision": "a9fc17825ff4",
+      "sourceUrl": "https://tiles.maps.eox.at/wms?service=WMS&request=GetMap&version=1.1.1&layers=s2cloudless&styles=&format=image%2Fjpeg&srs=EPSG%3A4326&bbox=10.067291302%2C45.801400000%2C16.022308698%2C49.801400000&width=1024&height=1024",
+      "bytes": 230867,
+      "sha256": "a9fc17825ff45b0552c59dc6b1859c56761941e8b702105c1a22ce7177fc0030",
+      "mime": "image/jpeg"
+    },
+    {
+      "id": "city-12-city",
+      "level": "city",
+      "bounds": [
+        12.44929826041365,
+        47.4014,
+        13.64030173958635,
+        48.2014
+      ],
+      "width": 2048,
+      "height": 2048,
+      "minimumZoom": 190,
+      "url": "/assets/gallery/satellite/city-12-city.jpg",
+      "revision": "d078e77b17d9",
+      "sourceUrl": "https://tiles.maps.eox.at/wms?service=WMS&request=GetMap&version=1.1.1&layers=s2cloudless&styles=&format=image%2Fjpeg&srs=EPSG%3A4326&bbox=12.449298260%2C47.401400000%2C13.640301740%2C48.201400000&width=2048&height=2048",
+      "bytes": 755940,
+      "sha256": "d078e77b17d94837f08b6646ec205d9ef8528ff883def5180850be6f5dc9d660",
+      "mime": "image/jpeg"
+    },
+    {
+      "id": "city-13-region",
+      "level": "region",
+      "bounds": [
+        9.1715722278968,
+        49.3397,
+        15.574627772103202,
+        53.3397
+      ],
+      "width": 1024,
+      "height": 1024,
+      "minimumZoom": 44,
+      "url": "/assets/gallery/satellite/city-13-region.jpg",
+      "revision": "b4695d7b399a",
+      "sourceUrl": "https://tiles.maps.eox.at/wms?service=WMS&request=GetMap&version=1.1.1&layers=s2cloudless&styles=&format=image%2Fjpeg&srs=EPSG%3A4326&bbox=9.171572228%2C49.339700000%2C15.574627772%2C53.339700000&width=1024&height=1024",
+      "bytes": 223735,
+      "sha256": "b4695d7b399ac18c17f687373aba9d08e703ed5d9a4cf903e3a11fb0df901374",
+      "mime": "image/jpeg"
+    },
+    {
+      "id": "city-13-city",
+      "level": "city",
+      "bounds": [
+        11.73279444557936,
+        50.9397,
+        13.013405554420642,
+        51.7397
+      ],
+      "width": 2048,
+      "height": 2048,
+      "minimumZoom": 190,
+      "url": "/assets/gallery/satellite/city-13-city.jpg",
+      "revision": "4bddb405362f",
+      "sourceUrl": "https://tiles.maps.eox.at/wms?service=WMS&request=GetMap&version=1.1.1&layers=s2cloudless&styles=&format=image%2Fjpeg&srs=EPSG%3A4326&bbox=11.732794446%2C50.939700000%2C13.013405554%2C51.739700000&width=2048&height=2048",
+      "bytes": 763092,
+      "sha256": "4bddb405362f0cead8e656bf1d0310fb2d3281f029d6ea23bd9c3c1d6f9bb2b8",
+      "mime": "image/jpeg"
+    },
+    {
+      "id": "city-14-region",
+      "level": "region",
+      "bounds": [
+        -0.4922607490211668,
+        39.3851,
+        4.839060749021167,
+        43.3851
+      ],
+      "width": 1024,
+      "height": 1024,
+      "minimumZoom": 44,
+      "url": "/assets/gallery/satellite/city-14-region.jpg",
+      "revision": "280415799545",
+      "sourceUrl": "https://tiles.maps.eox.at/wms?service=WMS&request=GetMap&version=1.1.1&layers=s2cloudless&styles=&format=image%2Fjpeg&srs=EPSG%3A4326&bbox=-0.492260749%2C39.385100000%2C4.839060749%2C43.385100000&width=1024&height=1024",
+      "bytes": 145710,
+      "sha256": "280415799545d02bf85a19aa5116520a961d31b6d11b31a3c04e4388eaad2567",
+      "mime": "image/jpeg"
+    },
+    {
+      "id": "city-14-city",
+      "level": "city",
+      "bounds": [
+        1.6402678501957666,
+        40.9851,
+        2.706532149804233,
+        41.7851
+      ],
+      "width": 2048,
+      "height": 2048,
+      "minimumZoom": 190,
+      "url": "/assets/gallery/satellite/city-14-city.jpg",
+      "revision": "f2fa7172129e",
+      "sourceUrl": "https://tiles.maps.eox.at/wms?service=WMS&request=GetMap&version=1.1.1&layers=s2cloudless&styles=&format=image%2Fjpeg&srs=EPSG%3A4326&bbox=1.640267850%2C40.985100000%2C2.706532150%2C41.785100000&width=2048&height=2048",
+      "bytes": 568442,
+      "sha256": "f2fa7172129e0c2fce7b1af7c80226f2c434f67348293e2f6691ba19485f3dfd",
+      "mime": "image/jpeg"
+    },
+    {
+      "id": "city-15-region",
+      "level": "region",
+      "bounds": [
+        7.294945887649861,
+        51.8655,
+        14.07825411235014,
+        55.8655
+      ],
+      "width": 1024,
+      "height": 1024,
+      "minimumZoom": 44,
+      "url": "/assets/gallery/satellite/city-15-region.jpg",
+      "revision": "273040d81a28",
+      "sourceUrl": "https://tiles.maps.eox.at/wms?service=WMS&request=GetMap&version=1.1.1&layers=s2cloudless&styles=&format=image%2Fjpeg&srs=EPSG%3A4326&bbox=7.294945888%2C51.865500000%2C14.078254112%2C55.865500000&width=1024&height=1024",
+      "bytes": 174803,
+      "sha256": "273040d81a284abdb78079e367d7d858cf01cd7639a23b986b3249b05f1986a8",
+      "mime": "image/jpeg"
+    },
+    {
+      "id": "city-15-city",
+      "level": "city",
+      "bounds": [
+        10.008269177529973,
+        53.4655,
+        11.364930822470027,
+        54.265499999999996
+      ],
+      "width": 2048,
+      "height": 2048,
+      "minimumZoom": 190,
+      "url": "/assets/gallery/satellite/city-15-city.jpg",
+      "revision": "8826476fe7b3",
+      "sourceUrl": "https://tiles.maps.eox.at/wms?service=WMS&request=GetMap&version=1.1.1&layers=s2cloudless&styles=&format=image%2Fjpeg&srs=EPSG%3A4326&bbox=10.008269178%2C53.465500000%2C11.364930822%2C54.265500000&width=2048&height=2048",
+      "bytes": 610070,
+      "sha256": "8826476fe7b32833181f3cb1dc70aedbf1119b14901fd4e10f8ff2a78d69ce5b",
+      "mime": "image/jpeg"
+    },
+    {
+      "id": "city-16-region",
+      "level": "region",
+      "bounds": [
+        5.354771417370586,
+        47.0069,
+        11.452628582629416,
+        51.0069
+      ],
+      "width": 1024,
+      "height": 1024,
+      "minimumZoom": 44,
+      "url": "/assets/gallery/satellite/city-16-region.jpg",
+      "revision": "39867371730c",
+      "sourceUrl": "https://tiles.maps.eox.at/wms?service=WMS&request=GetMap&version=1.1.1&layers=s2cloudless&styles=&format=image%2Fjpeg&srs=EPSG%3A4326&bbox=5.354771417%2C47.006900000%2C11.452628583%2C51.006900000&width=1024&height=1024",
+      "bytes": 225555,
+      "sha256": "39867371730cee109d649720aa3de25b7914ca649ad1e877d4438b70afd98d35",
+      "mime": "image/jpeg"
+    },
+    {
+      "id": "city-16-city",
+      "level": "city",
+      "bounds": [
+        7.793914283474118,
+        48.6069,
+        9.013485716525883,
+        49.4069
+      ],
+      "width": 2048,
+      "height": 2048,
+      "minimumZoom": 190,
+      "url": "/assets/gallery/satellite/city-16-city.jpg",
+      "revision": "c2b299480576",
+      "sourceUrl": "https://tiles.maps.eox.at/wms?service=WMS&request=GetMap&version=1.1.1&layers=s2cloudless&styles=&format=image%2Fjpeg&srs=EPSG%3A4326&bbox=7.793914283%2C48.606900000%2C9.013485717%2C49.406900000&width=2048&height=2048",
+      "bytes": 701839,
+      "sha256": "c2b299480576d0ed8cbb31d2dbaf66b5613aa63d899dd4c30cca182141d451c9",
+      "mime": "image/jpeg"
+    },
+    {
+      "id": "city-17-region",
+      "level": "region",
+      "bounds": [
+        26.444311874163333,
+        39.1428,
+        31.75588812583667,
+        43.1428
+      ],
+      "width": 1024,
+      "height": 1024,
+      "minimumZoom": 44,
+      "url": "/assets/gallery/satellite/city-17-region.jpg",
+      "revision": "8c3b03d99498",
+      "sourceUrl": "https://tiles.maps.eox.at/wms?service=WMS&request=GetMap&version=1.1.1&layers=s2cloudless&styles=&format=image%2Fjpeg&srs=EPSG%3A4326&bbox=26.444311874%2C39.142800000%2C31.755888126%2C43.142800000&width=1024&height=1024",
+      "bytes": 164769,
+      "sha256": "8c3b03d99498ff5f4209d4225f0e60f627c286b6a32192f76b7d20b15bde0ed7",
+      "mime": "image/jpeg"
+    },
+    {
+      "id": "city-17-city",
+      "level": "city",
+      "bounds": [
+        28.568942374832666,
+        40.7428,
+        29.631257625167336,
+        41.5428
+      ],
+      "width": 2048,
+      "height": 2048,
+      "minimumZoom": 190,
+      "url": "/assets/gallery/satellite/city-17-city.jpg",
+      "revision": "022c55c86a28",
+      "sourceUrl": "https://tiles.maps.eox.at/wms?service=WMS&request=GetMap&version=1.1.1&layers=s2cloudless&styles=&format=image%2Fjpeg&srs=EPSG%3A4326&bbox=28.568942375%2C40.742800000%2C29.631257625%2C41.542800000&width=2048&height=2048",
+      "bytes": 503807,
+      "sha256": "022c55c86a28369d88f93f5c2af882619f88e47ce9e2a5944dbcd0ae957aec78",
+      "mime": "image/jpeg"
+    }
+  ],
+  "totalBytes": 17505319,
+  "runtimeDelivery": "Same-origin self-hosted assets only; no external imagery requests."
+}

@@ -1,0 +1,14 @@
+# Install only after the production artifact is verified on Hetzner.
+batikanor.com {
+    encode zstd gzip
+    header {
+        X-Content-Type-Options "nosniff"
+        Referrer-Policy "same-origin"
+        -Server
+    }
+    reverse_proxy batikanor-production-web:8080
+}
+
+www.batikanor.com {
+    redir https://batikanor.com{uri} permanent
+}

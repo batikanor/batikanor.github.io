@@ -6,7 +6,7 @@ export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="mt-20 py-8 border-t border-amber-950/40 bg-[#120c08]/85 backdrop-blur-xl text-amber-100/70">
+    <footer className="portfolio-footer mt-12 py-7">
       <div className="max-w-6xl mx-auto px-4">
         <div className="flex flex-col items-center space-y-4">
           {/* Social Links */}
@@ -15,34 +15,34 @@ export default function Footer() {
               href="https://github.com/batikanor"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-gray-600 dark:text-gray-400 hover:text-amber-600 dark:hover:text-amber-500 transition-colors"
+              className="transition-colors"
               aria-label="GitHub"
             >
-              <FaGithub className="text-2xl" />
+              <FaGithub className="text-xl" />
             </a>
             <a
               href="https://linkedin.com/in/batikanor"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-gray-600 dark:text-gray-400 hover:text-amber-600 dark:hover:text-amber-500 transition-colors"
+              className="transition-colors"
               aria-label="LinkedIn"
             >
-              <FaLinkedin className="text-2xl" />
+              <FaLinkedin className="text-xl" />
             </a>
             <a
               href="mailto:batikanor@gmail.com"
-              className="text-gray-600 dark:text-gray-400 hover:text-amber-600 dark:hover:text-amber-500 transition-colors"
+              className="transition-colors"
               aria-label="Email"
             >
-              <FaEnvelope className="text-2xl" />
+              <FaEnvelope className="text-xl" />
             </a>
           </div>
 
           {/* Copyright */}
-          <div className="text-center text-sm text-gray-600 dark:text-gray-400">
+          <div className="text-center text-xs">
             <p className="flex items-center gap-1">
               Made with{" "}
-              <FaHeart className="text-amber-600 dark:text-amber-500" /> by
+              <FaHeart className="footer-heart" /> by
               Batıkan
             </p>
             <p className="mt-1">© {currentYear} All rights reserved</p>

@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <meta name="robots" content="noindex,nofollow" />
-  <meta name="theme-color" content="#10191c" />
+  <meta name="theme-color" content="#3b4345" />
   <meta name="description" content="A geographically real Earth, streamed at the scale of an achievement journey." />
   <!-- The globe and its relief need these hosts before the first tile request. -->
   <link rel="preconnect" href="https://gibs.earthdata.nasa.gov" crossorigin />
@@ -13,19 +13,57 @@
   <link rel="dns-prefetch" href="//wmtsod1.bayernwolke.de" />
   <link rel="dns-prefetch" href="//gdi.berlin.de" />
   <title>Batıkan — Hacker · Developer · Entrepreneur</title>
+  <style>
+    html.cv-page #intro-screen, html.cv-page #app > :not(#cv-view-root) { display: none !important; }
+    .gallery-loading { display: none; }
+    html.gallery-pending body { margin: 0; background: var(--portfolio-bg-raised, #444b4c); }
+    html.gallery-pending #app, html.gallery-pending #intro-screen { visibility: hidden; }
+    html.gallery-pending .gallery-loading {
+      position: fixed; inset: 0; z-index: 35; display: grid; place-items: center;
+      background: var(--portfolio-bg-raised, #444b4c); pointer-events: none;
+    }
+    .gallery-loading-mark { display: flex; align-items: center; gap: 8px; height: 48px; }
+    .gallery-loading-mark span {
+      display: block; box-sizing: border-box; width: 14px; height: 28px; border: 1px solid currentColor; border-radius: 2px;
+      color: var(--portfolio-accent, #c6b7a1);
+      background: color-mix(in srgb, currentColor 8%, transparent);
+      animation: gallery-loading-breathe 2.4s ease-in-out infinite;
+    }
+    .gallery-loading-mark span:nth-child(2) { height: 36px; color: var(--portfolio-link, #bdd3df); animation-delay: -.8s; }
+    .gallery-loading-mark span:nth-child(3) { color: var(--portfolio-accent-strong, #bcae98); animation-delay: -1.6s; }
+    @keyframes gallery-loading-breathe {
+      0%, 100% { opacity: .3; transform: translateY(2px); }
+      50% { opacity: .85; transform: translateY(-2px); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .gallery-loading-mark span { animation: none; opacity: .65; transform: none; }
+    }
+  </style>
   <script>
     // Paint the entry screen immediately, without requesting any map modules or tiles.
     try {
       const url = new URL(location.href);
-      const path = url.pathname.replace(/\/+$/, '') || '/';
-      if ((path === '/' || path === '/index.html') && !url.searchParams.has('event')
+      const path = url.pathname.replace(/\/index\.html$/, '').replace(/\/+$/, '') || '/';
+      let hash = '';
+      try { hash = decodeURIComponent(url.hash.slice(1)); } catch { /* Ignore malformed old anchors. */ }
+      const cv = ['/cv', '/cv/en'].includes(path) || url.searchParams.get('view') === 'cv'
+        || url.searchParams.get('download') === 'cv' || hash === 'cv';
+      const gallery = (document.documentElement.dataset.portfolioExperience === 'gallery'
+        || url.searchParams.get('prototype') === 'room') && url.searchParams.get('experience') !== 'earth';
+      if (gallery) document.documentElement.classList.add('gallery-experience');
+      if (cv) document.documentElement.classList.add('cv-page');
+      if (path === '/' && !url.searchParams.has('event')
         && !url.searchParams.has('view') && !url.searchParams.has('download') && !url.hash) {
         document.documentElement.classList.add('intro-active');
+      } else if (gallery && !cv
+        && !url.searchParams.has('download')) {
+        document.documentElement.classList.add('gallery-pending');
       }
     } catch { /* Bootstrap validates the route again. */ }
   </script>
 </head>
 <body>
+  <div class="gallery-loading" aria-hidden="true"><div class="gallery-loading-mark"><span></span><span></span><span></span></div></div>
   <section id="intro-screen" class="intro-screen" aria-labelledby="intro-title">
     <div class="intro-backdrop" aria-hidden="true"></div>
     <div class="intro-frame">
@@ -53,7 +91,7 @@
         <div class="intro-footer-links"><a href="/?view=cv">View CV ↗</a><span class="intro-contact-links"><a href="mailto:batikanor@gmail.com">Email ↗</a><a href="https://linkedin.com/in/batikanor" target="_blank" rel="noopener noreferrer">LinkedIn ↗</a></span></div>
         <p id="intro-load-status" class="intro-load-status" role="status" aria-live="polite"></p>
         <button id="intro-enter" class="intro-enter" type="button" disabled><span class="intro-enter-label">Enter</span><span class="intro-enter-arrow" aria-hidden="true">↗</span></button>
-        <a id="intro-fallback-link" class="intro-enter" href="/?view=list" hidden>Open achievement list <span class="intro-enter-arrow" aria-hidden="true">↗</span></a>
+        <a id="intro-fallback-link" class="intro-enter" href="/projects/" hidden>Open projects <span class="intro-enter-arrow" aria-hidden="true">↗</span></a>
       </footer>
     </div>
   </section>

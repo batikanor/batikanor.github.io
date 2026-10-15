@@ -14,17 +14,21 @@ const CV_PREVIEW_URL = 'https://docs.google.com/document/d/1WJrlmn0cTgHiylnJaGbD
 /**
  * Mount the current CV as an in-site, accessible document view.
  *
- * @param {{root?: HTMLElement, onProjectLink?: (slug: string) => void}} options
+ * @param {{root?: HTMLElement, presentation?: 'page' | 'window', onProjectLink?: (slug: string) => void}} options
  * @returns {{open: () => void, close: () => void, isOpen: () => boolean}}
  */
-export function createCvView({ root = document.body, onProjectLink } = {}) {
+export function createCvView({ root = document.body, presentation = 'window', onProjectLink } = {}) {
   if (!(root instanceof HTMLElement)) {
     throw new TypeError('createCvView requires an HTMLElement root');
   }
+  if (presentation !== 'page' && presentation !== 'window') {
+    throw new TypeError('createCvView presentation must be page or window');
+  }
+  const pagePresentation = presentation === 'page';
 
   const dialog = document.createElement('dialog');
   dialog.id = 'cv-view';
-  dialog.className = 'cv-view is-floating is-reading';
+  dialog.className = `cv-view ${pagePresentation ? 'is-page' : 'is-floating'} is-reading`;
   dialog.setAttribute('aria-labelledby', 'cv-view-title');
   dialog.setAttribute('aria-modal', 'false');
   dialog.innerHTML = `
@@ -65,14 +69,24 @@ export function createCvView({ root = document.body, onProjectLink } = {}) {
   const closeButton = dialog.querySelector('.cv-view-close');
   const sizeButton = dialog.querySelector('.cv-view-size');
   const dragHandle = dialog.querySelector('.cv-view-drag');
+  if (pagePresentation) {
+    for (const control of [sizeButton, dragHandle, ...dialog.querySelectorAll('.cv-view-resize')]) {
+      control.hidden = true;
+      control.disabled = true;
+    }
+    closeButton.textContent = '← Home';
+    closeButton.setAttribute('aria-label', 'Return to portfolio');
+    closeButton.title = 'Return to portfolio';
+  }
   let previousFocus = null;
   let abortController = null;
   let pdfTask = null;
   let pdfDocument = null;
   let cvPdfBlob = null;
   let previewTimeout = null;
-  let zoomIndex = 0;
-  const zoomLevels = [1, 1.5, 2.2];
+  const zoomLevels = pagePresentation ? [.65, .85, 1, 1.25, 1.5, 2] : [1, 1.5, 2.2];
+  const defaultZoomIndex = pagePresentation ? 2 : 0;
+  let zoomIndex = defaultZoomIndex;
   let expanded = false;
   let reading = true;
   let windowRect = null;
@@ -81,11 +95,18 @@ export function createCvView({ root = document.body, onProjectLink } = {}) {
 
   function windowBounds({measureChrome = true} = {}) {
     const width = window.innerWidth, height = window.innerHeight;
-    const gutter = Math.min(8, width / 4, height / 4);
+    const gutter = pagePresentation ? 0 : Math.min(8, width / 4, height / 4);
     const styles = window.getComputedStyle(dialog);
     const safe = edge => Math.max(0, parseFloat(styles.getPropertyValue(`--cv-safe-${edge}`)) || 0);
     const left = Math.min(gutter + safe('left'), width - 1);
     const top = Math.min(gutter + safe('top'), height - 1);
+    // A dedicated CV route owns its viewport. Map chronology and topbars must
+    // never turn this page into a smaller right-aligned reading window.
+    if (pagePresentation) return {
+      left, top, right: Math.max(left + 1, width - safe('right')),
+      bottom: Math.max(top + 1, height - safe('bottom')),
+      viewportWidth: width, viewportHeight: height, minWidth: 1, minHeight: 1,
+    };
     const chromeHeight = dialog.open && measureChrome
       ? dialog.querySelector('.cv-view-header').getBoundingClientRect().height
         + dialog.querySelector('.cv-view-help').getBoundingClientRect().height
@@ -109,15 +130,15 @@ export function createCvView({ root = document.body, onProjectLink } = {}) {
   }
 
   function updateWindowControls() {
-    dialog.classList.toggle('is-expanded', expanded);
-    dialog.classList.toggle('is-floating', !expanded);
+    dialog.classList.toggle('is-expanded', !pagePresentation && expanded);
+    dialog.classList.toggle('is-floating', !pagePresentation && !expanded);
     dialog.classList.toggle('is-reading', reading);
     sizeButton.textContent = expanded ? '↙ Restore' : '⛶ Expand';
     const label = expanded ? 'Restore CV window' : 'Expand CV window';
     sizeButton.setAttribute('aria-label', label);
     sizeButton.title = label;
     sizeButton.setAttribute('aria-pressed', String(expanded));
-    dragHandle.disabled = false;
+    dragHandle.disabled = pagePresentation;
   }
 
   function writeWindowRect(rect) {
@@ -149,6 +170,13 @@ export function createCvView({ root = document.body, onProjectLink } = {}) {
     expanded = false;
     reading = true;
     restoreState = null;
+    if (pagePresentation) {
+      windowRect = expandedPanelRect(windowBounds({measureChrome: false}));
+      writeWindowRect(windowRect);
+      updateWindowControls();
+      if (dialog.open) updatePageLayout();
+      return;
+    }
     windowRect = largePanelRect(windowBounds({measureChrome: false}));
     writeWindowRect(windowRect);
     const area = windowBounds();
@@ -228,14 +256,18 @@ export function createCvView({ root = document.body, onProjectLink } = {}) {
     });
   }
 
-  sizeButton.addEventListener('click', toggleExpanded);
-  dragHandle.addEventListener('dblclick', resetReadingView);
-  bindWindowHandle(dragHandle, 'move');
-  bindWindowHandle(dialog.querySelector('.cv-view-resize-left'), 'sw');
-  bindWindowHandle(dialog.querySelector('.cv-view-resize-right'), 'se');
+  if (!pagePresentation) {
+    sizeButton.addEventListener('click', toggleExpanded);
+    dragHandle.addEventListener('dblclick', resetReadingView);
+    bindWindowHandle(dragHandle, 'move');
+    bindWindowHandle(dialog.querySelector('.cv-view-resize-left'), 'sw');
+    bindWindowHandle(dialog.querySelector('.cv-view-resize-right'), 'se');
+  }
 
   function updatePageLayout() {
-    const baseWidth = Math.min(820, Math.max(280, documentViewport.clientWidth - 24));
+    const baseWidth = pagePresentation
+      ? Math.max(1, documentViewport.clientWidth - 24)
+      : Math.min(820, Math.max(280, documentViewport.clientWidth - 24));
     const pageWidth = Math.round(baseWidth * zoomLevels[zoomIndex]);
     pages.style.width = `${Math.max(documentViewport.clientWidth, pageWidth + 24)}px`;
     pages.querySelectorAll('.cv-view-page').forEach((page) => {
@@ -266,7 +298,7 @@ export function createCvView({ root = document.body, onProjectLink } = {}) {
     geometryFrame = requestAnimationFrame(() => { geometryFrame = 0; reclampWindow(); });
   }
   window.addEventListener('resize', scheduleGeometry);
-  if (typeof ResizeObserver !== 'undefined') {
+  if (!pagePresentation && typeof ResizeObserver !== 'undefined') {
     const observer = new ResizeObserver(scheduleGeometry);
     for (const id of ['journey', 'sources']) {
       const node = document.getElementById(id);
@@ -297,7 +329,7 @@ export function createCvView({ root = document.body, onProjectLink } = {}) {
     pages.replaceChildren();
     loading.hidden = false;
     loading.textContent = 'Loading the latest CV…';
-    zoomIndex = 0;
+    zoomIndex = defaultZoomIndex;
     const target = previousFocus?.isConnected && !previousFocus.closest('[hidden]')
       ? previousFocus
       : document.getElementById('portfolio-toggle');
@@ -320,9 +352,16 @@ export function createCvView({ root = document.body, onProjectLink } = {}) {
       const pdfPage = await pdfDocument.getPage(number);
       if (signal.aborted) return;
 
-      // One high-resolution canvas is responsive at normal size and retains
-      // enough pixels for the zoom controls on phones and laptops alike.
-      const viewport = pdfPage.getViewport({ scale: 2.5 });
+      // The full-page view can be wider than the old 820px reading window.
+      // Match its paper width and screen density, bounded to 16MP per page.
+      let renderScale = 2.5;
+      if (pagePresentation) {
+        const paper = pdfPage.getViewport({ scale: 1 });
+        const pixelRatio = Math.min(2, window.devicePixelRatio || 1);
+        const sharpScale = Math.max(2.5, Math.max(1, documentViewport.clientWidth - 24) * pixelRatio / paper.width);
+        renderScale = Math.min(sharpScale, Math.sqrt(16_000_000 / (paper.width * paper.height)));
+      }
+      const viewport = pdfPage.getViewport({ scale: renderScale });
       const pageElement = document.createElement('div');
       pageElement.className = 'cv-view-page';
       pageElement.setAttribute('aria-label', `CV page ${number} of ${pdfDocument.numPages}`);

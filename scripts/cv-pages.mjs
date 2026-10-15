@@ -14,13 +14,13 @@ const assert=(condition,message)=>{if(!condition)throw new Error(message);};
 function renderCvNoScript() {
   return `<noscript>
   <style>
-    #app,#intro-screen{display:none!important}html,body{height:auto!important;overflow:auto!important;background:#10191c;color:#f5f3eb}
-    .cv-static{min-height:100svh;padding:clamp(16px,4vw,48px);font:16px/1.6 Arial,sans-serif;box-sizing:border-box}
-    .cv-static-shell{max-width:1100px;margin:auto;padding:clamp(20px,4vw,40px);border:1px solid #d9bb8d;border-radius:4px;background:#112227}
-    .cv-static-brand{display:flex;flex-direction:column;color:#f5f3eb}.cv-static-brand strong{font-size:24px}.cv-static-brand small{color:#e3c084;font-size:12px}
-    .cv-static h1{font:500 clamp(28px,4vw,44px)/1.2 Georgia,serif}.cv-static nav{display:flex;gap:12px;flex-wrap:wrap;margin:20px 0}
-    .cv-static a{display:inline-flex;align-items:center;min-height:44px;padding:8px 16px;border:1px solid #d9bb8d;border-radius:3px;color:#f5f3eb;text-decoration:none;box-sizing:border-box}
-    .cv-static a:focus-visible{outline:3px solid #e3c084;outline-offset:3px}.cv-static iframe{display:block;width:100%;height:80vh;min-height:440px;border:0;background:#fff}
+    #app,#intro-screen{display:none!important}html,body{height:auto!important;overflow:auto!important;background:var(--portfolio-bg);color:var(--portfolio-text)}
+    .cv-static{height:100svh;min-height:440px;padding:0;font:16px/1.6 var(--portfolio-font-body);box-sizing:border-box}
+    .cv-static-shell{display:flex;flex-direction:column;gap:8px;height:100%;min-height:0;width:100%;margin:0;padding:clamp(12px,2vw,24px);background:var(--portfolio-surface);box-sizing:border-box}
+    .cv-static-brand{display:flex;flex-direction:column;color:var(--portfolio-text-strong)}.cv-static-brand strong{font-family:var(--portfolio-font-display);font-size:24px;font-weight:600;letter-spacing:-.04em}.cv-static-brand small{color:var(--portfolio-muted);font-size:12px}
+    .cv-static h1{margin:0;font:500 clamp(24px,3vw,36px)/1.2 var(--portfolio-font-display);color:var(--portfolio-text-strong)}.cv-static nav{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+    .cv-static a{display:inline-flex;align-items:center;min-height:36px;padding:7px 12px;border:1px solid var(--portfolio-border-soft);border-radius:var(--portfolio-radius);background:var(--portfolio-surface-deep);color:var(--portfolio-text-secondary);font-size:12px;font-weight:500;line-height:1.2;text-decoration:none;box-sizing:border-box}
+    .cv-static a:hover{background:var(--portfolio-surface-hover);color:var(--portfolio-text-strong)}.cv-static a:focus-visible{outline:2px solid var(--portfolio-focus);outline-offset:3px}.cv-static iframe{display:block;flex:1;width:100%;height:auto;min-height:240px;border:0;background:#fff}
   </style>
   <main class="cv-static"><section class="cv-static-shell" aria-labelledby="cv-static-title">
     <div class="cv-static-brand"><strong>Batıkan</strong><small>Hacker · Developer · Entrepreneur</small></div>

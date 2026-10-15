@@ -53,7 +53,7 @@ export default function RootLayout({ children }) {
       className={`dark ${geistSans.variable} ${geistMono.variable}`}
     >
       <body
-        className="antialiased flex flex-col min-h-screen relative bg-[#0a0806] text-white selection:bg-amber-400 selection:text-gray-950"
+        className="portfolio-site antialiased flex flex-col min-h-screen relative"
         suppressHydrationWarning
       >
         <ThemeProvider
@@ -64,7 +64,7 @@ export default function RootLayout({ children }) {
         >
           <SuiProviders>
             {/* Full-screen Topographic 3D World Background */}
-            <SiteBackground />
+            <div className="legacy-site-background"><SiteBackground /></div>
 
             {/* Main Content Area - z-10 over the map, pointer-events-none allows dragging & clicking map through open spaces */}
             <main className="flex-1 relative z-10 pointer-events-none">

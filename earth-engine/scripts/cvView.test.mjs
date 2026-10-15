@@ -7,15 +7,19 @@ import {clampPanelRect, expandedPanelRect, largePanelRect, reserveJourneySpace, 
 // PDF worker or network. The pending PDF request is aborted by the real close
 // handler; window sizing must neither recreate pages nor initiate another PDF.
 const source = (await readFile(new URL('../src/cvView.js', import.meta.url), 'utf8'))
-  .replace(/^import .*;\n/gm, '').replace('export function createCvView', 'function createCvView');
+  .replace(/^import .*;\n/gm, '').replace('export function createCvView', 'function createCvView')
+  .replace("import('pdfjs-dist')", 'loadPdfModule()');
 
-function fixture(width = 1280, height = 900, {journeyTop = height - 112, journeyVisible = true} = {}) {
+function fixture(width = 1280, height = 900, {
+  journeyTop = height - 112, journeyVisible = true, presentation, safe = {},
+  devicePixelRatio = 1, pdfModule, pdfBlob,
+} = {}) {
   const frames = new Map(), observers = []; let frameId = 0;
   const flushFrames = () => { const pending=[...frames.values()];frames.clear();for(const fn of pending)fn(); };
-  const window = {innerWidth:width,innerHeight:height,listeners:new Map(),
+  const window = {innerWidth:width,innerHeight:height,devicePixelRatio,listeners:new Map(),
     addEventListener(type, fn) { const list=this.listeners.get(type)||[];list.push(fn);this.listeners.set(type,list); },
     emit(type) { for (const fn of this.listeners.get(type)||[]) fn(); flushFrames(); },
-    getComputedStyle() { return {getPropertyValue: () => '0px'}; },
+    getComputedStyle() { return {getPropertyValue: name => `${safe[name.replace('--cv-safe-', '')] ?? 0}px`}; },
   };
   let document, requests = 0;
   const signals = [], timers = new Set();
@@ -61,6 +65,7 @@ function fixture(width = 1280, height = 900, {journeyTop = height - 112, journey
     }
     closestDialog(){for(let node=this;node;node=node.parentElement)if(node.tagName==='dialog')return node;return null;}
     get clientWidth(){return this.getBoundingClientRect().width-(this.classes.has('cv-view-document')?2:0);}
+    getContext(type,options){this.contextType=type;this.contextOptions=options;return this.context??={canvas:this};}
     setPointerCapture(id){this.captured=id;}
     hasPointerCapture(id){return this.captured===id;}
     releasePointerCapture(){this.captured=null;}
@@ -76,15 +81,16 @@ function fixture(width = 1280, height = 900, {journeyTop = height - 112, journey
   const journey=new Element('nav');journey.id='journey';journey.hidden=!journeyVisible;journey.getBoundingClientRect=()=>journey.hidden?{width:0,height:0,top:0}:{width:window.innerWidth-24,height:60,top:journeyTop};document.body.append(journey);
   const sources=new Element('div');sources.id='sources';document.body.append(sources);
   const topbar=new Element('header');topbar.className='topbar';topbar.hidden=!journeyVisible;topbar.getBoundingClientRect=()=>topbar.hidden?{width:0,height:0,bottom:0}:{width:window.innerWidth-24,height:44,bottom:window.innerWidth<=760?56:66};document.body.append(topbar);
-  const create=new Function('document','window','HTMLElement','portfolioLinks','bindCvDownload','fetchCvPdfBlob','getProject','cvDestinationUrl','pdfWorkerUrl','clampPanelRect','expandedPanelRect','largePanelRect','reserveJourneySpace','reserveReadingTopbar','resizePanelRect','withCompactPanelMinimum','setTimeout','clearTimeout','requestAnimationFrame','cancelAnimationFrame','ResizeObserver',source+'\nreturn createCvView;')(
-    document,window,Element,{cvPdf:'https://docs.google.com/export?format=pdf'},()=>{},({signal})=>{requests++;signals.push(signal);return new Promise(()=>{});},()=>null,()=>null,'worker.mjs',clampPanelRect,expandedPanelRect,largePanelRect,reserveJourneySpace,reserveReadingTopbar,resizePanelRect,withCompactPanelMinimum,
+  const create=new Function('document','window','HTMLElement','portfolioLinks','bindCvDownload','fetchCvPdfBlob','getProject','cvDestinationUrl','pdfWorkerUrl','clampPanelRect','expandedPanelRect','largePanelRect','reserveJourneySpace','reserveReadingTopbar','resizePanelRect','withCompactPanelMinimum','setTimeout','clearTimeout','requestAnimationFrame','cancelAnimationFrame','ResizeObserver','loadPdfModule','portfolioProjectSlug',source+'\nreturn createCvView;')(
+    document,window,Element,{cvPdf:'https://docs.google.com/export?format=pdf'},()=>{},({signal})=>{requests++;signals.push(signal);return pdfBlob?Promise.resolve(pdfBlob):new Promise(()=>{});},()=>null,()=>null,'worker.mjs',clampPanelRect,expandedPanelRect,largePanelRect,reserveJourneySpace,reserveReadingTopbar,resizePanelRect,withCompactPanelMinimum,
     fn=>{timers.add(fn);return fn;},fn=>timers.delete(fn),
     fn=>{frames.set(++frameId,fn);return frameId;},id=>frames.delete(id),class {constructor(fn){this.callback=fn;this.nodes=[];observers.push(this);}observe(node){this.nodes.push(node);}},
+    ()=>Promise.resolve(pdfModule),()=>null,
   );
-  const viewer=create(),dialog=document.body.querySelector('#cv-view');
+  const viewer=create({presentation}),dialog=document.body.querySelector('#cv-view');
   const node=selector=>dialog.querySelector(selector);
   return {viewer,dialog,window,document,node,trigger,signals,timers,Element,journey,sources,observers,
-    setJourneyTop(value){journeyTop=value;observers[0].callback();flushFrames();},
+    setJourneyTop(value){journeyTop=value;for(const observer of observers)observer.callback();flushFrames();},
     resize(width,height){const bottomInset=window.innerHeight-journeyTop;window.innerWidth=width;window.innerHeight=height;journeyTop=height-bottomInset;window.emit('resize');},
     get requests(){return requests;}};
 }
@@ -255,4 +261,139 @@ test('default CV at1280×633 keeps the visible topbar reachable while Expand use
   assert.deepEqual(f.dialog.getBoundingClientRect(),{left:8,top:8,width:1264,height:501,right:1272,bottom:509});
   f.node('.cv-view-size').emit('click');assert.deepEqual(f.dialog.getBoundingClientRect(),reading);
   f.viewer.close();
+});
+
+test('dedicated CV pages fill desktop, phone and short viewports instead of map window geometry',()=>{
+  for(const [width,height] of [[1920,1080],[1280,633],[768,1024],[390,844],[320,568],[568,320],[390,240]]){
+    const f=fixture(width,height,{presentation:'page'});f.viewer.open();
+    assert.deepEqual(f.dialog.getBoundingClientRect(),
+      {left:0,top:0,width,height,right:width,bottom:height},`${width}×${height}`);
+    assert.equal(f.dialog.classList.contains('is-page'),true);
+    assert.equal(f.dialog.classList.contains('is-floating'),false);
+    assert.equal(f.dialog.classList.contains('is-expanded'),false);
+    assert.equal(f.dialog.modeless,true);
+    // Even mistakenly visible map rails cannot reserve space on this route.
+    f.setJourneyTop(100);
+    assert.equal(f.dialog.getBoundingClientRect().bottom,height);
+    assert.equal(f.observers.length,0,'page does not watch unrelated map rails');
+    f.viewer.close();
+  }
+});
+
+test('dedicated CV page respects safe insets, ignores hidden rails and remains a page after resizing and reopening',()=>{
+  const f=fixture(390,844,{presentation:'page',journeyVisible:false,
+    safe:{top:47,right:6,bottom:34,left:6}});
+  const expected=(width,height)=>({left:6,top:47,width:width-12,height:height-81,right:width-6,bottom:height-34});
+  f.viewer.open();assert.deepEqual(f.dialog.getBoundingClientRect(),expected(390,844));
+  f.resize(844,390);assert.deepEqual(f.dialog.getBoundingClientRect(),expected(844,390));
+  f.node('[data-cv-zoom="in"]').emit('click');
+  f.viewer.close();assert.equal(f.signals[0].aborted,true);assert.equal(f.timers.size,0);
+  f.resize(320,568);f.viewer.open();
+  assert.deepEqual(f.dialog.getBoundingClientRect(),expected(320,568));
+  assert.equal(f.node('[data-cv-zoom="out"]').disabled,false,'fit-width default still allows zooming out');
+  const page=new f.Element();page.className='cv-view-page';f.node('.cv-view-pages').append(page);
+  f.resize(320,568);assert.equal(page.style.width,'282px','reopen restores fit-width rather than the earlier zoom');
+  assert.equal(f.requests,2,'each open requests one current CV');
+  f.viewer.close();
+});
+
+test('dedicated CV page has a Home action and no live floating window controls',()=>{
+  const f=fixture(1280,900,{presentation:'page'});f.viewer.open();
+  const initial=f.dialog.getBoundingClientRect();
+  for(const selector of ['.cv-view-size','.cv-view-drag','.cv-view-resize-left','.cv-view-resize-right']){
+    const control=f.node(selector);
+    assert.equal(control.hidden,true,selector);
+    assert.equal(control.disabled,true,selector);
+    control.emit('click');control.emit('dblclick');
+    control.emit('keydown',{key:'ArrowLeft'});control.emit('keydown',{key:'Home'});
+    control.emit('pointerdown',{clientX:400,clientY:300});
+    control.emit('pointermove',{clientX:100,clientY:100});control.emit('pointerup');
+    assert.equal(control.hasPointerCapture(1),false,'hidden control has no gesture handlers');
+    assert.deepEqual(f.dialog.getBoundingClientRect(),initial);
+  }
+  const home=f.node('.cv-view-close');
+  assert.equal(home.textContent,'← Home');
+  assert.equal(home.getAttribute('aria-label'),'Return to portfolio');
+  assert.equal(home.title,'Return to portfolio');
+  assert.equal(home.hidden,false);assert.equal(home.disabled,false);
+  let closes=0;f.dialog.addEventListener('close',()=>closes++);
+  home.emit('click');assert.equal(closes,1);assert.equal(f.viewer.isOpen(),false);
+  assert.equal(f.signals[0].aborted,true);assert.equal(f.document.activeElement,f.trigger);
+});
+
+test('dedicated CV page fits paper to available width and zoom/resize reuse the same PDF pages',()=>{
+  const f=fixture(1920,1080,{presentation:'page'});f.viewer.open();
+  const page=new f.Element();page.className='cv-view-page';f.node('.cv-view-pages').append(page);
+  f.resize(1920,1080);
+  assert.equal(page.style.width,'1894px','desktop paper uses the full available width instead of a fixed cap');
+  assert.equal(f.node('.cv-view-pages').style.width,'1918px','page wrapper spans the full document viewport');
+  assert.equal(f.node('[data-cv-zoom="out"]').disabled,false);
+  f.node('[data-cv-zoom="out"]').emit('click');assert.equal(page.style.width,'1610px');
+  f.node('[data-cv-zoom="out"]').emit('click');assert.equal(page.style.width,'1231px');
+  assert.equal(f.node('[data-cv-zoom="out"]').disabled,true);
+  f.node('[data-cv-zoom="in"]').emit('click');f.node('[data-cv-zoom="in"]').emit('click');
+  assert.equal(page.style.width,'1894px');
+  f.node('[data-cv-zoom="in"]').emit('click');assert.equal(page.style.width,'2368px');
+  f.node('[data-cv-zoom="in"]').emit('click');assert.equal(page.style.width,'2841px');
+  f.resize(390,844);assert.equal(page.style.width,'546px','phone retains the selected zoom after resize');
+  assert.equal(f.node('.cv-view-pages').style.width,'570px','zoomed paper can scroll horizontally');
+  f.node('[data-cv-zoom="out"]').emit('click');f.node('[data-cv-zoom="out"]').emit('click');
+  assert.equal(page.style.width,'364px','normal phone paper fits within the page viewport');
+  assert.equal(f.node('.cv-view-pages').style.width,'388px','fit width has no horizontal overflow on a phone');
+  f.resize(240,320);assert.equal(page.style.width,'214px','very narrow viewports do not inherit a floating window minimum');
+  assert.equal(f.node('.cv-view-pages').children[0],page);
+  assert.equal(f.requests,1,'zooming and resizing do not refetch the PDF');
+  assert.equal(f.signals[0].aborted,false);
+  f.viewer.close();
+});
+
+test('rendered CV paper stays sharp at full width, bounded on 4K screens and preserves PDF links and page reuse',async()=>{
+  for(const scenario of [
+    {width:1920,height:1080,dpr:1,presentation:'page',bitmapWidth:1894},
+    {width:1280,height:900,dpr:2,presentation:'page',bitmapWidth:2508},
+    {width:3840,height:2160,dpr:2,presentation:'page',bitmapWidth:3465,capped:true},
+    {width:1920,height:1080,dpr:2,presentation:'window',bitmapWidth:1500},
+  ]){
+    const renders=[];let documents=0,destroyed=0;
+    const pdfPage={
+      getViewport({scale}){return {width:600*scale,height:800*scale,transform:[scale,0,0,-scale,0,800*scale]};},
+      render(options){renders.push(options);return {promise:Promise.resolve()};},
+      async getAnnotations(){return [{url:'https://example.com/project',rect:[60,480,180,640]}];},
+      async getTextContent(){return {items:[{str:'CV document text'}]};},
+    };
+    const pdfModule={GlobalWorkerOptions:{},getDocument({data}){
+      documents++;assert.ok(data instanceof Uint8Array);assert.ok(data.length>0);
+      return {promise:Promise.resolve({numPages:1,async getPage(){return pdfPage;}}),
+        async destroy(){destroyed++;}};
+    }};
+    const f=fixture(scenario.width,scenario.height,{presentation:scenario.presentation,
+      devicePixelRatio:scenario.dpr,pdfModule,pdfBlob:new Blob(['fixture PDF bytes'])});
+    f.viewer.open();await new Promise(resolve=>setImmediate(resolve));
+    assert.equal(f.node('.cv-view-loading').hidden,true,'the real async PDF pipeline finishes');
+    assert.equal(pdfModule.GlobalWorkerOptions.workerSrc,'worker.mjs');
+    const page=f.node('.cv-view-pages').children[0],canvas=page.children[0];
+    assert.equal(canvas.tagName,'canvas');assert.equal(canvas.width,scenario.bitmapWidth);
+    assert.equal(canvas.contextType,'2d');assert.deepEqual(canvas.contextOptions,{alpha:false});
+    assert.equal(renders[0].canvasContext,canvas.context);
+    assert.ok(Math.abs(renders[0].viewport.width/renders[0].viewport.height-.75)<1e-12,
+      'the original PDF aspect ratio survives adaptive rendering');
+    assert.ok(Math.abs(canvas.width/canvas.height-.75)<.001,'pixel rounding preserves paper proportions');
+    if(scenario.capped){
+      const pixels=renders[0].viewport.width*renders[0].viewport.height;
+      assert.ok(pixels<=16_000_001&&pixels>=15_999_999,'4K rendering reaches the bounded pixel budget');
+    }
+    const link=page.querySelector('.cv-view-document-link');
+    assert.equal(link.href,'https://example.com/project');assert.equal(link.target,'_blank');
+    for(const [property,percent] of Object.entries({left:10,top:20,width:20,height:20}))
+      assert.ok(Math.abs(parseFloat(link.style[property])-percent)<1e-10,`${property} annotation stays in PDF coordinates`);
+    assert.equal(page.querySelector('.sr-only').textContent,'CV document text');
+    const originalBitmap={width:canvas.width,height:canvas.height};
+    f.node('[data-cv-zoom="in"]').emit('click');f.resize(390,844);
+    assert.equal(f.node('.cv-view-pages').children[0],page);
+    assert.equal(page.children[0],canvas);
+    assert.deepEqual({width:canvas.width,height:canvas.height},originalBitmap);
+    assert.equal(f.requests,1);assert.equal(documents,1);assert.equal(renders.length,1);
+    assert.equal(f.timers.size,0,'successful rendering clears the preview timeout');
+    f.viewer.close();assert.equal(destroyed,1);
+  }
 });

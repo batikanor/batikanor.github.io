@@ -11,6 +11,7 @@ export function startCvOnly() {
   let navigatingToProject = false;
   const cv = createCvView({
     root,
+    presentation: 'page',
     onProjectLink(slug) {
       navigatingToProject = true;
       const url = cvDestinationUrl(window.location.href, slug);

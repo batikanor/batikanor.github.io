@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {runInNewContext} from 'node:vm';
-import {shouldShowIntro, shouldInitializeFallbackNeutral} from '../src/introGate.js';
+import {shouldShowIntro} from '../src/introGate.js';
 
 test('only the plain homepage waits for an explicit Enter', () => {
   for (const href of [
@@ -41,14 +41,8 @@ test('the single dossier introduction has the requested facts and one Enter acti
   assert.match(intro, /<ul class="intro-facts-list">/);
   assert.match(intro, /<ul class="intro-sector-list">/);
   assert.match(intro, /<span class="intro-enter-label">Enter<\/span>/);
-});
-
-test('prewarmed no-WebGL fallback stays neutral until Enter on the homepage', () => {
-  assert.equal(shouldInitializeFallbackNeutral('https://batikanor.com/', true), true);
-  assert.equal(shouldInitializeFallbackNeutral('https://batikanor.com/?intro=2', true), true);
-  assert.equal(shouldInitializeFallbackNeutral('https://batikanor.com/', false), false);
-  assert.equal(shouldInitializeFallbackNeutral('https://batikanor.com/?view=list', true), false);
-  assert.equal(shouldInitializeFallbackNeutral('https://batikanor.com/?event=real-coin-map-2025', true), false);
+  assert.match(intro, /id="intro-fallback-link"[^>]*href="\/projects\/"/);
+  assert.ok(!intro.includes('view=list'), 'recovery uses the existing authored projects page');
 });
 
 test('cold entry cannot accept a click before its bootstrap handler is ready', async () => {

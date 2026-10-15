@@ -4,12 +4,18 @@
  * of the portfolio. These pages use the same authored data, not SEO-only copy.
  */
 import {mkdir, rm, writeFile} from 'node:fs/promises';
+import {readFileSync} from 'node:fs';
 import {join} from 'node:path';
 import {contestsAndActivities} from '../src/data/contestsAndActivities.js';
 
 const productionOrigin = 'https://batikanor.com';
 const stagingOrigin = 'https://staging.batikanor.com';
 const author = 'Batıkan Bora Ormancı';
+
+// Reading pages and the JavaScript-free index ship the same local fonts and
+// theme as the interactive portfolio, without depending on its client bundle.
+const portfolioStyles = `${readFileSync(new URL('../earth-engine/src/portfolioFonts.css', import.meta.url), 'utf8')}
+${readFileSync(new URL('../earth-engine/src/portfolioTheme.css', import.meta.url), 'utf8').replace(/^@import\s+[^;]+;\s*/gm, '')}`;
 
 export const achievementPages = contestsAndActivities;
 export const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, char => ({
@@ -150,7 +156,7 @@ export function renderAchievementPage(item, index, {staging = false} = {}) {
   <meta name="description" content="${escapeHtml(description)}" />
   <link rel="canonical" href="${escapeHtml(canonical)}" />
   <link rel="icon" href="/favicon.ico" sizes="any" />
-  <meta name="theme-color" content="#10191c" />
+  <meta name="theme-color" content="#3b4345" />
   <meta property="og:type" content="article" />
   <meta property="og:url" content="${escapeHtml(canonical)}" />
   <meta property="og:title" content="${escapeHtml(title)}" />
@@ -175,16 +181,17 @@ export function renderAchievementPage(item, index, {staging = false} = {}) {
 </body></html>\n`;
 }
 
-export const achievementStyles = `
-:root{color-scheme:dark;font-family:Arial,Helvetica,sans-serif;background:#10191c;color:#edf2ed}
-*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;min-height:100vh;background:radial-gradient(circle at 0 0,#213b3b,#10191c 48%);line-height:1.65}
-a{color:#e7bc7e;text-underline-offset:.2em}a:hover{color:#fff}a:focus-visible{outline:2px solid #f2cd92;outline-offset:4px}
-.site-header{max-width:1080px;margin:auto;padding:28px 24px;display:flex;gap:18px;align-items:center;justify-content:space-between;border-bottom:1px solid #b3c4ba32}
-.site-header a{text-decoration:none}.brand{color:#f8f5ed;font-family:Georgia,serif;font-size:32px;line-height:1}.brand small{display:block;margin-top:9px;color:#e2c394;font:700 10px Arial,sans-serif;letter-spacing:.16em;text-transform:uppercase}.map-link{border:1px solid #d6b88780;border-radius:4px;padding:9px 15px;font-size:13px;font-weight:700;white-space:nowrap}
-main{max-width:900px;padding:58px 24px 28px;margin:auto}.eyebrow{color:#e7bc7e;letter-spacing:.14em;text-transform:uppercase;font-size:11px;font-weight:700}h1{font:normal clamp(38px,6vw,70px)/1.08 Georgia,serif;letter-spacing:-.035em;margin:12px 0 22px;overflow-wrap:anywhere}.summary{font-size:clamp(18px,2.3vw,23px);line-height:1.5;color:#dce8e3;border-left:3px solid #d6b887;padding-left:19px;margin:0 0 32px}
-.tags{display:flex;flex-wrap:wrap;gap:8px;margin:24px 0 40px}.tags span{border:1px solid #e7bc7e50;padding:4px 11px;border-radius:99px;color:#e4d1b8;font-size:11px;letter-spacing:.06em}.article-body{color:#d1ddda;font-size:16px}.article-body p{margin:0 0 24px}.article-body h2,.sources h2{color:#f8f5ed;font:normal 29px/1.2 Georgia,serif;margin:42px 0 15px}.article-body ul,.sources ul{padding-left:24px}.article-body li,.sources li{margin:8px 0}.article-body figure{margin:32px 0 42px}.article-body img{max-width:100%;height:auto;display:block;border-radius:6px;border:1px solid #b3c4ba44;box-shadow:0 16px 45px #0005}.article-body figcaption,.media-link small{display:block;margin-top:8px;color:#9faeaa;font-size:13px}.media-link{border-left:2px solid #d6b887;padding-left:14px}.sources{border-top:1px solid #b3c4ba32;margin-top:50px;padding-top:2px}.sources ul{columns:2;column-gap:40px}.sources li{break-inside:avoid}
-.article-nav{max-width:900px;margin:45px auto;padding:24px;display:grid;grid-template-columns:1fr 1fr;gap:18px;border-top:1px solid #b3c4ba32}.article-nav a{text-decoration:none;color:#e5eee9;font:normal 18px/1.3 Georgia,serif}.article-nav a:last-child{text-align:right}.article-nav a span{display:block;font:700 10px Arial,sans-serif;color:#d6b887;letter-spacing:.15em;text-transform:uppercase;margin-bottom:7px}footer{max-width:1080px;margin:auto;padding:28px 24px 50px;border-top:1px solid #b3c4ba32;display:flex;flex-wrap:wrap;gap:22px;font-size:12px;font-weight:700}
-@media(max-width:650px){.site-header{padding:19px 16px}.brand{font-size:27px}.brand small{font-size:8px;letter-spacing:.08em}.map-link{font-size:11px;padding:7px 9px}main{padding:32px 18px 12px}.sources ul{columns:1}.article-nav{padding:20px 18px;gap:14px}.article-nav a{font-size:15px}}
+export const achievementStyles = `${portfolioStyles}
+:root{font-family:var(--portfolio-font-body);background:var(--portfolio-bg);color:var(--portfolio-text)}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;min-height:100vh;background:linear-gradient(160deg,var(--portfolio-bg-raised),var(--portfolio-bg) 65%);line-height:1.65}
+a{color:var(--portfolio-link);text-underline-offset:.2em}a:hover{color:var(--portfolio-text-strong)}a:focus-visible{outline:2px solid var(--portfolio-focus);outline-offset:4px}
+.site-header{max-width:1080px;margin:auto;padding:28px 24px;display:flex;gap:18px;align-items:center;justify-content:space-between;border-bottom:1px solid var(--portfolio-border-soft)}
+.site-header a{text-decoration:none}.brand{color:var(--portfolio-text-strong);font-family:var(--portfolio-font-display);font-size:32px;line-height:1}.brand small{display:block;margin-top:9px;color:var(--portfolio-accent);font:500 11px/1.4 var(--portfolio-font-body);letter-spacing:.02em}.map-link{border:1px solid var(--portfolio-border);border-radius:var(--portfolio-radius);background:var(--portfolio-surface);padding:9px 15px;font-size:13px;font-weight:500;white-space:nowrap}.map-link:hover{background:var(--portfolio-surface-hover)}
+main{max-width:900px;padding:52px 24px 28px;margin:auto}.eyebrow{color:var(--portfolio-muted);font-size:12px;line-height:1.5;font-weight:500}h1{font:500 clamp(32px,5vw,56px)/1.12 var(--portfolio-font-display);letter-spacing:-.03em;margin:12px 0 22px;overflow-wrap:anywhere;text-wrap:balance}.summary{font-size:clamp(17px,2vw,21px);line-height:1.55;color:var(--portfolio-text-secondary);border-left:2px solid var(--portfolio-accent);padding-left:18px;margin:0 0 28px}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin:22px 0 34px}.tags span{border:1px solid var(--portfolio-border-soft);background:var(--portfolio-surface);padding:3px 8px;border-radius:var(--portfolio-radius);color:var(--portfolio-muted);font-size:11px;line-height:1.5}.article-body{color:var(--portfolio-text-secondary);font-size:16px}.article-body p{margin:0 0 24px}.article-body h2,.sources h2{color:var(--portfolio-text-strong);font:500 26px/1.25 var(--portfolio-font-display);margin:38px 0 14px}.article-body ul,.sources ul{padding-left:24px}.article-body li,.sources li{margin:8px 0}.article-body figure{margin:30px 0 38px}.article-body img{max-width:100%;height:auto;display:block;border-radius:var(--portfolio-radius);border:1px solid var(--portfolio-border-soft);box-shadow:var(--portfolio-shadow)}.article-body figcaption,.media-link small{display:block;margin-top:8px;color:var(--portfolio-muted);font-size:12px;line-height:1.5}.media-link{border-left:2px solid var(--portfolio-accent);padding-left:14px}.sources{border-top:1px solid var(--portfolio-border-soft);margin-top:44px;padding-top:2px}.sources ul{columns:2;column-gap:40px}.sources li{break-inside:avoid}
+.article-nav{max-width:900px;margin:40px auto;padding:24px;display:grid;grid-template-columns:1fr 1fr;gap:18px;border-top:1px solid var(--portfolio-border-soft)}.article-nav a{text-decoration:none;color:var(--portfolio-text);font:500 18px/1.4 var(--portfolio-font-display);overflow-wrap:anywhere}.article-nav a:hover{color:var(--portfolio-link)}.article-nav a:last-child{text-align:right}.article-nav a span{display:block;font:500 11px/1.4 var(--portfolio-font-body);color:var(--portfolio-accent);margin-bottom:7px}footer{max-width:1080px;margin:auto;padding:28px 24px 50px;border-top:1px solid var(--portfolio-border-soft);display:flex;flex-wrap:wrap;gap:22px;font-size:13px;font-weight:500}
+@media(max-width:650px){.site-header{padding:19px 16px;gap:14px;flex-wrap:wrap}.brand{font-size:26px}.brand small{font-size:9px}.map-link{font-size:11px;padding:7px 9px}main{padding:30px 18px 12px}.eyebrow{font-size:11px}h1{font-size:30px;line-height:1.15;margin:12px 0 18px}.summary{font-size:17px;padding-left:14px;margin-bottom:24px}.tags{gap:5px;margin:20px 0 28px}.tags span{font-size:10px;padding:3px 7px}.article-body h2,.sources h2{font-size:22px;margin-top:30px}.sources ul{columns:1}.article-nav{padding:20px 18px;gap:14px}.article-nav a{font-size:16px}footer{padding:24px 18px 40px;gap:18px;font-size:12px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 `;
 
 export async function writeAchievementPages(out, {staging = false} = {}) {
@@ -209,13 +216,17 @@ export function renderSitemap() {
 }
 
 export function renderNoScriptIndex() {
-  return `<noscript><style>
+  return `<noscript><style>${portfolioStyles}
     .intro-screen,#app{display:none!important}
-    body{margin:0;background:#10191c;color:#edf2ed;font:16px/1.6 Arial,sans-serif}
+    html{height:auto;min-height:100%}
+    body{margin:0;height:auto;min-height:100vh;overflow:auto;background:var(--portfolio-bg);color:var(--portfolio-text);font:16px/1.65 var(--portfolio-font-body)}
     #seo-noscript{display:block;max-width:850px;margin:auto;padding:40px 22px 70px}
-    #seo-noscript h1{font:normal 58px Georgia,serif;margin:0 0 8px}
-    #seo-noscript h2{font:normal 30px Georgia,serif;margin:42px 0 12px}
-    #seo-noscript a{color:#e7bc7e}#seo-noscript li{margin:9px 0}
+    #seo-noscript h1{font:500 clamp(36px,6vw,58px)/1.12 var(--portfolio-font-display);letter-spacing:-.03em;margin:0 0 8px}
+    #seo-noscript h2{font:500 26px/1.25 var(--portfolio-font-display);margin:36px 0 12px}
+    #seo-noscript a{color:var(--portfolio-link);text-underline-offset:.2em}#seo-noscript a:hover{color:var(--portfolio-text-strong)}
+    #seo-noscript a:focus-visible{outline:2px solid var(--portfolio-focus);outline-offset:4px}
+    #seo-noscript li{margin:9px 0}#seo-noscript small{color:var(--portfolio-muted)}
+    @media(max-width:650px){#seo-noscript{padding:30px 18px 50px}#seo-noscript h1{font-size:32px}#seo-noscript h2{font-size:22px}}
   </style><main id="seo-noscript"><h1>Batıkan</h1><p>Hacker · Developer · Entrepreneur</p>
   <p>I’ve won prizes in 30+ competitions, acted as a juror and mentor several times, and worked in software, tooling, space tech, biotech, energy, finance and AI.</p>
   <p>This interactive map needs JavaScript. You can still read every achievement below, or visit my <a href="/cv/">CV</a> and <a href="/projects/">projects</a>.</p>

@@ -1,5 +1,180 @@
 # Batıkan portfolio staging on Hetzner
 
+## Owner hosting policy — 12 October 2026
+
+All hosting must use Hetzner, including production, staging, previews, demos,
+public review/evidence URLs, application runtimes, databases, uploads and assets.
+Vercel hosting or managed services require direct owner approval for the exact
+project, environment and service; existing configuration is not approval.
+The scoped `AGENTS.md` preserves the full instruction. Historical GitHub Pages
+production instructions describe the existing legacy delivery and recovery
+material; future production delivery must use Hetzner. Preserve exact artifacts,
+environment differences, data and historical review links, and verify delivery
+and rollback before any migration cutover. Preserve unrelated DNS and services.
+
+## Single-wall gallery prototype — 13 October 2026
+
+The isolated `staging/gallery-room-prototype` branch adds a skylit 3D gallery
+with 32 project stations, full authored story boards and native media screens.
+The satellite geographic globe sits in a larger bottom-left dock with chronology
+directly below.
+The homepage opens with the same introductory dossier as production, using the
+gallery's charcoal, stone and bronze colors. Its content, layout, CV, Email and
+LinkedIn links remain intact. The room prepares behind the introduction with
+input disabled; only Enter reveals it and focuses the gallery stage. Direct
+project and CV links bypass the introduction. Retired list links normalize to the regular site. The Batıkan brand returns
+to the homepage introduction. Intro and map typography are served from Hetzner
+using local copies of the same openly licensed font families.
+Select a project to teleport, tap a board to approach, drag to look, use WASD
+to walk between neighboring project walls, Space to jump, and Escape or ↶
+to return to the whole wall. The walls share a continuous corridor with a
+3.6-unit gap for each sculpture. Walking across the midpoint selects the next
+project and updates the globe and current URL without moving the camera or
+adding history entries. The active wall and its immediate neighbors display
+text, references and photos; only the active wall connects video/iframe viewers.
+Jumps preserve horizontal movement, land at the original eye height, and reset
+when framing a board, switching projects or leaving the browser window.
+Phone layouts use a smaller type scale: 16px project titles (14px for long
+titles), 9px tags and 11.5px story copy with 11px minimum projected reading text.
+Section headings, media captions, map arrows and object controls are reduced
+to match. The same map footprint, full two-line location and original media
+proportions remain; desktop/tablet typography is unchanged.
+
+Every project's title, original story, photos and embeds occupy one front-facing
+wall. The physical layout maps directly to the viewport, reserving the header,
+bottom-left globe and small right-side hints. An adaptive composition chooses
+the story/media balance and native-aspect image grid from the actual content.
+All 66 media sources and 36 original photo proportions are preserved. One
+References panel per project groups all 107 original links; long text remains
+scrollable inside its board. There are no side-wall screens or angled wings.
+References boards size their height from the actual column breakpoints and
+wrapped labels, including link arrows, padding, header and controls. They use
+available wall height before introducing a scroll area. Wall controls retain
+their intended compact size on phones as well as desktop.
+Selecting a project opens the whole wall on desktop and phone. An approach
+enlarges its existing native screen; Escape/↶ returns to the wall without a modal.
+Reflow updates physical frames, masks and existing HTML surfaces together, so
+resizing retains native viewer objects and their active navigation.
+
+Each top title contains only the heading and a compact technologies box
+(stacked on narrow screens). Project numbering appears in the map selector,
+with the date and full recorded venue/address plus city/country beneath it.
+Locations wrap across two lines at the existing font size, spanning the dock
+width. The count and date share the space between the arrows, leaving two full
+location lines below them within the 78px desktop / 58px phone navigation strip. The
+selector opens the full searchable achievement picker, with larger arrows on
+either side. There is no title or bottom-right counter or engraved station/city
+plaque. Photo and monitor approach controls are 80% transparent at rest, with
+clear keyboard focus and no full-image tint or shadow. Stories omit inline
+media-placement prompts and the redundant references shortcut, since every
+source already has its own wall screen. Four obsolete placement phrases are
+adjusted only in the room presentation; original source data and legacy prose
+remain available. Approaching a component leaves the other active boards' text
+visible; camera framing alone determines what remains in view.
+
+The coordinated charcoal/stone palette uses shared vertex-color gradients to
+blend floor, walls and ceiling, with soft neutral light and matte bronze details.
+The globe zooms into selected projects at city scale and flies out and back in
+between locations. Numbered clusters, individual choices, +/−/reset, wheel,
+arrow-key rotation and Home remain available inside its fixed dock.
+
+Satellite imagery is genuine Sentinel-2 cloudless 2016/17 from EOX/Copernicus,
+licensed under CC BY 4.0. It is a historical basemap rather than contemporary
+venue photography. All 38 generated images are served by Hetzner; browsers make
+no imagery requests to EOX. A small global layer loads first, followed by lazy
+regional/city images, with a three-entry detail cache. The 18 distinct city
+groups cover all 32 project locations. Attribution and the source year are
+available through the small map imagery info control, whose panel is closed
+by default. `earth-engine/scripts/build-gallery-satellite.py` performs
+finite build-time exports and records exact bounds, source URLs and hashes;
+newer non-commercial EOX mosaics are excluded from this public release.
+
+Build with `EARTH_ROOM_PROTOTYPE=true ./deploy/staging/build.sh` to make the
+room the staging entry point. The overlay rejects this flag for production.
+CV routes retain their lightweight viewer, and all legacy links,
+downloads and original project text/media are preserved. The classic Earth
+experience remains available at `/?experience=earth`.
+
+Prototype code is intentionally separate from the production map modules.
+The release evidence and frozen source are in
+`release-handoffs/gallery-single-wall-20261013` in the project workspace.
+The follow-up title/progress release is recorded in
+`release-handoffs/gallery-title-refinement-20261013`.
+The description and compact map navigation follow-up is recorded in
+`release-handoffs/gallery-clean-wall-20261013`.
+The minimal title and under-map metadata follow-up is recorded in
+`release-handoffs/gallery-minimal-title-20261013`.
+The continuous walking and Space jump follow-up is recorded in
+`release-handoffs/gallery-walk-jump-20261013`.
+The restored introduction follow-up is recorded in
+`release-handoffs/gallery-intro-20261014`.
+The wrapped-reference sizing correction is recorded in
+`release-handoffs/gallery-reference-fit-20261014`.
+The full recorded location beneath the map is recorded in
+`release-handoffs/gallery-full-location-20261014`.
+The smaller mobile type and controls are recorded in
+`release-handoffs/gallery-mobile-scale-20261014`.
+
+The shared site styling follow-up is recorded in
+`release-handoffs/gallery-shared-style-20261014`. The introduction, gallery,
+achievement reading pages, CV viewer, fallback list and legacy projects index
+use `earth-engine/src/portfolioTheme.css` for their stone/charcoal surfaces,
+bronze accents, pale blue links, local DM Sans/Playfair typography, focus rings,
+frame corners and shadows. Keep that file as the shared source when changing
+the palette. Generated reading pages include the same theme and local font
+definitions so their no-JavaScript views also match. The original CV document
+keeps its white paper. The compact phone scale and all native media proportions
+remain intact; font-aware References sizing prevents avoidable new scrolling.
+
+The initial gallery loading placeholder contains no visible text. Three small
+bronze/pale-blue frames gently lift and fade against the shared stone backdrop.
+Its critical CSS is inline, needs no assets, and becomes static for reduced
+motion. It is limited to the existing direct-gallery pending state; the normal
+homepage introduction and the CV/list paths keep their existing behavior.
+The release is recorded in `release-handoffs/gallery-loading-mark-20261014`.
+
+Standalone CV routes (`/cv/`, `/cv/en/`, `?view=cv` and `#cv`) now use an
+explicit page presentation: all available viewport width and height, PDF paper
+fitted to that width, zoom in/out, document links, download and Home. Safe-area
+insets are reserved once. Floating move/resize/Expand controls remain available
+for CV windows opened inside the classic map; they are omitted from the page.
+The early route classifier hides legacy map controls before CV startup, and
+no-JavaScript CV pages also use the full available width. The fallback list
+returns to a centered full-width layout when details close, and its open desktop
+column now matches the actual 70% reading window with a 16px gap.
+The release is recorded in `release-handoffs/gallery-cv-page-20261014`.
+
+The mobile compact follow-up is recorded in
+`release-handoffs/gallery-mobile-compact-20261014`. Below 700px, story and
+summary text uses 13px (12–13px when approached), section headings 12px,
+References links 11px (12px when approached), and References headings 12px.
+The map navigator is 188×64px with 28px arrows and a 20px current count;
+full locations still wrap to two lines. The mobile walking hint is hidden and
+its unused layout reservation is removed. The separate Text view button,
+list runtime and its styles are removed. Old list bookmarks normalize to the
+regular experience, preserving project/CV targets and unrelated URL parameters.
+Devices without WebGL use the existing authored achievement/index pages;
+CV/download routes remain GPU-independent and homepage entry still waits for Enter.
+This supersedes the historical fallback-list notes above.
+
+The mobile reading and view-lock follow-up is recorded in
+`release-handoffs/gallery-mobile-lock-20261014`. The gallery starts with its
+view locked on desktop and mobile. A small padlock in the top bar enables free
+WASD walking and drag-to-look when unlocked. Relocking freezes the current view,
+clears held movement keys and an active drag, and preserves jumping. Space works
+while locked; project/globe navigation and approaching boards remain available.
+The lock retains its state between project selections and resets on a fresh visit.
+
+Below 700px, description/summary copy uses 11.5px (11–11.5px approached), section
+headings 10px, and References 8.5px (9px approached). Titles use 16px/14px and tags
+9px. Smaller padding and 20px board controls accompany actual layout changes:
+compact References panels release space for the original description, whose
+phone-only scoring prioritizes useful reading height. Both screenshot photos
+retain their native proportions. Navigation is 188×58px with 24px arrows; the
+globe stays its previous size, with 20px tools. Desktop/tablet compositions and
+typography remain unchanged. Gallery text-size-adjust is fixed at 100% to keep
+mobile browsers from inflating the carefully measured board copy.
+
 `batikanor.com` and `www.batikanor.com` remain on GitHub Pages. This preview
 uses the already-running, isolated `batikanor-earth-staging-web` static Caddy
 container on the MapTheory Hetzner host. **None of these commands deploys to

@@ -184,6 +184,7 @@ async function runCvOnly(href) {
     bindCvDownload() {},
     createCvView(value) {
       options = value;
+      assert.equal(value.presentation, 'page', `standalone CV entry must use the whole page: ${href}`);
       return {
         open() {
           trace.openCalls += 1;
@@ -293,14 +294,15 @@ test('project navigation still works after a BFCache-restored CV viewer', async 
 
 test('bootstrap dispatches all CV entries before WebGL detection or the map runtime', async () => {
   const original = await readFile(new URL('../earth-engine/src/bootstrap.js', import.meta.url), 'utf8');
+  const achievements = JSON.parse(await readFile(new URL('../earth-engine/src/data/achievements.json', import.meta.url), 'utf8'));
   const end = original.indexOf('\nstart().catch(');
   assert.ok(end > 0, 'bootstrap error boundary must remain present');
   const source = original.slice(0, end).replace(/^import[^\n]+\n/gm, '').replace(/\bimport\(/g, 'importModule(');
-  for (const href of [...paths.map(path => `https://batikanor.com${path}`), 'https://batikanor.com/?view=cv', 'https://batikanor.com/#cv']) {
+  for (const href of [...paths.map(path => `https://batikanor.com${path}`), 'https://batikanor.com/?view=cv', 'https://batikanor.com/#cv', 'https://batikanor.com/?download=cv']) {
     const calls = [];
     const destination = new URL(href);
     const result = await vm.runInNewContext(`${source}\nstartPortfolio();`, {
-      URL, URLSearchParams, readPortfolioRoute,
+      URL, URLSearchParams, readPortfolioRoute, achievements,
       location: destination,
       document: {createElement() { assert.fail(`CV entry must not create a WebGL canvas: ${href}`); }},
       async importModule(path) {
@@ -321,21 +323,22 @@ test('release-manifest bootstrap does not speculatively preload the map on CV ro
   assert.ok(replacement, 'stable manifest bootstrap must remain extractable from the overlay');
   const markup = vm.runInNewContext(replacement[1]);
   const script = markup.match(/<script type="module">([\s\S]+)<\/script>/)[1].replace(/\bimport\(/g, 'importEntry(');
-  for (const href of [...paths.map(path => `https://batikanor.com${path}?utm_source=friend`),
-    'https://batikanor.com/?view=cv', 'https://batikanor.com/#cv', 'https://batikanor.com/?view=cv&download=cv']) {
+  for (const experience of ['', 'gallery']) for (const href of [...paths.map(path => `https://batikanor.com${path}?utm_source=friend`),
+    'https://batikanor.com/?view=cv', 'https://batikanor.com/#cv', 'https://batikanor.com/?view=cv&download=cv', 'https://batikanor.com/?download=cv']) {
     const preloads = [];
     const imports = [];
     await vm.runInNewContext(`(async () => {${script}})()`, {
       URL, URLSearchParams,
       location: new URL(href),
       document: {
+        documentElement: {dataset: {portfolioExperience: experience}},
         createElement(tag) { assert.equal(tag, 'link'); return {}; },
         head: {append(link) { preloads.push(link); }},
       },
       async fetch(url, options) {
         assert.ok(url.startsWith('/assets/earth-current.json'), 'only the tiny release manifest may be fetched');
         assert.equal(options.cache, 'no-store');
-        return {ok: true, async json() { return {entry: '/assets/index-CvTest.js', mapEntry: '/assets/main-CvTest.js'}; }};
+        return {ok: true, async json() { return {entry: '/assets/index-CvTest.js', mapEntry: '/assets/main-CvTest.js',roomEntry:'/assets/galleryRoom-CvTest.js'}; }};
       },
       async importEntry(entry) { imports.push(entry); },
       console: {error(...args) { assert.fail(`manifest bootstrap error on ${href}: ${args.join(' ')}`); }},

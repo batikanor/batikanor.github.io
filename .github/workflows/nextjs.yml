@@ -1,4 +1,4 @@
-name: Deploy Next.js site to Pages
+name: Deploy reviewed site to Pages
 
 on:
   push:
@@ -22,76 +22,19 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
-
-      # Install pnpm globally to ensure it's available for the whole process
-      - name: Install pnpm
-        run: npm install -g pnpm
-
-      - name: Detect package manager
-        id: detect-package-manager
-        run: |
-          if [ -f "${{ github.workspace }}/pnpm-lock.yaml" ]; then
-            echo "manager=pnpm" >> $GITHUB_OUTPUT
-            echo "command=install" >> $GITHUB_OUTPUT
-            echo "runner=pnpm" >> $GITHUB_OUTPUT
-            exit 0
-          elif [ -f "${{ github.workspace }}/yarn.lock" ]; then
-            echo "manager=yarn" >> $GITHUB_OUTPUT
-            echo "command=install" >> $GITHUB_OUTPUT
-            echo "runner=yarn" >> $GITHUB_OUTPUT
-            exit 0
-          elif [ -f "${{ github.workspace }}/package.json" ]; then
-            echo "manager=npm" >> $GITHUB_OUTPUT
-            echo "command=ci" >> $GITHUB_OUTPUT
-            echo "runner=npx --no-install" >> $GITHUB_OUTPUT
-            exit 0
-          else
-            echo "Unable to determine package manager"
-            exit 1
-          fi
-
+          node-version: "24"
       - name: Setup Pages
         uses: actions/configure-pages@v5
-        with:
-          static_site_generator: next
-
-      - name: Restore cache
-        uses: actions/cache@v4
-        with:
-          path: |
-            .next/cache
-          key: ${{ runner.os }}-nextjs-${{ hashFiles('**/pnpm-lock.yaml', '**/yarn.lock', '**/package-lock.json') }}-${{ hashFiles('**.[jt]s', '**.[jt]sx') }}
-          restore-keys: |
-            ${{ runner.os }}-nextjs-${{ hashFiles('**/pnpm-lock.yaml', '**/yarn.lock', '**/package-lock.json') }}-
-
-      - name: Install dependencies
-        run: ${{ steps.detect-package-manager.outputs.manager }} ${{ steps.detect-package-manager.outputs.command }}
-
-      - name: Build with Next.js
-        env:
-          NEXT_PUBLIC_OPENROUTER_API_KEY: ${{ secrets.NEXT_PUBLIC_OPENROUTER_API_KEY }}
-        run: ${{ steps.detect-package-manager.outputs.runner }} build
-
-      # Keep the Next static export (including /sui, old demos and certificates),
-      # then replace its homepage and CV routes with the Earth app.
-      # The public build excludes EOX's non-commercial imagery completely.
-      - name: Build and verify Earth homepage
-        env:
-          VITE_PUBLIC_RELEASE: "true"
-        run: |
-          npm ci --prefix earth-engine --no-audit --no-fund
-          npm --prefix earth-engine run verify
-          npm --prefix earth-engine run build
-          node scripts/overlay-earth-homepage.mjs
-          node --test tests/achievementSeo.test.mjs tests/cvPages.test.mjs
-          node scripts/verify-seo-artifact.mjs production
-
-      - name: Upload artifact
+      - name: Verify production tools
+        run: node --test tests/*.test.mjs
+      - name: Download and verify frozen staging promotion
+        run: node scripts/download-pages-release.mjs
+      - name: Verify production SEO
+        run: node scripts/verify-seo-artifact.mjs production
+      - name: Upload exact reviewed artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: ./out
