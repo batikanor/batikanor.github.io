@@ -34,7 +34,7 @@ function fixture(width = 1280, height = 900, {
     replaceChildren(...nodes) { this.children=[];this.append(...nodes); }
     set innerHTML(html) {
       this.markup=html;this.children=[];
-      for (const match of html.matchAll(/<([a-z]+)\b([^>]*)>/g)) {
+      for (const match of html.matchAll(/<([a-z][a-z0-9]*)\b([^>]*)>/g)) {
         const node=new Element(match[1]),attrs=match[2];
         for(const attr of attrs.matchAll(/([\w-]+)="([^"]*)"/g)) {
           node.setAttribute(attr[1],attr[2]);
@@ -107,6 +107,11 @@ test('CV opens modeless in a shorter reading view, Expand and Restore preserve p
   const f=fixture();f.viewer.open();
   assert.equal(f.dialog.modeless,true);
   assert.equal(f.dialog.getAttribute('aria-modal'),'false');
+  assert.equal(f.dialog.getAttribute('aria-labelledby'),'cv-view-title');
+  assert.ok(f.node('#cv-view-title'),'floating viewer keeps its accessible document heading');
+  assert.equal(f.node('.cv-view-close').hidden,false);
+  assert.equal(f.node('.cv-view-close').disabled,false);
+  assert.equal(f.document.activeElement,f.node('.cv-view-close'));
   assert.equal(f.dialog.classList.contains('is-reading'),true);
   assert.equal(f.dialog.classList.contains('is-expanded'),false);
   assert.equal(f.node('.cv-view-size').getAttribute('aria-label'),'Expand CV window');
@@ -271,6 +276,7 @@ test('dedicated CV pages fill desktop, phone and short viewports instead of map 
     assert.equal(f.dialog.classList.contains('is-page'),true);
     assert.equal(f.dialog.classList.contains('is-floating'),false);
     assert.equal(f.dialog.classList.contains('is-expanded'),false);
+    assert.equal(f.dialog.classList.contains('is-compact'),false,'short page viewports retain the shared home wordmark');
     assert.equal(f.dialog.modeless,true);
     // Even mistakenly visible map rails cannot reserve space on this route.
     f.setJourneyTop(100);
@@ -297,9 +303,18 @@ test('dedicated CV page respects safe insets, ignores hidden rails and remains a
   f.viewer.close();
 });
 
-test('dedicated CV page has a Home action and no live floating window controls',()=>{
+test('dedicated CV page uses the shared home wordmark and no live floating window controls',()=>{
   const f=fixture(1280,900,{presentation:'page'});f.viewer.open();
   const initial=f.dialog.getBoundingClientRect();
+  const brand=f.node('.cv-view-brand');
+  assert.equal(brand.tagName,'a');
+  assert.equal(brand.getAttribute('href'),'/','wordmark returns directly to the introduction from any CV alias');
+  assert.equal(brand.getAttribute('aria-label'),'Batıkanor — return to introduction');
+  assert.equal(f.document.activeElement,brand,'initial focus must remain on a visible control');
+  assert.equal(f.dialog.getAttribute('aria-label'),'Curriculum vitae','the page remains named without a visible identity heading');
+  assert.equal(f.dialog.getAttribute('aria-labelledby'),null);
+  assert.equal(f.node('.cv-view-kicker'),null);
+  assert.equal(f.node('#cv-view-title'),null);
   for(const selector of ['.cv-view-size','.cv-view-drag','.cv-view-resize-left','.cv-view-resize-right']){
     const control=f.node(selector);
     assert.equal(control.hidden,true,selector);
@@ -311,13 +326,11 @@ test('dedicated CV page has a Home action and no live floating window controls',
     assert.equal(control.hasPointerCapture(1),false,'hidden control has no gesture handlers');
     assert.deepEqual(f.dialog.getBoundingClientRect(),initial);
   }
-  const home=f.node('.cv-view-close');
-  assert.equal(home.textContent,'← Home');
-  assert.equal(home.getAttribute('aria-label'),'Return to portfolio');
-  assert.equal(home.title,'Return to portfolio');
-  assert.equal(home.hidden,false);assert.equal(home.disabled,false);
-  let closes=0;f.dialog.addEventListener('close',()=>closes++);
-  home.emit('click');assert.equal(closes,1);assert.equal(f.viewer.isOpen(),false);
+  assert.equal(f.node('.cv-view-close').hidden,true,'page has no duplicate Home/close action');
+  assert.equal(f.node('.cv-view-close').disabled,true);
+  assert.equal(f.viewer.isOpen(),true);
+  f.viewer.close();
+  assert.equal(f.viewer.isOpen(),false);
   assert.equal(f.signals[0].aborted,true);assert.equal(f.document.activeElement,f.trigger);
 });
 

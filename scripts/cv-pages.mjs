@@ -17,16 +17,20 @@ function renderCvNoScript() {
     #app,#intro-screen{display:none!important}html,body{height:auto!important;overflow:auto!important;background:var(--portfolio-bg);color:var(--portfolio-text)}
     .cv-static{height:100svh;min-height:440px;padding:0;font:16px/1.6 var(--portfolio-font-body);box-sizing:border-box}
     .cv-static-shell{display:flex;flex-direction:column;gap:8px;height:100%;min-height:0;width:100%;margin:0;padding:clamp(12px,2vw,24px);background:var(--portfolio-surface);box-sizing:border-box}
-    .cv-static-brand{display:flex;flex-direction:column;color:var(--portfolio-text-strong)}.cv-static-brand strong{font-family:var(--portfolio-font-display);font-size:24px;font-weight:600;letter-spacing:-.04em}.cv-static-brand small{color:var(--portfolio-muted);font-size:12px}
+    .cv-static-header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px}.cv-static a.cv-static-brand{padding:0;border:0;background:transparent;color:var(--portfolio-text-strong);font:500 27px/1.1 var(--portfolio-font-display);letter-spacing:-1.2px;white-space:nowrap}
     .portfolio-wordmark-accent{color:var(--portfolio-wordmark-accent,#d7bf95)}
-    .cv-static h1{margin:0;font:500 clamp(24px,3vw,36px)/1.2 var(--portfolio-font-display);color:var(--portfolio-text-strong)}.cv-static nav{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+    .cv-static-title{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}.cv-static nav{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
     .cv-static a{display:inline-flex;align-items:center;min-height:36px;padding:7px 12px;border:1px solid var(--portfolio-border-soft);border-radius:var(--portfolio-radius);background:var(--portfolio-surface-deep);color:var(--portfolio-text-secondary);font-size:12px;font-weight:500;line-height:1.2;text-decoration:none;box-sizing:border-box}
     .cv-static a:hover{background:var(--portfolio-surface-hover);color:var(--portfolio-text-strong)}.cv-static a:focus-visible{outline:2px solid var(--portfolio-focus);outline-offset:3px}.cv-static iframe{display:block;flex:1;width:100%;height:auto;min-height:240px;border:0;background:#fff}
+    .cv-static a.cv-static-brand:hover{background:transparent;color:var(--portfolio-text-strong)}
+    @media(max-width:760px){.cv-static a.cv-static-brand{font-size:24px;letter-spacing:-.9px}}
   </style>
   <main class="cv-static"><section class="cv-static-shell" aria-labelledby="cv-static-title">
-    <div class="cv-static-brand"><strong>Batıkan<span class="portfolio-wordmark-accent">or</span></strong><small>Hacker · Developer · Entrepreneur</small></div>
-    <h1 id="cv-static-title">${CV_TITLE}</h1>
-    <nav aria-label="CV actions"><a href="/">Home</a><a href="${CV_PREVIEW_URL}" target="_blank" rel="noopener noreferrer">Open in Drive ↗</a><a href="${portfolioLinks.cvPdf}" target="_blank" rel="noopener noreferrer">Download PDF ↓</a></nav>
+    <h1 id="cv-static-title" class="cv-static-title">Curriculum vitae</h1>
+    <header class="cv-static-header">
+      <a class="cv-static-brand" href="/" aria-label="Batıkanor — return to introduction"><span>Batıkan</span><span class="portfolio-wordmark-accent">or</span></a>
+      <nav aria-label="CV actions"><a href="${CV_PREVIEW_URL}" target="_blank" rel="noopener noreferrer">Open in Drive ↗</a><a href="${portfolioLinks.cvPdf}" target="_blank" rel="noopener noreferrer">Download PDF ↓</a></nav>
+    </header>
     <iframe title="Batıkan Bora Ormancı’s current CV" src="${CV_PREVIEW_URL}"></iframe>
   </section></main>
 </noscript>`;

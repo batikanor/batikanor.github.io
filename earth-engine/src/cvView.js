@@ -29,14 +29,16 @@ export function createCvView({ root = document.body, presentation = 'window', on
   const dialog = document.createElement('dialog');
   dialog.id = 'cv-view';
   dialog.className = `cv-view ${pagePresentation ? 'is-page' : 'is-floating'} is-reading`;
-  dialog.setAttribute('aria-labelledby', 'cv-view-title');
+  dialog.setAttribute(pagePresentation ? 'aria-label' : 'aria-labelledby', pagePresentation ? 'Curriculum vitae' : 'cv-view-title');
   dialog.setAttribute('aria-modal', 'false');
   dialog.innerHTML = `
     <div class="cv-view-shell">
       <header class="cv-view-header">
         <div class="cv-view-heading">
+          ${pagePresentation ? '<a class="cv-view-brand" href="/" aria-label="Batıkanor — return to introduction"><span>Batıkan</span><span class="portfolio-wordmark-accent">or</span></a>' : `
           <span class="cv-view-kicker">CURRICULUM VITAE</span>
           <h2 id="cv-view-title">Batıkan Bora Ormancı</h2>
+          `}
         </div>
         <div class="cv-view-actions">
           <div class="cv-view-document-actions">
@@ -70,13 +72,10 @@ export function createCvView({ root = document.body, presentation = 'window', on
   const sizeButton = dialog.querySelector('.cv-view-size');
   const dragHandle = dialog.querySelector('.cv-view-drag');
   if (pagePresentation) {
-    for (const control of [sizeButton, dragHandle, ...dialog.querySelectorAll('.cv-view-resize')]) {
+    for (const control of [sizeButton, dragHandle, closeButton, ...dialog.querySelectorAll('.cv-view-resize')]) {
       control.hidden = true;
       control.disabled = true;
     }
-    closeButton.textContent = '← Home';
-    closeButton.setAttribute('aria-label', 'Return to portfolio');
-    closeButton.title = 'Return to portfolio';
   }
   let previousFocus = null;
   let abortController = null;
@@ -142,7 +141,7 @@ export function createCvView({ root = document.body, presentation = 'window', on
   }
 
   function writeWindowRect(rect) {
-    dialog.classList.toggle('is-compact', rect.height < 320);
+    dialog.classList.toggle('is-compact', !pagePresentation && rect.height < 320);
     for (const [property, value] of Object.entries({
       left: rect.x, top: rect.y, width: rect.width, height: rect.height,
     })) dialog.style[property] = `${value}px`;
@@ -305,7 +304,7 @@ export function createCvView({ root = document.body, presentation = 'window', on
       if (node) observer.observe(node);
     }
   }
-  closeButton.addEventListener('click', () => dialog.close());
+  if (!pagePresentation) closeButton.addEventListener('click', () => dialog.close());
   bindCvDownload(dialog.querySelector('.cv-view-download'), { getBlob: () => cvPdfBlob });
 
   // A map's global keyboard controls must not interpret keys pressed while
@@ -429,7 +428,7 @@ export function createCvView({ root = document.body, presentation = 'window', on
       resetReadingView();
       dialog.show();
       resetReadingView();
-      closeButton.focus();
+      (pagePresentation ? dialog.querySelector('.cv-view-brand') : closeButton).focus({preventScroll: true});
       abortController = new AbortController();
       const { signal } = abortController;
       previewTimeout = setTimeout(() => {

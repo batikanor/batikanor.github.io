@@ -35,6 +35,7 @@ export function startLiveProjects({ project } = {}) {
   for (const [text, href] of [['Achievements', '/?view=world'], ['CV', '/cv/'], ['Email', 'mailto:batikanor@gmail.com'], ['LinkedIn ↗', 'https://linkedin.com/in/batikanor']]) {
     const link = el('a', null, text);
     link.href = href;
+    if (href === '/?view=world' || href === '/cv/') link.classList.add('live-projects-nav-action');
     if (href.startsWith('https:')) { link.target = '_blank'; link.rel = 'noopener noreferrer'; }
     if (href.startsWith('mailto:')) decorateBrandLink(link, 'email');
     else if (href.includes('linkedin.com/')) decorateBrandLink(link, 'linkedin');

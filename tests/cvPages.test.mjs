@@ -109,6 +109,11 @@ test('both CV aliases retain the current viewer and canonicalize to the CV docum
     assert.ok(!html.includes('/_next/'));
     assert.ok(!html.includes('http-equiv="refresh"'));
     assert.match(html, /<noscript>[\s\S]*href="\/"/);
+    const fallback=html.match(/<noscript>([\s\S]*?)<\/noscript>/)?.[1];
+    assert.match(fallback, /<a\b(?=[^>]*class="cv-static-brand")(?=[^>]*href="\/")(?=[^>]*aria-label="Batıkanor — return to introduction")[^>]*>/,
+      'no-JavaScript CV has the same native home wordmark');
+    assert.equal([...fallback.matchAll(/<a\b[^>]*href="\/"/g)].length,1,'home navigation is not repeated among the CV actions');
+    assert.doesNotMatch(fallback, /<a\b[^>]*>Home<\/a>/);
     assert.ok(html.includes(previewUrl));
     assert.ok(html.includes(pdfUrl));
     assert.ok(!html.includes('The map needs JavaScript.'));
