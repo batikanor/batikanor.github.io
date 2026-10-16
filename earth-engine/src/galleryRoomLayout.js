@@ -139,7 +139,7 @@ const intersects = (a, b) => a.x < right(b) - .01 && right(a) > b.x + .01 &&
 
 function viewportSize(viewport = {}) {
   return {width: Math.max(280, Number(viewport.width) || 1280),
-    height: Math.max(240, Number(viewport.height) || 900), dockBounds: viewport.dockBounds};
+    height: Math.max(240, Number(viewport.height) || 900), dockBounds: viewport.dockBounds, headerBounds: viewport.headerBounds};
 }
 
 function mediaInCells(media, region, columns, gap, phone) {
@@ -194,13 +194,16 @@ function mediaGrid(media, region, gap, phone) {
  */
 export function galleryStationPlan(project, viewport = {}) {
   project = getProject(project?.slug) || project;
-  const {width, height, dockBounds} = viewportSize(viewport), phone = width < 700;
+  const {width, height, dockBounds, headerBounds} = viewportSize(viewport), phone = width < 700;
   const tablet = width <= 900;
-  const short = height < 480, margin = phone ? 12 : width <= 900 ? 18 : 24;
+  const short = height < 480;
+  const headerInset = Math.max(Number(headerBounds?.left) || 0, width - (Number(headerBounds?.right) || width));
+  const ordinaryHeaderInset = width < 360 ? 14 : phone ? 19 : width <= 900 ? 24 : 32;
+  const margin = Math.max(phone ? 12 : width <= 900 ? 18 : 24, headerInset > ordinaryHeaderInset ? headerInset + 2 : 0);
   const gap = phone ? 10 : 14, scale = WALL_HEIGHT / height;
   const dock = roomDockRectangle(width, height, dockBounds);
-  const focusedSafe = roomSafeArea(width, height, true, dockBounds);
-  const header = phone ? 68 : focusedSafe.top;
+  const focusedSafe = roomSafeArea(width, height, true, dockBounds, headerBounds);
+  const header = phone ? Math.max(68, Number.isFinite(headerBounds?.bottom) ? headerBounds.bottom + 12 : 0) : focusedSafe.top;
   // The phone room has no footer actions or walking hint. Use the released
   // wall space instead of reserving an invisible lower-right rectangle.
   const hintHeight = phone ? 0 : short ? 42 : 104;
@@ -260,8 +263,8 @@ export function galleryStationPlan(project, viewport = {}) {
     if(rect.width<=0||rect.height<=0)return null;
     for(let attempt=0;attempt<6;attempt++){
       const worldWidth=rect.width*scale,worldHeight=rect.height*scale;
-      const plan=surfaceCameraPlan({worldWidth,worldHeight,position:[0,5,-2.72],rotation:[0,0,0],framePadding:3*scale},
-        {width,height,dockBounds},roomCameraFov(width));
+      const plan=surfaceCameraPlan({worldWidth,worldHeight,position:[0,5,-2.72],rotation:[0,0,0],framePadding:(phone?1.5:2)*scale},
+        {width,height,dockBounds,headerBounds},roomCameraFov(width));
       const pixels=height/(2*Math.tan(roomCameraFov(width)*Math.PI/360)*plan.distance);
       const displayedWidth=worldWidth*pixels,displayedHeight=worldHeight*pixels;
       if(displayedHeight<minHeight){const nextWidth=rect.width*displayedHeight/minHeight*.995;rect.x+=(rect.width-nextWidth)/2;rect.width=nextWidth;continue;}
@@ -424,7 +427,7 @@ export function galleryStationPlan(project, viewport = {}) {
     return {...fields, position: [(rect.x + rect.width / 2 - width / 2) * scale,
       (height - rect.y - rect.height / 2) * scale, WALL_Z], rotation: [0, 0, 0],
       width: rect.width, height: rect.height, worldWidth: rect.width * scale, worldHeight: rect.height * scale,
-      framePadding: 3 * scale, pixelRect: {...rect}, ...(entry.kind === 'title' ? {titleLayout} : {}), ...(photo ? {photo} : {})};
+      framePadding: (phone ? 1.5 : 2) * scale, pixelRect: {...rect}, ...(entry.kind === 'title' ? {titleLayout} : {}), ...(photo ? {photo} : {})};
   });
   const wallLayout = {width, height, worldWidth: width * scale, worldHeight: WALL_HEIGHT, wallZ: WALL_Z,
     rects: components.map(pose => ({id: pose.id, ...pose.pixelRect})), obstructions, dock, short,constrained};

@@ -1,5 +1,5 @@
 /** Fit a physical board inside the usable screen while leaving the globe dock visible. */
-export function roomSafeArea(width, height, focused = false, dockBounds = null) {
+export function roomSafeArea(width, height, focused = false, dockBounds = null, headerBounds = null) {
   const phone = width < 700;
   if (!focused) return {left: 0, right: 0, top: 0, bottom: 0};
   const landscape = height < 480 && width > height;
@@ -11,6 +11,14 @@ export function roomSafeArea(width, height, focused = false, dockBounds = null) 
     if (phone && !landscape && Number.isFinite(dockBounds.top)) safe.bottom = Math.max(safe.bottom, height - dockBounds.top);
     else if (Number.isFinite(dockBounds.right)) safe.left = Math.max(safe.left, dockBounds.right + 8);
   }
+  // The header already follows native safe-area insets. Its actual bounds keep
+  // a notched phone's reading boards inside the same clear horizontal edges.
+  if (headerBounds) {
+    if (Number.isFinite(headerBounds.left)) safe.left = Math.max(safe.left, headerBounds.left);
+    if (Number.isFinite(headerBounds.right)) safe.right = Math.max(safe.right, width - headerBounds.right);
+    const controlsBottom = Number.isFinite(headerBounds.controlsBottom) ? headerBounds.controlsBottom : headerBounds.bottom;
+    if (Number.isFinite(controlsBottom)) safe.top = Math.max(safe.top, controlsBottom + 16);
+  }
   return safe;
 }
 
@@ -19,7 +27,7 @@ export function roomCameraFov(width) {return width < 900 ? 65 : 50;}
 
 export function surfaceCameraPlan(surface, viewport, fov = 50) {
   const {width, height} = viewport;
-  const safe = roomSafeArea(width, height, true, viewport.dockBounds);
+  const safe = roomSafeArea(width, height, true, viewport.dockBounds, viewport.headerBounds);
   const usableWidth = Math.max(120, width - safe.left - safe.right);
   const readingWidth = surface.kind === 'link' || surface.type === 'link' ? Math.min(usableWidth, 420) : usableWidth;
   const usableHeight = Math.max(100, height - safe.top - safe.bottom);
@@ -147,7 +155,7 @@ export function overviewCameraPlan(station, viewport, fov = 50) {
   const optimized = frontOverviewPlan(station, viewport, fov);
   if (optimized) return optimized;
   const {width, height, dockBounds} = viewport;
-  const safe = roomSafeArea(width, height, true, dockBounds);
+  const safe = roomSafeArea(width, height, true, dockBounds, viewport.headerBounds);
   // The overview shows movement hints above the lower-right contact links.
   if (width >= 700) safe.bottom = Math.max(safe.bottom, height < 480 ? 96 : 112);
   const usableWidth = Math.max(120, width - safe.left - safe.right);

@@ -49,6 +49,8 @@ function fixture(index = 0) {
     performance: {now: () => 100},
     framePlan: kind => ({slug:context.slug,kind:kind===undefined?context.focusKind:kind}),
     applyPose: plan => posePlans.push({plan,animated:false}),
+    isAtPose: () => false,
+    sampleAnimation() {},
     animatePose: plan => {posePlans.push({plan,animated:true});context.animation={plan};},
     stage: {focus() {this.focused=true;}}, cancelDrag() {}
   });

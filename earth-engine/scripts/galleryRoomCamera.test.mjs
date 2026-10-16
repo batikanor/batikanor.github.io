@@ -106,6 +106,38 @@ test('actual inset dock bounds expand focused safe space and are shared with wal
   assert.deepEqual(roomDockRectangle(1280,900,{left:40,right:416,top:430,bottom:870}),{left:32,right:424,top:422,bottom:878});
 });
 
+test('Android and iPhone boards and controls stay inside browser-height and notch-safe viewports',()=>{
+  const sizes=[[320,568],[375,667],[390,664],[390,844],[430,814],[430,932],
+    [360,640],[360,800],[412,780],[412,915],[844,390]];
+  for(const [width,height]of sizes){
+    const phone=width<700,landscape=width>height;
+    const inset=landscape?44:width<360?14:19;
+    const top=landscape?15:width>=390?59:19;
+    const headerBounds={left:inset,right:width-inset,top,bottom:top+28,controlsBottom:top+(phone?62:28)};
+    const globe=phone?(height<=620?144:height<=740?168:188):180;
+    const dockHeight=globe+(phone?58:78)+(phone&&height<=620?2:4);
+    const dockBottom=height-(landscape?21:width>=390?34:10);
+    const dockLeft=landscape?44:16,dockWidth=phone?188:240;
+    const viewport={width,height,headerBounds,dockBounds:{left:dockLeft,right:dockLeft+dockWidth,top:dockBottom-dockHeight,bottom:dockBottom}};
+    room.resize(viewport);
+    for(const station of room.stations.values()){
+      assertWall(station,viewport);
+      for(const surface of station.components.filter(pose=>pose.kind!=='title')){
+        const plan=surfaceCameraPlan(surface,viewport,roomCameraFov(width));
+        const points=projectFrame(surface,cameraFor(plan,viewport),viewport);
+        assertSafe(points,plan.safe,viewport,`${station.slug}/${surface.id} ${width}x${height}`);
+        assert.ok(plan.safe.left>=inset&&plan.safe.right>=inset,'focus follows native header safe edges');
+        assert.ok(plan.safe.top>=headerBounds.controlsBottom+16,'reading controls clear the complete native header and absolute mobile return row');
+        if(landscape){
+          const overview=overviewCameraPlan(station,viewport,roomCameraFov(width));
+          assertSafe(projectFrame(surface,cameraFor(overview,viewport),viewport),{left:44,right:44,top:0,bottom:0},viewport,
+            `${station.slug}/${surface.id} landscape notch`);
+        }
+      }
+    }
+  }
+});
+
 test('wall camera maps the complete physical plane exactly without fitting an empty room',()=>{
   for(const viewport of viewports){
     const worldHeight=10.8,worldWidth=worldHeight*viewport.width/viewport.height;

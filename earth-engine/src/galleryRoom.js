@@ -26,9 +26,37 @@ const el = (tag, className, text) => {
 };
 const svgArrow = direction => direction === 'previous' ? '←' : '→';
 
-/** Prepare the spatial gallery; a deferred room keeps intro focus until activate(). */
-export async function startGalleryRoom({deferActivation=false}={}) {
+/** Phones begin in a readable native gallery; its lock still opens the spatial room. */
+export async function startGalleryRoom({deferActivation=false,spatial=false,eventSlug}={}) {
   window.__galleryRoom?.dispose?.();
+  if(!spatial&&(innerWidth<700||innerWidth<=1000&&matchMedia('(pointer: coarse)').matches)){
+    const {startGalleryMobile}=await import('./galleryRoomMobile.js');
+    let mobileApi,handoff;
+    async function openMobile(options={}){
+      mobileApi=await startGalleryMobile({deferActivation:options.deferActivation??false,onExploreRoom});
+      if(options.sortMode)mobileApi.setSortMode(options.sortMode);
+      return mobileApi;
+    }
+    function onExploreRoom(options){
+      if(!handoff){
+        mobileApi?.dispose?.();
+        handoff=startGalleryRoom({spatial:true,eventSlug:options?.eventSlug}).then(api=>{
+          if(options?.sortMode)api.setSortMode(options.sortMode);
+          api.setViewLocked(false);
+          return api;
+        }).catch(async error=>{
+          // A phone without a usable WebGL room must keep its readable gallery.
+          handoff=null;
+          await openMobile({sortMode:options?.sortMode});
+          const status=mobileApi.root.querySelector?.('#gallery-room-status');
+          if(status)status.textContent='The 3D room is unavailable on this device. You can keep exploring here.';
+          throw error;
+        });
+      }
+      return handoff;
+    }
+    return openMobile({deferActivation});
+  }
   let ordered=defaultOrder,sortMode='recent';
   document.documentElement.classList.remove('gallery-pending');
   if(!deferActivation)document.documentElement.classList.remove('intro-active');
@@ -85,7 +113,9 @@ export async function startGalleryRoom({deferActivation=false}={}) {
   const announce=el('p','gallery-room-live');announce.id='gallery-room-status';announce.setAttribute('role','status');announce.setAttribute('aria-live','polite');root.append(announce);
   document.body.append(root);
 
-  const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true,powerPreference:'high-performance'});
+  let renderer;
+  try{renderer=new THREE.WebGLRenderer({antialias:true,alpha:true,powerPreference:'high-performance'});}
+  catch(error){root.remove();document.body.classList.remove('gallery-room-active');if(original)original.inert=false;throw error;}
   renderer.setPixelRatio(Math.min(devicePixelRatio||1,2));
   renderer.setClearColor(0x444b4c,0);
   renderer.outputColorSpace=THREE.SRGBColorSpace;
@@ -100,9 +130,17 @@ export async function startGalleryRoom({deferActivation=false}={}) {
   const camera=new THREE.PerspectiveCamera(roomCameraFov(innerWidth),innerWidth/innerHeight,.08,170);
   const cssCamera=new THREE.PerspectiveCamera();
   cssCamera.position.z=1000;
-  const viewport=()=>({width:innerWidth,height:innerHeight,dockBounds:dock.getBoundingClientRect()});
+  const viewport=()=>{
+    const bounds=header.getBoundingClientRect();
+    return {width:innerWidth,height:innerHeight,dockBounds:dock.getBoundingClientRect(),headerBounds:{
+      left:bounds.left,right:bounds.right,top:bounds.top,bottom:bounds.bottom,
+      // On phones the return control sits on an absolute second row, outside
+      // the header's normal-flow box. Reserve that row before it is exposed.
+      controlsBottom:Math.max(bounds.bottom,innerWidth<700?bounds.top+62:bounds.bottom)
+    }};
+  };
   const room=createGalleryRoomScene({scene,renderer,projects:ordered,reducedMotion,viewport:viewport()});
-  let slug=readPortfolioRoute(location.href,knownSlugs).eventSlug??ordered[0].slug;
+  let slug=bySlug.has(eventSlug)?eventSlug:readPortfolioRoute(location.href,knownSlugs).eventSlug??ordered[0].slug;
   let viewLocked=true;
   let active=!deferActivation,focusKind=null,animation=null,teleportTimer=null,pendingSlug=null,disposed=false,raf=0,lastTime=0,frameCount=0,needsRender=true;
   const keys=new Set(),tapKeys=new Set(),lookTarget=new THREE.Vector3(),pointer=new THREE.Vector2(),raycaster=new THREE.Raycaster();
@@ -173,12 +211,33 @@ export async function startGalleryRoom({deferActivation=false}={}) {
     else camera.setViewOffset(innerWidth,innerHeight,offset.x,offset.y,innerWidth,innerHeight);
   }
   function applyPose(plan){resetJump();camera.position.fromArray(plan.position);lookTarget.fromArray(plan.target);camera.lookAt(lookTarget);setProjection(plan.viewOffset);needsRender=true;}
+  function isAtPose(plan){
+    const offset=camera.view?.enabled?{x:camera.view.offsetX,y:camera.view.offsetY}:{x:0,y:0};
+    return camera.position.distanceToSquared(new THREE.Vector3().fromArray(plan.position))<1e-12&&
+      lookTarget.distanceToSquared(new THREE.Vector3().fromArray(plan.target))<1e-12&&
+      Math.abs(offset.x-plan.viewOffset.x)<1e-6&&Math.abs(offset.y-plan.viewOffset.y)<1e-6;
+  }
+  function sampleAnimation(time){
+    if(!animation)return;
+    needsRender=true;
+    const t=THREE.MathUtils.clamp((time-animation.start)/animation.duration,0,1),smooth=t*t*t*(t*(t*6-15)+10);
+    if(t===1){
+      camera.position.copy(animation.to);lookTarget.copy(animation.targetTo);setProjection(animation.offsetTo);animation=null;
+    }else{
+      camera.position.lerpVectors(animation.from,animation.to,smooth);lookTarget.lerpVectors(animation.targetFrom,animation.targetTo,smooth);
+      setProjection({x:THREE.MathUtils.lerp(animation.offsetFrom.x,animation.offsetTo.x,smooth),y:THREE.MathUtils.lerp(animation.offsetFrom.y,animation.offsetTo.y,smooth)});
+    }
+    camera.lookAt(lookTarget);
+  }
   function animatePose(plan){
+    // Input can arrive between frames. Retarget the visible in-flight pose at
+    // this instant instead of restarting from the last rendered camera sample.
+    const now=performance.now();sampleAnimation(now);
     resetJump();
     const distance=camera.position.distanceTo(new THREE.Vector3().fromArray(plan.position));
     const duration=roomTransitionDuration(distance,reducedMotion);
     if(!duration){applyPose(plan);animation=null;return;}
-    animation={start:performance.now(),duration,from:camera.position.clone(),to:new THREE.Vector3().fromArray(plan.position),
+    animation={start:now,duration,from:camera.position.clone(),to:new THREE.Vector3().fromArray(plan.position),
       targetFrom:lookTarget.clone(),targetTo:new THREE.Vector3().fromArray(plan.target),
       offsetFrom:{x:camera.view?.offsetX??0,y:camera.view?.offsetY??0},offsetTo:plan.viewOffset};
   }
@@ -246,12 +305,18 @@ export async function startGalleryRoom({deferActivation=false}={}) {
     if(pendingSlug!==null)beginManualMovement();
     if(descriptor.slug!==slug)adoptWalkStation(descriptor.slug);
     if(descriptor.slug!==slug)return;
-    if(focusKind===descriptor.kind&&!animation){stage.focus({preventScroll:true});return;}
+    if(focusKind===descriptor.kind){stage.focus({preventScroll:true});return;}
     clearMovementKeys();focusKind=descriptor.kind;animatePose(framePlan());refreshNavigation();
     content.setFocusedSurface?.(focusKind);
     stage.focus({preventScroll:true});
   }
-  function returnToRoom(){if(!active)return;cancelDrag();clearMovementKeys();beginManualMovement();focusKind=null;content.setFocusedSurface?.(null);animatePose(framePlan(null));refreshNavigation();stage.focus({preventScroll:true});}
+  function returnToRoom(){
+    if(!active)return;
+    cancelDrag();clearMovementKeys();
+    if(focusKind===null&&pendingSlug===null&&(animation||isAtPose(framePlan(null)))){stage.focus({preventScroll:true});return;}
+    sampleAnimation(performance.now());beginManualMovement();focusKind=null;content.setFocusedSurface?.(null);
+    animatePose(framePlan(null));refreshNavigation();stage.focus({preventScroll:true});
+  }
   function step(direction){const target=getChronologyState(ordered,pendingSlug??slug)[direction];if(target)selectProject(target.slug);}
   previous.addEventListener('click',()=>step('previous'),{signal});next.addEventListener('click',()=>step('next'),{signal});
   returnButton.addEventListener('click',returnToRoom,{signal});
@@ -353,13 +418,7 @@ export async function startGalleryRoom({deferActivation=false}={}) {
   function render(time){
     raf=0;if(disposed||document.hidden)return;
     const delta=lastTime?Math.min((time-lastTime)/1000,.06):0;lastTime=time;
-    if(active&&animation){
-      needsRender=true;
-      const t=Math.min(1,(time-animation.start)/animation.duration),smooth=t*t*t*(t*(t*6-15)+10);
-      camera.position.lerpVectors(animation.from,animation.to,smooth);lookTarget.lerpVectors(animation.targetFrom,animation.targetTo,smooth);camera.lookAt(lookTarget);
-      setProjection({x:THREE.MathUtils.lerp(animation.offsetFrom.x,animation.offsetTo.x,smooth),y:THREE.MathUtils.lerp(animation.offsetFrom.y,animation.offsetTo.y,smooth)});
-      if(t===1)animation=null;
-    }
+    if(active&&animation)sampleAnimation(time);
     if(active&&!viewLocked&&(keys.size||tapKeys.size)){
       needsRender=true;
       const yaw=new THREE.Euler().setFromQuaternion(camera.quaternion,'YXZ').y;

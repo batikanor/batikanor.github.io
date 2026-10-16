@@ -219,7 +219,7 @@ test('three adjacent walls retain readable content and photographs while crossin
   neighborStory.element.dispatch('click');
   assert.equal(focused.at(-1), neighborStory, 'visible neighbor board clicks retain their own project descriptor');
   const neighborPhoto = panels(projects[0].slug).find(panel => panel.photo);
-  neighborPhoto.approach.querySelector('button').dispatch('click');
+  neighborPhoto.zoomIn.dispatch('click');
   assert.equal(focused.at(-1), neighborPhoto, 'the native approach control reaches the controller for a neighboring project');
 
   const old = gallery.stationSurfaces.get(projects[1].slug), chosen = Object.values(old).find(panel => panel.element.querySelector('iframe'));
@@ -506,38 +506,25 @@ test('a failed bounded photo retries its original once, reports a second failure
   gallery.dispose();
 });
 
-test('native next-object controls cycle story, every media display and the one References panel before wrapping', () => {
-  const focused = [];
-  let returned = 0;
-  const multiSource = contestsAndActivities.find(project => galleryStationMedia(project).length >= 4 && galleryStationLinks(project).length);
-  const station = stations.find(item => item.slug === multiSource.slug);
+test('each panel has two footer magnifiers that zoom the same panel in and out', () => {
+  const focused = [];let returned = 0;
+  const project = contestsAndActivities.find(project => galleryStationMedia(project).length >= 4 && galleryStationLinks(project).length);
+  const station = stations.find(item => item.slug === project.slug);
   const gallery = createGalleryRoomContent({scene: new Scene(), stations: [station], onFocusSurface: surface => focused.push(surface), onReturnToRoom: () => returned++});
-  const descriptors = Object.values(gallery.stationSurfaces.get(station.slug)).filter(item => ['story', 'media', 'references'].includes(item.type));
-  for (const descriptor of descriptors) {
+  for (const descriptor of Object.values(gallery.stationSurfaces.get(station.slug)).filter(item => item.type !== 'title')) {
+    gallery.setFocusedSurface(null);
     const buttons = descendants(descriptor.element).filter(element => element.tagName === 'BUTTON');
-    const button = buttons.find(element => element.getAttribute('aria-label') === 'Next object');
-    assert.ok(button, descriptor.kind);
-    assert.equal(button.textContent, '→');
-    assert.equal(button.title, 'Next object');
-    assert.ok(button.className.includes('gallery-room-symbol'));
-    button.dispatch('click');
-    const room = buttons.find(element => element.getAttribute('aria-label') === 'Return to room');
-    assert.equal(room.textContent, '↶');
-    assert.equal(room.title, 'Return to room');
-    room.dispatch('click');
+    assert.deepEqual(buttons.map(button => button.getAttribute('aria-label')), ['Zoom in', 'Zoom out']);
+    assert.equal(buttons[0].parentElement, buttons[1].parentElement);
+    for (const button of buttons) assert.match(button.innerHTML, /<svg[^>]+viewBox="0 0 24 24"/);
+    assert.equal(buttons[0].disabled, false);assert.equal(buttons[1].disabled, true);
+    buttons[1].dispatch('click');assert.equal(returned, focused.length);
+    buttons[0].dispatch('click');assert.equal(focused.at(-1), descriptor);
+    gallery.setFocusedSurface(descriptor.kind);
+    assert.equal(buttons[0].disabled, true);assert.equal(buttons[1].disabled, false);
+    const count = focused.length;buttons[0].dispatch('click');assert.equal(focused.length, count);
+    buttons[1].dispatch('click');assert.equal(returned, focused.length);
   }
-  assert.equal(returned, descriptors.length);
-  assert.deepEqual(focused.map(item => item.kind), [...descriptors.slice(1), descriptors[0]].map(item => item.kind));
-  assert.equal(gallery.activeSlug, station.slug);
-  const media = descriptors.find(item => item.type === 'media');
-  const approach = descendants(media.approach).find(element => element.tagName === 'BUTTON');
-  assert.equal(approach.textContent, '⤢');
-  assert.equal(approach.getAttribute('aria-label'), 'Approach screen');
-  assert.equal(approach.title, 'Approach screen');
-  approach.dispatch('click');
-  assert.equal(focused.at(-1), media);
-  const story = descriptors[0];
-  assert.equal(descendants(story.element).some(element => element.tagName === 'BUTTON' && element.textContent.startsWith('View ')), false);
   gallery.dispose();
 });
 
@@ -560,59 +547,45 @@ test('titles retain only their authored heading and technologies on desktop, pho
   gallery.dispose();
 });
 
-test('photo and monitor approach controls stay native and discreet without tinting the source', async () => {
-  const focused=[];
-  const gallery=createGalleryRoomContent({scene:new Scene(),stations,onFocusSurface:surface=>focused.push(surface)});
-  let photos=0,monitors=0;
-  for(const descriptors of gallery.stationSurfaces.values())for(const descriptor of Object.values(descriptors)){
-    if(descriptor.type!=='media')continue;
-    if(descriptor.photo)photos++;else monitors++;
-    const button=descriptor.approach.querySelector('button');
-    assert.equal(button.textContent,'⤢');
-    assert.equal(button.getAttribute('aria-label'),'Approach screen');
-    assert.ok(button.matches('.gallery-room-symbol'),'native hit-target class is retained');
-    button.dispatch('click');assert.equal(focused.at(-1),descriptor);
+test('photo and monitor previews have no centered icon and tapping the surface zooms in', async () => {
+  const focused = [];
+  const gallery = createGalleryRoomContent({scene: new Scene(), stations, onFocusSurface: surface => focused.push(surface)});
+  let photos = 0, monitors = 0;
+  for (const descriptors of gallery.stationSurfaces.values()) for (const descriptor of Object.values(descriptors)) {
+    if (descriptor.type !== 'media') continue;
+    if (descriptor.photo) photos++;else monitors++;
+    assert.equal(descriptor.approach.querySelector('button'), null);
+    assert.equal(descriptor.approach.getAttribute('aria-hidden'), 'true');
+    descriptor.element.dispatch('click', {target: descriptor.approach});
+    assert.equal(focused.at(-1), descriptor);
   }
-  assert.equal(photos,36);assert.equal(monitors,30);
-  const css=await readFile(new URL('../src/galleryRoomContent.css',import.meta.url),'utf8');
-  const overlay=/\.gallery-room-screen-approach\s*\{([^}]+)\}/.exec(css)?.[1];
-  const control=/\.gallery-room-screen-approach \.gallery-room-control\s*\{([^}]+)\}/.exec(css)?.[1];
-  assert.match(overlay,/background:\s*transparent\s*;/,'the full-image overlay has no tint');
-  assert.match(control,/opacity:\s*\.2\s*;/,'both media kinds use the requested 80% transparency');
-  assert.match(control,/box-shadow:\s*none\s*;/,'no approach shadow obscures photographs');
-  assert.match(css,/\.gallery-room-screen-approach \.gallery-room-control:focus-visible\s*\{\s*opacity:\s*1\s*;/,
-    'keyboard focus restores control legibility without covering the image');
+  assert.equal(photos, 36);assert.equal(monitors, 30);
+  const css = await readFile(new URL('../src/galleryRoomContent.css', import.meta.url), 'utf8');
+  assert.match(/\.gallery-room-screen-approach\s*\{([^}]+)\}/.exec(css)?.[1], /background:\s*transparent\s*;/);
   gallery.dispose();
 });
 
-test('projects without media cycle directly between their story and one References panel', () => {
+test('projects without media zoom their story and references independently', () => {
   const focused = [];
   const project = contestsAndActivities.find(project => !galleryStationMedia(project).length && galleryStationLinks(project).length);
   const gallery = createGalleryRoomContent({scene: new Scene(), stations: stations.filter(item => item.slug === project.slug), onFocusSurface: surface => focused.push(surface)});
   const descriptors = gallery.stationSurfaces.get(project.slug);
   assert.equal(descriptors.media, undefined);
-  const next = descendants(descriptors.story.element).find(element => element.tagName === 'BUTTON' && element.getAttribute('aria-label') === 'Next object');
-  assert.ok(next);next.dispatch('click');
-  assert.equal(focused.at(-1), descriptors.references);
-  const wayfinding = descendants(descriptors.story.element).find(element => element.tagName === 'BUTTON' && /^\d+ references →$/.test(element.textContent));
-  assert.equal(wayfinding, undefined, 'References is reached through the original card or Next object without a redundant shortcut');
+  for (const descriptor of [descriptors.story, descriptors.references]) {
+    descriptor.zoomIn.dispatch('click');assert.equal(focused.at(-1), descriptor);
+    assert.equal(descendants(descriptor.element).some(element => element.getAttribute?.('aria-label') === 'Next object'), false);
+  }
   gallery.dispose();
 });
 
-test('compact screens retain accessible symbol controls and the original source', () => {
+test('compact screens retain both accessible magnifiers and original-source links', () => {
   const station = stations.find(item => galleryStationMedia(contestsAndActivities.find(project => project.slug === item.slug)).length && galleryStationLinks(contestsAndActivities.find(project => project.slug === item.slug)).length);
   const gallery = createGalleryRoomContent({scene: new Scene(), stations: [station]});
   gallery.resize({width: 390});
-  const surfaces = Object.values(gallery.stationSurfaces.get(station.slug));
-  for (const surface of surfaces.filter(item => item.type === 'story' || item.type === 'media')) {
-    const buttons = descendants(surface.element).filter(element => element.tagName === 'BUTTON');
-    const room = buttons.find(button => button.getAttribute('aria-label') === 'Return to room');
-    assert.ok(room, `${surface.kind}: return action remains available`);
-    assert.equal(room.className.includes('gallery-room-screen-return'), surface.type === 'media');
-    if (surface.type === 'media') {
-      assert.ok(buttons.some(button => button.textContent === '→' && button.getAttribute('aria-label') === 'Next object'));
-      assert.ok(descendants(surface.element).some(element => element.tagName === 'A' && element.textContent === 'Open original ↗' && element.href === projectHref(surface.media.url, window.location.href)));
-    }
+  for (const surface of Object.values(gallery.stationSurfaces.get(station.slug)).filter(item => item.type !== 'title')) {
+    assert.equal(surface.zoomIn.getAttribute('aria-label'), 'Zoom in');assert.equal(surface.zoomOut.getAttribute('aria-label'), 'Zoom out');
+    assert.notEqual(surface.zoomIn.hidden, true);assert.notEqual(surface.zoomOut.hidden, true);
+    if (surface.type === 'media') assert.ok(descendants(surface.element).some(element => element.tagName === 'A' && element.textContent === 'Open original ↗' && element.href === projectHref(surface.media.url, window.location.href)));
   }
   gallery.dispose();
 });
@@ -712,6 +685,37 @@ test('real wall reflow preserves native players and source navigation while CSS3
   assert.equal(surfaces.story.width,station.surfaces.story.width);
   gallery.dispose();room.dispose();
   assert.ok(players.every(player=>!player.hasAttribute('src')));
+});
+
+test('tiny phone media previews retain their player while the focused screen restores room for all native actions', () => {
+  const room=createGalleryRoomScene({scene:new Scene(),projects:contestsAndActivities});
+  const gallery=createGalleryRoomContent({scene:new Scene(),stations:room.stations});
+  let tinyPreviews=0,focusedScreens=0;
+  try{
+    for(const [width,height]of[[320,568],[375,667],[390,664],[390,844],[430,814],[360,640],[412,780],[412,915],[844,390]]){
+      const viewport={width,height};room.resize(viewport);gallery.resize(viewport);
+      for(const station of room.stations.values()){
+        gallery.setActiveSlug(station.slug);
+        const media=Object.values(gallery.stationSurfaces.get(station.slug)).filter(surface=>surface.type==='media'&&!surface.photo);
+        for(const surface of media){
+          gallery.setFocusedSurface(null);
+          const small=surface.width<100;
+          assert.equal(surface.element.className.split(' ').includes('is-tiny'),small);
+          if(small)tinyPreviews++;
+          const player=surface.element.querySelector('iframe')??surface.element.querySelector('video');
+          const approach=surface.element.querySelector('.gallery-room-screen-approach');
+          gallery.setFocusedSurface(surface.kind);focusedScreens++;
+          assert.ok(surface.width>=100,`${station.slug}/${surface.kind} at ${width}x${height}: focused actions have a complete native row`);
+          assert.equal(surface.element.className.split(' ').includes('is-tiny'),false);
+          assert.equal(surface.element.querySelector('iframe')??surface.element.querySelector('video'),player,'approach reuses the native player');
+          assert.equal(surface.element.querySelector('.gallery-room-screen-approach'),approach);
+          assert.equal(approach.hidden,true,'the center approach relinquishes pointer access to the focused player');
+        }
+      }
+    }
+    assert.ok(tinyPreviews>0,'the regression covers actually narrow original preview screens');
+    assert.equal(focusedScreens,30*9,'every nonphoto screen is approached at every selected phone/browser size');
+  }finally{gallery.dispose();room.dispose();}
 });
 
 test('every focused story and References panel has useful reading space and native-size text across all responsive walls', () => {

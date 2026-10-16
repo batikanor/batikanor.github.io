@@ -1,23 +1,38 @@
 .gallery-room-surface {
   box-sizing: border-box; color: var(--portfolio-text); font-family: var(--portfolio-font-body);
-  backface-visibility: hidden; overflow: hidden; user-select: text !important;
+  backface-visibility: hidden; overflow: clip; user-select: text !important;
   --room-copy: 22px; --room-heading: 29px; --room-small: 16px; --room-control: 18px;
+  --room-border-width: .75px; --room-scrollbar-width: 4px;
+  --room-scrollbar-thumb: color-mix(in srgb, var(--portfolio-muted) 60%, transparent);
 }
 .gallery-room-surface *, .gallery-room-surface *::before, .gallery-room-surface *::after { box-sizing: border-box; }
+.gallery-room-surface :is(.gallery-room-title-content, .gallery-room-story-scroll, .gallery-room-screen-caption, .gallery-room-media-status, .gallery-room-credit, .gallery-room-references-list, .gallery-room-photo-caption) {
+  scrollbar-color: var(--room-scrollbar-thumb) transparent;
+  scrollbar-width: thin;
+}
+/* WebKit scrollbars stay subtle on iPhone; Chromium otherwise lets its native
+   `thin` setting override the narrower authored track. */
+@supports selector(::-webkit-scrollbar) {
+  .gallery-room-surface :is(.gallery-room-title-content, .gallery-room-story-scroll, .gallery-room-screen-caption, .gallery-room-media-status, .gallery-room-credit, .gallery-room-references-list, .gallery-room-photo-caption) { scrollbar-width: auto; }
+  .gallery-room-surface ::-webkit-scrollbar { width: var(--room-scrollbar-width); height: var(--room-scrollbar-width); }
+  .gallery-room-surface ::-webkit-scrollbar-track { background: transparent; }
+  .gallery-room-surface ::-webkit-scrollbar-thumb { border-radius: 8px; background: var(--room-scrollbar-thumb); }
+  .gallery-room-surface ::-webkit-scrollbar-corner { background: transparent; }
+}
 .gallery-room-surface button, .gallery-room-surface a { touch-action: manipulation; }
 .gallery-room-surface :focus-visible { outline: 3px solid var(--portfolio-focus); outline-offset: 3px; }
 .gallery-room-surface a { color: var(--portfolio-link); text-underline-offset: .16em; overflow-wrap: anywhere; }
-.gallery-room-title { display: flex; align-items: center; gap: 24px; padding: 6px 28px; background: linear-gradient(160deg,var(--portfolio-surface-hover),var(--portfolio-surface)); border: 1px solid var(--portfolio-border); }
+.gallery-room-title { display: flex; align-items: center; gap: 24px; padding: 6px 28px; background: linear-gradient(160deg,var(--portfolio-surface-hover),var(--portfolio-surface)); border: var(--room-border-width) solid var(--portfolio-border); }
 .gallery-room-title-copy { flex: 1; min-width: 0; }
 .gallery-room-title-content { display: flex; align-items: flex-start; gap: 16px; flex: 1; min-width: 0; min-height: 0; max-height: 100%; overflow: auto; overscroll-behavior: contain; touch-action: pan-y; scrollbar-width: thin; }
 .gallery-room-title h1 { margin: 0 0 4px; font-family: var(--portfolio-font-display); font-size: 36px; line-height: 1.1; font-weight: 400; overflow-wrap: break-word; }
 .gallery-room-title.has-long-title h1 { font-size: 30px; }
-.gallery-room-story { display: flex; flex-direction: column; background: linear-gradient(155deg,var(--portfolio-surface-hover),var(--portfolio-surface) 70%); border: 1px solid var(--portfolio-border); --room-copy: 19px; --room-heading: 25px; }
-.gallery-room-story-scroll { flex: 1; min-height: 0; padding: 20px 22px; overflow: auto; overscroll-behavior: contain; touch-action: pan-y; font-size: var(--room-copy); line-height: 1.42; scrollbar-color: var(--portfolio-muted) var(--portfolio-surface); scrollbar-width: thin; }
+.gallery-room-story { display: flex; flex-direction: column; background: linear-gradient(155deg,var(--portfolio-surface-hover),var(--portfolio-surface) 70%); border: var(--room-border-width) solid var(--portfolio-border); --room-copy: 19px; --room-heading: 25px; }
+.gallery-room-story-scroll { flex: 1; min-height: 0; padding: 20px 22px; overflow: auto; overscroll-behavior: contain; touch-action: pan-y; font-size: var(--room-copy); line-height: 1.42; }
 .gallery-room-story-title { margin: 0 0 16px; font-family: var(--portfolio-font-display); font-size: var(--room-heading); font-weight: 400; line-height: 1.2; overflow-wrap: break-word; }
 .gallery-room-story h3 { margin: 20px 0 9px; font-size: calc(var(--room-copy) * 1.06); line-height: 1.3; }
 .gallery-room-story p { margin: 0 0 14px; }
-.gallery-room-summary { padding: 0 0 1px 13px; border-left: 3px solid var(--portfolio-accent); margin-bottom: 18px; }
+.gallery-room-summary { padding: 0 0 1px 13px; border-left: 2px solid var(--portfolio-accent); margin-bottom: 18px; }
 .gallery-room-summary h3 { margin-top: 0; }
 .gallery-room-story-bullet { padding-left: 11px; }
 /* Wider reading canvases spend their space on the original account. Phone
@@ -28,17 +43,17 @@
 .gallery-room-story:not(.is-compact) p { margin-bottom: 11px; }
 .gallery-room-story:not(.is-compact) .gallery-room-summary { margin-bottom: 14px; }
 .gallery-room-story:not(.is-compact) .gallery-room-summary h3 { margin-top: 0; }
-.gallery-room-control { border: 1px solid var(--portfolio-border); border-radius: var(--portfolio-radius); padding: 8px 12px; min-height: 42px; font: inherit; font-size: var(--room-control); color: var(--portfolio-text); background: var(--portfolio-surface); cursor: pointer; line-height: 1.2; white-space: nowrap; }
+.gallery-room-control { border: var(--room-border-width) solid var(--portfolio-border); border-radius: var(--portfolio-radius); padding: 8px 12px; min-height: 42px; font: inherit; font-size: var(--room-control); color: var(--portfolio-text); background: var(--portfolio-surface); cursor: pointer; line-height: 1.2; white-space: nowrap; }
 .gallery-room-control:hover { background: var(--portfolio-surface-hover); border-color: var(--portfolio-accent); }
-.gallery-room-board-controls { display: flex; align-items: center; justify-content: space-between; flex: 0 0 auto; gap: 8px; padding: 6px 10px; border-top: 1px solid var(--portfolio-border-soft); background: var(--portfolio-surface-deep); }
-.gallery-room-technologies { display: flex; flex-wrap: wrap; align-content: center; gap: 4px 10px; flex: 0 0 var(--title-technologies-width,280px); width: var(--title-technologies-width,280px); min-width: 0; margin: 0; padding: 8px 10px; border: 1px solid var(--portfolio-border-soft); border-radius: 4px; background: color-mix(in srgb, var(--portfolio-surface-deep) 38%, transparent); list-style: none; font-size: 13px; line-height: 1.35; color: var(--portfolio-muted); }
+.gallery-room-board-controls { display: flex; align-items: center; justify-content: space-between; flex: 0 0 auto; min-width: 0; max-width: 100%; gap: 8px; padding: 4px 8px; border-top: var(--room-border-width) solid var(--portfolio-border-soft); background: var(--portfolio-surface-deep); }
+.gallery-room-technologies { display: flex; flex-wrap: wrap; align-content: center; gap: 4px 10px; flex: 0 0 var(--title-technologies-width,280px); width: var(--title-technologies-width,280px); min-width: 0; margin: 0; padding: 8px 10px; border: var(--room-border-width) solid var(--portfolio-border-soft); border-radius: 4px; background: color-mix(in srgb, var(--portfolio-surface-deep) 38%, transparent); list-style: none; font-size: 13px; line-height: 1.35; color: var(--portfolio-muted); }
 .gallery-room-technologies li { max-width: 100%; overflow-wrap: anywhere; }
 .gallery-room-title.has-stacked-technologies .gallery-room-title-content { flex-direction: column; align-items: stretch; gap: 8px; }
 .gallery-room-title.has-stacked-technologies .gallery-room-title-copy { flex: 0 0 auto; }
 .gallery-room-title.has-stacked-technologies .gallery-room-technologies { flex-basis: auto; width: 100%; }
 .gallery-room-title.is-compact .gallery-room-technologies { font-size: 12px; }
-.gallery-room-media { display: flex; flex-direction: column; background: var(--portfolio-surface-deep); border: 6px solid var(--portfolio-surface-deep); border-radius: var(--portfolio-radius); }
-.gallery-room-screen-header { flex: 0 0 auto; min-width: 0; padding: 8px 12px; background: var(--portfolio-surface); border-bottom: 1px solid var(--portfolio-border-soft); }
+.gallery-room-media { display: flex; flex-direction: column; background: var(--portfolio-surface-deep); border: 4px solid var(--portfolio-surface-deep); border-radius: var(--portfolio-radius); }
+.gallery-room-screen-header { flex: 0 0 auto; min-width: 0; padding: 8px 12px; background: var(--portfolio-surface); border-bottom: var(--room-border-width) solid var(--portfolio-border-soft); }
 .gallery-room-screen-caption { margin: 0; font-weight: 500; font-family: var(--portfolio-font-body); font-size: 16px; line-height: 1.3; max-height: 63px; overflow: auto; scrollbar-width: thin; overscroll-behavior: contain; touch-action: pan-y; }
 .gallery-room-screen-content { position: relative; display: flex; flex-direction: column; flex: 1 1 0; min-width: 0; min-height: 100px; overflow: hidden; background: var(--portfolio-surface-deep); }
 .gallery-room-media-viewport { position: relative; flex: 1 1 0; width: 100%; min-width: 0; min-height: 0; overflow: hidden; display: grid; place-items: center; background: var(--portfolio-surface-deep); }
@@ -52,12 +67,12 @@
 .gallery-room-link-only p { margin: 0; }
 .gallery-room-link-only a { color: var(--portfolio-link); }
 .gallery-room-screen-controls { flex: 0 0 auto; min-width: 0; padding: 6px 9px; background: var(--portfolio-surface); }
-.gallery-room-screen-actions { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: var(--room-control); line-height: 1.2; }
+.gallery-room-screen-actions { display: flex; align-items: center; justify-content: space-between; min-width: 0; max-width: 100%; gap: 8px; font-size: var(--room-control); line-height: 1.2; }
 .gallery-room-screen-actions > a { flex: 0 0 auto; white-space: nowrap; }
 .gallery-room-screen-actions .gallery-room-control { padding: 6px 9px; min-height: 38px; }
 .gallery-room-credit { margin: 6px 0 0; font-size: 16px; line-height: 1.3; color: var(--portfolio-muted); max-height: 42px; overflow: auto; overscroll-behavior: contain; scrollbar-width: thin; }
-.gallery-room-references { display: flex; flex-direction: column; background: linear-gradient(150deg,var(--portfolio-surface-hover),var(--portfolio-surface)); border: 1px solid var(--portfolio-border-soft); }
-.gallery-room-references-header { display: flex; align-items: center; justify-content: space-between; flex: 0 0 auto; gap: 8px; padding: 7px 10px; border-bottom: 1px solid var(--portfolio-border-soft); }
+.gallery-room-references { display: flex; flex-direction: column; background: linear-gradient(150deg,var(--portfolio-surface-hover),var(--portfolio-surface)); border: var(--room-border-width) solid var(--portfolio-border-soft); }
+.gallery-room-references-header { display: flex; align-items: center; justify-content: space-between; flex: 0 0 auto; gap: 8px; padding: 7px 10px; border-bottom: var(--room-border-width) solid var(--portfolio-border-soft); }
 .gallery-room-references-header h2 { min-width: 0; margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 18px; line-height: 1.2; font-weight: 500; }
 .gallery-room-references-count { flex-shrink: 0; color: var(--portfolio-muted); font-size: 12px; }
 .gallery-room-references-list { display: grid; grid-template-columns: repeat(auto-fit,minmax(min(100%,180px),1fr)); align-content: start; gap: 3px 16px; flex: 1; min-height: 0; margin: 0; padding: 7px 10px; overflow: auto; overscroll-behavior: contain; touch-action: pan-y; list-style: none; font-size: 14px; line-height: 1.35; scrollbar-width: thin; }
@@ -78,7 +93,7 @@
 .gallery-room-title.is-compact { gap: 16px; padding: 4px 18px; }
 .gallery-room-title.is-compact h1 { font-size: 24px; }
 .gallery-room-title.is-compact.has-long-title h1 { font-size: 20px; }
-.gallery-room-media.is-compact { border-width: 4px; }
+.gallery-room-media.is-compact { border-width: 2px; }
 .gallery-room-media.is-compact .gallery-room-screen-header { padding: 7px 10px; }
 .gallery-room-media.is-compact .gallery-room-screen-caption { font-size: 14px; line-height: 1.3; max-height: 37px; }
 .gallery-room-media.is-compact .gallery-room-screen-controls { padding: 5px 7px; }
@@ -88,11 +103,13 @@
 .gallery-room-media.is-compact .gallery-room-media-status { font-size: 16px; line-height: 1.3; padding: 6px 8px; }
 .gallery-room-screen-approach { position: absolute; inset: 0; z-index: 1; display: grid; place-items: center; background: transparent; }
 .gallery-room-screen-approach[hidden] { display: none !important; }
-.gallery-room-screen-approach .gallery-room-control { padding: 10px 15px; border-color: var(--portfolio-border); background: color-mix(in srgb, var(--portfolio-surface-hover) 93%, transparent); opacity: .2; box-shadow: none; }
-.gallery-room-screen-approach .gallery-room-control:focus-visible { opacity: 1; }
 .gallery-room-photo:not([src]), .gallery-room-native-video:not([src]), .gallery-room-native-frame:not([src]) { visibility: hidden; }
-/* Navigation uses compact, named native buttons so more of each physical
-   board stays available for the original writing and embedded media. */
+/* Explicit magnifiers share one quiet footer on every reading surface. */
+.gallery-room-zoom svg { display: block; width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; pointer-events: none; }
+.gallery-room-zoom:disabled { opacity: .35; cursor: default; }
+.gallery-room-board-controls { justify-content: flex-start; }
+.gallery-room-surface:not(.is-focused):not(.gallery-room-title) { cursor: zoom-in; }
+.gallery-room-screen-approach { cursor: zoom-in; }
 .gallery-room-control.gallery-room-symbol {
   display: inline-grid;
   place-items: center;
@@ -195,10 +212,10 @@
 .gallery-room-story.is-wall-panel.is-tablet:not(.is-focused) { --room-copy: 17px; }
 .gallery-room-story.is-wall-panel .gallery-room-story-scroll { padding: 10px 12px; }
 .gallery-room-story.is-wall-panel .gallery-room-story-title { display: none; }
-.is-wall-panel .gallery-room-board-controls { padding: 4px 7px; }
-.gallery-room-story.is-wall-panel .gallery-room-board-controls { padding: 4px 7px; }
+.is-wall-panel .gallery-room-board-controls { padding: 3px 6px; }
+.gallery-room-story.is-wall-panel .gallery-room-board-controls { padding: 3px 6px; }
 .gallery-room-surface.is-wall-panel:not(.gallery-room-photo-board) .gallery-room-control.gallery-room-symbol { flex-basis: 28px; width: 28px; height: 28px; min-height: 28px; font-size: 20px; }
-.gallery-room-media.is-wall-panel:not(.gallery-room-photo-board) { border-width: 2px; }
+.gallery-room-media.is-wall-panel:not(.gallery-room-photo-board) { border-width: 1px; }
 .gallery-room-media.is-wall-panel .gallery-room-screen-header { padding: 4px 7px; }
 .gallery-room-media.is-wall-panel .gallery-room-screen-caption { font-size: 13px; line-height: 1.3; max-height: 34px; }
 .gallery-room-media.is-wall-panel .gallery-room-screen-content { min-height: 0; }
@@ -209,6 +226,13 @@
 .gallery-room-media.is-wall-panel:not(.is-focused) .gallery-room-screen-actions > a::after { content: '↗'; font-size: 16px; }
 .gallery-room-media.is-wall-panel.is-narrow .gallery-room-screen-actions > a { font-size: 0; }
 .gallery-room-media.is-wall-panel.is-narrow .gallery-room-screen-actions > a::after { content: '↗'; font-size: 16px; }
+/* Small spatial previews retain both magnifiers; original links return on approach. */
+.gallery-room-media.is-wall-panel.is-tiny:not(.gallery-room-photo-board):not(.is-focused) .gallery-room-screen-header,
+.gallery-room-media.is-wall-panel.is-tiny:not(.gallery-room-photo-board):not(.is-focused) .gallery-room-credit,
+.gallery-room-media.is-wall-panel.is-tiny:not(.gallery-room-photo-board):not(.is-focused) .gallery-room-screen-actions > a { display: none; }
+.gallery-room-media.is-wall-panel.is-tiny:not(.gallery-room-photo-board):not(.is-focused) .gallery-room-screen-actions { justify-content: flex-start; gap: 2px; }
+.gallery-room-media.is-wall-panel.is-tiny:not(.gallery-room-photo-board):not(.is-focused) .gallery-room-screen-controls { padding: 1px 2px; }
+.gallery-room-media.is-wall-panel.is-tiny:not(.gallery-room-photo-board):not(.is-focused) .gallery-room-control.gallery-room-zoom { flex: 0 0 12px; width: 12px; height: 12px; min-height: 12px; padding: 0; font-size: 12px; }
 .gallery-room-references.is-wall-panel .gallery-room-board-controls { flex: 0 0 auto; }
 .gallery-room-references.is-wall-panel:not(.is-focused) .gallery-room-references-header { padding: 5px 8px; }
 .gallery-room-references.is-wall-panel:not(.is-focused) .gallery-room-references-header h2 { font-size: 16px; }
@@ -217,6 +241,7 @@
 
 /* Phone wall labels and navigation leave more room for the project itself. */
 @media (max-width: 699px) {
+  .gallery-room-surface { --room-border-width: .5px; --room-scrollbar-width: 3px; }
   .gallery-room-surface.gallery-room-title.is-wall-panel { gap: 4px; padding: 3px 8px; }
   .gallery-room-surface.gallery-room-title.is-wall-panel h1 { margin-bottom: 3px; font-size: 16px; line-height: 1.1; }
   .gallery-room-surface.gallery-room-title.is-wall-panel.has-long-title h1 { font-size: 14px; }
@@ -227,10 +252,10 @@
   .gallery-room-story.is-wall-panel.is-tablet:not(.is-focused) { --room-copy: 11.5px; --room-heading: 10px; }
   .gallery-room-story.is-wall-panel .gallery-room-story-scroll { padding: 6px 8px; line-height: 1.42; }
   .gallery-room-story.is-wall-panel h3 { margin: 8px 0 4px; font-size: 10px; line-height: 1.3; }
-  .gallery-room-story.is-wall-panel .gallery-room-summary { padding-left: 8px; border-left-width: 2px; margin-bottom: 8px; }
+  .gallery-room-story.is-wall-panel .gallery-room-summary { padding-left: 8px; border-left-width: 1px; margin-bottom: 8px; }
   .gallery-room-story.is-wall-panel .gallery-room-summary h3 { margin-top: 0; }
   .gallery-room-story.is-wall-panel p { margin-bottom: 6px; }
-  .gallery-room-surface.is-wall-panel .gallery-room-board-controls { padding: 3px 5px; }
+  .gallery-room-surface.is-wall-panel .gallery-room-board-controls { padding: 2px 4px; }
   .gallery-room-surface.gallery-room-references.is-wall-panel .gallery-room-references-header { padding: 3px 6px; }
   .gallery-room-surface.gallery-room-references.is-wall-panel .gallery-room-references-header h2 { font-size: 10px; line-height: 1.2; }
   .gallery-room-references.is-wall-panel .gallery-room-references-count { font-size: 8px; }
@@ -250,14 +275,6 @@
     min-height: calc(24px * var(--photo-ui-scale));
     padding: 0;
     font-size: calc(14px * var(--photo-ui-scale));
-  }
-  .gallery-room-surface.is-wall-panel .gallery-room-screen-approach .gallery-room-control.gallery-room-symbol { flex-basis: 24px; width: 24px; height: 24px; min-height: 24px; padding: 0; font-size: 16px; }
-  .gallery-room-media.gallery-room-photo-board.is-wall-panel .gallery-room-screen-approach .gallery-room-control.gallery-room-symbol {
-    flex-basis: min(24px,calc(24px * var(--photo-ui-scale)));
-    width: min(24px,calc(24px * var(--photo-ui-scale)));
-    height: min(24px,calc(24px * var(--photo-ui-scale)));
-    min-height: min(24px,calc(24px * var(--photo-ui-scale)));
-    font-size: min(16px,calc(14px * var(--photo-ui-scale)));
   }
   .gallery-room-photo-board.is-wall-panel .gallery-room-photo-caption-title { font-size: calc(12px * var(--photo-ui-scale)); }
   .gallery-room-photo-board.is-wall-panel .gallery-room-photo-credit { font-size: calc(11px * var(--photo-ui-scale)); }

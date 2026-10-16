@@ -19,6 +19,7 @@ const source=await readFile(new URL('../src/galleryRoom.js',import.meta.url),'ut
 const brandLinksSource=await readFile(new URL('../src/brandLinks.js',import.meta.url),'utf8');
 const dragSource=source.slice(source.indexOf('  let drag=null;'),source.indexOf('  reducedQuery.addEventListener'));
 const renderSource=source.slice(source.indexOf('  function render(time)'),source.indexOf('  function dispose()'));
+const sampleSource=source.slice(source.indexOf('  function sampleAnimation(time)'),source.indexOf('  function animatePose(plan)'));
 const movementSource=source.slice(source.indexOf('  function clearMovementKeys()'),source.indexOf('  function currentStation()'));
 const keyboardSource=source.slice(source.indexOf('  const controlTarget='),source.indexOf('  let drag=null;'));
 assert.ok(dragSource.includes("stage.addEventListener('pointermove'"));
@@ -53,9 +54,10 @@ function fixture(width,height,kind=null,dockBounds=null){
     adoptWalkStation(){},beginManualMovement(){context.animation=null;context.focusKind=null;},
     cssRenderer:{render(){}},cssScene:new THREE.Scene(),cssCamera:new THREE.PerspectiveCamera(),renderGalleryRoomDom,
     scene:{},renderer:{render(){},info:{render:{calls:1,triangles:1}}},
+    setProjection(offset){if(!offset.x&&!offset.y)camera.clearViewOffset();else camera.setViewOffset(width,height,offset.x,offset.y,width,height);},
     requestAnimationFrame:()=>1,dispatchEvent(){},Event
   });
-  new vm.Script(dragSource+'\n'+renderSource).runInContext(context);
+  new vm.Script(dragSource+'\n'+sampleSource+'\n'+renderSource).runInContext(context);
   return {context,plan,focuses,keys,tapKeys,captures,
     dispatch(type,details={}){handlers.get(type)?.({button:0,isPrimary:true,pointerId:1,clientX:100,clientY:100,...details});}};
 }
@@ -95,7 +97,7 @@ function integratedMovement(f){
 
 // Run the actual startup and public API with native scene/camera math. Only
 // browser surfaces, scheduling and GPU rendering are replaced in this fixture.
-function startupFixture({reducedMotion=true,loadSummaryExporter}={}){
+function startupFixture({reducedMotion=true,coarse=false,loadSummaryExporter,loadGalleryMobile,createRendererError}={}){
   const pending=new Map(),timers=new Map(),events=[],pushed=[],replaced=[],resizes=[],globeSelections=[];
   let sequence=0,clock=0,picker;
   class Target{
@@ -135,6 +137,11 @@ function startupFixture({reducedMotion=true,loadSummaryExporter}={}){
     hasPointerCapture(id){return this.captures.has(id);}
     releasePointerCapture(id){this.captures.delete(id);}
     getBoundingClientRect(){
+      if(this.className==='gallery-room-header'){
+        const phone=context.innerWidth<700,left=context.innerWidth<360?14:phone?19:context.innerWidth<=900?24:32;
+        const top=phone?19:context.innerHeight<480?15:27,height=phone?28:32;
+        return {left,right:context.innerWidth-left,top,bottom:top+height,width:context.innerWidth-left*2,height};
+      }
       const phone=context.innerWidth<700,width=phone?220:336,height=phone?270:418,left=phone?16:28,bottom=context.innerHeight-(phone?18:27);
       return {left,right:left+width,top:bottom-height,bottom,width,height};
     }
@@ -150,7 +157,7 @@ function startupFixture({reducedMotion=true,loadSummaryExporter}={}){
     return visit(document.body)??null;
   };
   class Renderer{
-    constructor(){this.domElement=new Element('canvas');this.shadowMap={};this.info={render:{calls:0,triangles:0}};}
+    constructor(){const error=createRendererError?.();if(error)throw error;this.domElement=new Element('canvas');this.shadowMap={};this.info={render:{calls:0,triangles:0}};}
     setPixelRatio(){}setClearColor(){}setSize(){}dispose(){}forceContextLoss(){}
     render(scene,camera){scene.updateMatrixWorld(true);camera.updateMatrixWorld(true);this.info.render.calls++;}
   }
@@ -163,7 +170,8 @@ function startupFixture({reducedMotion=true,loadSummaryExporter}={}){
     renderGalleryRoomDom,createRoomJumpState,stepRoomJump,document,window,Element,AbortController,Event,
     bindAchievementSummaryDownload:(button,options)=>bindAchievementSummaryDownload(button,{...options,...(loadSummaryExporter?{loadExporter:loadSummaryExporter}:{})}),
     location:{href:'https://staging.batikanor.com/'},innerWidth:1280,innerHeight:900,devicePixelRatio:1,
-    matchMedia:()=>reducedQuery,performance:{now:()=>clock},
+    matchMedia:query=>query==='(pointer: coarse)'?{matches:coarse}:reducedQuery,performance:{now:()=>clock},
+    loadGalleryMobile:loadGalleryMobile??(()=>{throw new Error('A spatial fixture must explicitly bypass native mobile startup');}),
     createGalleryRoomPicker:({projects,onSortChange})=>(picker={element:new Element('div'),projects,
       setActive(slug){this.activeSlug=slug;},setProjects(projects){this.projects=projects;},
       setSortMode(mode){this.sortMode=mode;},changeSort(mode){onSortChange(mode);},close(){},dispose(){}}),
@@ -185,9 +193,10 @@ function startupFixture({reducedMotion=true,loadSummaryExporter}={}){
   context.history={pushState(_state,_title,url){context.location.href=url.href;pushed.push(url.searchParams.get('event'));},
     replaceState(_state,_title,url){context.location.href=url.href;replaced.push(url.searchParams.get('event'));}};
   new vm.Script(brandLinksSource.replace(/^import .*;\n/gm,'').replace(/^export /gm,'')).runInContext(context);
-  new vm.Script(source.replace(/^import .*;\n/gm,'').replace(/^export /gm,'')).runInContext(context);
+  new vm.Script(source.replace(/^import .*;\n/gm,'').replace(/^export /gm,'').replace("import('./galleryRoomMobile.js')",'loadGalleryMobile()')).runInContext(context);
   return {context,document,enter,original,pending,timers,events,pushed,replaced,resizes,globeSelections,get picker(){return picker;},
     tick(time){clock=time;const callbacks=[...pending.values()];pending.clear();callbacks.forEach(callback=>callback(time));},
+    advanceClock(time){clock=time;},
     key(key,details={}){
       let event={key,code:key===' '?'Space':'Key'+key.toUpperCase(),target:document.activeElement,...details};
       // Native keyboard events reach a modal's ancestor handler before window.
@@ -201,7 +210,7 @@ function startupFixture({reducedMotion=true,loadSummaryExporter}={}){
 }
 
 test('a deferred gallery prepares useful frames without consuming intro keys, pointers, history or focus',async()=>{
-  const f=startupFixture(),api=await f.context.startGalleryRoom({deferActivation:true});
+  const f=startupFixture(),api=await f.context.startGalleryRoom({deferActivation:true,spatial:true});
   try{
     const initial=api.getStats(),stage=f.document.getElementById('gallery-room-stage');
     assert.equal(initial.active,false);assert.equal(initial.viewLocked,true);assert.equal(api.root.inert,true);assert.equal(api.root.classList.contains('is-preparing'),true);
@@ -232,7 +241,7 @@ test('a deferred gallery prepares useful frames without consuming intro keys, po
 });
 
 test('explicit activation refits the prepared gallery, focuses its stage and enables input only once',async()=>{
-  const f=startupFixture(),api=await f.context.startGalleryRoom({deferActivation:true});
+  const f=startupFixture(),api=await f.context.startGalleryRoom({deferActivation:true,spatial:true});
   try{
     f.tick(0);f.tick(16.7);f.context.innerWidth=390;f.context.innerHeight=844;
     f.original.inert=false; // finishIntro has released the old app before activation.
@@ -240,7 +249,7 @@ test('explicit activation refits the prepared gallery, focuses its stage and ena
     const stage=f.document.getElementById('gallery-room-stage'),active=api.getStats();
     assert.equal(active.active,true);assert.equal(api.root.inert,false);assert.equal(api.root.classList.contains('is-preparing'),false);
     assert.equal(f.original.inert,true);assert.equal(f.document.activeElement,stage);assert.equal(api.camera.aspect,390/844);
-    assert.deepEqual(f.resizes.at(-1),{width:390,height:844,dockBounds:stage.getBoundingClientRect()});
+    assert.deepEqual(JSON.parse(JSON.stringify(f.resizes.at(-1))),{width:390,height:844,dockBounds:stage.getBoundingClientRect(),headerBounds:{left:19,right:371,top:19,bottom:47,controlsBottom:81}});
     const selected=api.room.stations.get(active.activeSlug),plan=overviewCameraPlan(selected,active.viewport,roomCameraFov(390));
     assert.deepEqual(active.camera,plan.position,'the first exposed frame uses the latest viewport');
     const resizeCount=f.resizes.length,focusCount=stage.focusCount;api.activate();
@@ -259,7 +268,7 @@ test('explicit activation refits the prepared gallery, focuses its stage and ena
 });
 
 test('an entrance map choice exposes the chosen wall, content, globe and fitted camera before stage input',async()=>{
-  const f=startupFixture(),api=await f.context.startGalleryRoom({deferActivation:true});
+  const f=startupFixture(),api=await f.context.startGalleryRoom({deferActivation:true,spatial:true});
   try{
     f.tick(0);f.tick(16.7);
     const prepared=api.getStats(),chosen=projects.find(project=>project.slug!==prepared.activeSlug).slug;
@@ -293,7 +302,7 @@ test('an entrance map choice exposes the chosen wall, content, globe and fitted 
 });
 
 test('an unknown entrance choice preserves the prepared project and cannot alter an active or disposed room',async()=>{
-  const f=startupFixture(),api=await f.context.startGalleryRoom({deferActivation:true});
+  const f=startupFixture(),api=await f.context.startGalleryRoom({deferActivation:true,spatial:true});
   const prepared=api.getStats();
   try{
     api.activate({eventSlug:'not-a-known-achievement'});
@@ -311,13 +320,70 @@ test('an unknown entrance choice preserves the prepared project and cannot alter
 
 test('default startup keeps deep links immediately active',async()=>{
   const f=startupFixture(),slug=projects[3].slug;f.context.location.href=portfolioUrl(f.context.location.href,{eventSlug:slug}).href;
-  const api=await f.context.startGalleryRoom();
+  const api=await f.context.startGalleryRoom({spatial:true});
   try{
     assert.equal(api.getStats().active,true);assert.equal(api.getStats().activeSlug,slug);assert.equal(api.root.inert,false);
     assert.equal(api.root.classList.contains('is-preparing'),false);assert.equal(f.document.documentElement.classList.contains('intro-active'),false);
     f.document.getElementById('gallery-room-stage').focus();
     assert.equal(f.key('ArrowRight').prevented,true);assert.notEqual(api.getStats().activeSlug,slug);
   }finally{api.dispose();}
+});
+
+test('phones and coarse-pointer tablets delegate to a native gallery before creating a spatial renderer',async()=>{
+  for(const [width,coarse,native]of[[320,false,true],[390,true,true],[699,false,true],[700,false,false],[700,true,true],[1000,true,true],[1001,true,false]]){
+    let calls=0,received;
+    const mobile={root:{},dispose(){}};
+    const f=startupFixture({coarse,loadGalleryMobile:async()=>({startGalleryMobile:options=>{calls++;received=options;return mobile;}})});
+    f.context.innerWidth=width;
+    const api=await f.context.startGalleryRoom({deferActivation:true});
+    try{
+      assert.equal(calls,native?1:0,`${width}px, coarse=${coarse}`);
+      if(native){
+        assert.equal(api,mobile);assert.equal(received.deferActivation,true);assert.equal(typeof received.onExploreRoom,'function');
+        assert.equal(f.document.getElementById('gallery-room-stage'),null,'the phone entry creates no CSS3D/WebGL room');
+        assert.equal(f.pending.size,0,'the spatial render loop never starts');
+      }else assert.ok(api.room,'desktop and fine-pointer tablet retain the spatial room');
+    }finally{api.dispose();}
+  }
+});
+
+test('native unlock hands the same selected achievement and importance order to one unlocked spatial room',async()=>{
+  let received,disposed=false,disposals=0,f;
+  const mobile={root:{},dispose(){if(disposed)return;disposed=true;disposals++;if(f.context.window.__galleryRoom===this)delete f.context.window.__galleryRoom;}};
+  f=startupFixture({coarse:true,loadGalleryMobile:async()=>({startGalleryMobile:options=>{received=options;f.context.window.__galleryRoom=mobile;return mobile;}})});
+  f.context.innerWidth=390;f.context.innerHeight=844;
+  const native=await f.context.startGalleryRoom(),chosen=projects[3].slug;
+  const first=received.onExploreRoom({eventSlug:chosen,sortMode:'importance'});
+  const repeated=received.onExploreRoom({eventSlug:chosen,sortMode:'importance'});
+  assert.equal(native,mobile);assert.equal(first,repeated,'repeated unlock taps share one handoff');
+  const api=await first;
+  try{
+    assert.equal(disposals,1);assert.equal(api.getStats().activeSlug,chosen);assert.equal(api.getStats().sortMode,'importance');
+    assert.equal(api.getStats().viewLocked,false);assert.equal(api.getStats().active,true);assert.equal(f.context.window.__galleryRoom,api);
+    assert.deepEqual(f.pushed,[]);assert.deepEqual(f.replaced,[],'changing presentation adds no history entries');
+  }finally{api.dispose();}
+});
+
+test('a failed spatial unlock restores the readable native gallery and permits another attempt',async()=>{
+  let f,attempts=0;const sessions=[],failure=new Error('WebGL unavailable');
+  f=startupFixture({coarse:true,createRendererError:()=>++attempts===1?failure:null,loadGalleryMobile:async()=>({startGalleryMobile:options=>{
+    const status={textContent:''};
+    const api={root:{querySelector:()=>status},status,options,sortMode:'recent',disposed:false,
+      setSortMode(mode){this.sortMode=mode;},dispose(){if(this.disposed)return;this.disposed=true;if(f.context.window.__galleryRoom===this)delete f.context.window.__galleryRoom;}};
+    f.context.window.__galleryRoom=api;sessions.push(api);return api;
+  }})});
+  f.context.innerWidth=390;f.context.innerHeight=844;
+  const chosen=projects[3].slug;f.context.location.href=portfolioUrl(f.context.location.href,{eventSlug:chosen}).href;
+  const initial=await f.context.startGalleryRoom();
+  await assert.rejects(initial.options.onExploreRoom({eventSlug:chosen,sortMode:'importance'}),error=>error===failure);
+  const restored=sessions.at(-1);
+  assert.equal(sessions.length,2);assert.equal(initial.disposed,true);assert.equal(restored.disposed,false);
+  assert.equal(f.context.window.__galleryRoom,restored);assert.equal(restored.sortMode,'importance');
+  assert.match(restored.status.textContent,/keep exploring here/);assert.equal(f.document.getElementById('gallery-room-stage'),null,'a failed room leaves no orphan surface');
+  assert.equal(new URL(f.context.location.href).searchParams.get('event'),chosen);
+  const retry=await restored.options.onExploreRoom({eventSlug:chosen,sortMode:'importance'});
+  try{assert.equal(attempts,2);assert.equal(retry.getStats().activeSlug,chosen);assert.equal(retry.getStats().viewLocked,false);}
+  finally{retry.dispose();}
 });
 
 test('the achievement header configures its PDF lazily without stage input and exposes accessible branded contact links',async()=>{
@@ -327,7 +393,7 @@ test('the achievement header configures its PDF lazily without stage input and e
     loads++;
     return {exportProjectsPdf:options=>{exportOptions=options;return new Promise(resolve=>{finishRendering=resolve;});}};
   }});
-  const api=await f.context.startGalleryRoom();
+  const api=await f.context.startGalleryRoom({spatial:true});
   const button=f.document.getElementById('gallery-summary-download'),status=f.document.getElementById('gallery-summary-status');
   const find=(element,predicate)=>predicate(element)?element:element.children.map(child=>find(child,predicate)).find(Boolean);
   let dialog;
@@ -406,7 +472,7 @@ test('the achievement header configures its PDF lazily without stage input and e
 });
 
 test('the initial view lock blocks walking and looking, keeps Space jumping, and unlocks through its native button',async()=>{
-  const f=startupFixture(),api=await f.context.startGalleryRoom();
+  const f=startupFixture(),api=await f.context.startGalleryRoom({spatial:true});
   try{
     const stage=f.document.getElementById('gallery-room-stage'),button=f.document.getElementById('gallery-view-lock');
     stage.focus();f.tick(0);f.tick(16.7);
@@ -448,7 +514,7 @@ test('the initial view lock blocks walking and looking, keeps Space jumping, and
 });
 
 test('relocking freezes the chosen view, releases held movement and drag, and preserves queued and airborne jumps',async()=>{
-  const f=startupFixture(),api=await f.context.startGalleryRoom();
+  const f=startupFixture(),api=await f.context.startGalleryRoom({spatial:true});
   try{
     const stage=f.document.getElementById('gallery-room-stage');stage.focus();api.setViewLocked(false);f.tick(0);f.tick(16.7);
     f.key('w');f.tick(33.4);f.key('d');
@@ -473,7 +539,7 @@ test('relocking freezes the chosen view, releases held movement and drag, and pr
 });
 
 test('locked stage clicks still approach boards and Escape returns to the complete current wall',async()=>{
-  const f=startupFixture(),api=await f.context.startGalleryRoom();
+  const f=startupFixture(),api=await f.context.startGalleryRoom({spatial:true});
   try{
     const stage=f.document.getElementById('gallery-room-stage');stage.focus();f.tick(0);f.tick(16.7);
     const initial=api.getStats(),station=api.room.stations.get(initial.activeSlug);
@@ -490,7 +556,7 @@ test('locked stage clicks still approach boards and Escape returns to the comple
 });
 
 test('lock toggles preserve programmatic reading animations and pending project navigation',async()=>{
-  const f=startupFixture({reducedMotion:false}),api=await f.context.startGalleryRoom();
+  const f=startupFixture({reducedMotion:false}),api=await f.context.startGalleryRoom({spatial:true});
   const lockButton=f.document.getElementById('gallery-view-lock');
   try{
     const stage=f.document.getElementById('gallery-room-stage');stage.focus();f.tick(0);f.tick(16.7);
@@ -512,6 +578,52 @@ test('lock toggles preserve programmatic reading animations and pending project 
   assert.equal(api.getStats().viewLocked,true,'neither old controls nor the API can change a disposed room');
   assert.equal(f.key('w',{target:f.document.body}).prevented,undefined,'disposal releases global keyboard handling');
   assert.equal(f.pending.size,0);
+});
+
+test('repeated approach and return taps do not restart the current camera transition',async()=>{
+  const f=startupFixture({reducedMotion:false}),api=await f.context.startGalleryRoom({spatial:true});
+  try{
+    f.tick(0);f.tick(16.7);
+    const overview=api.getStats(),surface=api.content.stationSurfaces.get(overview.activeSlug).story;
+    const destination=surfaceCameraPlan(surface,overview.viewport,api.camera.fov);
+    const duration=roomTransitionDuration(new THREE.Vector3(...overview.camera).distanceTo(new THREE.Vector3(...destination.position)));
+    api.content.approach('story');
+    f.advanceClock(16.7+duration*.4);api.content.approach('story');
+    f.advanceClock(16.7+duration*.8);api.content.approach('story');
+    f.tick(16.7+duration+1);
+    assert.equal(api.getStats().transitioning,false,'the first approach deadline is retained');
+    assert.deepEqual(api.getStats().camera,destination.position,'the completed camera is the exact destination');
+    assert.deepEqual(api.getStats().lookTarget,destination.target);
+    const backStart=16.7+duration+1;
+    const backDuration=roomTransitionDuration(new THREE.Vector3(...destination.position).distanceTo(new THREE.Vector3(...overview.camera)));
+    api.content.returnToRoom();
+    f.advanceClock(backStart+backDuration*.4);api.content.returnToRoom();
+    f.advanceClock(backStart+backDuration*.8);api.content.returnToRoom();
+    f.tick(backStart+backDuration+1);
+    assert.equal(api.getStats().transitioning,false,'the first return deadline is retained');
+    assert.equal(api.getStats().focusKind,null);assert.deepEqual(api.getStats().camera,overview.camera);assert.deepEqual(api.getStats().lookTarget,overview.lookTarget);
+    assert.equal(api.camera.view?.enabled,false,'return settles the complete wall projection');
+    api.content.returnToRoom();assert.equal(api.getStats().transitioning,false,'a settled Return does not start an idle tween');
+  }finally{api.dispose();}
+});
+
+test('a new focus destination samples the in-flight camera between render frames',async()=>{
+  const f=startupFixture({reducedMotion:false}),api=await f.context.startGalleryRoom({spatial:true});
+  try{
+    f.tick(0);f.tick(16.7);
+    const origin=api.getStats(),story=api.content.stationSurfaces.get(origin.activeSlug).story;
+    const destination=surfaceCameraPlan(story,origin.viewport,api.camera.fov);
+    const duration=roomTransitionDuration(new THREE.Vector3(...origin.camera).distanceTo(new THREE.Vector3(...destination.position)));
+    api.content.approach('story');f.tick(16.7+duration*.1);
+    const oldRendered=api.getStats().camera;
+    f.advanceClock(16.7+duration*.4);
+    const t=.4,smooth=t*t*t*(t*(t*6-15)+10);
+    const expected=new THREE.Vector3(...origin.camera).lerp(new THREE.Vector3(...destination.position),smooth);
+    api.content.returnToRoom();
+    assert.ok(api.camera.position.distanceTo(expected)<1e-10,'return starts at the current tween sample');
+    assert.notDeepEqual(api.getStats().camera,oldRendered,'it does not restart from a stale rendered frame');
+    f.tick(10000);assert.equal(api.getStats().transitioning,false);assert.deepEqual(api.getStats().camera,origin.camera);
+  }finally{api.dispose();}
 });
 
 const viewports=[[1280,900],[1280,720],[700,1080],[568,320],[390,844]];
@@ -627,6 +739,53 @@ test('resize updates physical wall layout before live content and applies the ne
   assert.deepEqual(context.camera.position.toArray(),expected.position);
 });
 
+test('phone browser-height changes preserve the chosen reading board and refit every live pose',async()=>{
+  const f=startupFixture(),api=await f.context.startGalleryRoom({spatial:true});
+  try{
+    const chosen=api.getStats().activeSlug;
+    for(const [width,height]of[[390,844],[390,664],[390,844],[412,915],[412,780],[844,390],[390,844]]){
+      f.context.innerWidth=width;f.context.innerHeight=height;
+      f.context.window.dispatch('resize');
+      api.content.approach('story');
+      const stats=api.getStats(),station=api.room.stations.get(chosen);
+      assert.equal(stats.activeSlug,chosen);assert.equal(stats.focusKind,'story');
+      assert.equal(station.wallLayout.width,width);assert.equal(station.wallLayout.height,height);
+      assert.equal(stats.viewport.headerBounds.right,width-stats.viewport.headerBounds.left);
+      const expected=surfaceCameraPlan(api.content.stationSurfaces.get(chosen).story,stats.viewport,api.camera.fov);
+      assert.deepEqual(stats.camera,expected.position,'visible browser dimensions determine the complete approached frame');
+      assert.equal(api.getStats().transitioning,false,'a resize cannot leave a stale in-progress button animation');
+      assert.equal(api.camera.aspect,width/height);
+    }
+    assert.deepEqual(f.pushed,[]);assert.deepEqual(f.replaced,[],'browser chrome changes do not change project history');
+  }finally{api.dispose();}
+});
+
+test('native phone scroll regions have no ancestor blocking pan-y and fixed board chrome cannot focus-scroll sideways',async()=>{
+  const [roomCss,contentCss,globeCss]=await Promise.all(['galleryRoom.css','galleryRoomContent.css','galleryRoomGlobe.css'].map(name=>readFile(new URL('../src/'+name,import.meta.url),'utf8')));
+  const declarations=(css,selector)=>{
+    const rule=[...css.matchAll(/([^{}]+)\{([^{}]*)\}/g)].find(match=>match[1].trim()===selector);
+    assert.ok(rule,`${selector} has its own gesture boundary`);
+    return Object.fromEntries([...rule[2].matchAll(/([\w-]+)\s*:\s*([^;]+);?/g)].map(match=>[match[1],match[2].trim()]));
+  };
+  const stage=declarations(roomCss,'.gallery-room-stage');
+  const surface=declarations(contentCss,'.gallery-room-surface');
+  const globe=declarations(globeCss,'.gallery-room-globe');
+  const nativePanY=ancestors=>ancestors.every(style=>!style['touch-action']||['auto','pan-y','manipulation'].includes(style['touch-action']));
+  for(const selector of['.gallery-room-story-scroll','.gallery-room-title-content','.gallery-room-references-list','.gallery-room-photo-caption']){
+    const scroll=declarations(contentCss,selector);
+    assert.ok(nativePanY([stage,surface,scroll]),`${selector}: a parent must not cancel its native vertical gesture`);
+    assert.equal(scroll['touch-action'],'pan-y');
+  }
+  for(const selector of['.gallery-room-globe-credit','.gallery-room-globe-cluster-options']){
+    assert.ok(nativePanY([globe,declarations(globeCss,selector)]),`${selector}: globe dragging must not disable native list scrolling`);
+  }
+  assert.ok(nativePanY([declarations(roomCss,'.gallery-room-picker-options')]));
+  assert.equal(surface.overflow,'clip','outer frames cannot scroll hidden footer controls horizontally on native focus');
+  const backdrop=declarations(roomCss,'.gallery-room-backdrop');
+  assert.equal(backdrop['touch-action'],'none');assert.equal(backdrop['pointer-events'],'auto','the empty room keeps a separate custom drag target');
+  assert.equal(declarations(globeCss,'.gallery-room-globe-canvas')['touch-action'],'none','the actual globe canvas keeps its custom drag gesture');
+});
+
 test('holding D walks continuously to the real neighboring wall and synchronizes project, map, URL and visible content',()=>{
   for(const [width,height]of viewports){
     const f=fixture(width,height),m=integratedMovement(f),camera=f.context.camera;
@@ -700,7 +859,7 @@ test('jumping across a station boundary preserves airborne height and the global
 test('importance order preserves the current focused achievement and synchronizes selector, walls, counter order and arrows',async()=>{
   const recent=sortAchievementsNewestFirst(projects),important=sortAchievementsByImportance(recent),chosen=recent[4].slug;
   const f=startupFixture();f.context.location.href=portfolioUrl(f.context.location.href,{eventSlug:chosen}).href;
-  const api=await f.context.startGalleryRoom();
+  const api=await f.context.startGalleryRoom({spatial:true});
   try{
     assert.equal(api.getStats().sortMode,'recent');
     assert.deepEqual([...api.getStats().projectOrder],recent.map(project=>project.slug));
@@ -734,7 +893,7 @@ test('importance order preserves the current focused achievement and synchronize
 
 test('sorting during a pending project change commits that selected achievement once and retains order through browser history',async()=>{
   const recent=sortAchievementsNewestFirst(projects),important=sortAchievementsByImportance(recent);
-  const f=startupFixture({reducedMotion:false}),api=await f.context.startGalleryRoom();
+  const f=startupFixture({reducedMotion:false}),api=await f.context.startGalleryRoom({spatial:true});
   try{
     f.document.getElementById('gallery-next').dispatch('click');
     const pending=api.getStats().pendingSlug;assert.equal(pending,recent[1].slug);assert.equal(f.timers.size,1);
@@ -752,7 +911,7 @@ test('sorting during a pending project change commits that selected achievement 
 });
 
 test('deferred and disposed galleries cannot be reordered by old controls or their public API',async()=>{
-  const f=startupFixture(),api=await f.context.startGalleryRoom({deferActivation:true});
+  const f=startupFixture(),api=await f.context.startGalleryRoom({deferActivation:true,spatial:true});
   const originalOrder=[...api.getStats().projectOrder];
   try{
     f.picker.changeSort('importance');assert.equal(api.getStats().sortMode,'recent');
@@ -767,7 +926,7 @@ test('deferred and disposed galleries cannot be reordered by old controls or the
 
 test('Back to the original bare gallery URL restores its original achievement after importance sorting',async()=>{
   const recent=sortAchievementsNewestFirst(projects),important=sortAchievementsByImportance(recent);
-  const f=startupFixture(),api=await f.context.startGalleryRoom();
+  const f=startupFixture(),api=await f.context.startGalleryRoom({spatial:true});
   try{
     assert.notEqual(recent[0].slug,important[0].slug);
     f.picker.changeSort('importance');assert.equal(api.getStats().activeSlug,recent[0].slug);

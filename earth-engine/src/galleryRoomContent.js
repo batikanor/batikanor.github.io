@@ -163,6 +163,7 @@ function makePreview(media, project, options, photo = null) {
     preview = node('img', 'gallery-room-photo');
     preview.alt = title;
     preview.decoding = 'async';
+    if (options.presentation === 'flow') preview.loading = 'lazy';
     if (photo) { preview.width = photo.width; preview.height = photo.height; }
     preview.addEventListener('load', () => { if (connected) status.textContent = ''; });
     preview.addEventListener('error', () => {
@@ -186,6 +187,7 @@ function makePreview(media, project, options, photo = null) {
   } else if (spec?.kind === 'iframe') {
     preview = node('iframe', 'gallery-room-native-frame');
     preview.title = title;
+    if (options.presentation === 'flow') preview.loading = 'lazy';
     preview.allow = 'accelerometer; encrypted-media; gyroscope; picture-in-picture; clipboard-write';
     preview.referrerPolicy = 'strict-origin-when-cross-origin';
     // Viewer controls remain on this physical screen. No modal/fullscreen surface.
@@ -214,7 +216,7 @@ function makePreview(media, project, options, photo = null) {
       imageFallbackAttempted = false;
       status.textContent = spec.kind === 'iframe' ? `Opening ${spec.provider} preview…` : spec.kind === 'image' ? 'Loading original photo…' : 'Loading original video…';
       preview.src = spec.url;
-      if (spec.kind === 'iframe') timeout = setTimeout(() => {
+      if (spec.kind === 'iframe' && options.presentation !== 'flow') timeout = setTimeout(() => {
         if (connected) status.textContent = 'The provider may be slow or may block embedding. Open the original below.';
       }, 12000);
     },
@@ -234,19 +236,29 @@ function makePreview(media, project, options, photo = null) {
   };
 }
 
-function nextObject(station, descriptor, options) {
-  const objects = Object.values(station.descriptors).filter(item => ['story', 'media', 'references'].includes(item.type));
-  const index = objects.indexOf(descriptor);
-  const next = objects[(index + 1) % objects.length];
-  if (next && next !== descriptor) options.onFocusSurface?.(next);
+function zoomControls(descriptor, options, host) {
+  for (const direction of ['in', 'out']) {
+    const button = symbolControl('', `Zoom ${direction}`, () => {
+      if (button.disabled) return;
+      if (direction === 'in') options.onFocusSurface?.(descriptor);
+      else options.onReturnToRoom?.();
+    }, `gallery-room-zoom gallery-room-zoom-${direction}`);
+    const mark = direction === 'in' ? '<path d="M7 10.5h7M10.5 7v7"/>' : '<path d="M7 10.5h7"/>';
+    button.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="10.5" cy="10.5" r="6.5"/>${mark}<path d="m15.5 15.5 4.5 4.5"/></svg>`;
+    button.disabled = direction === 'out';
+    descriptor[direction === 'in' ? 'zoomIn' : 'zoomOut'] = button;
+    host.append(button);
+  }
+}
+
+function updateZoomControls(descriptor, focused) {
+  if (descriptor.zoomIn) descriptor.zoomIn.disabled = focused;
+  if (descriptor.zoomOut) descriptor.zoomOut.disabled = !focused;
 }
 
 function boardControls(station, descriptor, options) {
   const footer = node('footer', 'gallery-room-board-controls');
-  if (Object.values(station.descriptors).filter(item => item.type !== 'title').length > 1) {
-    footer.append(symbolControl('→', 'Next object', () => nextObject(station, descriptor, options)));
-  }
-  footer.append(symbolControl('↶', 'Return to room', () => options.onReturnToRoom?.()));
+  zoomControls(descriptor, options, footer);
   return footer;
 }
 
@@ -262,11 +274,21 @@ function storyContents(host, project, station, options) {
     summary.append(node('h3', null, 'Summary'), node('p', null, project.shortDescription));
     scroll.append(summary);
   }
-  // Media already occupies its original wall screen. Skip only its placement
-  // token, retaining the surrounding authored blocks and genuine inline links.
+  // Phone stories keep the authored paragraph/media sequence. The spatial
+  // wall still presents each source on its own neighboring screen.
+  const inlineMedia = new Map(Object.values(station.descriptors)
+    .filter(descriptor => descriptor.type === 'media').map(descriptor => [descriptor.media.key, descriptor]));
   let previous = 0;
   for (const match of description.matchAll(placeholder)) {
     textBlocks(scroll, description.slice(previous, match.index), options);
+    if (options.presentation === 'flow') {
+      const key = `${match[1] === 'image' ? 'image' : 'embed'}:${Number(match[2])}`;
+      const descriptor = inlineMedia.get(key);
+      if (descriptor && !station.inlineMedia.has(descriptor.kind)) {
+        descriptor.element.classList.add('gallery-room-inline-media');
+        scroll.append(descriptor.element);station.inlineMedia.add(descriptor.kind);
+      }
+    }
     previous = match.index + match[0].length;
   }
   textBlocks(scroll, description.slice(previous), options);
@@ -283,14 +305,14 @@ function monitorContents(host, project, station, descriptor, options) {
   const viewport = node('div', 'gallery-room-screen-content');
   const preview = makePreview(media, project, options);
   const approach = node('div', 'gallery-room-screen-approach');
-  approach.append(symbolControl('⤢', 'Approach screen', () => options.onFocusSurface?.(descriptor)));
+  approach.setAttribute('aria-hidden', 'true');
   preview.stage.append(approach);
   descriptor.approach = approach;
   viewport.append(preview.stage, preview.status);
   station.previews.set(descriptor.kind, preview);
   const controls = node('footer', 'gallery-room-screen-controls');
   const actions = node('div', 'gallery-room-screen-actions');
-  actions.append(symbolControl('→', 'Next object', () => nextObject(station, descriptor, options)), symbolControl('↶', 'Return to room', () => options.onReturnToRoom?.(), 'gallery-room-screen-return'));
+  zoomControls(descriptor, options, actions);
   sourceLink(actions, media, options);
   controls.append(actions);
   if (media.credit) {
@@ -308,7 +330,7 @@ function photoContents(host, project, station, descriptor, options) {
   host.dataset.photoHeight = photo.height;
   const preview = makePreview(media, project, options, photo);
   const approach = node('div', 'gallery-room-screen-approach');
-  approach.append(symbolControl('⤢', 'Approach screen', () => options.onFocusSurface?.(descriptor)));
+  approach.setAttribute('aria-hidden', 'true');
   preview.stage.append(preview.status, approach);
   descriptor.approach = approach;
   station.previews.set(descriptor.kind, preview);
@@ -320,7 +342,7 @@ function photoContents(host, project, station, descriptor, options) {
   if (media.credit) caption.append(node('p', 'gallery-room-photo-credit', media.credit));
   const controls = node('footer', 'gallery-room-screen-controls');
   const actions = node('div', 'gallery-room-screen-actions');
-  actions.append(symbolControl('→', 'Next object', () => nextObject(station, descriptor, options)), symbolControl('↶', 'Return to room', () => options.onReturnToRoom?.(), 'gallery-room-screen-return'));
+  zoomControls(descriptor, options, actions);
   sourceLink(actions, media, options);
   controls.append(actions);
   host.append(preview.stage, caption, controls);
@@ -361,10 +383,12 @@ function stationComponents(station, project) {
 }
 
 /** One physical board per story, media source or resource; native viewers stay on their own screens. */
-export function createGalleryRoomContent({scene, stations = [], activeSlug, baseHref, onFocusSurface, onProjectLink, onReturnToRoom} = {}) {
+export function createGalleryRoomContent({scene, stations = [], activeSlug, baseHref, onFocusSurface, onProjectLink, onReturnToRoom, presentation = 'spatial', container = null} = {}) {
   if (!scene?.add) throw new TypeError('A CSS3D scene is required');
+  const flow = presentation === 'flow';
+  if (flow && !container?.append) throw new TypeError('A native gallery flow container is required');
   const stationList = stations instanceof Map ? [...stations.values()] : [...stations];
-  const options = {baseHref: baseHref ?? window.location.href, onFocusSurface, onProjectLink, onReturnToRoom};
+  const options = {baseHref: baseHref ?? window.location.href, onFocusSurface, onProjectLink, onReturnToRoom, presentation};
   const surfaces = [];
   const stationSurfaces = new Map();
   const states = new Map();
@@ -375,7 +399,7 @@ export function createGalleryRoomContent({scene, stations = [], activeSlug, base
   for (const station of stationList) {
     const project = getProject(station.slug);
     if (!project) continue;
-    const state = {station, project, media: galleryStationMedia(project), links: galleryStationLinks(project), active: false, visible: false, focused: null, descriptors: {}, previews: new Map()};
+    const state = {station, project, media: galleryStationMedia(project), links: galleryStationLinks(project), active: false, visible: false, focused: null, descriptors: {}, previews: new Map(), inlineMedia: new Set()};
     states.set(project.slug, state);
     for (const pose of stationComponents(station, project)) {
       const kind = pose.id;
@@ -397,9 +421,22 @@ export function createGalleryRoomContent({scene, stations = [], activeSlug, base
       object.userData.surface = descriptor;
       state.descriptors[kind] = descriptor;
       surfaces.push(object);
-      scene.add(object);
+      if (!flow) scene.add(object);
+      let gesture = null;
+      element.addEventListener('pointerdown', event => {
+        gesture = {id: event.pointerId, x: event.clientX, y: event.clientY, dragged: false};
+      }, {passive: true});
+      element.addEventListener('pointermove', event => {
+        if (gesture?.id === event.pointerId && Math.hypot(event.clientX - gesture.x, event.clientY - gesture.y) > 8) gesture.dragged = true;
+      }, {passive: true});
+      element.addEventListener('pointercancel', () => {if (gesture) gesture.dragged = true;}, {passive: true});
       element.addEventListener('click', event => {
         if (event.target.closest('a,button,iframe,video,input,select,textarea')) return;
+        const owner = event.target.closest('[data-gallery-surface]');
+        if (owner && owner !== element) return;
+        if (gesture?.dragged && event.detail !== 0) return;
+        const selection = window.getSelection?.();
+        if (selection && !selection.isCollapsed && String(selection).trim() && element.contains?.(selection.anchorNode)) return;
         onFocusSurface?.(descriptor);
       });
       element.addEventListener('keydown', event => {
@@ -432,17 +469,23 @@ export function createGalleryRoomContent({scene, stations = [], activeSlug, base
   }
   function connectFocusedPreview(state) {
     for (const [id, preview] of state.previews) {
-      state.descriptors[id].approach.hidden = state.active && id === state.focused;
+      const nativeFrame = flow && preview.preview?.tagName === 'IFRAME';
+      state.descriptors[id].approach.hidden = flow ? !nativeFrame || id === state.focused : state.active && id === state.focused;
+      // A passive preview cannot trap the page's scroll inside Google Drive.
+      // Approaching activates the original viewer without navigating/reloading it.
+      if (nativeFrame) preview.preview.inert = id !== state.focused;
       // Adjacent walls retain their photographs and readable boards. Native
       // players belong only to the active wall and its current reading approach.
-      if (state.visible && (preview.isStatic || state.active && (!state.focused || id === state.focused))) preview.connect();
+      if (state.visible && (preview.isStatic || state.active && (flow || !state.focused || id === state.focused))) preview.connect();
       else preview.disconnect();
     }
   }
   function clearFocus(state) {
     const focused = state.focused != null;
     state.focused = null;
-    for (const descriptor of Object.values(state.descriptors)) descriptor.element.classList.remove('is-focused');
+    for (const descriptor of Object.values(state.descriptors)) {
+      descriptor.element.classList.remove('is-focused');updateZoomControls(descriptor, false);
+    }
     return focused;
   }
   function stop(state) {
@@ -454,22 +497,27 @@ export function createGalleryRoomContent({scene, stations = [], activeSlug, base
       descriptor.object.visible = false;
       descriptor.element.inert = true;
       descriptor.element.setAttribute('aria-hidden', 'true');
-      descriptor.element.remove();
+      if (!flow || !state.inlineMedia.has(descriptor.kind)) descriptor.element.remove();
     }
   }
   function start(state) {
     state.visible = true;
-    for (const descriptor of Object.values(state.descriptors)) {
-      descriptor.object.visible = true;
+    const descriptors = Object.values(state.descriptors);
+    const ordered = flow ? [state.descriptors.title, state.descriptors.story,
+      ...state.media.map(media => descriptors.find(item => item.type === 'media' && item.media.key === media.key)),
+      state.descriptors.references].filter(Boolean) : descriptors;
+    for (const descriptor of ordered) {
+      descriptor.object.visible = !flow;
       descriptor.element.inert = false;
       descriptor.element.removeAttribute('aria-hidden');
+      if (flow && !state.inlineMedia.has(descriptor.kind) && descriptor.element.parentElement !== container) container.append(descriptor.element);
     }
     connectFocusedPreview(state);
   }
   function refreshVisibility() {
     for (const [slug, state] of states) {
       state.active = slug === currentSlug;
-      if (state.active || explicitVisibleSlugs?.has(slug)) start(state);
+      if (state.active || !flow && explicitVisibleSlugs?.has(slug)) start(state);
       else stop(state);
     }
   }
@@ -492,12 +540,24 @@ export function createGalleryRoomContent({scene, stations = [], activeSlug, base
     const state = states.get(currentSlug);
     if (disposed || !state) return;
     state.focused = state.descriptors[id] ? id : null;
-    for (const descriptor of Object.values(state.descriptors)) descriptor.element.classList.toggle('is-focused', descriptor.kind === state.focused);
+    for (const descriptor of Object.values(state.descriptors)) {
+      const focused = descriptor.kind === state.focused;
+      descriptor.element.classList.toggle('is-focused', focused);updateZoomControls(descriptor, focused);
+    }
     connectFocusedPreview(state);
     resize(lastViewport);
   }
   function resize(viewport = {}) {
     lastViewport = viewport;
+    if (flow) {
+      for (const state of states.values()) for (const descriptor of Object.values(state.descriptors)) {
+        descriptor.element.classList.add('is-flow-panel');
+        descriptor.element.style.width = ''; descriptor.element.style.height = '';
+        descriptor.element.style.transform = ''; descriptor.element.style.position = 'relative';
+        descriptor.element.style.setProperty('--photo-ui-scale', '1');
+      }
+      return;
+    }
     const viewportWidth = typeof viewport === 'number' ? viewport : viewport.width ?? window.innerWidth;
     const compact = viewportWidth <= 600;
     const tablet = viewportWidth <= 900;
@@ -544,6 +604,7 @@ export function createGalleryRoomContent({scene, stations = [], activeSlug, base
         descriptor.element.classList.toggle('is-tablet', !compact && tablet);
         descriptor.element.classList.toggle('is-wall-panel', wall);
         descriptor.element.classList.toggle('is-narrow', descriptor.width < 260);
+        descriptor.element.classList.toggle('is-tiny', descriptor.width < 100);
         if (descriptor.type === 'title') {
           descriptor.element.classList.toggle('has-stacked-technologies', wall ? descriptor.titleLayout?.technologiesStacked : viewportWidth < 700);
           descriptor.element.style.setProperty('--title-technologies-width', `${wall ? descriptor.titleLayout?.technologiesWidth ?? 280 : Math.min(280, descriptor.width * .28)}px`);

@@ -11,7 +11,7 @@ const source = (await readFile(new URL('../src/galleryRoomGlobe.js', import.meta
   .replace("from 'three';", `from '${import.meta.resolve('three')}';`);
 const {galleryGlobeCoordinate, galleryGlobeRotation, galleryGlobeYawTarget,
   galleryGlobeIsTap, pickGalleryGlobeMarker, clusterGalleryGlobeMarkers, pickGalleryGlobeCluster,
-  galleryGlobeClusterTarget, GALLERY_GLOBE_MAX_ZOOM, GALLERY_GLOBE_PROJECT_ZOOM} = await import(`data:text/javascript;base64,${Buffer.from(source).toString('base64')}`);
+  galleryGlobeClusterTarget, galleryGlobeProjectTarget, GALLERY_GLOBE_MAX_ZOOM, GALLERY_GLOBE_PROJECT_ZOOM} = await import(`data:text/javascript;base64,${Buffer.from(source).toString('base64')}`);
 const projects = JSON.parse(await readFile(new URL('../src/data/achievements.json', import.meta.url), 'utf8'));
 const near = (actual, expected, tolerance = 1e-7) => assert.ok(Math.abs(actual - expected) < tolerance,
   `${actual} differs from ${expected}`);
@@ -75,7 +75,8 @@ test('delayed dot activation preserves its repeat-pick position through the real
   const flightSource = source.slice(source.indexOf('  function advanceFlight(time)'), source.indexOf('  function focusCluster(cluster)'));
   const activateSource = source.slice(source.indexOf('  function setActive(slug,'), source.indexOf('  function resize()'));
   const context = vm.createContext({THREE, GALLERY_GLOBE_MAX_ZOOM, GALLERY_GLOBE_PROJECT_ZOOM,
-    galleryGlobeRotation, galleryGlobeYawTarget, disposed: false, locations: projects, activeSlug: null,
+    galleryGlobeRotation, galleryGlobeYawTarget, galleryGlobeProjectTarget, disposed: false, locations: projects, activeSlug: null,
+    projectFocused: false, width: 336, height: 336,
     select: {}, live: {}, motion: {matches: true}, pitch: .4, yaw: -Math.PI / 2, zoom: 1,
     camera: new THREE.OrthographicCamera(-1.23, 1.23, 1.23, -1.23, .1, 10),
     window: {performance: {now: () => 155}}, hoverSlug: null, previousPick: null, flight: null,
@@ -88,7 +89,7 @@ test('delayed dot activation preserves its repeat-pick position through the real
   context.setActive(first.slug);
   assert.equal(pickGalleryGlobeMarker(markers, point, {previousSlug: context.previousPick?.slug}).slug,
     markers[1].slug, 'the delayed room commit retains the prior dot so another shared project can be reached');
-  near(context.zoom, GALLERY_GLOBE_PROJECT_ZOOM);
+  near(context.zoom, galleryGlobeProjectTarget(projects[0], projects).zoom);
   context.setActive(projects[2].slug);
   assert.equal(context.previousPick, null, 'external project navigation starts a fresh pick cycle');
 });
@@ -138,6 +139,34 @@ test('cluster targets use real geography, the short seam, and bounded zoom with 
   assert.equal(galleryGlobeClusterTarget(seam, GALLERY_GLOBE_MAX_ZOOM).zoom, GALLERY_GLOBE_MAX_ZOOM);
   assert.equal(galleryGlobeClusterTarget(seam, GALLERY_GLOBE_MAX_ZOOM).expand, true);
   assert.throws(() => galleryGlobeClusterTarget([]), TypeError);
+});
+
+test('project focus targets adapt to actual neighboring geography and stop at the useful map limit', () => {
+  for (const size of [112, 188, 224, 336]) for (const project of projects) {
+    const target = galleryGlobeProjectTarget(project, projects, {width: size, height: size});
+    assert.ok(Number.isFinite(target.zoom));
+    assert.ok(target.zoom >= GALLERY_GLOBE_PROJECT_ZOOM && target.zoom <= GALLERY_GLOBE_MAX_ZOOM);
+    const rotation = galleryGlobeRotation(project.coordinates.lat, project.coordinates.lng);
+    near(target.pitch, rotation.pitch);near(target.yaw, rotation.yaw);
+    const quaternion = new THREE.Quaternion().setFromEuler(new THREE.Euler(target.pitch, target.yaw, 0, 'XYZ'));
+    const scale = size / (2 * 1.23), disc = size / 2 - 15;
+    const neighboring = projects.filter(other => other.slug !== project.slug)
+      .map(other => new THREE.Vector3(...galleryGlobeCoordinate(other.coordinates.lat, other.coordinates.lng, 1.018))
+        .applyQuaternion(quaternion)).filter(point => point.z > .015);
+    const separable = neighboring.filter(point => Math.hypot(point.x, point.y) > 1e-9);
+    if (target.zoom < GALLERY_GLOBE_MAX_ZOOM) {
+      assert.ok(separable.every(point => Math.hypot(point.x, point.y) * scale * target.zoom > disc),
+        `${size}px / ${project.slug}: the adaptive scale removes every geographically separable neighboring anchor`);
+    }
+  }
+  const bayer = projects.find(project => project.slug === 'bayer-ai-2024');
+  assert.equal(galleryGlobeProjectTarget(bayer, projects).zoom, GALLERY_GLOBE_MAX_ZOOM,
+    'the reported central Munich view reaches the bounded detailed scale instead of fixed320');
+  const isolated = {...projects[0], slug: 'isolated', coordinates: {lat: 0, lng: 0}};
+  near(galleryGlobeProjectTarget(isolated).zoom, GALLERY_GLOBE_PROJECT_ZOOM);
+  const coincident = {...isolated, slug: 'same-location'};
+  assert.ok(Number.isFinite(galleryGlobeProjectTarget(isolated, [isolated, coincident]).zoom),
+    'exactly shared venues never produce an infinite zoom');
 });
 
 test('a numbered cluster zooms without selecting a room, while collocated projects open choices', () => {
@@ -268,6 +297,75 @@ function munichClusterFixture(size) {
   return {fixture, globe, cluster, selections};
 }
 
+test('resolved locations have persistent native arrows before hover, with exact anchors and selection', async t => {
+  const pair = [
+    {...projects[0], slug: 'first-location', title: 'First location', coordinates: {lat: 48.1, lng: 11.5}},
+    {...projects[0], slug: 'second-location', title: 'Second location', coordinates: {lat: 48.1, lng: 11.7}},
+    {...projects[0], slug: 'rear-location', title: 'Rear location', coordinates: {lat: 48.1, lng: -168.5}},
+  ];
+  for (const size of [112, 188, 252, 336]) await t.test(`${size}px`, () => {
+    const fixture = globeDocument(size), selections = [];
+    const globe = createFixtureGlobe({container: fixture.container, achievements: pair,
+      initialSlug: 'first-location', onSelect: slug => selections.push(slug)});
+    const arrows = () => fixture.descendants().filter(node => node.classList.contains('gallery-room-globe-marker'));
+    const canvas = fixture.descendants().find(node => node.classList.contains('gallery-room-globe-canvas'));
+    const tools = fixture.descendants().filter(node => node.classList.contains('gallery-room-globe-tool'));
+    try {
+      assert.deepEqual(arrows().map(node => node.dataset.projectSlug), ['first-location'],
+        'the selected project starts with its own arrow before entering map exploration');
+      tools[1].dispatch('click');
+      assert.equal(arrows().length, 2, 'both separated places appear before any pointer interaction');
+      const original = new Map(arrows().map(node => [node.dataset.projectSlug, node]));
+      for (const marker of globe.getMarkerPositions().filter(marker => marker.visible)) {
+        const arrow = original.get(marker.slug);
+        assert.ok(arrow, `${marker.slug} has an always-present native arrow`);
+        near(Number.parseFloat(arrow.style.left), marker.x);near(Number.parseFloat(arrow.style.top), marker.y);
+        assert.equal(arrow.hidden, false);assert.equal(arrow.tagName, 'BUTTON');
+        assert.match(arrow.getAttribute('aria-label'), /^View achievement: /);
+        assert.match(arrow.innerHTML, /<svg[^>]+viewBox="0 0 28 28"/);
+      }
+      assert.equal(original.has('rear-location'), false, 'hidden hemisphere locations never gain an arrow');
+      assert.equal(original.get('first-location').getAttribute('aria-current'), 'location');
+      assert.equal(original.get('second-location').getAttribute('aria-current'), 'false');
+      original.get('second-location').dispatch('click');
+      assert.deepEqual(selections, ['second-location'], 'native click or keyboard activation selects its exact location');
+      globe.setActive('second-location');
+      assert.deepEqual(arrows().map(node => node.dataset.projectSlug), ['second-location'],
+        'committing the selected project restores a single focused arrow');
+      assert.equal(arrows()[0].getAttribute('aria-current'), 'location');
+      tools[1].dispatch('click');
+      const exploring = new Map(arrows().map(node => [node.dataset.projectSlug, node]));
+      assert.equal(exploring.size, 2);
+      assert.equal(exploring.get('first-location').getAttribute('aria-current'), 'false');
+      fixture.setSize(size + 12);globe.resize();
+      for (const marker of globe.getMarkerPositions().filter(marker => marker.visible)) {
+        const arrow = arrows().find(node => node.dataset.projectSlug === marker.slug);
+        assert.equal(arrow, exploring.get(marker.slug), 'responsive resize retains native controls');
+        near(Number.parseFloat(arrow.style.left), marker.x);near(Number.parseFloat(arrow.style.top), marker.y);
+      }
+      exploring.get('first-location').focus();
+      for (let step = 0; step < 16 && arrows().length; step++) tools[1].dispatch('click');
+      assert.equal(arrows().length, 0, 'regrouped places only show their numbered cluster');
+      assert.equal(fixture.document.activeElement, canvas, 'focus recovers when its individual control disappears');
+      for (const arrow of [...original.values(), ...exploring.values()]) arrow.dispatch('click');
+      assert.deepEqual(selections, ['second-location'], 'stale grouped controls cannot select a location');
+      const cluster = fixture.descendants().find(node => node.classList.contains('gallery-room-globe-cluster'));
+      assert.ok(cluster);cluster.dispatch('click');
+      assert.equal(arrows().length, 2, 'splitting the group immediately restores both individual arrows');
+      const restored = arrows().find(node => node.dataset.projectSlug === 'first-location');
+      for (let step = 0; step < 16; step++) tools[0].dispatch('click');
+      assert.equal(arrows().some(node => node.dataset.projectSlug === 'first-location'), false,
+        'an individual arrow is removed when its actual point exits the circular viewport');
+      restored.dispatch('click');
+      assert.deepEqual(selections, ['second-location'], 'an off-disc detached control cannot dispatch stale selection');
+      const remaining = arrows()[0];
+      globe.dispose();remaining?.dispatch('click');
+      assert.deepEqual(selections, ['second-location']);
+      assert.equal(fixture.container.children.length, 0);assert.equal(fixture.pending.size, 0);
+    } finally {globe.dispose();}
+  });
+});
+
 test('one native badge or canvas click splits all nine Munich achievements on tiny, phone and desktop globes', async t => {
   for (const size of [112, 150, 252, 336]) for (const reducedMotion of [true, false]) for (const route of ['native badge', 'canvas hit']) {
     await t.test(`${size}px, ${reducedMotion ? 'reduced motion' : 'animated'}, ${route}`, () => {
@@ -384,7 +482,7 @@ test('ordinary gallery globes retain the first active project and fitted satelli
     assert.equal(chooser.children.length, projects.length);
     assert.equal(chooser.value, projects[0].slug);
     assert.equal(globe.getStats().activeSlug, projects[0].slug);
-    assert.equal(globe.getStats().zoom, GALLERY_GLOBE_PROJECT_ZOOM);
+    near(globe.getStats().zoom, galleryGlobeProjectTarget(projects[0], projects).zoom);
     assert.ok(globe.getStats().detailRequests > 0);
   } finally {globe.dispose();}
 });
@@ -458,13 +556,160 @@ test('animated zoom advances within the fixed canvas, preserves idle cluster nod
   globe.dispose();assert.equal(fixture.pending.size, 0);
 });
 
-function assertProjectCentered(globe, slug, size = 336) {
+function assertProjectCentered(globe, slug, size = 336, locations = projects) {
   const marker = globe.getMarkerPositions().find(item => item.slug === slug);
   assert.ok(marker?.visible, 'the real project location is visible');
   near(marker.x, size / 2);near(marker.y, size / 2);
-  near(globe.getStats().zoom, GALLERY_GLOBE_PROJECT_ZOOM);
+  const target = galleryGlobeProjectTarget(locations.find(project => project.slug === slug), locations,
+    {width: size, height: size});
+  near(globe.getStats().zoom, target.zoom);
   assert.equal(globe.getStats().flying, false);
 }
+
+function assertOnlyActiveArrow(fixture, globe, slug) {
+  assert.equal(globe.getStats().projectFocused, true);
+  const arrows = fixture.descendants().filter(node => node.classList.contains('gallery-room-globe-marker'));
+  assert.deepEqual(arrows.map(node => node.dataset.projectSlug), [slug],
+    'the settled selected achievement is the only rendered geographic arrow');
+  assert.equal(arrows[0].getAttribute('aria-current'), 'location');
+  assert.equal(fixture.descendants().filter(node => node.classList.contains('gallery-room-globe-cluster')).length, 0,
+    'the selected achievement never remains inside a numbered badge');
+  assert.deepEqual(globe.getClusters().map(group => group.members.map(member => member.slug)), [[slug]]);
+  const point = globe.getMarkerPositions().find(marker => marker.slug === slug);
+  near(Number.parseFloat(arrows[0].style.left), point.x);near(Number.parseFloat(arrows[0].style.top), point.y);
+}
+
+test('every real achievement settles with its own arrow across tiny, phone and desktop map sizes', async t => {
+  for (const size of [112, 188, 224, 336]) await t.test(`${size}px`, () => {
+    const fixture = globeDocument(size), selections = [];
+    const globe = createFixtureGlobe({container: fixture.container, achievements: projects,
+      onSelect: slug => selections.push(slug)});
+    try {
+      for (const project of projects) {
+        globe.setActive(project.slug);assertProjectCentered(globe, project.slug, size);
+        assertOnlyActiveArrow(fixture, globe, project.slug);
+      }
+      assert.deepEqual(selections, [], 'next/previous style activation does not trigger a second navigation');
+      const bayer = projects.find(project => project.slug === 'bayer-ai-2024');
+      globe.setActive(bayer.slug);assertOnlyActiveArrow(fixture, globe, bayer.slug);
+      assert.ok(globe.getMarkerPositions().filter(marker => marker.visible).length > 1,
+        'the true nearby geography remains available even when the selected project owns its presentation');
+      for (const slug of ['solana-ideathon-2024', 'mdsi-bundesliga-2024', 'bachelors-thesis', 'tgu-perfect-gpa']) {
+        globe.setActive(slug);assertOnlyActiveArrow(fixture, globe, slug);
+      }
+    } finally {globe.dispose();}
+  });
+});
+
+test('manual globe exploration restores real clusters and a new project choice restores one-arrow focus', () => {
+  const actions = ['zoom in', 'zoom out', 'wheel', 'reset', 'arrow key', 'drag'];
+  for (const action of actions) {
+    const fixture = globeDocument(224), selected = 'bayer-ai-2024', selections = [];
+    const globe = createFixtureGlobe({container: fixture.container, achievements: projects, initialSlug: selected,
+      onSelect: slug => selections.push(slug)});
+    const canvas = fixture.descendants().find(node => node.classList.contains('gallery-room-globe-canvas'));
+    const tools = fixture.descendants().filter(node => node.classList.contains('gallery-room-globe-tool'));
+    try {
+      assertOnlyActiveArrow(fixture, globe, selected);
+      if (action === 'zoom in') tools[0].dispatch('click');
+      if (action === 'zoom out') tools[1].dispatch('click');
+      if (action === 'wheel') fixture.container.dispatch('wheel', {deltaY: 120, target: canvas});
+      if (action === 'reset') tools[2].dispatch('click');
+      if (action === 'arrow key') canvas.dispatch('keydown', {key: 'ArrowRight'});
+      if (action === 'drag') {
+        canvas.dispatch('pointerdown', {isPrimary: true, button: 0, pointerId: 1, clientX: 112, clientY: 112});
+        assert.equal(globe.getStats().projectFocused, true, 'holding a pointer without moving retains project focus');
+        canvas.dispatch('pointermove', {pointerId: 1, clientX: 125, clientY: 112});
+        canvas.dispatch('pointerup', {pointerId: 1, clientX: 125, clientY: 112});
+      }
+      assert.equal(globe.getStats().projectFocused, false, `${action}: intentional map exploration restores geography`);
+      const visible = globe.getMarkerPositions().filter(marker => marker.visible).map(marker => marker.slug).sort();
+      const presented = globe.getClusters().flatMap(group => group.members.map(member => member.slug)).sort();
+      assert.deepEqual(presented, visible, `${action}: no nearby locations are lost in exploration mode`);
+      assert.ok(presented.length > 1, `${action}: actual neighboring projects reappear`);
+      globe.setActive('mdsi-bundesliga-2024');assertOnlyActiveArrow(fixture, globe, 'mdsi-bundesliga-2024');
+      const arrow = fixture.descendants().find(node => node.classList.contains('gallery-room-globe-marker'));
+      arrow.dispatch('click');assert.deepEqual(selections, ['mdsi-bundesliga-2024'],
+        'the isolated native control selects the exact achievement, including a shared venue');
+      assertOnlyActiveArrow(fixture, globe, 'mdsi-bundesliga-2024');
+    } finally {globe.dispose();}
+  }
+});
+
+test('focused canvas picking cannot activate hidden neighboring or coincident achievements', () => {
+  const fixture = globeDocument(336), selections = [], selected = 'bayer-ai-2024';
+  const globe = createFixtureGlobe({container: fixture.container, achievements: projects, initialSlug: selected,
+    onSelect: slug => selections.push(slug)});
+  const canvas = fixture.descendants().find(node => node.classList.contains('gallery-room-globe-canvas'));
+  const tap = marker => {
+    const event = {isPrimary: true, button: 0, pointerId: 7, clientX: marker.x, clientY: marker.y};
+    canvas.dispatch('pointerdown', event);canvas.dispatch('pointerup', event);
+  };
+  try {
+    const hidden = globe.getMarkerPositions().filter(marker => marker.visible && marker.slug !== selected
+      && Math.hypot(marker.x - 168, marker.y - 168) > 15).sort((a, b) => b.x - a.x)[0];
+    assert.ok(hidden, 'the reported Munich area includes a distinct but intentionally hidden neighbor');
+    tap(hidden);assert.deepEqual(selections, [], 'only the rendered geographic controls are pickable');
+    assertOnlyActiveArrow(fixture, globe, selected);
+    globe.setActive('mdsi-bundesliga-2024');
+    const point = globe.getMarkerPositions().find(marker => marker.slug === 'mdsi-bundesliga-2024');
+    tap(point);tap(point);
+    assert.deepEqual(selections, ['mdsi-bundesliga-2024', 'mdsi-bundesliga-2024'],
+      'repeated clicks on the focused arrow never cycle invisibly to a shared-venue project');
+    assertOnlyActiveArrow(fixture, globe, 'mdsi-bundesliga-2024');
+  } finally {globe.dispose();}
+});
+
+test('rapid interrupted navigation, viewport resize and reduced-motion changes settle to the final selected arrow', () => {
+  const fixture = globeDocument(188, {reducedMotion: false});
+  const globe = createFixtureGlobe({container: fixture.container, achievements: projects});
+  try {
+    fixture.tick(200);
+    for (const [index, slug] of ['music-ai-osaka-2025', 'ethmunich-2023', 'bayer-ai-2024'].entries()) {
+      fixture.advanceTime(240 + index * 120);globe.setActive(slug);fixture.tick(260 + index * 120);
+      assert.equal(globe.getStats().activeSlug, slug);
+    }
+    fixture.setSize(336);globe.resize();fixture.tick(2600);
+    assertProjectCentered(globe, 'bayer-ai-2024');assertOnlyActiveArrow(fixture, globe, 'bayer-ai-2024');
+    globe.setActive('tesla-gigathon-2026');fixture.tick(2700);
+    fixture.setSize(112);globe.resize();fixture.tick(5000);
+    assertProjectCentered(globe, 'tesla-gigathon-2026', 112);assertOnlyActiveArrow(fixture, globe, 'tesla-gigathon-2026');
+    globe.setActive('bachelors-thesis');fixture.tick(5100);
+    const motion = fixture.window.matchMedia();motion.matches = true;motion.dispatch('change');
+    assertProjectCentered(globe, 'bachelors-thesis', 112);assertOnlyActiveArrow(fixture, globe, 'bachelors-thesis');
+  } finally {globe.dispose();}
+  assert.equal(fixture.pending.size, 0);
+});
+
+test('a native tap interrupting an intercity flight restores exploration instead of a blank focused map', () => {
+  const fixture = globeDocument(224), selections = [];
+  const globe = createFixtureGlobe({container: fixture.container, achievements: projects,
+    onSelect: slug => selections.push(slug)});
+  const destination = 'music-ai-osaka-2025';
+  const canvas = fixture.descendants().find(node => node.classList.contains('gallery-room-globe-canvas'));
+  const motion = fixture.window.matchMedia();motion.matches = false;motion.dispatch('change');
+  try {
+    globe.setActive(destination);fixture.tick(120);
+    assert.equal(globe.getStats().flying, true);
+    assert.equal(globe.getMarkerPositions().find(marker => marker.slug === destination).visible, false,
+      'the regression interrupts before the destination has entered the disc');
+    const event = {isPrimary: true, button: 0, pointerId: 12, clientX: 0, clientY: 0};
+    canvas.dispatch('pointerdown', event);canvas.dispatch('pointerup', event);
+    assert.equal(globe.getStats().flying, false);
+    assert.equal(globe.getStats().projectFocused, false,
+      'interrupting a geographic flight cannot retain a settled focus state at an intermediate rotation');
+    const visibleSlugs = () => globe.getMarkerPositions().filter(marker => marker.visible).map(marker => marker.slug).sort();
+    const displayedSlugs = () => globe.getClusters().flatMap(group => group.members.map(marker => marker.slug)).sort();
+    assert.ok(visibleSlugs().length > 0, 'real starting geography remains in the interrupted viewport');
+    assert.deepEqual(displayedSlugs(), visibleSlugs(), 'the full exploratory marker layer survives interruption');
+    fixture.setSize(336);globe.resize();fixture.tick(2200);
+    assert.equal(globe.getStats().projectFocused, false, 'resize does not silently reactivate a canceled project flight');
+    assert.deepEqual(displayedSlugs(), visibleSlugs());
+    assert.deepEqual(selections, [], 'tapping empty globe background does not select a different project');
+    globe.setActive(destination, {recenter: true});fixture.tick(4400);
+    assertProjectCentered(globe, destination);assertOnlyActiveArrow(fixture, globe, destination);
+  } finally {globe.dispose();}
+});
 
 test('natural Earth texture keeps its original daylight colors across the entire globe', () => {
   const fixture = globeDocument(), globe = createFixtureGlobe({container: fixture.container, achievements: projects});
@@ -583,8 +828,8 @@ test('larger responsive viewports preserve active geography, cluster clipping an
   for (const size of [336, 280, 220, 188, 168, 144, 112, 180]) {
     fixture.setSize(size);globe.resize();assertProjectCentered(globe, projects[0].slug, size);
     assert.equal(globe.getStats().width, size);assert.equal(globe.getStats().height, size);
-    const visible = globe.getMarkerPositions().filter(marker => marker.visible).map(marker => marker.slug).sort();
-    assert.deepEqual(globe.getClusters().flatMap(cluster => cluster.members.map(marker => marker.slug)).sort(), visible);
+    assert.equal(globe.getStats().projectFocused, true);
+    assert.deepEqual(globe.getClusters().flatMap(cluster => cluster.members.map(marker => marker.slug)), [projects[0].slug]);
     for (const cluster of globe.getClusters()) assert.ok(Math.hypot(cluster.x - size / 2, cluster.y - size / 2) <= size / 2 - 15 + 1e-8);
   }
   for (let step = 0; step < 12; step++) tools[0].dispatch('click');
@@ -615,9 +860,9 @@ test('distant achievements pull out, rotate north-up on the short path, then set
   const from = globe.getStats();motion.matches = false;motion.dispatch('change');
   const destination = projects.find(project => project.country === 'Japan');
   globe.setActive(destination.slug);
-  near(globe.getStats().zoom, GALLERY_GLOBE_PROJECT_ZOOM);
+  near(globe.getStats().zoom, from.zoom);
   fixture.tick(200);const pullout = globe.getStats();
-  assert.ok(pullout.zoom < GALLERY_GLOBE_PROJECT_ZOOM && pullout.zoom > 1);
+  assert.ok(pullout.zoom < from.zoom && pullout.zoom > 1);
   fixture.tick(700);const cruise = globe.getStats();
   assert.ok(cruise.zoom <= 1.2, 'distant rotation reveals the Earth before crossing continents');
   assert.ok(Math.abs(cruise.yaw - from.yaw) > .1);
@@ -636,7 +881,8 @@ test('nearby, identical and seam-crossing project locations avoid a gratuitous w
   const globe = createFixtureGlobe({container: fixture.container, achievements: projects});
   const nearby = projects.find(project => project.slug === 'pdm-kill-the-search-bar-2026');
   motion.matches = false;motion.dispatch('change');globe.setActive(nearby.slug);
-  fixture.tick(300);near(globe.getStats().zoom, GALLERY_GLOBE_PROJECT_ZOOM);
+  fixture.tick(300);assert.ok(globe.getStats().zoom >= GALLERY_GLOBE_PROJECT_ZOOM,
+    'a nearby move adjusts its isolation scale without pulling out to the world');
   fixture.tick(1000);assertProjectCentered(globe, nearby.slug);
   motion.matches = true;motion.dispatch('change');globe.setActive('solana-ideathon-2024');
   const same = globe.getStats();motion.matches = false;motion.dispatch('change');
@@ -652,7 +898,7 @@ test('nearby, identical and seam-crossing project locations avoid a gratuitous w
   seamMotion.matches = false;seamMotion.dispatch('change');seam.setActive('seam-1');
   seamFixture.tick(350);assert.ok(seam.getStats().zoom < GALLERY_GLOBE_PROJECT_ZOOM,
     'a two-degree move at city scale briefly reveals regional context');
-  seamFixture.tick(1400);assertProjectCentered(seam, 'seam-1');
+  seamFixture.tick(1400);assertProjectCentered(seam, 'seam-1', 336, seamProjects);
   near(seam.getStats().yaw - startYaw, -2 * Math.PI / 180);seam.dispose();
 });
 
