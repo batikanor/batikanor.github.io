@@ -88,7 +88,7 @@ test('focused framing clears the larger left globe at portrait, tablet and short
 
 test('the compact phone chronology preserves the globe and full-location space at every responsive size',()=>{
   for(const [width,height,left,right,top,bottom]of[
-    [1280,900,20,372,447,881],[900,1000,12,308,603,981],
+    [1280,900,20,372,503,881],[900,1000,12,308,603,981],
     [800,600,12,308,263,581],[800,479,10,266,197,475],
     [568,320,8,212,130,318],[390,844,8,212,568,834],
     [390,650,8,212,400,646],[320,568,8,212,346,566]

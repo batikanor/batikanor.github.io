@@ -1,5 +1,6 @@
 import {getProject, projectHref, projectMedia} from './projectContent.js';
 import {galleryPhotoSource} from './galleryRoomMediaDimensions.js';
+import {galleryWallCuration} from './galleryRoomCuration.js';
 import {roomDockRectangle, roomSafeArea, roomCameraFov, surfaceCameraPlan} from './galleryRoomCamera.js';
 
 const placeholder = /\{\{(image|embed|gdrive_embed)\[(\d+)\]\}\}/g;
@@ -142,7 +143,7 @@ function viewportSize(viewport = {}) {
     height: Math.max(240, Number(viewport.height) || 900), dockBounds: viewport.dockBounds, headerBounds: viewport.headerBounds};
 }
 
-function mediaInCells(media, region, columns, gap, phone) {
+function mediaInCells(media, region, columns, gap, phone, preferredAspect = {}, topAligned = false) {
   if (!media.length) return [];
   const rows = Math.ceil(media.length / columns);
   const cellWidth = (region.width - gap * (columns - 1)) / columns;
@@ -152,7 +153,18 @@ function mediaInCells(media, region, columns, gap, phone) {
     const cell = rectangle(region.x + (index % columns) * (cellWidth + gap),
       region.y + Math.floor(index / columns) * (cellHeight + gap), cellWidth, cellHeight);
     const source = galleryPhotoSource(record);
-    if (!source) return {id: index ? `media-${index + 1}` : 'media', kind: 'media', media: record, rect: cell};
+    if (!source) {
+      const aspect = preferredAspect[record.key];
+      if (!aspect) return {id: index ? `media-${index + 1}` : 'media', kind: 'media', media: record, rect: cell};
+      // Documents/videos retain their own player; this only gives its viewport
+      // a suitable landscape shape. Photos always use verified dimensions.
+      const chrome = Math.min(80, cell.height * .3);
+      const screenWidth = Math.min(cell.width, Math.max(12, cell.height - chrome) * aspect);
+      const screenHeight = screenWidth / aspect + chrome;
+      return {id: index ? `media-${index + 1}` : 'media', kind: 'media', media: record,
+        rect: rectangle(cell.x + (cell.width - screenWidth) / 2,
+          (topAligned ? cell.y : cell.y + (cell.height - screenHeight) / 2), screenWidth, screenHeight)};
+    }
     const minimumImageHeight = Math.max(24,24*source.height/source.width);
     let chromeScale = Math.min(1, Math.max(.12, (cellHeight - minimumImageHeight) / (phone ? 64 : 80)), cellWidth / 150);
     let caption = (phone ? 36 : 48) * chromeScale, controls = (phone ? 28 : 32) * chromeScale;
@@ -165,16 +177,16 @@ function mediaInCells(media, region, columns, gap, phone) {
     const height = imageHeight + caption + controls;
     return {id: index ? `media-${index + 1}` : 'media', kind: 'media', media: record,
       photo: {...source, captionPixels: caption, controlsPixels: controls},
-      rect: rectangle(cell.x + (cell.width - width) / 2, cell.y + (cell.height - height) / 2, width, height)};
+      rect: rectangle(cell.x + (cell.width - width) / 2, (topAligned ? cell.y : cell.y + (cell.height - height) / 2), width, height)};
   });
 }
 
 /** Choose the most useful native-aspect media grid for a given wall region. */
-function mediaGrid(media, region, gap, phone) {
+function mediaGrid(media, region, gap, phone, preferredAspect = {}, topAligned = false) {
   let best = null, bestScore = -Infinity;
   if (!media.length) return [];
   for (let columns = 1; columns <= media.length; columns++) {
-    const entries = mediaInCells(media, region, columns, gap, phone);
+    const entries = mediaInCells(media, region, columns, gap, phone, preferredAspect, topAligned);
     if (!entries) continue;
     if(entries.some(entry=>entry.rect.width<24-1e-7||entry.rect.height<40-1e-7))continue;
     const score = entries.reduce((sum, entry) => {
@@ -185,6 +197,66 @@ function mediaGrid(media, region, gap, phone) {
     if (score > bestScore) {best = entries; bestScore = score;}
   }
   return best;
+}
+
+/** Estimate the actual overview copy, so empty story area earns no reward. */
+function storyHeightAt(project, width) {
+  const plain = value => String(value || '').replace(placeholder, '')
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1').replace(/[*_#]/g, '').trim();
+  const lines = (text, available) => {
+    let count = 1, current = '';
+    for (const word of plain(text).split(/\s+/u).filter(Boolean)) {
+      const next = current ? `${current} ${word}` : word;
+      if (current && referenceTextWidth(next, 16) > available) {count++; current = word;}
+      else current = next;
+    }
+    return count;
+  };
+  const inner = Math.max(40, width - 26);
+  const summary = project.shortDescription ? 22 + 7 + lines(project.shortDescription, inner - 15) * 22.4 + 25 : 0;
+  const paragraphs = String(project.longDescription || '').split(/\n+/u).map(plain).filter(Boolean);
+  return Math.ceil(60 + summary + paragraphs.reduce((sum, text) => sum + lines(text, inner) * 22.4 + 11, 0));
+}
+
+/** Art-directed media groups retain source/component order and native players. */
+function editorialMedia(media, region, gap, curation) {
+  if (!media.length) return [];
+  const preferredAspect = curation.preferredAspect || {};
+  const remap = entries => entries?.map(entry => {
+    const index = media.findIndex(record => record.key === entry.media.key);
+    return {...entry, id: index ? `media-${index + 1}` : 'media'};
+  }).sort((a, b) => media.findIndex(record => record.key === a.media.key) - media.findIndex(record => record.key === b.media.key));
+  const grid = (records, rect) => mediaGrid(records, rect, gap, false, preferredAspect, true);
+  const ordered = [...media].sort((a, b) => {
+    const rank = record => {const i = curation.leadMedia.indexOf(record.key); return i < 0 ? media.length : i;};
+    return rank(a) - rank(b);
+  });
+  const options = [remap(grid(media, region))].filter(Boolean);
+  if (media.length > 2) {
+    // A portrait anchor can span the full height, with supporting sources in
+    // their own landscape/portrait cells. A wide anchor gets the top row.
+    for (const share of [.45, .54, .62]) {
+      const first = ordered[0], source = galleryPhotoSource(first);
+      const portrait = source && source.height > source.width;
+      const lead = portrait
+        ? rectangle(region.x, region.y, (region.width - gap) * share, region.height)
+        : rectangle(region.x, region.y, region.width, (region.height - gap) * share);
+      const rest = portrait
+        ? rectangle(right(lead) + gap, region.y, region.width - lead.width - gap, region.height)
+        : rectangle(region.x, bottom(lead) + gap, region.width, region.height - lead.height - gap);
+      const a = grid([first], lead), b = grid(ordered.slice(1), rest);
+      if (a && b) options.push(remap([...a, ...b]));
+    }
+  }
+  const score = entries => entries.reduce((sum, entry) => {
+    const imageHeight = entry.rect.height - (entry.photo?.captionPixels || 0) - (entry.photo?.controlsPixels || 0);
+    const lead = curation.leadMedia.indexOf(entry.media.key);
+    return sum + entry.rect.width * imageHeight * (lead === 0 ? 3.2 : lead === 1 ? 1.5 : 1)
+      * Math.min(1, entry.rect.width / 180) ** 2;
+  }, 0);
+  const minimumWidth = Math.min(150, (region.width - gap * 2) / Math.min(3, media.length));
+  const legible = options.filter(entries => entries.every(entry => entry.rect.width >= minimumWidth - .01 && entry.rect.height >= 120));
+  return (legible.length ? legible : options).sort((a, b) => score(b) - score(a))[0] || null;
 }
 
 /**
@@ -255,6 +327,12 @@ export function galleryStationPlan(project, viewport = {}) {
   const lower = rectangle(rightX, Math.max(startY, dock.top + gap), width - margin - rightX,
     hint.y - gap - Math.max(startY, dock.top + gap));
   const media = galleryStationMedia(project), links = galleryStationLinks(project), candidates = [];
+  const curation = galleryWallCuration(project), editorial = width >= 1200 && height >= 650;
+  const storyHeightCache = new Map();
+  const storyRequiredHeight = panelWidth => {
+    if (!storyHeightCache.has(panelWidth)) storyHeightCache.set(panelWidth, storyHeightAt(project, panelWidth));
+    return storyHeightCache.get(panelWidth);
+  };
   const readingWidth = Math.max(120,width-focusedSafe.left-focusedSafe.right)/1.09;
   const referenceReadingHeight = phone ? 100 : 130;
   const referencesMinRatio = (referenceReadingHeight+2)/readingWidth;
@@ -275,12 +353,12 @@ export function galleryStationPlan(project, viewport = {}) {
   };
   const obstructions = [rectangle(0, 0, width, header),
     rectangle(dock.left, dock.top, dock.right - dock.left, dock.bottom - dock.top), ...(phone ? [] : [hint])];
-  const add = (storyRect, mediaRect, referencesRect, providedScreens=null, compactReading=false) => {
+  const add = (storyRect, mediaRect, referencesRect, providedScreens=null, compactReading=false, curated=false) => {
     storyRect=fitReadingPanel(storyRect,100,140);
     if(!storyRect)return;
     if (storyRect.width < 35 || storyRect.height < (compactReading?54:84) ||
       (links.length && (!referencesRect || referencesRect.width < 40 || referencesRect.height < 42))) return;
-    const screens = providedScreens??mediaGrid(media, mediaRect || rectangle(0, 0, 0, 0), gap, phone);
+    const screens = providedScreens??mediaGrid(media, mediaRect || rectangle(0, 0, 0, 0), gap, phone, editorial ? curation.preferredAspect : undefined);
     if (!screens) return;
     if(screens.some(entry=>entry.rect.width<24-1e-7||entry.rect.height<40-1e-7))return;
     if(links.length){
@@ -306,10 +384,13 @@ export function galleryStationPlan(project, viewport = {}) {
         ? rectangle(entry.rect.x-3,entry.rect.y-3,entry.rect.width+6,entry.rect.height+6) : entry.rect, block)))) return;
     for (let i = 0; i < entries.length; i++) for (let j = i + 1; j < entries.length; j++) if (intersects(entries[i].rect, entries[j].rect)) return;
     const storyReadability = Math.min(1, storyRect.width / (phone ? 175 : 310)) ** 2;
-    const storyScore = area(storyRect) * storyReadability * (phone ? 4 : 1.4);
+    const usefulStoryHeight = editorial ? Math.min(storyRect.height, storyRequiredHeight(storyRect.width)) : storyRect.height;
+    const storyScore = storyRect.width * usefulStoryHeight * storyReadability * (phone ? 4 : 1.4);
     const mediaScore = screens.reduce((sum, entry) => {
       const imageHeight = entry.rect.height - (entry.photo?.captionPixels || 0) - (entry.photo?.controlsPixels || 0);
-      return sum + entry.rect.width * imageHeight * Math.min(1, entry.rect.width / (phone ? 90 : 130)) ** 2;
+      const lead = editorial ? curation.leadMedia.indexOf(entry.media.key) : -1;
+      return sum + entry.rect.width * imageHeight * Math.min(1, entry.rect.width / (phone ? 90 : 130)) ** 2
+        * (lead === 0 && curation.family === 'gallery-led' ? 2.3 : lead === 1 && curation.family === 'gallery-led' ? 1.3 : 1);
     }, 0);
     const referenceScore = links.length ? Math.min(area(referencesRect), 260 * Math.max(120, referencesRect.width)) * .18 : 0;
     const weakestMedia=screens.length?Math.min(...screens.map(entry=>Math.min(1,entry.rect.width/(phone?32:64))*Math.min(1,entry.rect.height/(phone?44:80)))):1;
@@ -317,8 +398,70 @@ export function galleryStationPlan(project, viewport = {}) {
     // previews do. The compact board uses 41px of chrome; 125px of content
     // accommodates the Summary heading and several actual paragraph lines.
     const visibleCopy = phone ? Math.min(1,Math.max(0,storyRect.height-41)/125) ** 2 : 1;
-    candidates.push({entries, score: (storyScore + mediaScore * (phone ? 1.8 : 3) + referenceScore)*weakestMedia*visibleCopy});
+    const readingFit = editorial ? Math.min(1, storyRect.height / storyRequiredHeight(storyRect.width)) : 1;
+    candidates.push({entries, curated, readingFit, score: (storyScore + mediaScore * (phone ? 1.8 : 3) + referenceScore)
+      * weakestMedia * visibleCopy * (.2 + .8 * readingFit ** 2) * (curated ? 1.12 : 1)});
   };
+  if (editorial) {
+    const left = rectangle(margin, startY, Math.max(rightX - margin - gap, width >= 1600 ? 430 : 0), upper.height);
+    const main = rectangle(right(left) + gap, startY, width - margin - right(left) - gap, rightRegion.height);
+    const curatedAdd = (story, mediaRegion, refs, screens) => add(story, mediaRegion, refs,
+      screens ?? editorialMedia(media, mediaRegion || rectangle(0, 0, 0, 0), gap, curation), false, true);
+    // The large, full-height portrait belongs beside the story, not in the
+    // shallow leftover space above the map. Both boards share top and bottom.
+    if (curation.family === 'portrait-led') {
+      const lead = media.find(record => record.key === curation.leadMedia[0]);
+      if (lead) {
+        const portraitRegion = links.length ? main : rightRegion;
+        const first = mediaInCells([lead], portraitRegion, 1, gap, false)[0];
+        if (first) {
+          first.rect.x = portraitRegion.x;
+          const remaining = media.filter(record => record !== lead);
+          const storyX = right(first.rect) + gap;
+          const story = rectangle(storyX, startY, right(portraitRegion) - storyX, portraitRegion.height);
+          const refs = links.length ? {...left} : null;
+          if (!remaining.length) curatedAdd(story, null, refs, [first]);
+          else {
+            for (const share of [.55, .65, .75]) {
+              const storyHeight = (story.height - gap) * share;
+              const restRegion = rectangle(story.x, story.y + storyHeight + gap, story.width, story.height - storyHeight - gap);
+              const rest = editorialMedia(remaining, restRegion, gap, curation);
+              if (rest) {
+                const screens = [first, ...rest].map(entry => ({...entry,
+                  id: media.indexOf(entry.media) ? `media-${media.indexOf(entry.media) + 1}` : 'media'}));
+                curatedAdd({...story, height: storyHeight}, null, refs, screens);
+              }
+            }
+          }
+        }
+      }
+    }
+    // Shared top/bottom aligned columns keep text legible while freeing the
+    // whole right-hand height for broad photos, documents and demonstrations.
+    for (const share of [.34, .42, .5]) {
+      const storyWidth = (main.width - gap) * share;
+      curatedAdd(rectangle(main.x, startY, storyWidth, main.height),
+        rectangle(main.x + storyWidth + gap, startY, main.width - storyWidth - gap, main.height),
+        links.length ? {...left} : null);
+    }
+    // Related landscape photos read as one deliberate pair beneath the story;
+    // mixed collections can use a lead image and supporting rows in that area.
+    for (const fraction of [.32, .42, .52, .62]) {
+      const storyHeight = Math.max(100, Math.min((main.height - gap) * fraction,
+        Math.max(130, storyRequiredHeight(main.width))));
+      curatedAdd(rectangle(main.x, startY, main.width, storyHeight),
+        rectangle(main.x, startY + storyHeight + gap, main.width, main.height - storyHeight - gap),
+        links.length ? {...left} : null);
+    }
+    // Brief stories and compact References can share the left column. The
+    // main visual gets the broad wall, rather than competing with empty copy.
+    if (media.length && storyRequiredHeight(left.width) <= left.height * .8) {
+      const refHeight = links.length ? galleryReferencesMetrics(links, left.width).requiredHeight : 0;
+      const storyHeight = left.height - (refHeight ? refHeight + gap : 0);
+      curatedAdd(rectangle(left.x, left.y, left.width, storyHeight), main,
+        links.length ? rectangle(left.x, bottom(left) - refHeight, left.width, refHeight) : null);
+    }
+  }
   if (!media.length) {
     add(rightRegion, null, upper.width > 0 ? rectangle(margin, startY, rightX - margin - gap, upper.height) : null);
     add(upper, null, lower);
@@ -418,7 +561,19 @@ export function galleryStationPlan(project, viewport = {}) {
     })];
     candidates.push({entries,score:0});
   }
-  const selected = candidates.sort((a, b) => b.score - a.score)[0];
+  // A feasible portrait-led composition is an explicit editorial choice. The
+  // fallback pool still handles narrow/short windows without clipping sources.
+  const portraitChoices = editorial && curation.family === 'portrait-led'
+    ? candidates.filter(candidate => candidate.curated && candidate.entries.some(entry =>
+      entry.media?.key === curation.leadMedia[0] && entry.rect.height >= rightRegion.height - 1 &&
+      candidate.entries.find(part => part.id === 'story').rect.x >= right(entry.rect))) : [];
+  const curatedCandidates = editorial ? candidates.filter(candidate => candidate.curated) : [];
+  const mediaMinimum = curation.family === 'paired-photos' ? Math.min(500, width * .22)
+    : curation.family === 'gallery-led' ? Math.min(150, height * .17) : 0;
+  const prominentChoices = curatedCandidates.filter(candidate => candidate.entries
+    .filter(entry => entry.kind === 'media').every(entry => entry.rect.width >= mediaMinimum));
+  const curatedChoices = prominentChoices.length ? prominentChoices : curatedCandidates;
+  const selected = (portraitChoices.length ? portraitChoices : curatedChoices.length ? curatedChoices : candidates).sort((a, b) => b.score - a.score)[0];
   const components = selected.entries.map(entry => {
     const {rect, photo: source, ...fields} = entry;
     const photo = source ? {...source, worldWidth: rect.width * scale,
@@ -430,7 +585,7 @@ export function galleryStationPlan(project, viewport = {}) {
       framePadding: (phone ? 1.5 : 2) * scale, pixelRect: {...rect}, ...(entry.kind === 'title' ? {titleLayout} : {}), ...(photo ? {photo} : {})};
   });
   const wallLayout = {width, height, worldWidth: width * scale, worldHeight: WALL_HEIGHT, wallZ: WALL_Z,
-    rects: components.map(pose => ({id: pose.id, ...pose.pixelRect})), obstructions, dock, short,constrained};
+    rects: components.map(pose => ({id: pose.id, ...pose.pixelRect})), obstructions, dock, short,constrained, curation: curation.family, curated: !!selected.curated};
   return {components, wallLayout};
 }
 

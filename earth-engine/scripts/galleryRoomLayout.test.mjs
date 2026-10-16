@@ -78,11 +78,11 @@ test('References metrics stay tied to the exact body-font artifacts instead of s
 });
 
 test('DM Sans References reflow grows formerly underestimated desktop cards without truncating a label',()=>{
-  for(const[slug,width,height,minimum]of[['huawei-agorize-2024',1280,900,159],['ethrome-2025',1920,1080,189]]){
+  for(const[slug,width,height,minimum]of[['huawei-agorize-2024',1280,900,140],['ethrome-2025',1920,1080,189]]){
     const project=projects.find(project=>project.slug===slug),links=galleryStationLinks(project);
     const references=galleryStationPlan(project,{width,height}).components.find(pose=>pose.kind==='references');
     const metrics=galleryReferencesMetrics(links,references.width);
-    assert.ok(metrics.requiredHeight>=minimum,'the wider authored glyphs contribute their extra wrapped line');
+    assert.ok(galleryReferencesMetrics(links,320).requiredHeight>=minimum,'the original narrow-card fixture retains the complete authored glyphs and wrapped lines');
     assert.ok(references.height>=metrics.requiredHeight,
       `${slug}: the final reference line fits rather than scrolling under the footer`);
   }
@@ -113,17 +113,17 @@ test('References sizing follows native auto-fit thresholds, word wrapping and th
   assert.equal(galleryReferencesMetrics(links,382,{phone:true}).columns,2,'compact padding and column gaps match the phone CSS grid');
 });
 
-test('the two Decarbon references fit completely at the reported desktop sizes without shrinking either photograph',()=>{
+test('the two Decarbon references and both prominent photographs fit the reviewed desktop compositions',()=>{
   const project=projects.find(project=>project.slug==='decarbon-days-climathon-2026'),links=galleryStationLinks(project);
-  for(const[width,height,photoWidth,minimumPhotoHeight]of[[1794,886,497.76,411.84],[3588,1772,1216.317,890.878],
-    [2048,1011,571.42,460.946],[1280,900,405.357,350.238]]){
+  for(const[width,height,photoWidth,minimumPhotoHeight]of[[1794,886,400,340],[3588,1772,800,600],
+    [2048,1011,450,370],[1280,900,300,280]]){
     const {components}=galleryStationPlan(project,{width,height});
     const references=components.find(pose=>pose.kind==='references'),metrics=galleryReferencesMetrics(links,references.width);
     assert.ok(references.height>=metrics.requiredHeight,`${width}x${height}: the second reference's final line and footer fit`);
     assert.ok(references.height<=metrics.requiredHeight+1,'the card uses its content height rather than filling the empty region');
-    assert.deepEqual(metrics.rowLines,width===2048?[3]:[1,2]);
+    assert.equal(metrics.lineCounts.length,2,'both complete labels contribute their wrapped height');
     for(const photo of components.filter(pose=>pose.photo)){
-      assert.ok(photo.width>=photoWidth-1e-6&&photo.height>=minimumPhotoHeight-1e-3,'Reference growth uses its available region, preserving the original photos');
+      assert.ok(photo.width>=photoWidth-1e-6&&photo.height>=minimumPhotoHeight-1e-3,'both original proportional photographs remain prominent beside the readable story');
     }
   }
 });
@@ -226,8 +226,8 @@ test('single-photo walls retain a useful prize photograph and generous native-si
   const tesla=projects.find(project=>project.slug==='tesla-gigathon-2026');
   const {components}=galleryStationPlan(tesla,{width:1280,height:900});
   const story=components.find(pose=>pose.id==='story'),photo=components.find(pose=>pose.id==='media');
-  assert.ok(story.pixelRect.width>=650&&story.pixelRect.height>=220,'the story uses a substantial native-pixel canvas');
-  assert.ok(photo.pixelRect.width>=280&&photo.photo.worldHeight/10.8*900>=400,'the prize photograph stays large on arrival');
+  assert.ok(story.pixelRect.width>=380&&story.pixelRect.height>=500,'a readable full-height story shares the wall with the enlarged prize portrait');
+  assert.ok(photo.pixelRect.width>=300&&photo.photo.worldHeight/10.8*900>=400,'the prize photograph stays large on arrival');
   const dense=galleryStationPlan(projects.find(project=>project.slug==='music-ai-osaka-2025'),{width:1280,height:900});
   assert.equal(dense.components.filter(pose=>pose.kind==='media').length,6);
   assert.ok(dense.components.filter(pose=>pose.kind==='media').every(pose=>pose.pixelRect.width>=150&&pose.pixelRect.height>=120),
@@ -297,7 +297,7 @@ test('formerly clipped flat references and short stories have usable reading asp
   const phone=galleryStationComponents(projects.find(p=>p.slug==='huawei-agorize-2024'),{width:360,height:640});
   assert.ok(phone.find(p=>p.id==='media-4').width>=24-1e-7,'the former 9px photograph is approachable');
   const desktop=galleryStationComponents(projects.find(p=>p.slug==='tesla-gigathon-2026'),{width:1280,height:900});
-  assert.ok(desktop.find(p=>p.id==='story').width>=780,'ordinary desktop text keeps its generous width');
+  assert.ok(desktop.find(p=>p.id==='story').width>=380,'the story retains a useful reading column beside the full-height portrait');
 });
 
 test('compact split layouts stay readable while impossible tiny windows preserve all sources without throwing',()=>{

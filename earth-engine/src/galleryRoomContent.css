@@ -208,8 +208,8 @@
 .gallery-room-title.is-wall-panel.is-compact { gap: 8px; }
 .gallery-room-title.is-wall-panel.is-compact h1 { font-size: 22px; }
 .gallery-room-title.is-wall-panel.is-compact.has-long-title h1 { font-size: 18px; }
-.gallery-room-story.is-wall-panel:not(.is-focused) { --room-copy: 18px; }
-.gallery-room-story.is-wall-panel.is-tablet:not(.is-focused) { --room-copy: 17px; }
+.gallery-room-story.is-wall-panel:not(.is-focused) { --room-copy: 16px; }
+.gallery-room-story.is-wall-panel.is-tablet:not(.is-focused) { --room-copy: 16px; }
 .gallery-room-story.is-wall-panel .gallery-room-story-scroll { padding: 10px 12px; }
 .gallery-room-story.is-wall-panel .gallery-room-story-title { display: none; }
 .is-wall-panel .gallery-room-board-controls { padding: 3px 6px; }

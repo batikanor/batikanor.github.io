@@ -59,7 +59,7 @@ export function roomDockRectangle(width, height, measured) {
   const dockWidth = phone ? 188 : compactDesktop ? 240 : width <= 900 ? 280 : 336;
   const margin = phone ? 16 : compactDesktop ? 18 : width <= 900 ? 20 : 28;
   const globe = phone ? landscape ? 112 : height <= 620 ? 144 : height <= 740 ? 168 : 188
-    : compactDesktop ? 180 : height <= 650 ? 220 : width <= 900 ? 280 : 336;
+    : compactDesktop ? 180 : height <= 650 ? 220 : 280;
   const bottom = phone ? height <= 620 ? 10 : height <= 740 ? 12 : 18 : compactDesktop ? 12 : 27;
   const gap = phone && height <= 620 ? 2 : 4;
   const chronologyHeight = phone ? 58 : 78;

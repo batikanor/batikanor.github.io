@@ -36,7 +36,7 @@ html:not(.intro-active) .gallery-room-active #intro-screen{display:none!importan
 .gallery-room-view-lock:hover{background:var(--portfolio-surface-hover);color:var(--portfolio-text-strong)}
 .gallery-room [hidden]{display:none!important}
 .gallery-room-dock{position:absolute;z-index:20;left:max(28px,env(safe-area-inset-left));right:auto;bottom:max(27px,env(safe-area-inset-bottom));width:336px;display:flex;align-items:flex-start;flex-direction:column;gap:4px;pointer-events:auto}
-.gallery-room-globe-mount{width:336px;height:336px;position:relative}
+.gallery-room-globe-mount{width:280px;height:280px;position:relative;align-self:center}
 .gallery-room-chronology{position:relative;display:flex;align-items:flex-start;justify-content:space-between;width:336px;height:78px;gap:4px;padding-top:2px;border-top:1px solid color-mix(in srgb, var(--portfolio-accent) 36%, transparent);background:linear-gradient(90deg,color-mix(in srgb, var(--portfolio-surface-deep) 88%, transparent),color-mix(in srgb, var(--portfolio-surface-deep) 48%, transparent));border-radius:0 0 12px 12px;backdrop-filter:blur(7px)}
 .gallery-room-arrow{display:grid;place-items:center;flex:0 0 50px;width:50px;height:44px;border:1px solid var(--portfolio-border-soft);border-radius:var(--portfolio-radius);background:color-mix(in srgb, var(--portfolio-accent) 8%, transparent);font-family:inherit;font-size:34px;font-weight:400;color:var(--portfolio-text);cursor:pointer;transition:transform .2s,color .2s,background .2s}
 .gallery-room-arrow:hover:not(:disabled){color:var(--portfolio-text-strong);background:color-mix(in srgb, var(--portfolio-accent) 20%, transparent);transform:translateX(2px)}
