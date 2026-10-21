@@ -5,7 +5,6 @@ let pendingEntry = null;
 let resolveEntry = null;
 let enterBound = false;
 let entryDestination = 'map';
-
 function setIntroHistoryState(visible) {
   const current = history.state;
   const state = current && typeof current === 'object' && !Array.isArray(current) ? {...current} : {};

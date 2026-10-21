@@ -96,24 +96,32 @@
       <div class="intro-bottom-row">
         <div class="intro-exploration">
           <div class="intro-live-choice">
-            <div class="intro-project-cloud" aria-hidden="true">
-              <svg class="intro-project-cloud-art" viewBox="0 0 320 270" focusable="false">
-                <defs>
-                  <path id="intro-maptheory-curve" d="M62 65C126 17 204 19 278 60" />
-                  <path id="intro-gralobe-curve" d="M89 103Q187 80 279 108" />
-                  <path id="intro-cottbus-curve" d="M47 222C111 255 218 255 279 217" />
-                </defs>
-                <image class="intro-project-mark-maptheory" href="/assets/intro-projects/maptheory.svg?v=618ba754db94" x="16" y="45" width="42" height="42" transform="rotate(-13 37 66)" />
-                <text class="intro-project-word-maptheory" fill="#f3f0e4" font-family="Arial, sans-serif" font-size="35" font-weight="800" letter-spacing="-1.4"><textPath href="#intro-maptheory-curve" startOffset="50%" text-anchor="middle">Map<tspan class="intro-maptheory-accent" fill="#2dd4bf">theory</tspan></textPath></text>
-                <text class="intro-project-word-gralobe" fill="#44aaff" font-family="Arial, sans-serif" font-size="30" font-weight="700"><textPath href="#intro-gralobe-curve" startOffset="50%" text-anchor="middle">gralobe</textPath></text>
-                <image class="intro-project-mark-space" href="/assets/intro-projects/space-cottbus.svg?v=63fc4767a4c0" x="91" y="116" width="182" height="60" transform="rotate(-8 182 146)" />
-                <g class="intro-project-mark-cottbus" transform="translate(15 199) rotate(-10 20 20)" stroke="#eabb79" stroke-width="1.7">
-                  <g transform="translate(6 1)"><rect width="19" height="19" transform="matrix(.57735 1 -.43 .74478 8.1002 -7.0754)" fill="#dc915a" /></g>
-                  <g transform="translate(0 9)"><rect width="19" height="19" transform="matrix(.57735 1 -.43 .74478 8.1002 -7.0754)" fill="#efd7a6" /></g>
-                  <g transform="translate(12 11)"><rect width="19" height="19" transform="matrix(.57735 1 -.43 .74478 8.1002 -7.0754)" fill="#a6bfae" /></g>
-                </g>
-                <text class="intro-project-word-cottbus" fill="#e8e6dc" font-family="Arial, sans-serif" font-size="29" font-weight="600" letter-spacing="-.6"><textPath href="#intro-cottbus-curve" startOffset="50%" text-anchor="middle">Map of Cottbus</textPath></text>
-              </svg>
+            <div id="intro-project-fan" class="intro-project-fan" role="group" aria-label="Live project cards" aria-describedby="intro-project-fan-help">
+              <span id="intro-project-fan-help" class="sr-only">Swipe left or right to browse. Select a card to bring it forward. Open its logo to explore the project, or its URL to visit the website.</span>
+              <div class="intro-project-window intro-project-maptheory" data-project="maptheory" data-project-name="Maptheory" data-slot="3" data-front="true">
+                <button class="intro-project-surface" type="button" data-select-project="maptheory" aria-label="Bring Maptheory to the front" aria-pressed="true"></button>
+                <div class="intro-project-header" aria-hidden="true"><span class="intro-project-name">Map<span class="intro-maptheory-accent">theory</span></span></div>
+                <div class="intro-project-body"><a class="intro-project-open intro-project-brand" href="/?view=live-projects&amp;project=maptheory" aria-label="Explore Maptheory" draggable="false"><img class="intro-project-mark" src="/assets/intro-projects/maptheory.svg?v=618ba754db94" alt="" width="46" height="46" draggable="false" /><span class="intro-project-logo-copy">Map<span class="intro-maptheory-accent">theory</span></span></a></div>
+                <a class="intro-project-domain" href="https://maptheory.org/" target="_blank" rel="noopener noreferrer" aria-label="Visit maptheory.org — opens in a new tab" draggable="false">maptheory.org</a>
+              </div>
+              <div class="intro-project-window intro-project-space" data-project="space-cottbus" data-project-name="NASA Space Apps Cottbus" data-slot="0" data-front="false">
+                <button class="intro-project-surface" type="button" data-select-project="space-cottbus" aria-label="Bring NASA Space Apps Cottbus to the front" aria-pressed="false"></button>
+                <div class="intro-project-header" aria-hidden="true"><span class="intro-project-name">NASA Space Apps Cottbus</span></div>
+                <div class="intro-project-body"><a class="intro-project-open intro-project-brand" href="/?view=live-projects&amp;project=space-cottbus" aria-label="Explore NASA Space Apps Cottbus" draggable="false"><img class="intro-project-mark" src="/assets/intro-projects/space-cottbus.svg?v=63fc4767a4c0" alt="" width="150" height="59" draggable="false" /><span class="intro-project-logo-copy">NASA Space Apps Cottbus</span></a></div>
+                <a class="intro-project-domain" href="https://spacecottbus.com/" target="_blank" rel="noopener noreferrer" aria-label="Visit spacecottbus.com — opens in a new tab" draggable="false">spacecottbus.com</a>
+              </div>
+              <div class="intro-project-window intro-project-cottbus" data-project="cottbus" data-project-name="Map of Cottbus" data-slot="1" data-front="false">
+                <button class="intro-project-surface" type="button" data-select-project="cottbus" aria-label="Bring Map of Cottbus to the front" aria-pressed="false"></button>
+                <div class="intro-project-header" aria-hidden="true"><span class="intro-project-name">Map of Cottbus</span></div>
+                <div class="intro-project-body"><a class="intro-project-open intro-project-brand" href="/?view=live-projects&amp;project=cottbus" aria-label="Explore Map of Cottbus" draggable="false"><svg class="intro-project-mark" aria-hidden="true" viewBox="-2 -8 35 47" width="56" height="56" fill="none" stroke="#eabb79" stroke-width="1.7" focusable="false"><g transform="translate(6 1)"><rect width="19" height="19" transform="matrix(.57735 1 -.43 .74478 8.1002 -7.0754)" fill="#dc915a" /></g><g transform="translate(0 9)"><rect width="19" height="19" transform="matrix(.57735 1 -.43 .74478 8.1002 -7.0754)" fill="#efd7a6" /></g><g transform="translate(12 11)"><rect width="19" height="19" transform="matrix(.57735 1 -.43 .74478 8.1002 -7.0754)" fill="#a6bfae" /></g></svg><span class="intro-project-logo-copy">Map of Cottbus</span></a></div>
+                <a class="intro-project-domain" href="https://cottbus.maptheory.org/" target="_blank" rel="noopener noreferrer" aria-label="Visit cottbus.maptheory.org — opens in a new tab" draggable="false">cottbus.maptheory.org</a>
+              </div>
+              <div class="intro-project-window intro-project-gralobe" data-project="gralobe" data-project-name="Gralobe" data-slot="2" data-front="false">
+                <button class="intro-project-surface" type="button" data-select-project="gralobe" aria-label="Bring Gralobe to the front" aria-pressed="false"></button>
+                <div class="intro-project-header" aria-hidden="true"><span class="intro-project-name">Gralobe</span></div>
+                <div class="intro-project-body"><a class="intro-project-open intro-project-brand" href="/?view=live-projects&amp;project=gralobe" aria-label="Explore Gralobe" draggable="false"><span class="intro-gralobe-wordmark">gralobe</span></a></div>
+                <a class="intro-project-domain" href="https://gralobe.maptheory.org/" target="_blank" rel="noopener noreferrer" aria-label="Visit gralobe.maptheory.org — opens in a new tab" draggable="false">gralobe.maptheory.org</a>
+              </div>
             </div>
             <a id="intro-live-projects" class="intro-enter intro-enter-secondary" href="/?view=live-projects"><span>Explore live projects</span><span class="intro-enter-arrow" aria-hidden="true">↗</span></a>
           </div>

@@ -149,7 +149,10 @@ export async function startGalleryRoom({deferActivation=false,spatial=false,even
   bindAchievementSummaryDownload(summaryDownload,{status:summaryStatus,signal});
   summaryDownload.addEventListener('click',()=>{clearMovementKeys();cancelDrag();},{signal});
   const content=createGalleryRoomContent({scene:cssScene,stations:room.stations,activeSlug:slug,
-    baseHref:location.href,onFocusSurface:focusSurface,onProjectLink:selectProject,onReturnToRoom:returnToRoom});
+    readingContainer:root,onReadingChange:(reading,descriptor)=>{
+      stage.inert=reading;
+      if(reading)descriptor.closeDescription.focus({preventScroll:true});
+    },baseHref:location.href,onFocusSurface:focusSurface,onProjectLink:selectProject,onReturnToRoom:returnToRoom});
   const globe=createGalleryRoomGlobe({container:globeMount,achievements:ordered,onSelect:selectProject});
   globe.setActive(slug);
 

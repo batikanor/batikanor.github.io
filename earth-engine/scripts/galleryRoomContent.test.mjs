@@ -5,7 +5,7 @@ import {Scene, PerspectiveCamera, Vector3} from 'three';
 import {contestsAndActivities} from '../src/data/contestsAndActivities.js';
 import {renderProjectContent, projectHref} from '../src/projectContent.js';
 import {galleryStationComponents} from '../src/galleryRoomLayout.js';
-import {roomCameraFov, surfaceCameraPlan, overviewCameraPlan} from '../src/galleryRoomCamera.js';
+import {roomCameraFov, roomSafeArea, surfaceCameraPlan, overviewCameraPlan} from '../src/galleryRoomCamera.js';
 import {createGalleryRoomScene} from '../src/galleryRoomScene.js';
 
 class TextNode {
@@ -14,7 +14,7 @@ class TextNode {
 class Element {
   constructor(tag) {
     this.tagName = tag.toUpperCase(); this.children = []; this.attributes = new Map();
-    this.dataset = {}; this.style = {setProperty(key, value) { this[key] = String(value); }, getPropertyValue(key) { return this[key] || ''; }}; this.listeners = new Map(); this.parentElement = null;
+    this.dataset = {}; this.style = {setProperty(key, value) { this[key] = String(value); }, getPropertyValue(key) { return this[key] || ''; }, removeProperty(key) { const value = this[key] || ''; delete this[key]; return value; }}; this.listeners = new Map(); this.parentElement = null;
     this.ownerDocument = globalThis.document;
     this.classList = {
       add: (...names) => { this.className = [...new Set([...(this.className || '').split(' ').filter(Boolean), ...names])].join(' '); },
@@ -25,7 +25,7 @@ class Element {
       }
     };
   }
-  append(...items) { for (const item of items) { const child = typeof item === 'string' ? new TextNode(item) : item; this.children.push(child); child.parentElement = this; } }
+  append(...items) { for (const item of items) { const child = typeof item === 'string' ? new TextNode(item) : item; child.remove?.(); if (child.parentElement) child.parentElement.children = child.parentElement.children.filter(item => item !== child); this.children.push(child); child.parentElement = this; } }
   replaceChildren(...items) { this.children.forEach(item => { item.parentElement = null; }); this.children = []; this.append(...items); }
   get textContent() { return this.children.map(child => child.textContent).join(''); }
   set textContent(text) { this.replaceChildren(new TextNode(String(text))); }
@@ -340,7 +340,7 @@ test('wider reading canvases preserve authored copy, live surfaces and exact phy
   assert.deepEqual(authoredBlocks(story.element), copy);
   assert.deepEqual(descendants(story.element).filter(element => element.tagName === 'A').map(element => element.href), links);
   gallery.resize({width: 1280, height: 720});
-  assert.ok(story.width > 0 && story.width <= 960, 'a short desktop adapts reading density to the physical board aspect');
+  assert.equal(story.width, galleryStoryCanvasWidth(story, {width: 1280, height: 720}), 'a short desktop reflows at the projected reading width');
   assert.deepEqual(authoredBlocks(story.element), copy);
   gallery.resize({width: 1440});
   assert.equal(story.width, 960);
@@ -351,7 +351,15 @@ test('wider reading canvases preserve authored copy, live surfaces and exact phy
   gallery.dispose();
 });
 
-test('approached stories retain their readable mobile, tablet and desktop type scales at the real projected size', () => {
+test('approached stories preserve overview type size at the real projected desktop and tablet width', async () => {
+  const css = (await readFile(new URL('../src/galleryRoomContent.css', import.meta.url), 'utf8')).replace(/\/\*[\s\S]*?\*\//g, '');
+  for (const selector of ['.gallery-room-story', '.gallery-room-story.is-tablet',
+    '.gallery-room-story.is-wall-panel', '.gallery-room-story.is-reading-story']) {
+    const rule = [...css.matchAll(/([^{}]+)\{([^{}]*)\}/g)]
+      .find(match => match[1].trim() === selector)?.[2];
+    assert.equal(Number.parseFloat(/--room-copy:\s*([\d.]+)px/.exec(rule)?.[1]), 16,
+      `${selector}: shipped story styles retain the 16px overview text used by projection metrics`);
+  }
   const surface = galleryStationComponents(contestsAndActivities[0]).find(pose => pose.kind === 'story');
   for (const viewport of [
     {width: 1280, height: 720}, {width: 1280, height: 900}, {width: 1440, height: 900},
@@ -372,17 +380,19 @@ test('approached stories retain their readable mobile, tablet and desktop type s
     const right = new Vector3(surface.position[0] + surface.worldWidth / 2, surface.position[1], surface.position[2]).project(camera);
     const displayedWidth = (right.x - left.x) * viewport.width / 2;
     const canvasWidth = galleryStoryCanvasWidth(surface, viewport);
-    const bodySize = viewport.width < 700 ? 11.5 : viewport.width <= 900 ? 18 : 19;
-    const minimum = viewport.width < 700 ? 11 : viewport.width <= 900 ? 16 : 17;
+    const bodySize = viewport.width < 700 ? 11.5 : 16;
+    const minimum = viewport.width < 700 ? 11 : 15.8;
     const displayedBodySize = bodySize * displayedWidth / canvasWidth;
     assert.ok(displayedBodySize >= minimum - 1e-9,
       `${viewport.width}×${viewport.height}: actual approached text stays at least ${minimum}px`);
-    if (viewport.width > 900) assert.ok(displayedBodySize <= 22 + 1e-9,
-      `${viewport.width}×${viewport.height}: larger windows reveal more writing instead of inflating desktop text`);
+    if (viewport.width >= 700) {
+      assert.equal(canvasWidth, Math.ceil(displayedWidth), 'the fallback canvas uses the projected width instead of enlarging its contents');
+      assert.ok(displayedBodySize <= 16 + 1e-9,
+        `${viewport.width}×${viewport.height}: approach never inflates the 16px overview text`);
+    }
     if (viewport.width < 700) assert.ok(displayedBodySize <= 11.5 + 1e-9,
       `${viewport.width}×${viewport.height}: mobile reading keeps a restrained type scale`);
-    if (viewport.width >= 1920) assert.ok(canvasWidth > 840, 'large desktop windows increase reading capacity');
-    else assert.ok(canvasWidth <= (viewport.width <= 900 ? 680 : 960));
+    if (viewport.width < 700) assert.ok(canvasWidth <= 680);
   }
   assert.ok(galleryStoryCanvasWidth(surface, {width: 1280, height: 900}) > 600, 'a normal desktop shows more authored text than the former 600px canvas');
   assert.ok(galleryStoryCanvasWidth(surface, {width: 700, height: 1080}) < 500, 'a narrow tablet cannot shrink an oversized text canvas');
@@ -390,6 +400,212 @@ test('approached stories retain their readable mobile, tablet and desktop type s
   assert.equal(galleryStoryCanvasWidth(surface, {width: 390}), 360, 'height-missing phones keep the established density fallback');
   assert.equal(galleryStoryCanvasWidth(surface, 1280), 960, 'numeric resize preserves the established fallback');
   assert.equal(galleryStoryCanvasWidth(surface, {width: 800}), 680, 'missing-height resize preserves the established fallback');
+});
+
+test('Hong Kong description uses a taller native reading surface without replacing its authored nodes', () => {
+  const slug = 'hong-kong-talent-engage-eurotech-healthtech-2026';
+  const cssScene = new Scene(), readingContainer = new Element('div'), wallContainer = new Element('div');
+  const room = createGalleryRoomScene({scene: new Scene(), projects: contestsAndActivities});
+  const gallery = createGalleryRoomContent({scene: cssScene, stations: room.stations, activeSlug: slug, readingContainer});
+  const story = gallery.stationSurfaces.get(slug).story;
+  const element = story.element, object = story.object;
+  const scroll = element.querySelector('.gallery-room-story-scroll');
+  const authoredNodes = [...scroll.children], copy = authoredBlocks(element);
+  const links = descendants(element).filter(child => child.tagName === 'A');
+  const destinations = links.map(link => link.href);
+  try {
+    for (const [width, height] of [[1280, 900], [1440, 900], [1920, 1080]]) {
+      gallery.setFocusedSurface(null);
+      const viewport = {width, height};room.resize(viewport);gallery.resize(viewport);
+      const arrival = {width: story.width, height: story.height};
+      // The renderer's transform is removed while reading and restored before
+      // CSS3D takes ownership again; the native scroll node stays unchanged.
+      wallContainer.append(element);element.style.transform = 'matrix3d(wall)';
+      scroll.scrollTop = 81;
+      gallery.setFocusedSurface('story');
+      const safe = roomSafeArea(width, height, true);
+      const expected = {left: safe.left + 8, top: safe.top + 8,
+        width: width - safe.left - safe.right - 16, height: height - safe.top - safe.bottom - 16};
+      assert.deepEqual(story.readingRect, expected, `${width}×${height}: use the available reading height`);
+      assert.equal(element.parentElement, readingContainer);
+      assert.equal(readingContainer.children.filter(child => child === element).length, 1);
+      assert.equal(wallContainer.children.includes(element), false);
+      assert.equal(object.parent, null, 'CSS3D cannot apply a second camera transform to native reading text');
+      assert.equal(element.style.transform, 'none');
+      assert.equal(element.style.position, 'absolute');
+      assert.equal(element.style.zIndex, '10');
+      assert.equal(element.style.width, `${expected.width}px`);
+      assert.equal(element.style.height, `${expected.height}px`);
+      assert.ok(element.className.split(' ').includes('is-reading-story'));
+      assert.ok(expected.height > arrival.height, `${width}×${height}: focus increases description height`);
+      assert.ok(expected.height - 60 > 600, 'the description has room for many native-size lines, beyond fixed controls');
+      assert.equal(element.querySelector('.gallery-room-story-scroll'), scroll);
+      assert.deepEqual(scroll.children, authoredNodes);
+      assert.deepEqual(authoredBlocks(element), copy);
+      assert.deepEqual(descendants(element).filter(child => child.tagName === 'A'), links);
+      assert.deepEqual(links.map(link => link.href), destinations);
+      assert.equal(scroll.scrollTop, 81);
+      assert.equal(gallery.stationSurfaces.get(slug).story, story);
+      assert.equal(story.object, object);
+      gallery.setFocusedSurface(null);
+      assert.equal(story.readingRect, undefined);
+      assert.equal(object.parent, cssScene);
+      assert.equal(readingContainer.children.includes(element), false);
+      assert.equal(element.className.split(' ').includes('is-reading-story'), false);
+      assert.equal(element.style.transform, 'matrix3d(wall)');
+      assert.equal(element.style.width, `${arrival.width}px`);
+      assert.equal(element.style.height, `${arrival.height}px`);
+      assert.equal(scroll.scrollTop, 81, 'return preserves the same scroll state');
+    }
+  } finally {gallery.dispose();room.dispose();}
+});
+
+test('native description ownership survives focus changes, project changes, responsive reflow and disposal', () => {
+  const slug = 'hong-kong-talent-engage-eurotech-healthtech-2026';
+  const scene = new Scene(), readingContainer = new Element('div');
+  const viewport = {width: 1440, height: 900};
+  const room = createGalleryRoomScene({scene: new Scene(), projects: contestsAndActivities, viewport});
+  const gallery = createGalleryRoomContent({scene, stations: room.stations, activeSlug: slug, readingContainer});
+  const descriptors = gallery.stationSurfaces.get(slug), story = descriptors.story;
+  const scroll = story.element.querySelector('.gallery-room-story-scroll');
+  const copy = authoredBlocks(story.element), storyChildren = [...story.element.children];
+  const players = Object.values(descriptors).flatMap(panel => descendants(panel.element))
+    .filter(child => ['IMG', 'IFRAME', 'VIDEO'].includes(child.tagName));
+  try {
+    gallery.resize(viewport);scroll.scrollTop = 137;
+    for (const destination of ['references', 'media', null]) {
+      gallery.setFocusedSurface('story');
+      assert.equal(story.element.parentElement, readingContainer);
+      assert.equal(story.object.parent, null);
+      gallery.setFocusedSurface(destination);
+      assert.equal(story.readingRect, undefined);
+      assert.equal(story.object.parent, scene);
+      assert.equal(readingContainer.children.includes(story.element), false);
+      assert.equal(scroll.scrollTop, 137);
+    }
+    gallery.setFocusedSurface('story');
+    const originalRect = {...story.readingRect};
+    const resized = {width: 1024, height: 768, dockBounds: {left: 28, right: 400, top: 300, bottom: 740},
+      headerBounds: {left: 32, right: 992, top: 27, bottom: 68, controlsBottom: 72}};
+    room.resize(resized);gallery.resize(resized);
+    assert.equal(story.element.parentElement, readingContainer);
+    assert.notDeepEqual(story.readingRect, originalRect);
+    const safe = roomSafeArea(resized.width, resized.height, true, resized.dockBounds, resized.headerBounds);
+    assert.equal(story.readingRect.left, safe.left + 8);
+    assert.equal(story.readingRect.top, safe.top + 8);
+    assert.ok(story.readingRect.left + story.readingRect.width <= resized.width - safe.right);
+    assert.ok(story.readingRect.top + story.readingRect.height <= resized.height - safe.bottom);
+    assert.equal(scroll.scrollTop, 137);
+    // Sorting moves the existing station and then reflows the content. It must
+    // not put the reading article back under the transformed scene.
+    room.setOrder([...contestsAndActivities].reverse());gallery.resize(resized);
+    assert.equal(story.element.parentElement, readingContainer);
+    assert.equal(story.object.parent, null);
+    assert.deepEqual(story.element.children, storyChildren);
+    assert.deepEqual(authoredBlocks(story.element), copy);
+    assert.deepEqual(Object.values(descriptors).flatMap(panel => descendants(panel.element))
+      .filter(child => ['IMG', 'IFRAME', 'VIDEO'].includes(child.tagName)), players);
+    assert.equal(scroll.scrollTop, 137);
+    const nextSlug = contestsAndActivities.find(project => project.slug !== slug).slug;
+    gallery.setActiveSlug(nextSlug);
+    assert.equal(story.readingRect, undefined);
+    assert.equal(story.object.parent, scene);
+    assert.equal(readingContainer.children.includes(story.element), false);
+    gallery.setActiveSlug(slug);gallery.setFocusedSurface('story');
+    assert.equal(story.element.parentElement, readingContainer);
+    assert.equal(story.element.querySelector('.gallery-room-story-scroll'), scroll);
+    assert.equal(scroll.scrollTop, 137);
+    gallery.resize({width: 650, height: 844});
+    assert.equal(story.readingRect, undefined, 'small spatial windows retain their established compact approach');
+    assert.equal(story.object.parent, scene);
+    gallery.resize(viewport);
+    assert.equal(story.element.parentElement, readingContainer, 'returning to a desktop window restores native reading');
+    gallery.dispose();
+    assert.equal(readingContainer.children.length, 0);
+    assert.equal(story.object.parent, null);
+  } finally {gallery.dispose();room.dispose();}
+});
+
+test('native phone flow never moves a focused description into the spatial reading host', () => {
+  const slug = 'hong-kong-talent-engage-eurotech-healthtech-2026';
+  const container = new Element('div'), readingContainer = new Element('div');
+  const gallery = createGalleryRoomContent({scene: new Scene(), stations, activeSlug: slug,
+    presentation: 'flow', container, readingContainer});
+  const story = gallery.stationSurfaces.get(slug).story;
+  const scroll = story.element.querySelector('.gallery-room-story-scroll');scroll.scrollTop = 93;
+  try {
+    gallery.resize({width: 800, height: 1000});gallery.setFocusedSurface('story');
+    assert.equal(story.element.parentElement, container);
+    assert.equal(story.readingRect, undefined);
+    assert.equal(readingContainer.children.length, 0);
+    assert.equal(story.element.style.position, 'relative');
+    assert.equal(story.element.style.width, '');
+    assert.equal(story.element.style.height, '');
+    assert.equal(story.element.querySelector('.gallery-room-story-scroll'), scroll);
+    assert.equal(scroll.scrollTop, 93);
+    assert.equal(story.closeDescription.hidden, true, 'native mobile reading does not expose the spatial close action');
+    gallery.setFocusedSurface(null);
+    assert.equal(story.element.parentElement, container);
+    assert.equal(story.closeDescription.hidden, true);
+  } finally {gallery.dispose();}
+});
+
+test('Close description is native, stable and acts only while its own desktop reading surface is open', () => {
+  const slug = 'hong-kong-talent-engage-eurotech-healthtech-2026';
+  const readingContainer = new Element('div');
+  const viewport = {width: 1440, height: 900};
+  const room = createGalleryRoomScene({scene: new Scene(), projects: contestsAndActivities, viewport});
+  let returned = 0;const readingChanges = [];
+  const gallery = createGalleryRoomContent({scene: new Scene(), stations: room.stations,
+    activeSlug: slug, readingContainer, onReadingChange(reading, descriptor) {readingChanges.push([reading, descriptor]);},
+    onReturnToRoom() {returned++;gallery.setFocusedSurface(null);}});
+  const story = gallery.stationSurfaces.get(slug).story;
+  const close = story.closeDescription, scroll = story.element.querySelector('.gallery-room-story-scroll');
+  const authored = authoredBlocks(story.element), nativeChildren = [...story.element.children];
+  const assertHidden = message => {
+    assert.equal(close.hidden, true, message);
+    const previous = returned;close.dispatch('click');
+    assert.equal(returned, previous, `${message}: a stale close action does not request navigation`);
+  };
+  try {
+    gallery.resize(viewport);
+    assert.equal(close.tagName, 'BUTTON');
+    assert.equal(close.type, 'button');
+    assert.equal(close.getAttribute('aria-label'), 'Close description');
+    assert.equal(story.element.querySelector('.gallery-room-story-close'), close);
+    assert.equal(story.element.children.indexOf(close) < story.element.children.indexOf(scroll), true,
+      'the close action is outside the authored scroll area');
+    assertHidden('overview keeps the close action hidden');
+    scroll.scrollTop = 112;gallery.setFocusedSurface('story');
+    assert.equal(readingChanges.length, 1);assert.deepEqual(readingChanges[0], [true, story]);
+    gallery.resize(viewport);assert.equal(readingChanges.length, 1, 'reflow does not steal focus again');
+    assert.equal(close.hidden, false);
+    assert.equal(close.parentElement, story.element);
+    close.dispatch('click');
+    assert.equal(returned, 1, 'the close button invokes the same return callback as Zoom out');
+    assert.deepEqual(readingChanges.at(-1), [false, story], 'close re-enables the scene with the same descriptor');
+    assert.equal(story.readingRect, undefined);
+    assert.equal(readingContainer.children.includes(story.element), false);
+    assert.equal(story.element.querySelector('.gallery-room-story-scroll'), scroll);
+    assert.equal(scroll.scrollTop, 112);
+    assertHidden('return hides the close action');
+    for (const destination of ['references', 'media']) {
+      gallery.setFocusedSurface('story');assert.equal(close.hidden, false);
+      gallery.setFocusedSurface(destination);assertHidden(`switching to ${destination} hides the close action`);
+    }
+    gallery.setFocusedSurface('story');gallery.resize({width: 650, height: 844});
+    assertHidden('compact spatial reading hides the desktop close action');
+    gallery.resize(viewport);assert.equal(close.hidden, false);
+    assert.equal(story.closeDescription, close);
+    assert.deepEqual(story.element.children, nativeChildren);
+    assert.deepEqual(authoredBlocks(story.element), authored);
+    const nextSlug = contestsAndActivities.find(project => project.slug !== slug).slug;
+    gallery.setActiveSlug(nextSlug);assertHidden('changing the project hides the previous close action');
+    gallery.setActiveSlug(slug);gallery.setFocusedSurface('story');assert.equal(close.hidden, false);
+    assert.equal(story.element.querySelector('.gallery-room-story-close'), close, 'reopening reuses the native close button');
+    assert.equal(descendants(story.element).filter(element => element.className?.split(' ').includes('gallery-room-story-close')).length, 1);
+    gallery.dispose();assertHidden('disposal hides and deactivates the retained close action');
+  } finally {gallery.dispose();room.dispose();}
 });
 
 test('portrait and landscape photographs reserve an exact intrinsic aperture with captions and controls below', () => {
@@ -513,7 +729,7 @@ test('each panel has two footer magnifiers that zoom the same panel in and out',
   const gallery = createGalleryRoomContent({scene: new Scene(), stations: [station], onFocusSurface: surface => focused.push(surface), onReturnToRoom: () => returned++});
   for (const descriptor of Object.values(gallery.stationSurfaces.get(station.slug)).filter(item => item.type !== 'title')) {
     gallery.setFocusedSurface(null);
-    const buttons = descendants(descriptor.element).filter(element => element.tagName === 'BUTTON');
+    const buttons = descendants(descriptor.element).filter(element => element.tagName === 'BUTTON' && element.className?.split(' ').includes('gallery-room-zoom'));
     assert.deepEqual(buttons.map(button => button.getAttribute('aria-label')), ['Zoom in', 'Zoom out']);
     assert.equal(buttons[0].parentElement, buttons[1].parentElement);
     for (const button of buttons) assert.match(button.innerHTML, /<svg[^>]+viewBox="0 0 24 24"/);
@@ -751,13 +967,14 @@ test('every focused story and References panel has useful reading space and nati
     // physical reading space retain their established minimums.
     const chrome=kind==='story'?(phone?27+12:37+20)+2:(phone?19+27+8:36.6+37+14)+2;
     const usefulHeight=(descriptor.height-chrome)*scale;
-    const cssBody=kind==='references'?(phone?9:16):phone?11.5:viewport.width<=900?18:19;
-    const actualFont=cssBody*scale,minimumFont=kind==='references'?(phone?9:16):phone?11:viewport.width<=900?16:17;
+    const cssBody=kind==='references'?(phone?9:16):phone?11.5:16;
+    const actualFont=cssBody*scale,minimumFont=kind==='references'?(phone?9:16):phone?11:15.8;
     const metric={slug:station.slug,kind,viewport:[viewport.width,viewport.height],
       arrival:[pose.width,pose.height],focused:[displayWidth,descriptor.height*scale],usefulHeight,actualFont};
     metrics.push(metric);
     if(usefulHeight<40-1e-7)failures.push({...metric,reason:'less than 40px of useful text viewport'});
     if(actualFont<minimumFont-1e-7)failures.push({...metric,reason:`focused font below ${minimumFont}px`});
+    if(!phone&&kind==='story'&&actualFont>16+1e-7)failures.push({...metric,reason:'focused story text exceeds its 16px overview size'});
     if(phone&&actualFont>(kind==='references'?9:11.5)+1e-7)failures.push({...metric,reason:'focused phone text exceeds its intended compact size'});
     return metric;
   }

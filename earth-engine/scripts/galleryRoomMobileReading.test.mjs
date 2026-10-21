@@ -221,7 +221,8 @@ test('every reading panel keeps a clear bottom-row zoom pair and no next-object 
     content.setActiveSlug(slug);
     for (const descriptor of Object.values(descriptors).filter(item => item.type !== 'title')) {
       panelCount++;
-      const buttons = ownElements(descriptor, 'button');
+      const buttons = ownElements(descriptor, 'button').filter(button => button.className?.split(' ').includes('gallery-room-zoom'));
+      if (descriptor.closeDescription) assert.equal(descriptor.closeDescription.hidden, true, 'the desktop popup close action stays hidden in native flow');
       assert.deepEqual(buttons.map(button => button.getAttribute('aria-label')), ['Zoom in', 'Zoom out'],
         `${slug}/${descriptor.kind}: each panel offers the same two explicit magnifier actions`);
       assert.equal(descriptor.zoomIn, buttons[0]); assert.equal(descriptor.zoomOut, buttons[1]);

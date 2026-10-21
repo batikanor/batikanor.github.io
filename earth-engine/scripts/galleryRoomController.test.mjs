@@ -130,7 +130,7 @@ function startupFixture({reducedMotion=true,coarse=false,loadSummaryExporter,loa
     removeAttribute(name){this.attributes.delete(name);}
     closest(){return ['BUTTON','A','INPUT','SELECT','TEXTAREA','IFRAME'].includes(this.tagName)?this:null;}
     get isConnected(){return this===document.body||!!this.parent?.isConnected;}
-    focus(){document.activeElement=this;this.focusCount=(this.focusCount??0)+1;}
+    focus(){if(this.inert)return;document.activeElement=this;this.focusCount=(this.focusCount??0)+1;}
     showModal(){this.open=true;this.modalOpenCount=(this.modalOpenCount??0)+1;}
     close(){this.open=false;this.dispatch('close');}
     setPointerCapture(id){this.captures.add(id);}
@@ -175,8 +175,8 @@ function startupFixture({reducedMotion=true,coarse=false,loadSummaryExporter,loa
     createGalleryRoomPicker:({projects,onSortChange})=>(picker={element:new Element('div'),projects,
       setActive(slug){this.activeSlug=slug;},setProjects(projects){this.projects=projects;},
       setSortMode(mode){this.sortMode=mode;},changeSort(mode){onSortChange(mode);},close(){},dispose(){}}),
-    createGalleryRoomContent:({stations,activeSlug,onFocusSurface,onReturnToRoom})=>{
-      const content={activeSlug,stationSurfaces:new Map(),focusedSurface:null,
+    createGalleryRoomContent:({stations,activeSlug,onFocusSurface,onReturnToRoom,readingContainer,onReadingChange})=>{
+      const content={activeSlug,readingContainer,readingChanged:onReadingChange,stationSurfaces:new Map(),focusedSurface:null,
         setActiveSlug(slug){this.activeSlug=slug;},setFocusedSurface(kind){this.focusedSurface=kind;},setVisibleSlugs(slugs){this.visibleSlugs=slugs;},
         resize(viewport){resizes.push({...viewport});sync();},dispose(){},
         approach(kind){onFocusSurface(this.stationSurfaces.get(this.activeSlug)?.[kind]);},returnToRoom:onReturnToRoom};
@@ -548,6 +548,7 @@ test('locked stage clicks still approach boards and Escape returns to the comple
     stage.dispatch('pointerup',{pointerId:10,clientX,clientY});
     assert.equal(api.getStats().viewLocked,true);assert.equal(api.getStats().focusKind,'story');assert.equal(api.content.focusedSurface,'story');
     assert.notDeepEqual(api.getStats().camera,initial.camera,'the programmatic reading approach remains available');
+    assert.equal(api.content.readingContainer,api.root,'the story can use native screen pixels above the spatial scene');
     assert.equal(f.key('Escape').prevented,true);assert.equal(api.getStats().focusKind,null);assert.equal(api.getStats().viewLocked,true);
     assert.deepEqual(api.getStats().camera,initial.camera);
     f.key('ArrowRight');assert.notEqual(api.getStats().activeSlug,initial.activeSlug);assert.equal(api.getStats().viewLocked,true);
@@ -578,6 +579,26 @@ test('lock toggles preserve programmatic reading animations and pending project 
   assert.equal(api.getStats().viewLocked,true,'neither old controls nor the API can change a disposed room');
   assert.equal(f.key('w',{target:f.document.body}).prevented,undefined,'disposal releases global keyboard handling');
   assert.equal(f.pending.size,0);
+});
+
+
+test('native description focus blocks the blurred scene while map and header controls remain available',async()=>{
+  const f=startupFixture(),api=await f.context.startGalleryRoom({spatial:true});
+  try{
+    const stage=f.document.getElementById('gallery-room-stage');
+    const close=f.document.createElement('button');api.root.append(close);
+    api.content.approach('story');
+    api.content.readingChanged(true,{closeDescription:close});
+    assert.equal(stage.inert,true,'blurred scene descendants cannot receive pointer or keyboard interaction');
+    assert.equal(f.document.activeElement,close,'the visible close action is immediately available to keyboard users');
+    stage.focus();assert.equal(f.document.activeElement,close,'the inert scene cannot steal focus from the description');
+    f.picker.element.focus();assert.equal(f.document.activeElement,f.picker.element,'map navigation stays usable');
+    f.document.getElementById('gallery-view-lock').focus();
+    assert.equal(f.document.activeElement,f.document.getElementById('gallery-view-lock'),'navbar controls stay usable');
+    assert.notEqual(api.root.inert,true,'the whole interface remains available');
+    api.content.readingChanged(false,{closeDescription:close});api.content.returnToRoom();
+    assert.equal(stage.inert,false);assert.equal(f.document.activeElement,stage);
+  }finally{api.dispose();}
 });
 
 test('repeated approach and return taps do not restart the current camera transition',async()=>{

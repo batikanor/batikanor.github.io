@@ -5,7 +5,9 @@
  * A wall is a composition, not a collection of equal-size slots. For each new
  * achievement, inspect its real media and review the resulting desktop and
  * phone screenshots. Give the useful photo, demonstration or document enough
- * space to communicate; do not reward an empty description board merely for
+ * space to communicate. Grow caption/credit rows into available space before
+ * introducing scrolling, without shrinking the photograph or its type. Do not
+ * reward an empty description board merely for
  * its area. Portraits can use the full height beside the story, while slides
  * and videos need broad screens. Check caption/footer space and the map lane.
  *

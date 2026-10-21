@@ -1,5 +1,6 @@
 import {getProject, projectHref, projectMedia} from './projectContent.js';
 import {galleryPhotoSource} from './galleryRoomMediaDimensions.js';
+import {galleryPhotoCaptionMetrics} from './galleryRoomPhotoCaption.js';
 import {galleryWallCuration} from './galleryRoomCuration.js';
 import {roomDockRectangle, roomSafeArea, roomCameraFov, surfaceCameraPlan} from './galleryRoomCamera.js';
 
@@ -178,6 +179,32 @@ function mediaInCells(media, region, columns, gap, phone, preferredAspect = {}, 
     return {id: index ? `media-${index + 1}` : 'media', kind: 'media', media: record,
       photo: {...source, captionPixels: caption, controlsPixels: controls},
       rect: rectangle(cell.x + (cell.width - width) / 2, (topAligned ? cell.y : cell.y + (cell.height - height) / 2), width, height)};
+  });
+}
+
+/** Spend unused space on complete photo captions before requiring a scroll. */
+export function fitGalleryPhotoCaptions(entries, {floor, gap = 14, obstructions = [], phone = false, title = ''} = {}) {
+  return entries.map(entry => {
+    if (!entry.photo) return entry;
+    const rect = {...entry.rect}, photo = {...entry.photo};
+    const uiScale = Math.min(.8, photo.controlsPixels / 40, photo.captionPixels / (entry.media.credit ? 55 : 36));
+    const media = {...entry.media, abovePhotoCaption: entry.media.abovePhotoCaption || `${title} — photo ${entry.media.index + 1}`};
+    const metrics = galleryPhotoCaptionMetrics(media, rect.width, {uiScale, phone});
+    let limit = Number.isFinite(floor) ? floor : bottom(rect);
+    const framePadding = phone ? 1.5 : 2;
+    for (const block of [...entries.filter(other => other !== entry).map(other => other.rect), ...obstructions]) {
+      if (rect.x - framePadding >= right(block) + framePadding - .01 ||
+        right(rect) + framePadding <= block.x - framePadding + .01 || bottom(block) <= rect.y + .01) continue;
+      // Existing neighbors/obstructions bound this column. A constrained
+      // composition with no room keeps its accessible caption scroll area.
+      limit = Math.min(limit, block.y >= bottom(rect) - .01 ? block.y - gap : bottom(rect));
+    }
+    const available = photo.captionPixels + Math.max(0, limit - bottom(rect));
+    const caption = Math.min(available, Math.max(photo.captionPixels, metrics.requiredHeight));
+    rect.height += caption - photo.captionPixels;
+    Object.assign(photo, {captionPixels: caption, captionRequiredPixels: metrics.requiredHeight,
+      captionComplete: caption + .01 >= metrics.requiredHeight, captionUiScale: uiScale});
+    return {...entry, rect, photo};
   });
 }
 
@@ -574,7 +601,8 @@ export function galleryStationPlan(project, viewport = {}) {
     .filter(entry => entry.kind === 'media').every(entry => entry.rect.width >= mediaMinimum));
   const curatedChoices = prominentChoices.length ? prominentChoices : curatedCandidates;
   const selected = (portraitChoices.length ? portraitChoices : curatedChoices.length ? curatedChoices : candidates).sort((a, b) => b.score - a.score)[0];
-  const components = selected.entries.map(entry => {
+  const fittedEntries = fitGalleryPhotoCaptions(selected.entries, {floor, gap, obstructions, phone, title: project.title});
+  const components = fittedEntries.map(entry => {
     const {rect, photo: source, ...fields} = entry;
     const photo = source ? {...source, worldWidth: rect.width * scale,
       worldHeight: (rect.height - source.captionPixels - source.controlsPixels) * scale,

@@ -296,7 +296,7 @@ test('dedicated CV page respects safe insets, ignores hidden rails and remains a
   f.viewer.close();assert.equal(f.signals[0].aborted,true);assert.equal(f.timers.size,0);
   f.resize(320,568);f.viewer.open();
   assert.deepEqual(f.dialog.getBoundingClientRect(),expected(320,568));
-  assert.equal(f.node('[data-cv-zoom="out"]').disabled,false,'fit-width default still allows zooming out');
+  assert.equal(f.node('[data-cv-zoom="out"]').disabled,false,'normal reading size still allows zooming out');
   const page=new f.Element();page.className='cv-view-page';f.node('.cv-view-pages').append(page);
   f.resize(320,568);assert.equal(page.style.width,'282px','reopen restores fit-width rather than the earlier zoom');
   assert.equal(f.requests,2,'each open requests one current CV');
@@ -334,20 +334,20 @@ test('dedicated CV page uses the shared home wordmark and no live floating windo
   assert.equal(f.signals[0].aborted,true);assert.equal(f.document.activeElement,f.trigger);
 });
 
-test('dedicated CV page fits paper to available width and zoom/resize reuse the same PDF pages',()=>{
+test('dedicated CV starts at normal reading size; explicit zoom and resize reuse the same PDF pages',()=>{
   const f=fixture(1920,1080,{presentation:'page'});f.viewer.open();
   const page=new f.Element();page.className='cv-view-page';f.node('.cv-view-pages').append(page);
   f.resize(1920,1080);
-  assert.equal(page.style.width,'1894px','desktop paper uses the full available width instead of a fixed cap');
+  assert.equal(page.style.width,'800px','wide desktop paper does not magnify text to fill the screen');
   assert.equal(f.node('.cv-view-pages').style.width,'1918px','page wrapper spans the full document viewport');
   assert.equal(f.node('[data-cv-zoom="out"]').disabled,false);
-  f.node('[data-cv-zoom="out"]').emit('click');assert.equal(page.style.width,'1610px');
-  f.node('[data-cv-zoom="out"]').emit('click');assert.equal(page.style.width,'1231px');
+  f.node('[data-cv-zoom="out"]').emit('click');assert.equal(page.style.width,'680px');
+  f.node('[data-cv-zoom="out"]').emit('click');assert.equal(page.style.width,'520px');
   assert.equal(f.node('[data-cv-zoom="out"]').disabled,true);
   f.node('[data-cv-zoom="in"]').emit('click');f.node('[data-cv-zoom="in"]').emit('click');
-  assert.equal(page.style.width,'1894px');
-  f.node('[data-cv-zoom="in"]').emit('click');assert.equal(page.style.width,'2368px');
-  f.node('[data-cv-zoom="in"]').emit('click');assert.equal(page.style.width,'2841px');
+  assert.equal(page.style.width,'800px');
+  f.node('[data-cv-zoom="in"]').emit('click');assert.equal(page.style.width,'1000px');
+  f.node('[data-cv-zoom="in"]').emit('click');assert.equal(page.style.width,'1200px');
   f.resize(390,844);assert.equal(page.style.width,'546px','phone retains the selected zoom after resize');
   assert.equal(f.node('.cv-view-pages').style.width,'570px','zoomed paper can scroll horizontally');
   f.node('[data-cv-zoom="out"]').emit('click');f.node('[data-cv-zoom="out"]').emit('click');
@@ -360,7 +360,7 @@ test('dedicated CV page fits paper to available width and zoom/resize reuse the 
   f.viewer.close();
 });
 
-test('rendered CV paper stays sharp at full width, bounded on 4K screens and preserves PDF links and page reuse',async()=>{
+test('rendered CV stays sharp when zoomed, bounded on 4K screens and preserves PDF links and page reuse',async()=>{
   for(const scenario of [
     {width:1920,height:1080,dpr:1,presentation:'page',bitmapWidth:1894},
     {width:1280,height:900,dpr:2,presentation:'page',bitmapWidth:2508},
@@ -385,6 +385,8 @@ test('rendered CV paper stays sharp at full width, bounded on 4K screens and pre
     assert.equal(f.node('.cv-view-loading').hidden,true,'the real async PDF pipeline finishes');
     assert.equal(pdfModule.GlobalWorkerOptions.workerSrc,'worker.mjs');
     const page=f.node('.cv-view-pages').children[0],canvas=page.children[0];
+    assert.equal(page.style.width,scenario.presentation==='page'?'800px':'820px',
+      'high-resolution bitmap size does not enlarge the displayed paper');
     assert.equal(canvas.tagName,'canvas');assert.equal(canvas.width,scenario.bitmapWidth);
     assert.equal(canvas.contextType,'2d');assert.deepEqual(canvas.contextOptions,{alpha:false});
     assert.equal(renders[0].canvasContext,canvas.context);
@@ -409,4 +411,42 @@ test('rendered CV paper stays sharp at full width, bounded on 4K screens and pre
     assert.equal(f.timers.size,0,'successful rendering clears the preview timeout');
     f.viewer.close();assert.equal(destroyed,1);
   }
+});
+
+test('actual A4, letter and landscape PDF dimensions determine normal CV reading sizes',async()=>{
+  let documents=0,renders=0;
+  const papers=[[595.28,841.89],[612,792],[792,612]];
+  const pdfModule={GlobalWorkerOptions:{},getDocument(){
+    documents++;
+    return {promise:Promise.resolve({numPages:papers.length,async getPage(number){
+      const [width,height]=papers[number-1];
+      return {
+        getViewport({scale}){return {width:width*scale,height:height*scale,transform:[scale,0,0,-scale,0,height*scale]};},
+        render(){renders++;return {promise:Promise.resolve()};},
+        async getAnnotations(){return [];},async getTextContent(){return {items:[]};},
+      };
+    }}),async destroy(){}};
+  }};
+  const f=fixture(1920,1080,{presentation:'page',pdfModule,pdfBlob:new Blob(['PDF bytes'])});
+  f.viewer.open();await new Promise(resolve=>setImmediate(resolve));
+  const pages=[...f.node('.cv-view-pages').children],canvases=pages.map(page=>page.children[0]);
+  const widths=()=>pages.map(page=>page.style.width);
+  assert.deepEqual(widths(),['794px','816px','1056px'],'each page uses its actual physical paper size');
+  f.resize(3840,2160);assert.deepEqual(widths(),['794px','816px','1056px'],'a wider desktop does not enlarge CV text');
+  f.node('[data-cv-zoom="in"]').emit('click');
+  assert.deepEqual(widths(),['992px','1020px','1320px'],'explicit zoom can exceed the normal reading size');
+  f.resize(390,844);assert.deepEqual(widths(),['455px','455px','455px'],'phone retains the selected zoom');
+  f.node('[data-cv-zoom="out"]').emit('click');
+  assert.deepEqual(widths(),['364px','364px','364px'],'normal phone reading fits all paper orientations');
+  assert.equal(f.node('.cv-view-pages').style.width,'388px');
+  f.resize(1920,1080);assert.deepEqual(widths(),['794px','816px','1056px']);
+  assert.deepEqual(f.node('.cv-view-pages').children,pages);
+  assert.deepEqual(pages.map(page=>page.children[0]),canvases,'all native canvas nodes survive zoom and resize');
+  assert.equal(f.requests,1);assert.equal(documents,1);assert.equal(renders,3,'layout changes do not refetch or rerender PDF pages');
+  f.node('[data-cv-zoom="in"]').emit('click');
+  assert.deepEqual(widths(),['992px','1020px','1320px']);
+  f.viewer.close();f.viewer.open();await new Promise(resolve=>setImmediate(resolve));
+  assert.deepEqual(f.node('.cv-view-pages').children.map(page=>page.style.width),['794px','816px','1056px'],
+    'reopening resets the document to normal reading size');
+  f.viewer.close();
 });

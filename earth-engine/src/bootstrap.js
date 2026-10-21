@@ -2,6 +2,7 @@ import {shouldShowIntro} from './introGate.js';
 import {readPortfolioRoute, portfolioUrl} from './portfolioRoute.js';
 import achievements from './data/achievements.json';
 import {finishIntro, hideIntroForDeepLink, waitForIntroEntry, requestIntroEntry} from './intro.js';
+import {mountIntroProjectFan} from './introProjectFan.js';
 
 /**
  * Do not load the large map runtime on browsers that cannot create WebGL2.
@@ -152,6 +153,7 @@ async function enterGalleryFromIntro() {
 }
 
 async function start() {
+  mountIntroProjectFan(document.getElementById('intro-project-fan'));
   const url = new URL(location.href);
   // Old bookmarks no longer select the removed text-view interface.
   if (url.searchParams.get('view') === 'list') {

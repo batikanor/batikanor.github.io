@@ -4,6 +4,7 @@ import {readFileSync} from 'node:fs';
 import vm from 'node:vm';
 import {shouldShowIntro} from '../src/introGate.js';
 import {readPortfolioRoute,portfolioUrl} from '../src/portfolioRoute.js';
+import {mountIntroProjectFan} from '../src/introProjectFan.js';
 
 const achievements=JSON.parse(readFileSync(new URL('../src/data/achievements.json',import.meta.url),'utf8'));
 const html=readFileSync(new URL('../index.html',import.meta.url),'utf8');
@@ -68,7 +69,7 @@ function fixture({href='https://staging.batikanor.com/',experience='gallery',web
     calls.activateSelection.push(options.eventSlug??null);
     this.root.inert=false;
   },dispose(){calls.disposed++;nodes.app.inert=false;}};
-  const context=vm.createContext({URL,URLSearchParams,shouldShowIntro,readPortfolioRoute,portfolioUrl,achievements,location,history,
+  const context=vm.createContext({URL,URLSearchParams,shouldShowIntro,readPortfolioRoute,portfolioUrl,mountIntroProjectFan,achievements,location,history,
     console:{error(...items){calls.errors.push(items);}},
     document:{documentElement,getElementById:id=>nodes[id],createElement(tag){
       assert.equal(tag,'canvas');return{getContext(name){assert.equal(name,'webgl2');calls.gpuContexts++;

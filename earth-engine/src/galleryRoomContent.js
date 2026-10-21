@@ -1,7 +1,7 @@
 import {CSS3DObject} from 'three/addons/renderers/CSS3DRenderer.js';
 import {getProject, projectHref} from './projectContent.js';
 import {galleryStationComponents, galleryStationMedia, galleryStationLinks} from './galleryRoomLayout.js';
-import {roomCameraFov, surfaceCameraPlan} from './galleryRoomCamera.js';
+import {roomCameraFov, surfaceCameraPlan, roomSafeArea} from './galleryRoomCamera.js';
 import './galleryRoomContent.css';
 
 export {galleryStationMedia, galleryStationLinks} from './galleryRoomLayout.js';
@@ -18,7 +18,7 @@ const storyPlacementCopy = new Map([
   ['circular-bsh-2024', [' See the slide deck for more details.', '']],
 ]);
 
-/** Keep approached reading text legible when the viewport limits board size. */
+/** Reflow approached text at its arrival size instead of magnifying the font. */
 export function galleryStoryCanvasWidth(surface, viewport = {}) {
   const width = typeof viewport === 'number' ? viewport : viewport.width;
   const compact = width <= 600;
@@ -30,10 +30,10 @@ export function galleryStoryCanvasWidth(surface, viewport = {}) {
   const plan = surfaceCameraPlan({...surface, position: surface.position ?? [0, 0, 0]}, viewport, fov);
   const displayedWidth = surface.worldWidth * height / (2 * Math.tan(fov * Math.PI / 360) * plan.distance);
   const phone = width < 700;
-  const bodySize = phone ? 11.5 : tablet ? 18 : 19, minimumDisplayedSize = phone ? 11 : tablet ? 16 : 17;
-  // Larger windows reveal more writing without inflating approached text.
-  const capacity = phone ? Math.max(preferred, Math.ceil(displayedWidth))
-    : tablet ? preferred : Math.max(preferred, Math.ceil(displayedWidth * bodySize / 22));
+  // One CSS pixel per projected pixel keeps desktop/tablet copy at 16px.
+  if (!phone) return Math.max(1, Math.ceil(displayedWidth));
+  const bodySize = 11.5, minimumDisplayedSize = 11;
+  const capacity = Math.max(preferred, Math.ceil(displayedWidth));
   return Math.max(1, Math.min(capacity, Math.floor(displayedWidth * bodySize / minimumDisplayedSize)));
 }
 
@@ -265,6 +265,13 @@ function boardControls(station, descriptor, options) {
 function storyContents(host, project, station, options) {
   const placementCopy = storyPlacementCopy.get(project.slug);
   const description = placementCopy ? (project.longDescription || '').replace(...placementCopy) : project.longDescription || '';
+  const descriptor = station.descriptors.story;
+  const close = node('button', 'gallery-room-story-close');
+  close.type = 'button';close.hidden = true;
+  close.setAttribute('aria-label', 'Close description');close.title = 'Close description · Esc';
+  close.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m6 6 12 12M18 6 6 18"/></svg>';
+  close.addEventListener('click', () => {if (descriptor.readingRect) options.onReturnToRoom?.();});
+  descriptor.closeDescription = close;
   const scroll = node('div', 'gallery-room-story-scroll');
   scroll.tabIndex = 0;
   scroll.setAttribute('aria-label', `Full story: ${project.title}`);
@@ -292,7 +299,7 @@ function storyContents(host, project, station, options) {
     previous = match.index + match[0].length;
   }
   textBlocks(scroll, description.slice(previous), options);
-  host.append(scroll, boardControls(station, station.descriptors.story, options));
+  host.append(close, scroll, boardControls(station, descriptor, options));
 }
 
 function monitorContents(host, project, station, descriptor, options) {
@@ -383,7 +390,7 @@ function stationComponents(station, project) {
 }
 
 /** One physical board per story, media source or resource; native viewers stay on their own screens. */
-export function createGalleryRoomContent({scene, stations = [], activeSlug, baseHref, onFocusSurface, onProjectLink, onReturnToRoom, presentation = 'spatial', container = null} = {}) {
+export function createGalleryRoomContent({scene, stations = [], activeSlug, baseHref, onFocusSurface, onProjectLink, onReturnToRoom, presentation = 'spatial', container = null, readingContainer = null, onReadingChange} = {}) {
   if (!scene?.add) throw new TypeError('A CSS3D scene is required');
   const flow = presentation === 'flow';
   if (flow && !container?.append) throw new TypeError('A native gallery flow container is required');
@@ -480,10 +487,52 @@ export function createGalleryRoomContent({scene, stations = [], activeSlug, base
       else preview.disconnect();
     }
   }
+  function restoreStory(descriptor) {
+    if (!descriptor.readingRect) return;
+    const scroll = descriptor.element.querySelector('.gallery-room-story-scroll');
+    const scrollTop = scroll?.scrollTop;
+    descriptor.element.remove();
+    Object.assign(descriptor.element.style, descriptor.readingStyle);
+    descriptor.element.classList.remove('is-reading-story');
+    descriptor.closeDescription.hidden = true;
+    delete descriptor.readingRect; delete descriptor.readingStyle;
+    scene.add(descriptor.object);
+    if (scroll) scroll.scrollTop = scrollTop;
+    onReadingChange?.(false, descriptor);
+  }
+  function placeReadingStory(descriptor, viewport) {
+    const width = viewport?.width, height = viewport?.height;
+    if (!readingContainer || ![width, height].every(value => Number.isFinite(value) && value > 0) || width < 700) {
+      restoreStory(descriptor); return;
+    }
+    const safe = roomSafeArea(width, height, true, viewport.dockBounds, viewport.headerBounds);
+    const rect = {left: safe.left + 8, top: safe.top + 8,
+      width: Math.max(120, width - safe.left - safe.right - 16),
+      height: Math.max(100, height - safe.top - safe.bottom - 16)};
+    const element = descriptor.element, scroll = element.querySelector('.gallery-room-story-scroll');
+    const scrollTop = scroll?.scrollTop;
+    const entering = !descriptor.readingRect;
+    if (entering) {
+      descriptor.readingStyle = Object.fromEntries(['position', 'transform', 'left', 'top', 'zIndex', 'display']
+        .map(key => [key, element.style[key] ?? '']));
+      // CSS3DRenderer owns descendants of its scene. Temporarily remove the
+      // object so it cannot overwrite this same native article's reading pose.
+      scene.remove(descriptor.object);
+      readingContainer.append(element);
+    }
+    descriptor.readingRect = rect;
+    element.classList.add('is-reading-story');
+    descriptor.closeDescription.hidden = false;
+    Object.assign(element.style, {position: 'absolute', transform: 'none', zIndex: '10', display: '',
+      left: `${rect.left}px`, top: `${rect.top}px`, width: `${rect.width}px`, height: `${rect.height}px`});
+    if (scroll) scroll.scrollTop = scrollTop;
+    if (entering) onReadingChange?.(true, descriptor);
+  }
   function clearFocus(state) {
     const focused = state.focused != null;
     state.focused = null;
     for (const descriptor of Object.values(state.descriptors)) {
+      restoreStory(descriptor);
       descriptor.element.classList.remove('is-focused');updateZoomControls(descriptor, false);
     }
     return focused;
@@ -566,6 +615,9 @@ export function createGalleryRoomContent({scene, stations = [], activeSlug, base
     for (const state of states.values()) {
       const poses = new Map(stationComponents(state.station, state.project).map(pose => [pose.id, pose]));
       for (const descriptor of Object.values(state.descriptors)) {
+        // Capture before the temporary physical dimensions can clamp native scroll.
+        const readingScroll = descriptor.readingRect ? descriptor.element.querySelector('.gallery-room-story-scroll') : null;
+        const readingScrollTop = readingScroll?.scrollTop;
         const pose = poses.get(descriptor.kind);
         if (pose) {
           Object.assign(descriptor, {photo: pose.photo, titleLayout: pose.titleLayout, pixelRect: pose.pixelRect, framePadding: pose.framePadding, originalWidth: pose.width,
@@ -596,7 +648,9 @@ export function createGalleryRoomContent({scene, stations = [], activeSlug, base
           const chromeScale = Math.min(focused ? 1 : .8,
             descriptor.photo.controlsWorldHeight * density / 40,
             descriptor.photo.captionWorldHeight * density / (descriptor.media.credit ? 55 : 36));
-          descriptor.element.style.setProperty('--photo-ui-scale', String(wall ? chromeScale : photoDensity / 100));
+          descriptor.element.style.setProperty('--photo-ui-scale', String(wall
+            ? !focused && Number.isFinite(descriptor.photo.captionUiScale) ? descriptor.photo.captionUiScale : chromeScale
+            : photoDensity / 100));
         }
         descriptor.element.style.width = `${descriptor.width}px`;
         descriptor.element.style.height = `${descriptor.height}px`;
@@ -610,6 +664,9 @@ export function createGalleryRoomContent({scene, stations = [], activeSlug, base
           descriptor.element.style.setProperty('--title-technologies-width', `${wall ? descriptor.titleLayout?.technologiesWidth ?? 280 : Math.min(280, descriptor.width * .28)}px`);
         }
         descriptor.object.scale.setScalar(descriptor.worldWidth / descriptor.width);
+        if (descriptor.type === 'story' && focused) placeReadingStory(descriptor, readingViewport);
+        else restoreStory(descriptor);
+        if (readingScroll) readingScroll.scrollTop = readingScrollTop;
       }
     }
   }

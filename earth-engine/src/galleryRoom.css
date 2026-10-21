@@ -130,3 +130,12 @@ html:not(.intro-active) .gallery-room-active #intro-screen{display:none!importan
 @media(min-width:700px) and (max-height:650px){.gallery-room-globe-mount{width:220px;height:220px}}
 @media(max-height:479px) and (min-width:700px){.gallery-room-dock{width:240px;bottom:max(12px,env(safe-area-inset-bottom));left:max(18px,env(safe-area-inset-left))}.gallery-room-globe-mount{width:180px;height:180px}.gallery-room-chronology{width:240px}.gallery-room-header{top:max(15px,env(safe-area-inset-top))}.gallery-room-hint{bottom:15px}.gallery-room-current-number{font-size:18px}.gallery-room-current-divider,.gallery-room-current-total{font-size:9px}.gallery-room-sort-button{font-size:7px;padding:2px}.gallery-room-current-controls{gap:2px}.gallery-room-current-count{gap:2px}.gallery-room-selector-button{padding-left:1px;padding-right:12px}.gallery-room-selector-chevron{font-size:11px}}
 @media(prefers-reduced-motion:reduce){.gallery-room-motion,.gallery-room-arrow,.gallery-room-links a{transition:none!important}}
+
+/* Only the spatial scene sits behind this dimmed glass. The native reading
+   article, map/chronology and header are siblings above it and remain sharp. */
+.gallery-room-stage::after {
+  content: ''; display: none; position: absolute; z-index: 3; inset: 0;
+  background: #0f171b99; -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+  pointer-events: none;
+}
+.gallery-room:has(> .gallery-room-story.is-reading-story) .gallery-room-stage::after { display: block; }

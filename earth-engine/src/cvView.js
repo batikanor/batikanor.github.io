@@ -81,6 +81,7 @@ export function createCvView({ root = document.body, presentation = 'window', on
   let abortController = null;
   let pdfTask = null;
   let pdfDocument = null;
+  const naturalPageWidths = new WeakMap();
   let cvPdfBlob = null;
   let previewTimeout = null;
   const zoomLevels = pagePresentation ? [.65, .85, 1, 1.25, 1.5, 2] : [1, 1.5, 2.2];
@@ -264,14 +265,20 @@ export function createCvView({ root = document.body, presentation = 'window', on
   }
 
   function updatePageLayout() {
-    const baseWidth = pagePresentation
-      ? Math.max(1, documentViewport.clientWidth - 24)
-      : Math.min(820, Math.max(280, documentViewport.clientWidth - 24));
-    const pageWidth = Math.round(baseWidth * zoomLevels[zoomIndex]);
-    pages.style.width = `${Math.max(documentViewport.clientWidth, pageWidth + 24)}px`;
+    const availableWidth = Math.max(1, documentViewport.clientWidth - 24);
+    let widestPage = 0;
     pages.querySelectorAll('.cv-view-page').forEach((page) => {
+      // The page route opens at the PDF's normal reading size (96 CSS px per
+      // inch), rather than magnifying its text to fill a wide desktop. Narrow
+      // screens still fit the paper; the explicit zoom controls can enlarge it.
+      const baseWidth = pagePresentation
+        ? Math.min(availableWidth, naturalPageWidths.get(page) ?? 800)
+        : Math.min(820, Math.max(280, availableWidth));
+      const pageWidth = Math.round(baseWidth * zoomLevels[zoomIndex]);
       page.style.width = `${pageWidth}px`;
+      widestPage = Math.max(widestPage, pageWidth);
     });
+    pages.style.width = `${Math.max(documentViewport.clientWidth, widestPage + 24)}px`;
     dialog.querySelector('[data-cv-zoom="out"]').disabled = zoomIndex === 0;
     dialog.querySelector('[data-cv-zoom="in"]').disabled = zoomIndex === zoomLevels.length - 1;
   }
@@ -351,11 +358,13 @@ export function createCvView({ root = document.body, presentation = 'window', on
       const pdfPage = await pdfDocument.getPage(number);
       if (signal.aborted) return;
 
-      // The full-page view can be wider than the old 820px reading window.
-      // Match its paper width and screen density, bounded to 16MP per page.
+      // Keep a sharp bitmap for explicit zoom without rerendering the page or
+      // replacing its native links. Bound wide/high-density screens to 16MP.
       let renderScale = 2.5;
+      let naturalWidth;
       if (pagePresentation) {
         const paper = pdfPage.getViewport({ scale: 1 });
+        naturalWidth = paper.width * 96 / 72;
         const pixelRatio = Math.min(2, window.devicePixelRatio || 1);
         const sharpScale = Math.max(2.5, Math.max(1, documentViewport.clientWidth - 24) * pixelRatio / paper.width);
         renderScale = Math.min(sharpScale, Math.sqrt(16_000_000 / (paper.width * paper.height)));
@@ -363,6 +372,7 @@ export function createCvView({ root = document.body, presentation = 'window', on
       const viewport = pdfPage.getViewport({ scale: renderScale });
       const pageElement = document.createElement('div');
       pageElement.className = 'cv-view-page';
+      if (pagePresentation) naturalPageWidths.set(pageElement, naturalWidth);
       pageElement.setAttribute('aria-label', `CV page ${number} of ${pdfDocument.numPages}`);
       const canvas = document.createElement('canvas');
       canvas.width = Math.ceil(viewport.width);
