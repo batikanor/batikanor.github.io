@@ -53,7 +53,7 @@ function fixture(project = null, { hasResizeObserver = true } = {}) {
       assert.notEqual(tag, 'canvas', 'the parent page must not load a separate GPU or map canvas');
       if (tag === 'svg') assert.equal(namespace, 'http://www.w3.org/2000/svg', 'brand marks use a real SVG namespace');
       this.namespaceURI = namespace;
-      this.tagName = tag.toUpperCase(); this.children = []; this.className = ''; this.attributes = new Map(); this.listeners = new Map(); this.dataset = {}; this.clientWidth = 640;
+      this.tagName = tag.toUpperCase(); this.children = []; this.className = ''; this.attributes = new Map(); this.listeners = new Map(); this.dataset = {}; this.clientWidth = 640; this.clientHeight = 400;
       this.style = { setProperty: (name, value) => { this.style[name] = value; } };
       this.classList = {
         contains: name => this.className.split(' ').includes(name),
@@ -63,7 +63,14 @@ function fixture(project = null, { hasResizeObserver = true } = {}) {
       };
       if (tag === 'iframe') createdFrames.push(this);
     }
-    append(...children) { for (const child of children) { this.children.push(child); child.parent = this; } }
+    get parentElement() { return this.parent || null; }
+    append(...children) {
+      for (const child of children) {
+        const descendants = node => [node, ...node.children.flatMap(descendants)];
+        if (child.parent) for (const frame of descendants(child).filter(node => node.tagName === 'IFRAME')) frame.contextRestarts = (frame.contextRestarts || 0) + 1;
+        child.remove(); this.children.push(child); child.parent = this;
+      }
+    }
     replaceChildren(...children) { this.children.forEach(child => { child.parent = null; }); this.children = []; this.text = ''; this.append(...children); }
     set textContent(value) { this.text = value; this.children = []; }
     get textContent() { return (this.text || '') + this.children.map(child => child.textContent).join(''); }
@@ -113,9 +120,10 @@ function fixture(project = null, { hasResizeObserver = true } = {}) {
 
 const settleRequests = () => new Promise(resolve => setImmediate(resolve));
 
-test('a bookmarked project loads only its real entry screen with a full native outbound link', () => {
+test('a bookmarked project fronts its own window and loads only its passive real entry screen', () => {
   const f = fixture('cottbus');
-  const frame = f.one('live-projects-site-frame'), overlay = f.one('live-projects-preview-link');
+  const frame = f.one('live-projects-site-frame'), address = f.all('live-projects-browser-domain')[2];
+  const cards = f.all('live-projects-card'), preview = f.one('live-projects-preview');
   assert.equal(f.app.inert, false);
   assert.equal(f.controller.root.dataset.project, 'cottbus');
   assert.equal(f.one('live-projects-name').textContent, 'Map of Cottbus');
@@ -128,22 +136,29 @@ test('a bookmarked project loads only its real entry screen with a full native o
   assert.equal(frame.getAttribute('aria-hidden'), 'true');
   assert.equal(frame.getAttribute('sandbox'), 'allow-scripts allow-same-origin');
   assert.ok(frame.getAttribute('allow').includes("autoplay 'none'"));
-  assert.equal(overlay.tagName, 'A');
-  assert.equal(overlay.href, 'https://cottbus.maptheory.org/');
-  assert.equal(overlay.target, '_blank');
-  assert.equal(overlay.rel, 'noopener noreferrer');
-  assert.match(overlay.getAttribute('aria-label'), /cottbus\.maptheory\.org/);
-  assert.equal(overlay.listeners.has('click'), false, 'native links preserve keyboard activation and open-in-tab');
-  assert.equal(overlay.parent, f.one('live-projects-preview'));
+  assert.equal(address.tagName, 'A');
+  assert.equal(address.href, 'https://cottbus.maptheory.org/');
+  assert.equal(address.target, '_blank');
+  assert.equal(address.rel, 'noopener noreferrer');
+  assert.match(address.getAttribute('aria-label'), /cottbus\.maptheory\.org/);
+  assert.equal(address.listeners.has('click'), false, 'native links preserve keyboard activation and open-in-tab');
+  assert.equal(address.parent.parent, cards[2]);
+  assert.equal(preview.parent, f.all('live-projects-window-body')[2], 'the body contains the passive preview beneath its selection overlay');
   assert.equal(frame.parent, f.one('live-projects-preview-frame'));
-  assert.equal(f.one('live-projects-open').href, overlay.href);
+  assert.equal(f.one('live-projects-open').href, address.href);
   assert.ok(f.one('live-projects-links').children.some(link => link.href === '/?view=world'));
+  assert.equal(f.one('live-projects-story').getAttribute('role'), 'tabpanel');
   assert.equal(f.one('live-projects-story').getAttribute('aria-labelledby'), 'live-project-cottbus');
+  assert.equal(f.one('live-projects-name').id, 'live-projects-name');
   assert.equal(f.document.documentElement.classList.contains('intro-active'), false);
   assert.equal(f.pushes.length, 0, 'opening a shared URL adds no history entry');
-  const descendants = node => [node, ...node.children.flatMap(descendants)];
-  assert.equal(descendants(f.one('live-projects-visual')).some(node => node.tagName === 'SVG'), false,
-    'site previews remain actual website frames rather than generated illustrations');
+  assert.equal(cards.length, LIVE_PROJECTS.length);
+  assert.ok(cards.every(card => card.tagName === 'FIGURE'));
+  assert.equal(f.one('live-projects-mosaic').getAttribute('role'), 'tablist');
+  assert.equal(f.one('live-projects-shelf'), undefined, 'the window headers choose a project');
+  assert.equal(f.one('live-projects-tabs'), undefined, 'there is no duplicate selector row');
+  assert.equal(f.all('live-projects-preview-select').length, LIVE_PROJECTS.length, 'every preview provides a separate native selection control');
+  assert.equal(f.one('live-projects-preview-action'), undefined);
   f.controller.dispose();
 });
 
@@ -166,10 +181,188 @@ test('branded contact links retain native destinations and accessible text besid
     assert.equal(link.children.filter(node => node.tagName === 'SVG').length, 1, 'redecoration cannot duplicate the icon');
     assert.equal(link.textContent, text);
   }
-  assert.equal(f.nodes().filter(node => node.tagName === 'SVG').length, 2, 'SVG marks are limited to the two contact links');
+  const descendants = node => [node, ...node.children.flatMap(descendants)];
+  assert.equal(descendants(f.one('live-projects-links')).filter(node => node.tagName === 'SVG').length, 2, 'each contact keeps exactly one original brand mark');
   assert.equal(f.createdFrames.length, 1);
   assert.equal(f.one('live-projects-site-frame').src, LIVE_PROJECTS[0].url);
   f.controller.dispose();
+});
+
+test('window header brands preserve original artwork without adding nested interactive controls or duplicate accessible names', () => {
+  const f = fixture(), tabs = f.all('live-projects-tab');
+  const captions = f.all('live-projects-tab-caption');
+  const descendants = node => [node, ...node.children.flatMap(descendants)];
+  for (const [index, tab] of tabs.entries()) {
+    const item = LIVE_PROJECTS[index];
+    const brand = captions[index].children[0];
+    assert.equal(tab.dataset.project, item.id);
+    assert.equal(tab.getAttribute('aria-label'), item.name);
+    assert.equal(brand.className, 'live-projects-tab-brand');
+    assert.equal(brand.getAttribute('aria-hidden'), 'true', 'artwork is decorative beside the full native project name');
+    assert.equal(captions[index].children[1].children[0].textContent, item.name);
+    assert.equal(captions[index].children[2].className, 'live-projects-tab-check');
+    assert.equal(captions[index].children[2].getAttribute('aria-hidden'), 'true');
+    assert.equal(descendants(tab).filter(node => node.tagName === 'BUTTON').length, 1);
+    assert.equal(descendants(tab).some(node => node.tagName === 'A'), false, 'selection cards remain native tabs, with outbound links outside their controls');
+    const previewButton = f.all('live-projects-preview-select')[index];
+    const body = f.all('live-projects-window-body')[index];
+    assert.equal(descendants(tab).some(node => node.classList.contains('live-projects-thumbnail')), false, 'the header and preview provide separate selection targets');
+    assert.equal(previewButton.parent, body, 'the native selection overlay covers the same body as its capture');
+    const thumbnail = descendants(body).find(node => node.classList.contains('live-projects-thumbnail'));
+    assert.equal(thumbnail.parent, body, 'the decorative capture is a sibling of the native overlay');
+    assert.equal(thumbnail.tagName, 'IMG', 'every window uses a capture of its actual website');
+    assert.match(thumbnail.src, /^\/assets\//, 'preview captures ship locally with the release');
+    assert.equal(thumbnail.alt, '', 'the preview button’s explicit label names its decorative capture');
+    assert.equal(thumbnail.draggable, false);
+  }
+  for (const [index, src, width, height] of [
+    [0, '/assets/intro-projects/maptheory.svg?v=618ba754db94', 46, 46],
+    [1, '/assets/intro-projects/space-cottbus.svg?v=63fc4767a4c0', 150, 59],
+  ]) {
+    const image = captions[index].children[0].children[0];
+    assert.equal(image.tagName, 'IMG');
+    assert.equal(image.src, src);
+    assert.equal(image.width, width);
+    assert.equal(image.height, height);
+    assert.equal(image.alt, '');
+    assert.equal(image.getAttribute('aria-hidden'), 'true');
+    assert.equal(image.draggable, false);
+  }
+  const cottbus = captions[2].children[0].children[0];
+  assert.equal(cottbus.namespaceURI, 'http://www.w3.org/2000/svg');
+  assert.equal(cottbus.getAttribute('viewBox'), '-2 -8 35 47', 'the original tile mark retains its complete bounds');
+  assert.equal(cottbus.getAttribute('focusable'), 'false');
+  assert.deepEqual(cottbus.children.map(node => node.getAttribute('transform')), ['translate(6 1)', 'translate(0 9)', 'translate(12 11)']);
+  assert.deepEqual(cottbus.children.map(node => node.children[0].getAttribute('fill')), ['#dc915a', '#efd7a6', '#a6bfae']);
+  assert.ok(cottbus.children.every(node => node.children[0].getAttribute('transform') === 'matrix(.57735 1 -.43 .74478 8.1002 -7.0754)'));
+  assert.equal(captions[3].children[0].children[0].textContent, 'gralobe');
+  assert.equal(captions[3].children[0].children[0].className, 'live-projects-tab-wordmark');
+  const brandNodes = captions.map(caption => caption.children[0]);
+  f.controller.selectProject('gralobe');
+  assert.deepEqual(captions.map(caption => caption.children[0]), brandNodes, 'selection preserves original logo nodes');
+  f.controller.dispose();
+});
+
+test('every desk window retains its independent canonical address and stable native selection nodes', () => {
+  const f = fixture('space-cottbus');
+  const cards = f.all('live-projects-card'), addresses = f.all('live-projects-browser-domain');
+  const tabs = f.all('live-projects-tab'), thumbnails = f.all('live-projects-thumbnail');
+  const previewButtons = f.all('live-projects-preview-select'), bodies = f.all('live-projects-window-body'), grips = f.all('live-projects-window-grip');
+  const preview = f.one('live-projects-preview');
+  addresses.forEach((address, index) => {
+    const item = LIVE_PROJECTS[index];
+    assert.equal(address.tagName, 'A');
+    assert.equal(address.href, item.url, 'public URLs never inherit iframe-only preview parameters');
+    assert.equal(address.textContent, item.domain);
+    assert.equal(address.target, '_blank');
+    assert.equal(address.rel, 'noopener noreferrer');
+    assert.equal(address.getAttribute('aria-label'), `Visit ${item.domain} — opens in a new tab`);
+    assert.equal(address.listeners.has('click'), false);
+    assert.equal(address.parent.parent, cards[index]);
+    assert.notEqual(address.parent, tabs[index], 'website links are siblings of card selection controls');
+  });
+  for (const item of LIVE_PROJECTS) {
+    f.controller.selectProject(item.id);
+    assert.deepEqual(f.all('live-projects-card'), cards);
+    assert.deepEqual(f.all('live-projects-browser-domain'), addresses);
+    assert.deepEqual(f.all('live-projects-tab'), tabs);
+    assert.deepEqual(f.all('live-projects-thumbnail'), thumbnails);
+    assert.deepEqual(f.all('live-projects-preview-select'), previewButtons);
+    assert.deepEqual(f.all('live-projects-window-body'), bodies);
+    assert.deepEqual(f.all('live-projects-window-grip'), grips);
+    assert.equal(f.one('live-projects-preview'), preview, 'selection moves the actual preview rather than cloning it');
+    assert.equal(preview.parent, bodies[liveProjectIndex(item.id)]);
+    assert.equal(f.one('live-projects-site-frame').src, item.previewUrl || item.url);
+    assert.equal(f.all('live-projects-site-frame').length, 1, 'only the selected website can execute');
+  }
+  const historyCount = f.pushes.length;
+  f.context.location.href = 'https://staging.batikanor.com/?view=live-projects&project=space-cottbus';
+  f.listeners.get('popstate')();
+  assert.equal(preview.parent, bodies[1]);
+  assert.deepEqual(f.all('live-projects-browser-domain'), addresses);
+  assert.equal(f.pushes.length, historyCount, 'Back restores the address without an extra navigation');
+  f.controller.dispose();
+});
+
+test('clicking any passive app preview selects and fronts its project while only native URL links visit sites', () => {
+  const f = fixture('maptheory');
+  const cards = f.all('live-projects-card'), buttons = f.all('live-projects-preview-select');
+  const tabs = f.all('live-projects-tab'), grips = f.all('live-projects-window-grip');
+  const addresses = f.all('live-projects-browser-domain'), bodies = f.all('live-projects-window-body');
+  const descendants = node => [node, ...node.children.flatMap(descendants)];
+  assert.equal(buttons.length, LIVE_PROJECTS.length);
+  assert.equal(grips.length, LIVE_PROJECTS.length);
+  assert.equal(f.one('live-projects-preview-link'), undefined, 'app previews no longer navigate away');
+  for (const [index, button] of buttons.entries()) {
+    const item = LIVE_PROJECTS[index], tab = tabs[index], grip = grips[index];
+    assert.equal(button.tagName, 'BUTTON');
+    assert.equal(button.type, 'button');
+    assert.equal(button.href, undefined, 'preview activation has no website destination');
+    assert.equal(button.target, undefined);
+    assert.equal(button.getAttribute('aria-label'), `Select ${item.name}`);
+    assert.equal(button.getAttribute('aria-controls'), 'live-projects-panel');
+    assert.equal(button.parent, bodies[index]);
+    assert.equal(bodies[index].parent, cards[index]);
+    assert.equal(descendants(button).some(node => ['BUTTON', 'A', 'IFRAME'].includes(node.tagName) && node !== button), false, 'native selection overlays contain no nested controls or browsing contexts');
+    assert.equal(tab.tagName, 'BUTTON');
+    assert.equal(tab.getAttribute('role'), 'tab');
+    assert.equal(grip.tagName, 'BUTTON');
+    assert.match(grip.getAttribute('aria-label'), /move/i);
+    assert.equal(descendants(tab).includes(grip), false, 'moving and selecting are separate controls');
+    button.dispatch('click');
+    assert.equal(f.controller.root.dataset.project, item.id);
+    assert.equal(cards[index].classList.contains('is-selected'), true, 'preview selection fronts and highlights the matching window');
+    assert.deepEqual(buttons.map(node => node.getAttribute('aria-pressed')), buttons.map((_, current) => String(current === index)));
+    assert.equal(tab.getAttribute('aria-selected'), 'true', 'preview and header selection stay synchronized');
+    assert.equal(f.one('live-projects-name').textContent, item.name);
+    assert.equal(f.one('live-projects-preview').parent, bodies[index]);
+    assert.equal(f.one('live-projects-site-frame').src, item.previewUrl || item.url);
+    assert.equal(new URL(f.context.location.href).searchParams.get('project'), item.id);
+    const frame = f.one('live-projects-site-frame'), frameCount = f.createdFrames.length, historyCount = f.pushes.length;
+    const points = f.one('live-projects-points').children;
+    button.dispatch('click');
+    assert.equal(f.one('live-projects-site-frame'), frame, 'clicking the selected preview cannot reload its website');
+    assert.equal(frame.contextRestarts || 0, 0);
+    assert.equal(f.createdFrames.length, frameCount);
+    assert.equal(f.one('live-projects-points').children, points);
+    assert.equal(f.pushes.length, historyCount, 'repeated preview selection adds no history entry');
+    assert.equal(addresses[index].tagName, 'A');
+    assert.equal(addresses[index].href, item.url, 'only the separate blue URL retains the canonical website destination');
+    assert.equal(addresses[index].target, '_blank');
+    assert.equal(addresses[index].rel, 'noopener noreferrer');
+    assert.equal(addresses[index].listeners.has('click'), false, 'website links retain native activation and modifiers');
+    assert.equal(frame.inert, true);
+    assert.equal(frame.tabIndex, -1);
+    assert.equal(frame.getAttribute('aria-hidden'), 'true');
+  }
+  assert.equal(f.pushes.length, LIVE_PROJECTS.length - 1, 'changing preview selections records portfolio history');
+  assert.equal(f.all('live-projects-site-frame').length, 1, 'only the selected passive app can execute');
+  f.controller.dispose();
+});
+
+test('moving a selected desk window preserves its passive preview and content without opening a website', () => {
+  const f = fixture('maptheory'), grip = f.all('live-projects-window-grip')[0];
+  const card = f.all('live-projects-card')[0], frame = f.one('live-projects-site-frame');
+  const points = f.one('live-projects-points').children;
+  assert.equal(grip.dispatch('pointerdown', { pointerId: 7, button: 0, isPrimary: true, clientX: 100, clientY: 100 }).prevented, true);
+  assert.equal(f.document.activeElement, grip, 'the move control retains keyboard focus');
+  grip.dispatch('pointermove', { pointerId: 7, clientX: 125, clientY: 110 });
+  const movedX = card.style['--window-x'];
+  assert.notEqual(movedX, undefined, 'dragging updates the window position');
+  grip.dispatch('pointerup', { pointerId: 7 });
+  grip.dispatch('pointermove', { pointerId: 7, clientX: 200, clientY: 200 });
+  assert.equal(card.style['--window-x'], movedX, 'releasing the grip ends the move');
+  assert.equal(grip.dispatch('keydown', { key: 'ArrowLeft' }).prevented, true);
+  assert.notEqual(card.style['--window-x'], movedX, 'keyboard arrows can adjust the selected window');
+  assert.equal(f.one('live-projects-site-frame'), frame);
+  assert.equal(frame.contextRestarts || 0, 0, 'moving a window must not detach its embedded browser');
+  assert.equal(f.one('live-projects-points').children, points);
+  assert.equal(f.createdFrames.length, 1);
+  assert.equal(f.pushes.length, 0, 'moving the selected window does not change portfolio history');
+  const finalX = card.style['--window-x'];
+  f.controller.dispose();
+  grip.dispatch('keydown', { key: 'ArrowRight' });
+  assert.equal(card.style['--window-x'], finalX, 'detached move controls cannot change state');
 });
 
 test('native tabs, keyboard selection and browser history keep the single preview and link in sync', () => {
@@ -180,7 +373,7 @@ test('native tabs, keyboard selection and browser history keep the single previe
     assert.equal(f.controller.root.dataset.project, item.id);
     assert.equal(f.all('live-projects-site-frame').length, 1);
     assert.equal(f.one('live-projects-site-frame').src, item.previewUrl || item.url);
-    assert.equal(f.one('live-projects-preview-link').href, item.url);
+    assert.equal(f.all('live-projects-browser-domain')[i].href, item.url);
     assert.equal(f.one('live-projects-open').href, item.url);
     const points = f.one('live-projects-points');
     assert.equal(points.tagName, 'UL');
@@ -216,11 +409,32 @@ test('native tabs, keyboard selection and browser history keep the single previe
   f.context.location.href = 'https://staging.batikanor.com/?view=live-projects&project=space-cottbus';
   f.listeners.get('popstate')();
   assert.equal(f.one('live-projects-site-frame').src, LIVE_PROJECTS[1].previewUrl);
-  assert.equal(f.one('live-projects-preview-link').href, LIVE_PROJECTS[1].url);
+  assert.equal(f.all('live-projects-browser-domain')[1].href, LIVE_PROJECTS[1].url);
   assert.equal(f.pushes.length, before, 'Back restores content without pushing another URL');
   const count = f.createdFrames.length;
   tabs[1].dispatch('click');
   assert.equal(f.createdFrames.length, count, 'reselecting a project does not restart its site');
+  f.controller.dispose();
+});
+
+test('previous and next controls wrap the selected window without recreating its native controls', () => {
+  const f = fixture(), cards = f.all('live-projects-card'), tabs = f.all('live-projects-tab');
+  const previous = f.one('live-projects-previous'), next = f.one('live-projects-next');
+  assert.equal(previous.tagName, 'BUTTON');
+  assert.equal(next.tagName, 'BUTTON');
+  assert.match(previous.getAttribute('aria-label'), /previous/i);
+  assert.match(next.getAttribute('aria-label'), /next/i);
+  assert.match(f.one('live-projects-count').textContent, /1\s*\/\s*4/);
+  previous.dispatch('click');
+  assert.equal(f.controller.root.dataset.project, 'gralobe');
+  assert.equal(f.one('live-projects-preview').parent, f.all('live-projects-window-body')[3]);
+  assert.match(f.one('live-projects-count').textContent, /4\s*\/\s*4/);
+  next.dispatch('click');
+  assert.equal(f.controller.root.dataset.project, 'maptheory');
+  assert.equal(f.one('live-projects-preview').parent, f.all('live-projects-window-body')[0]);
+  assert.match(f.one('live-projects-count').textContent, /1\s*\/\s*4/);
+  assert.deepEqual(f.all('live-projects-tab'), tabs);
+  assert.equal(f.all('live-projects-site-frame').length, 1);
   f.controller.dispose();
 });
 
@@ -240,7 +454,7 @@ test('Gralobe loads its actual demo and requests GitHub stars only when selected
   assert.equal(f.controller.root.dataset.project, 'gralobe');
   assert.equal(f.one('live-projects-name').textContent, 'Gralobe');
   assert.equal(f.one('live-projects-site-frame').src, 'https://gralobe.maptheory.org/');
-  assert.equal(f.one('live-projects-preview-link').href, 'https://gralobe.maptheory.org/');
+  assert.equal(f.all('live-projects-browser-domain')[3].href, 'https://gralobe.maptheory.org/');
   assert.equal(f.one('live-projects-open').href, 'https://gralobe.maptheory.org/');
   const stars = assertDatedStarsFallback(f);
   assert.equal(stars.tagName, 'A');
@@ -350,7 +564,7 @@ test('loading and failed previews retain native navigation and stale frame event
   const preview = f.one('live-projects-preview'), oldFrame = f.one('live-projects-site-frame');
   assert.equal(preview.dataset.state, 'loading');
   assert.match(f.one('live-projects-preview-status').textContent, /Loading/);
-  assert.equal(f.one('live-projects-preview-link').href, LIVE_PROJECTS[0].url);
+  assert.equal(f.all('live-projects-browser-domain')[0].href, LIVE_PROJECTS[0].url);
   oldFrame.onload();
   assert.equal(preview.dataset.state, 'response', 'load means a response, not proven cross-origin rendering');
   assert.equal(f.one('live-projects-open').href, LIVE_PROJECTS[0].url);
@@ -363,7 +577,7 @@ test('loading and failed previews retain native navigation and stale frame event
   assert.equal(preview.dataset.state, 'unavailable');
   assert.equal(frame.hidden, true);
   assert.match(f.one('live-projects-preview-status').textContent, /Preview unavailable/);
-  assert.equal(f.one('live-projects-preview-link').href, LIVE_PROJECTS[1].url);
+  assert.equal(f.all('live-projects-browser-domain')[1].href, LIVE_PROJECTS[1].url);
   assert.equal(f.one('live-projects-open').href, LIVE_PROJECTS[1].url);
   f.controller.selectProject('space-cottbus');
   assert.notEqual(f.one('live-projects-site-frame'), frame, 'reselecting an unavailable preview retries the site');
@@ -372,12 +586,20 @@ test('loading and failed previews retain native navigation and stale frame event
   f.controller.dispose();
 });
 
-test('preview resizing preserves the site entry screen without reloading it', () => {
+test('preview resizing contains the actual site in both dimensions without reloading it', () => {
   const f = fixture(), preview = f.one('live-projects-preview'), observer = f.observers[0];
   assert.equal(preview.style['--preview-scale'], '0.5');
   preview.clientWidth = 320;
   observer.callback();
   assert.equal(preview.style['--preview-scale'], '0.25');
+  preview.clientWidth = 800;
+  preview.clientHeight = 200;
+  observer.callback();
+  assert.equal(preview.style['--preview-scale'], '0.25', 'a short card contains the original site instead of clipping its height');
+  preview.clientWidth = 640;
+  preview.clientHeight = 0;
+  observer.callback();
+  assert.equal(preview.style['--preview-scale'], '0.5', 'an unmeasurable initial height can use the native preview ratio');
   assert.equal(f.createdFrames.length, 1);
   f.controller.dispose();
   assert.equal(observer.disconnected, true);
@@ -393,7 +615,10 @@ test('disposing the real controller removes listeners, unloads third-party conte
   assert.equal(f.one('live-projects-preview').style['--preview-scale'], '0.3');
   f.controller.dispose(); f.controller.dispose();
   tabs[2].dispatch('click');
+  f.all('live-projects-preview-select')[2].dispatch('click');
   tabs[0].dispatch('keydown', { key: 'End' });
+  f.one('live-projects-next').dispatch('click');
+  f.one('live-projects-previous').dispatch('click');
   f.controller.selectProject('cottbus');
   assert.equal(f.pushes.length, 0);
   assert.equal(root.dataset.project, 'maptheory');
@@ -404,4 +629,40 @@ test('disposing the real controller removes listeners, unloads third-party conte
   assert.equal(f.listeners.size, 0);
   assert.equal(f.context.window.__liveProjects, undefined);
   assert.equal(f.document.title, 'Portfolio');
+});
+
+test('reselecting the current card, Home and duplicate Back events never detach its live browser context', () => {
+  const f = fixture();
+  const frame = f.one('live-projects-site-frame');
+  const preview = f.one('live-projects-preview');
+  const points = f.one('live-projects-points').children;
+  frame.onload();
+  for (let i = 0; i < 8; i++) {
+    f.all('live-projects-tab')[0].dispatch('click');
+    f.all('live-projects-preview-select')[0].dispatch('click');
+    f.all('live-projects-tab')[0].dispatch('keydown', { key: 'Home' });
+    f.listeners.get('popstate')();
+    f.observers[0].callback();
+  }
+  assert.equal(frame.contextRestarts || 0, 0, 'a connected iframe subtree must never be re-appended on repeated selection');
+  assert.equal(f.one('live-projects-site-frame'), frame);
+  assert.equal(f.one('live-projects-preview'), preview);
+  assert.equal(f.one('live-projects-points').children, points, 'idle/repeated selection must not rebuild the text');
+  assert.equal(f.createdFrames.length, 1);
+  assert.equal(preview.dataset.state, 'response');
+  f.controller.dispose();
+});
+
+test('changing cards unloads the old website before relocating the preview container', () => {
+  const f = fixture();
+  for (const project of ['space-cottbus', 'cottbus', 'gralobe', 'maptheory']) {
+    const oldFrame = f.one('live-projects-site-frame');
+    f.controller.selectProject(project);
+    assert.equal(oldFrame.contextRestarts || 0, 0, 'moving the old iframe would trigger an unwanted reload before unload');
+    assert.equal(oldFrame.src, 'about:blank');
+    assert.equal(oldFrame.parent, null);
+    assert.equal(f.all('live-projects-site-frame').length, 1);
+    assert.equal(f.one('live-projects-preview').parent, f.all('live-projects-window-body')[liveProjectIndex(project)]);
+  }
+  f.controller.dispose();
 });

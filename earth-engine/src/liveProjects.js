@@ -9,9 +9,49 @@ const el = (tag, className, text) => {
   return node;
 };
 
+function projectBrand(item) {
+  const brand = el('span', 'live-projects-tab-brand');
+  brand.setAttribute('aria-hidden', 'true');
+  if (item.id === 'gralobe') {
+    brand.append(el('span', 'live-projects-tab-wordmark', 'gralobe'));
+  } else if (item.id === 'cottbus') {
+    const svg = (tag, attributes) => {
+      const node = document.createElementNS('http://www.w3.org/2000/svg', tag);
+      for (const [key, value] of Object.entries(attributes)) node.setAttribute(key, value);
+      return node;
+    };
+    const mark = svg('svg', { class: 'live-projects-tab-mark', 'aria-hidden': 'true', viewBox: '-2 -8 35 47', width: '56', height: '56', fill: 'none', stroke: '#eabb79', 'stroke-width': '1.7', focusable: 'false' });
+    for (const [transform, fill] of [['translate(6 1)', '#dc915a'], ['translate(0 9)', '#efd7a6'], ['translate(12 11)', '#a6bfae']]) {
+      const tile = svg('g', { transform });
+      tile.append(svg('rect', { width: '19', height: '19', transform: 'matrix(.57735 1 -.43 .74478 8.1002 -7.0754)', fill }));
+      mark.append(tile);
+    }
+    brand.append(mark);
+  } else {
+    const mark = el('img', 'live-projects-tab-mark');
+    const nasa = item.id === 'space-cottbus';
+    mark.src = nasa ? '/assets/intro-projects/space-cottbus.svg?v=63fc4767a4c0' : '/assets/intro-projects/maptheory.svg?v=618ba754db94';
+    mark.alt = '';
+    mark.width = nasa ? 150 : 46;
+    mark.height = nasa ? 59 : 46;
+    mark.draggable = false;
+    mark.setAttribute('aria-hidden', 'true');
+    brand.append(mark);
+  }
+  return brand;
+}
+
 // Keep the sites' own desktop entry screens intact as a scaled, click-to-open preview.
 const PREVIEW_WIDTH = 1280;
 const PREVIEW_HEIGHT = 800;
+// Original sites captured on 21 October 2026. Inactive cards stay passive;
+// only the selected project downloads and runs a live site.
+const PROJECT_PREVIEWS = {
+  maptheory: '/assets/live-projects/maptheory-5f5f7a16743c.jpg',
+  'space-cottbus': '/assets/live-projects/space-cottbus-5fa2c02d52f2.jpg',
+  cottbus: '/assets/live-projects/cottbus-386d270cbefc.jpg',
+  gralobe: '/assets/live-projects/gralobe-ac9b8b9c0a8b.jpg',
+};
 
 export function startLiveProjects({ project } = {}) {
   window.__liveProjects?.dispose?.();
@@ -44,34 +84,28 @@ export function startLiveProjects({ project } = {}) {
   header.append(brand, links);
 
   const room = el('section', 'live-projects-room');
-  const visual = el('figure', 'live-projects-visual');
-  const chrome = el('figcaption', 'live-projects-browser-bar');
-  const chromeDots = el('span', 'live-projects-browser-dots');
-  chromeDots.setAttribute('aria-hidden', 'true');
-  chromeDots.append(el('i'), el('i'), el('i'));
-  const previewDomain = el('span', 'live-projects-browser-domain');
-  chrome.append(chromeDots, previewDomain);
+  const mosaic = el('div', 'live-projects-mosaic live-projects-desk');
+  mosaic.setAttribute('role', 'tablist');
+  mosaic.setAttribute('aria-label', 'Live projects');
   const preview = el('div', 'live-projects-preview');
+  const poster = el('img', 'live-projects-preview-poster');
+  poster.alt = '';
+  poster.draggable = false;
   const fallback = el('div', 'live-projects-preview-fallback');
   fallback.setAttribute('aria-hidden', 'true');
   const fallbackName = el('span', 'live-projects-preview-name');
   const fallbackStatus = el('span', 'live-projects-preview-status');
   fallback.append(fallbackName, fallbackStatus);
   const siteFrame = el('div', 'live-projects-preview-frame');
-  const previewLink = el('a', 'live-projects-preview-link');
-  previewLink.target = '_blank';
-  previewLink.rel = 'noopener noreferrer';
-  const previewAction = el('span', 'live-projects-preview-action', 'Open site ↗');
-  previewAction.setAttribute('aria-hidden', 'true');
-  previewLink.append(previewAction);
-  preview.append(fallback, siteFrame, previewLink);
-  visual.append(chrome, preview);
+  preview.setAttribute('aria-hidden', 'true');
+  preview.append(poster, fallback, siteFrame);
 
   const story = el('article', 'live-projects-story');
   story.id = 'live-projects-panel';
   story.setAttribute('role', 'tabpanel');
   story.tabIndex = 0;
   const name = el('h1', 'live-projects-name');
+  name.id = 'live-projects-name';
   const points = el('ul', 'live-projects-points');
   const open = el('a', 'live-projects-open');
   open.target = '_blank';
@@ -80,26 +114,92 @@ export function startLiveProjects({ project } = {}) {
   const arrow = el('span', 'live-projects-open-arrow', '↗');
   arrow.setAttribute('aria-hidden', 'true');
   open.append(domain, arrow);
-  story.append(name, points, open);
-  room.append(visual, story);
-
-  const shelf = el('nav', 'live-projects-shelf');
-  shelf.setAttribute('aria-label', 'Choose a live project');
-  const tabs = el('div', 'live-projects-tabs');
-  tabs.setAttribute('role', 'tablist');
-  tabs.setAttribute('aria-label', 'Live projects');
-  tabs.style.setProperty('--live-project-count', String(LIVE_PROJECTS.length));
+  const identity = el('div', 'live-projects-identity');
+  identity.append(name, open);
+  story.append(identity, points);
+  const cards = [];
+  const windowBodies = [];
+  const previewButtons = [];
+  const windowOffsets = LIVE_PROJECTS.map(() => ({ x: 0, y: 0 }));
+  let drag = null;
   const tabButtons = LIVE_PROJECTS.map((item, index) => {
+    const card = el('figure', 'live-projects-visual live-projects-card');
+    card.dataset.project = item.id;
+    const chrome = el('figcaption', 'live-projects-browser-bar');
+    const chromeDots = el('span', 'live-projects-browser-dots');
+    chromeDots.setAttribute('aria-hidden', 'true');
+    chromeDots.append(el('i'), el('i'), el('i'));
+    const address = el('a', 'live-projects-browser-domain', item.domain);
+    address.href = item.url;
+    address.target = '_blank';
+    address.rel = 'noopener noreferrer';
+    address.setAttribute('aria-label', `Visit ${item.domain} — opens in a new tab`);
+    chrome.append(chromeDots);
     const button = el('button', 'live-projects-tab');
     button.id = `live-project-${item.id}`;
+    button.dataset.project = item.id;
     button.type = 'button';
     button.setAttribute('role', 'tab');
+    button.setAttribute('aria-label', item.name);
     button.setAttribute('aria-controls', story.id);
+    const thumbnail = el('img', 'live-projects-thumbnail');
+    thumbnail.src = PROJECT_PREVIEWS[item.id];
+    thumbnail.alt = '';
+    thumbnail.draggable = false;
+    thumbnail.decoding = 'async';
+    thumbnail.setAttribute('aria-hidden', 'true');
+    const caption = el('span', 'live-projects-tab-caption');
     const text = el('span', 'live-projects-tab-text');
-    text.append(el('span', 'live-projects-tab-name', item.name), el('span', 'live-projects-tab-domain', item.domain));
-    const direction = el('span', 'live-projects-tab-arrow', '↗');
-    direction.setAttribute('aria-hidden', 'true');
-    button.append(text, direction);
+    text.append(el('span', 'live-projects-tab-name', item.name));
+    const check = el('span', 'live-projects-tab-check', '✓');
+    check.setAttribute('aria-hidden', 'true');
+    caption.append(projectBrand(item), text, check);
+    button.append(caption);
+    const select = el('button', 'live-projects-preview-select');
+    select.type = 'button';
+    select.setAttribute('aria-label', `Select ${item.name}`);
+    select.setAttribute('aria-controls', story.id);
+    select.addEventListener('click', () => selectProject(index));
+    previewButtons.push(select);
+    const body = el('div', 'live-projects-window-body');
+    body.append(thumbnail, select);
+    windowBodies.push(body);
+    const grip = el('button', 'live-projects-window-grip', '⠿');
+    grip.type = 'button';
+    grip.setAttribute('aria-label', `Move ${item.name} window`);
+    grip.title = 'Drag to move · arrow keys to adjust';
+    grip.addEventListener('pointerdown', event => {
+      if (disposed || (event.button !== undefined && event.button !== 0) || event.isPrimary === false) return;
+      event.preventDefault();
+      selectProject(index);
+      grip.focus({ preventScroll: true });
+      drag = { index, pointerId: event.pointerId, startX: event.clientX, startY: event.clientY, ...windowOffsets[index] };
+      card.classList.add('is-dragging');
+      grip.setPointerCapture?.(event.pointerId);
+    });
+    grip.addEventListener('pointermove', event => {
+      if (disposed || drag?.index !== index || drag.pointerId !== event.pointerId) return;
+      moveWindow(index, drag.x + event.clientX - drag.startX, drag.y + event.clientY - drag.startY);
+    });
+    const endDrag = event => {
+      if (drag?.index !== index || drag.pointerId !== event.pointerId) return;
+      drag = null;
+      card.classList.remove('is-dragging');
+      if (grip.hasPointerCapture?.(event.pointerId)) grip.releasePointerCapture(event.pointerId);
+    };
+    grip.addEventListener('pointerup', endDrag);
+    grip.addEventListener('pointercancel', endDrag);
+    grip.addEventListener('lostpointercapture', endDrag);
+    grip.addEventListener('keydown', event => {
+      if (disposed) return;
+      const step = event.shiftKey ? 20 : 10;
+      const delta = { ArrowLeft: [-step, 0], ArrowRight: [step, 0], ArrowUp: [0, -step], ArrowDown: [0, step] }[event.key];
+      if (!delta && event.key !== 'Home') return;
+      event.preventDefault();
+      selectProject(index);
+      moveWindow(index, delta ? windowOffsets[index].x + delta[0] : 0, delta ? windowOffsets[index].y + delta[1] : 0);
+    });
+    chrome.append(button, address, grip);
     button.addEventListener('click', () => selectProject(index));
     button.addEventListener('keydown', event => {
       if (disposed) return;
@@ -113,14 +213,28 @@ export function startLiveProjects({ project } = {}) {
       selectProject(next);
       tabButtons[next].focus({ preventScroll: true });
     });
-    tabs.append(button);
+    card.append(chrome, body);
+    mosaic.append(card);
+    cards.push(card);
     return button;
   });
-  shelf.append(tabs);
+  const navigation = el('nav', 'live-projects-navigation');
+  navigation.setAttribute('aria-label', 'Project navigation');
+  const previous = el('button', 'live-projects-previous', '←');
+  previous.type = 'button';
+  previous.setAttribute('aria-label', 'Previous project');
+  const count = el('span', 'live-projects-count');
+  const next = el('button', 'live-projects-next', '→');
+  next.type = 'button';
+  next.setAttribute('aria-label', 'Next project');
+  previous.addEventListener('click', () => selectProject(adjacentLiveProject(selected, -1)));
+  next.addEventListener('click', () => selectProject(adjacentLiveProject(selected, 1)));
+  navigation.append(previous, count, next);
+  room.append(mosaic, navigation, story);
   const announcement = el('p', 'live-projects-sr-only');
   announcement.setAttribute('aria-live', 'polite');
   announcement.setAttribute('aria-atomic', 'true');
-  root.append(header, room, shelf, announcement);
+  root.append(header, room, announcement);
   app.replaceChildren(root);
 
   let selected = 0;
@@ -129,6 +243,22 @@ export function startLiveProjects({ project } = {}) {
   let previewProjectId = null;
   let starRequest = null;
   const starCounts = new Map();
+  let arranged = false;
+  function moveWindow(index, x, y) {
+    const offset = windowOffsets[index];
+    offset.x = Math.max(-45, Math.min(45, x));
+    offset.y = Math.max(-18, Math.min(18, y));
+    cards[index].style.setProperty('--window-x', `${offset.x}px`);
+    cards[index].style.setProperty('--window-y', `${offset.y}px`);
+  }
+  function arrangeCards() {
+    for (const [index, card] of cards.entries()) card.classList.toggle('is-selected', index === selected);
+    // Moving a connected iframe restarts it. Only transfer the empty container
+    // after selectProject has unloaded the outgoing site.
+    if (preview.parentElement !== windowBodies[selected]) windowBodies[selected].append(preview);
+    scalePreview();
+    arranged = true;
+  }
   function clearStarRequest() {
     starRequest?.abort();
     starRequest = null;
@@ -174,7 +304,8 @@ export function startLiveProjects({ project } = {}) {
   function scalePreview() {
     if (disposed) return;
     const width = preview.clientWidth || preview.getBoundingClientRect?.().width;
-    if (width > 0) preview.style.setProperty('--preview-scale', String(width / PREVIEW_WIDTH));
+    const height = preview.clientHeight || width * PREVIEW_HEIGHT / PREVIEW_WIDTH;
+    if (width > 0 && height > 0) preview.style.setProperty('--preview-scale', String(Math.min(width / PREVIEW_WIDTH, height / PREVIEW_HEIGHT)));
   }
   function clearPreview() {
     if (activeFrame) {
@@ -192,11 +323,9 @@ export function startLiveProjects({ project } = {}) {
     clearPreview();
     previewProjectId = item.id;
     preview.dataset.state = 'loading';
-    previewDomain.textContent = item.domain;
+    poster.src = PROJECT_PREVIEWS[item.id];
     fallbackName.textContent = item.name;
     fallbackStatus.textContent = 'Loading site preview…';
-    previewLink.href = item.url;
-    previewLink.setAttribute('aria-label', `Visit ${item.domain} — opens in a new tab`);
     const frame = el('iframe', 'live-projects-site-frame');
     frame.width = String(PREVIEW_WIDTH);
     frame.height = String(PREVIEW_HEIGHT);
@@ -209,16 +338,16 @@ export function startLiveProjects({ project } = {}) {
     frame.referrerPolicy = 'strict-origin-when-cross-origin';
     frame.loading = 'eager';
     // A load event does not establish that a cross-origin page rendered successfully.
-    // The native link remains available in every state, including a frame-policy failure.
+    // The separate native address remains available after a frame-policy failure.
     frame.onload = () => {
       if (disposed || activeFrame !== frame) return;
       preview.dataset.state = 'response';
-      fallbackStatus.textContent = 'Open the site ↗';
+      fallbackStatus.textContent = 'Website preview';
     };
     frame.onerror = () => {
       if (disposed || activeFrame !== frame) return;
       preview.dataset.state = 'unavailable';
-      fallbackStatus.textContent = 'Preview unavailable · Open the site ↗';
+      fallbackStatus.textContent = 'Preview unavailable';
       frame.hidden = true;
     };
     activeFrame = frame;
@@ -231,7 +360,22 @@ export function startLiveProjects({ project } = {}) {
   else addEventListener('resize', scalePreview);
   function selectProject(value, { updateUrl = true } = {}) {
     if (disposed) return;
-    selected = Number.isInteger(value) ? Math.max(0, Math.min(LIVE_PROJECTS.length - 1, value)) : liveProjectIndex(value);
+    const nextSelected = Number.isInteger(value) ? Math.max(0, Math.min(LIVE_PROJECTS.length - 1, value)) : liveProjectIndex(value);
+    if (arranged && nextSelected === selected) {
+      // Reattaching a connected iframe restarts its browser context, even when
+      // the iframe Element and its src are unchanged. Leave the live document
+      // and the running transition alone on a repeated selection or Back event.
+      showPreview(LIVE_PROJECTS[selected]);
+      if (updateUrl) {
+        const url = liveProjectUrl(location.href, LIVE_PROJECTS[selected].id);
+        if (url.href !== location.href) history.pushState(history.state, '', url);
+      }
+      return;
+    }
+    // Stop the outgoing site before moving the empty preview container. A DOM
+    // move must never briefly restart the previous site in the next card.
+    clearPreview();
+    selected = nextSelected;
     const item = LIVE_PROJECTS[selected];
     root.dataset.project = item.id;
     root.style.setProperty('--live-accent', item.accent);
@@ -243,12 +387,16 @@ export function startLiveProjects({ project } = {}) {
     open.href = item.url;
     open.setAttribute('aria-label', `Open ${item.domain} in a new tab`);
     story.setAttribute('aria-labelledby', tabButtons[selected].id);
+    arrangeCards();
     showPreview(item);
     tabButtons.forEach((button, index) => {
       button.setAttribute('aria-selected', String(index === selected));
       button.tabIndex = index === selected ? 0 : -1;
+      previewButtons[index].setAttribute('aria-pressed', String(index === selected));
     });
     announcement.textContent = item.name;
+    count.textContent = `${selected + 1} / ${LIVE_PROJECTS.length}`;
+    count.setAttribute('aria-label', `Project ${selected + 1} of ${LIVE_PROJECTS.length}`);
     if (updateUrl) {
       const url = liveProjectUrl(location.href, item.id);
       if (url.href !== location.href) history.pushState(history.state, '', url);
@@ -267,6 +415,7 @@ export function startLiveProjects({ project } = {}) {
       if (resizeObserver) resizeObserver.disconnect();
       else removeEventListener('resize', scalePreview);
       clearStarRequest();
+      drag = null;
       clearPreview();
       document.body.classList.remove('live-projects-active');
       document.title = previousTitle;
