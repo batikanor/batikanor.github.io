@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import vm from 'node:vm';
 import { LIVE_PROJECTS, liveProjectIndex, adjacentLiveProject, liveProjectUrl } from '../src/liveProjectsData.js';
+import { mountNpmDownloads } from '../src/npmDownloads.js';
 
 test('live project destinations include Gralobe’s canonical public demo', () => {
   assert.deepEqual(LIVE_PROJECTS.map(project => project.url), [
@@ -15,10 +16,15 @@ test('live project destinations include Gralobe’s canonical public demo', () =
     assert.ok(Object.isFrozen(project));
   }
   assert.equal(LIVE_PROJECTS[1].previewUrl, 'https://spacecottbus.com/?portfolio-preview=1');
+  assert.equal(LIVE_PROJECTS[0].dailyUniqueVisitors, 100);
+  assert.equal(LIVE_PROJECTS.slice(1).some(project => project.dailyUniqueVisitors), false);
   assert.equal(LIVE_PROJECTS[3].id, 'gralobe');
   assert.equal(LIVE_PROJECTS[3].githubRepo, 'batikanor/gralobe');
-  assert.equal(LIVE_PROJECTS[3].githubStars, 92);
-  assert.equal(LIVE_PROJECTS[3].githubStarsCheckedAt, '2026-10-15');
+  assert.equal(LIVE_PROJECTS[3].githubStars, 120);
+  assert.equal(LIVE_PROJECTS[3].githubStarsCheckedAt, '2026-10-23');
+  assert.equal(LIVE_PROJECTS[3].npmPackage, 'gralobe');
+  assert.equal(LIVE_PROJECTS[3].npmPublishedOn, '2025-11-29');
+  assert.equal(LIVE_PROJECTS[3].points.some(point => /weekly users/.test(point)), false);
 });
 
 test('unknown bookmarks recover to Maptheory and project arrows wrap in both directions', () => {
@@ -46,7 +52,7 @@ const brandRuntime = (await readFile(new URL('../src/brandLinks.js', import.meta
   .replace(/^import .*;\n/gm, '').replace(/^export /gm, '');
 
 function fixture(project = null, { hasResizeObserver = true } = {}) {
-  const listeners = new Map(), pushes = [], createdFrames = [], observers = [], requests = [];
+  const listeners = new Map(), pushes = [], createdFrames = [], observers = [], requests = [], npmRequests = [];
   const document = { title: 'Portfolio', activeElement: null };
   class Element {
     constructor(tag, namespace = null) {
@@ -76,6 +82,11 @@ function fixture(project = null, { hasResizeObserver = true } = {}) {
     get textContent() { return (this.text || '') + this.children.map(child => child.textContent).join(''); }
     setAttribute(name, value) { this.attributes.set(name, String(value)); if (name === 'class') this.className = String(value); }
     getAttribute(name) { return this.attributes.get(name) ?? null; }
+    querySelector(selector) {
+      const matches = node => selector.startsWith('.') ? node.classList.contains(selector.slice(1)) : node.getAttribute(selector.slice(1, -1)) !== null;
+      const find = node => node.children.find(matches) || node.children.map(find).find(Boolean);
+      return find(this) || null;
+    }
     addEventListener(type, callback) { this.listeners.set(type, callback); }
     dispatch(type, props = {}) { const event = { preventDefault() { this.prevented = true; }, ...props }; this.listeners.get(type)?.(event); return event; }
     focus() { document.activeElement = this; }
@@ -93,12 +104,14 @@ function fixture(project = null, { hasResizeObserver = true } = {}) {
     const visit = node => node.id === id ? node : node.children.map(visit).find(Boolean);
     return visit(document.body);
   };
+  const fetcher = (url, options = {}) => new Promise((resolve, reject) => {
+    const pending = url.startsWith('https://api.npmjs.org/') ? npmRequests : requests;
+    pending.push({ url, options, resolve, reject });
+  });
   const context = vm.createContext({
     LIVE_PROJECTS, adjacentLiveProject, liveProjectIndex, liveProjectUrl, document, URL, AbortController,
-    fetch: (url, options = {}) => new Promise((resolve, reject) => {
-      // Resolve explicitly, even after abort, to exercise responses already in flight.
-      requests.push({ url, options, resolve, reject });
-    }),
+    fetch: fetcher,
+    mountNpmDownloads: node => mountNpmDownloads(node, { fetch: fetcher }),
     window: {}, location: { href: `https://staging.batikanor.com/?view=live-projects${project ? `&project=${project}` : ''}` },
     addEventListener: (type, callback) => listeners.set(type, callback),
     removeEventListener: (type, callback) => { if (listeners.get(type) === callback) listeners.delete(type); },
@@ -115,7 +128,8 @@ function fixture(project = null, { hasResizeObserver = true } = {}) {
   const walk = node => [node, ...node.children.flatMap(walk)];
   const all = className => walk(controller.root).filter(node => node.className.split(' ').includes(className));
   const respond = (index, body, { ok = true, status = 200 } = {}) => requests[index].resolve({ ok, status, json: async () => body });
-  return { context, document, app, controller, pushes, listeners, observers, createdFrames, requests, respond, all, one: className => all(className)[0], nodes: () => walk(controller.root) };
+  const respondNpm = (index, body, { ok = true } = {}) => npmRequests[index].resolve({ ok, json: async () => body });
+  return { context, document, app, controller, pushes, listeners, observers, createdFrames, requests, npmRequests, respond, respondNpm, all, one: className => all(className)[0], nodes: () => walk(controller.root) };
 }
 
 const settleRequests = () => new Promise(resolve => setImmediate(resolve));
@@ -192,6 +206,7 @@ test('window header brands preserve original artwork without adding nested inter
   const f = fixture(), tabs = f.all('live-projects-tab');
   const captions = f.all('live-projects-tab-caption');
   const descendants = node => [node, ...node.children.flatMap(descendants)];
+  assert.equal(f.all('live-projects-tab-check').length, 0, 'selection uses the existing border without an additional tick');
   for (const [index, tab] of tabs.entries()) {
     const item = LIVE_PROJECTS[index];
     const brand = captions[index].children[0];
@@ -200,8 +215,7 @@ test('window header brands preserve original artwork without adding nested inter
     assert.equal(brand.className, 'live-projects-tab-brand');
     assert.equal(brand.getAttribute('aria-hidden'), 'true', 'artwork is decorative beside the full native project name');
     assert.equal(captions[index].children[1].children[0].textContent, item.name);
-    assert.equal(captions[index].children[2].className, 'live-projects-tab-check');
-    assert.equal(captions[index].children[2].getAttribute('aria-hidden'), 'true');
+    assert.equal(captions[index].children.length, 2, 'headers contain only the project brand and name');
     assert.equal(descendants(tab).filter(node => node.tagName === 'BUTTON').length, 1);
     assert.equal(descendants(tab).some(node => node.tagName === 'A'), false, 'selection cards remain native tabs, with outbound links outside their controls');
     const previewButton = f.all('live-projects-preview-select')[index];
@@ -377,7 +391,7 @@ test('native tabs, keyboard selection and browser history keep the single previe
     assert.equal(f.one('live-projects-open').href, item.url);
     const points = f.one('live-projects-points');
     assert.equal(points.tagName, 'UL');
-    assert.deepEqual(points.children.map(node => node.tagName), [...item.points, ...(item.githubRepo ? ['stars'] : [])].map(() => 'LI'));
+    assert.deepEqual(points.children.map(node => node.tagName), item.points.map(() => 'LI'));
     assert.deepEqual(points.children.slice(0, item.points.length).map(node => node.textContent), item.points.map(point => typeof point === 'string' ? point : point.text), 'project switching replaces every authored marketing point');
     item.points.forEach((point, pointIndex) => {
       if (typeof point === 'string') return;
@@ -441,63 +455,200 @@ test('previous and next controls wrap the selected window without recreating its
 function assertDatedStarsFallback(f) {
   const stars = f.one('live-projects-github-stars');
   assert.ok(stars, 'Gralobe retains its GitHub stars link when a fresh count is unavailable');
-  assert.match(stars.textContent, /92 GitHub stars/);
-  assert.match([stars.textContent, stars.title, stars.getAttribute('aria-label')].filter(Boolean).join(' '), /2026-10-15/,
+  assert.equal(stars.querySelector('.stat-pennant-number').textContent, '120');
+  assert.match(stars.getAttribute('aria-label'), /120 GitHub stars/);
+  assert.match([stars.textContent, stars.title, stars.getAttribute('aria-label')].filter(Boolean).join(' '), /2026-10-23/,
     'a fallback count is identified by the date on which it was checked');
   return stars;
 }
 
-test('Gralobe loads its actual demo and requests GitHub stars only when selected, then caches a valid fresh count', async () => {
+test('Maptheory keeps its owner-supplied visitor pennant plain and visible regardless of selection', () => {
+  const f = fixture('maptheory');
+  const visitors = f.one('live-projects-daily-visitors');
+  const maptheory = f.all('live-projects-card')[0];
+  assert.equal(visitors.tagName, 'SPAN');
+  assert.ok(visitors.classList.contains('stat-pennant--visitors'));
+  assert.equal(visitors.getAttribute('aria-label'), null, 'the visible caption supplies the accessible text');
+  assert.equal(visitors.querySelector('.stat-pennant-number').textContent, '~100');
+  const caption = visitors.querySelector('.stat-pennant-caption');
+  assert.equal(caption.textContent.trim(), 'daily unique visitors');
+  const unique = caption.querySelector('.stat-pennant-unique');
+  assert.equal(unique.textContent, 'unique ');
+  assert.equal(unique.getAttribute('aria-hidden'), null);
+  assert.equal(caption.children[1].textContent, 'visitors');
+  assert.equal(visitors.parent.parent.parent, maptheory);
+  assert.ok(visitors.parent.parent.classList.contains('has-project-stats'));
+  assert.ok(visitors.parent.parent.classList.contains('has-visitor-stats'));
+  for (const attribute of ['href', 'role', 'tabindex', 'title']) assert.equal(visitors.getAttribute(attribute), null);
+  assert.equal(visitors.href, undefined);
+  assert.equal(visitors.tabIndex, undefined);
+  assert.equal(visitors.listeners.size, 0);
+  assert.equal(visitors.title, undefined);
+  assert.equal(maptheory.classList.contains('is-selected'), true);
+  assert.equal(f.requests.length, 1, 'only the separately evidenced GitHub count is fetched');
+  assert.equal(f.npmRequests.length, 1, 'only the separately evidenced npm count is fetched');
+  f.controller.selectProject('gralobe');
+  assert.equal(maptheory.classList.contains('is-selected'), false);
+  assert.equal(f.one('live-projects-daily-visitors'), visitors, 'unselected Maptheory retains the same visible statistic');
+  assert.equal(visitors.querySelector('.stat-pennant-unique'), unique, 'selection preserves the same daily unique visitors caption');
+  assert.equal(caption.textContent.trim(), 'daily unique visitors');
+  assert.equal(visitors.hidden, undefined);
+  assert.equal(visitors.getAttribute('hidden'), null);
+  assert.equal(visitors.getAttribute('aria-hidden'), null);
+  assert.equal(f.all('live-projects-daily-visitors').length, 1);
+  assert.equal(f.controller.root.textContent.includes('unique users'), false);
+  assert.equal(f.controller.root.textContent.includes('weekly users'), false);
+  f.controller.selectProject('maptheory');
+  assert.equal(f.one('live-projects-daily-visitors'), visitors);
+  assert.equal(visitors.querySelector('.stat-pennant-unique'), unique);
+  assert.equal(f.all('live-projects-browser-domain')[0].href, 'https://maptheory.org/');
+  f.controller.dispose();
+});
+
+test('Gralobe keeps one native stars link in its window regardless of selection and caches fresh metadata', async () => {
   const f = fixture();
-  assert.equal(f.requests.length, 0, 'opening another project must not fetch Gralobe metadata');
+  const stars = assertDatedStarsFallback(f);
+  assert.equal(f.requests.length, 1, 'the visible Gralobe counter refreshes even while another project is selected');
+  assert.ok(stars.parent.classList.contains('live-projects-window-stats'));
+  assert.equal(stars.parent.parent.parent, f.all('live-projects-card')[3]);
+  assert.equal(f.all('live-projects-card')[3].classList.contains('is-selected'), false);
   f.controller.selectProject('gralobe');
   assert.equal(f.controller.root.dataset.project, 'gralobe');
   assert.equal(f.one('live-projects-name').textContent, 'Gralobe');
   assert.equal(f.one('live-projects-site-frame').src, 'https://gralobe.maptheory.org/');
   assert.equal(f.all('live-projects-browser-domain')[3].href, 'https://gralobe.maptheory.org/');
   assert.equal(f.one('live-projects-open').href, 'https://gralobe.maptheory.org/');
-  const stars = assertDatedStarsFallback(f);
   assert.equal(stars.tagName, 'A');
   assert.equal(stars.href, 'https://github.com/batikanor/gralobe');
   assert.equal(stars.target, '_blank');
   assert.equal(stars.rel, 'noopener noreferrer');
-  assert.equal(stars.listeners.has('click'), false, 'the stars bullet remains a native keyboard-accessible link');
-  assert.equal(stars.parent.tagName, 'LI');
-  assert.equal(stars.parent.parent, f.one('live-projects-points'));
+  assert.equal(stars.listeners.has('click'), false, 'stars retain native keyboard activation and open-in-tab');
+  assert.ok(stars.classList.contains('stat-pennant--github'));
+  const brand = stars.querySelector('.stat-pennant-brand');
+  assert.equal(brand.getAttribute('aria-hidden'), 'true');
+  assert.equal(stars.querySelector('.stat-pennant-label').textContent, 'stars');
+  assert.ok(stars.parent.classList.contains('stat-pennants'));
+  assert.ok(stars.parent.parent.classList.contains('has-project-stats'));
+  assert.equal(f.all('live-projects-github-stars').length, 1, 'selected details do not duplicate the persistent counter');
   assert.equal(f.requests.length, 1);
   assert.equal(f.requests[0].url, 'https://api.github.com/repos/batikanor/gralobe');
   assert.ok(f.requests[0].options.signal instanceof AbortSignal);
   assert.equal(f.requests[0].options.signal.aborted, false);
   f.respond(0, { full_name: 'batikanor/gralobe', stargazers_count: 103 });
   await settleRequests();
-  assert.match(f.one('live-projects-github-stars').textContent, /103 GitHub stars/);
+  assert.equal(stars.querySelector('.stat-pennant-number').textContent, '103');
+  assert.equal(stars.querySelector('.stat-pennant-brand'), brand, 'fetching a count preserves the original branded pennant');
+  assert.match(stars.getAttribute('aria-label'), /103 GitHub stars/);
   f.controller.selectProject('maptheory');
-  assert.equal(f.one('live-projects-github-stars'), undefined, 'the stars bullet belongs only to Gralobe');
+  assert.equal(f.one('live-projects-github-stars'), stars, 'the Gralobe counter remains available while another project is selected');
   f.controller.selectProject('gralobe');
-  assert.match(f.one('live-projects-github-stars').textContent, /103 GitHub stars/);
+  assert.equal(stars.querySelector('.stat-pennant-number').textContent, '103');
   assert.equal(f.requests.length, 1, 'a successful count is cached for this controller');
   f.controller.dispose();
 });
 
-test('switching projects aborts a pending stars request and ignores late results from the previous selection', async () => {
+test('selection keeps visible metadata requests running without recreating the native counter nodes', async () => {
   const f = fixture('gralobe');
-  const staleStars = assertDatedStarsFallback(f);
+  const stars = assertDatedStarsFallback(f);
+  const downloads = f.one('live-projects-npm-downloads');
   f.controller.selectProject('space-cottbus');
-  assert.equal(f.requests[0].options.signal.aborted, true);
-  assert.equal(f.one('live-projects-github-stars'), undefined);
+  assert.equal(f.requests[0].options.signal.aborted, false);
+  assert.equal(f.npmRequests[0].options.signal.aborted, false);
+  assert.equal(f.one('live-projects-github-stars'), stars);
   f.controller.selectProject('gralobe');
-  const currentStars = assertDatedStarsFallback(f);
-  assert.notEqual(currentStars, staleStars);
-  assert.equal(f.requests.length, 2, 'returning after cancellation starts a fresh request');
-  f.respond(0, { full_name: 'batikanor/gralobe', stargazers_count: 700 });
+  assert.equal(f.one('live-projects-github-stars'), stars);
+  assert.equal(f.one('live-projects-npm-downloads'), downloads);
+  assert.equal(f.requests.length, 1, 'selection does not duplicate requests for the persistent counter');
+  f.respond(0, { full_name: 'batikanor/gralobe', stargazers_count: 104 });
   await settleRequests();
-  assert.equal(f.one('live-projects-github-stars'), currentStars);
-  assertDatedStarsFallback(f);
-  assert.match(staleStars.textContent, /92 GitHub stars/, 'a stale response cannot update detached content');
-  f.respond(1, { full_name: 'batikanor/gralobe', stargazers_count: 104 });
-  await settleRequests();
-  assert.match(currentStars.textContent, /104 GitHub stars/);
+  assert.equal(stars.querySelector('.stat-pennant-number').textContent, '104');
   f.controller.dispose();
+});
+
+test('the persistent npm link fetches its actual latest available total since publication', async () => {
+  const f = fixture('maptheory');
+  const downloads = f.one('live-projects-npm-downloads');
+  assert.equal(downloads.tagName, 'A');
+  assert.equal(downloads.href, 'https://www.npmjs.com/package/gralobe');
+  assert.equal(downloads.target, '_blank');
+  assert.equal(downloads.rel, 'noopener noreferrer');
+  assert.equal(downloads.listeners.has('click'), false);
+  assert.ok(downloads.parent.classList.contains('live-projects-window-stats'));
+  assert.equal(downloads.dataset.npmPackage, 'gralobe');
+  assert.equal(downloads.dataset.npmPublishedOn, '2025-11-29');
+  assert.ok(downloads.classList.contains('stat-pennant--npm'));
+  const brand = downloads.querySelector('.stat-pennant-brand');
+  const count = downloads.querySelector('[data-npm-count]');
+  assert.equal(brand.getAttribute('aria-hidden'), 'true');
+  assert.equal(downloads.querySelector('.stat-pennant-label').textContent, 'downloads');
+  assert.equal(count.textContent, '…');
+  assert.match(downloads.getAttribute('aria-label'), /npm downloads/);
+  assert.equal(f.npmRequests.length, 1);
+  assert.equal(f.npmRequests[0].url, 'https://api.npmjs.org/downloads/point/last-day/gralobe');
+  f.respondNpm(0, { package: 'gralobe', start: '2026-10-22', end: '2026-10-22', downloads: 57 });
+  await settleRequests();
+  assert.equal(f.npmRequests[1].url, 'https://api.npmjs.org/downloads/point/2025-11-29:2026-10-22/gralobe');
+  f.controller.selectProject('cottbus');
+  f.respondNpm(1, { package: 'gralobe', start: '2025-11-29', end: '2026-10-22', downloads: 9876 });
+  await settleRequests();
+  assert.equal(count.textContent, '9,876');
+  assert.match(downloads.getAttribute('aria-label'), /9,876 npm downloads/);
+  assert.equal(downloads.querySelector('.stat-pennant-brand'), brand, 'fetched downloads preserve the original npm wordmark');
+  assert.match(downloads.title, /2025-11-29–2026-10-22/);
+  assert.equal(f.one('live-projects-npm-downloads'), downloads);
+  f.controller.selectProject('gralobe');
+  assert.equal(f.npmRequests.length, 2, 'project selection keeps the fetched total and node');
+  assert.equal(f.all('live-projects-npm-downloads').length, 1);
+  assert.equal(f.one('live-projects-points').textContent.includes('npm downloads'), false);
+  f.controller.dispose();
+});
+
+test('npm metadata failure keeps the native package link without presenting a fixed total', async () => {
+  const f = fixture();
+  f.npmRequests[0].reject(new Error('npm unavailable'));
+  await settleRequests();
+  const downloads = f.one('live-projects-npm-downloads');
+  assert.equal(downloads.querySelector('[data-npm-count]').textContent, '—');
+  assert.match(downloads.getAttribute('aria-label'), /npm downloads unavailable/);
+  assert.equal(downloads.href, 'https://www.npmjs.com/package/gralobe');
+  f.controller.selectProject('gralobe');
+  assert.equal(f.one('live-projects-site-frame').src, LIVE_PROJECTS[3].url);
+  assert.equal(f.one('live-projects-npm-downloads'), downloads);
+  f.controller.dispose();
+});
+
+test('BFCache suspends both counters and refetches current data without restarting the preview', async () => {
+  const f = fixture('cottbus');
+  const stars = assertDatedStarsFallback(f), downloads = f.one('live-projects-npm-downloads');
+  const frame = f.one('live-projects-site-frame');
+  const pageShow = f.listeners.get('pageshow');
+  f.listeners.get('pagehide')();
+  assert.equal(f.requests[0].options.signal.aborted, true);
+  assert.equal(f.npmRequests[0].options.signal.aborted, true);
+  pageShow({ persisted: true });
+  assert.equal(f.requests.length, 2);
+  assert.equal(f.npmRequests.length, 2);
+  f.respond(0, { full_name: 'batikanor/gralobe', stargazers_count: 700 });
+  f.respondNpm(0, { package: 'gralobe', start: '2026-10-18', end: '2026-10-18', downloads: 1 });
+  await settleRequests();
+  assertDatedStarsFallback(f);
+  assert.equal(f.npmRequests.length, 2, 'a cancelled npm response cannot start a range request');
+  f.respond(1, { full_name: 'batikanor/gralobe', stargazers_count: 121 });
+  f.respondNpm(1, { package: 'gralobe', start: '2026-10-22', end: '2026-10-22', downloads: 57 });
+  await settleRequests();
+  f.respondNpm(2, { package: 'gralobe', start: '2025-11-29', end: '2026-10-22', downloads: 9880 });
+  await settleRequests();
+  assert.equal(stars.querySelector('.stat-pennant-number').textContent, '121');
+  assert.match(stars.getAttribute('aria-label'), /121 GitHub stars/);
+  assert.equal(downloads.querySelector('[data-npm-count]').textContent, '9,880');
+  assert.equal(f.one('live-projects-site-frame'), frame);
+  assert.equal(frame.contextRestarts || 0, 0);
+  pageShow({ persisted: false });
+  assert.equal(f.requests.length, 2, 'ordinary pageshow does not duplicate the initial requests');
+  f.controller.dispose();
+  pageShow({ persisted: true });
+  assert.equal(f.requests.length, 2, 'disposed BFCache callbacks cannot recreate metadata requests');
+  assert.equal(f.listeners.size, 0);
 });
 
 test('disposing the controller aborts pending GitHub metadata and prevents detached updates', async () => {
@@ -505,9 +656,10 @@ test('disposing the controller aborts pending GitHub metadata and prevents detac
   const stars = assertDatedStarsFallback(f);
   f.controller.dispose();
   assert.equal(f.requests[0].options.signal.aborted, true);
+  assert.equal(f.npmRequests[0].options.signal.aborted, true);
   f.respond(0, { full_name: 'batikanor/gralobe', stargazers_count: 500 });
   await settleRequests();
-  assert.match(stars.textContent, /92 GitHub stars/);
+  assert.equal(stars.querySelector('.stat-pennant-number').textContent, '120');
   assert.equal(f.app.children.length, 0);
   f.controller.selectProject('gralobe');
   assert.equal(f.requests.length, 1, 'detached controls cannot start another request');
@@ -554,7 +706,9 @@ test('GitHub counts require the expected repository and a safe nonnegative integ
     const f = fixture('gralobe');
     f.respond(0, { full_name: 'batikanor/gralobe', stargazers_count: 0 });
     await settleRequests();
-    assert.match(f.one('live-projects-github-stars').textContent, /0 GitHub stars/);
+    const stars = f.one('live-projects-github-stars');
+    assert.equal(stars.querySelector('.stat-pennant-number').textContent, '0');
+    assert.match(stars.getAttribute('aria-label'), /0 GitHub stars/);
     f.controller.dispose();
   });
 });

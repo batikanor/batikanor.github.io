@@ -1,5 +1,6 @@
 @import './portfolioTheme.css';
 @import './brandLinks.css';
+@import './statPennants.css';
 
 html:not(.intro-active) .intro-screen { display: none; }
 html:not(.gallery-experience) .intro-achievements-map { display: none; }
@@ -167,7 +168,7 @@ html.intro-active #app { opacity: 0; pointer-events: none; }
 }
 .intro-exploration {
   --intro-map-size: clamp(192px, min(26dvh, 20vw), 260px);
-  --intro-visual-size: max(var(--intro-map-size), 232px);
+  --intro-visual-size: calc(max(var(--intro-map-size), 232px) + 32px);
   grid-column: 1;
   grid-row: 1;
   width: min(100%, 620px);
@@ -192,7 +193,7 @@ html.intro-active #app { opacity: 0; pointer-events: none; }
   position: relative;
   isolation: isolate;
   container: intro-fan / size;
-  width: min(100%, 280px);
+  width: min(100%, 300px);
   height: var(--intro-visual-size);
   padding: 0;
   user-select: none;
@@ -213,12 +214,12 @@ html.intro-active #app { opacity: 0; pointer-events: none; }
   --fan-slot: 0;
   position: absolute;
   z-index: calc(1 + var(--fan-slot));
-  top: calc(14px + var(--fan-slot) * 46px);
+  top: calc(14px + var(--fan-slot) * 52px);
   left: calc(20px + (1.5 - var(--fan-slot)) * 6px);
   display: flex;
   flex-direction: column;
   width: calc(100% - 40px);
-  height: calc(var(--intro-visual-size) - 162px);
+  height: calc(var(--intro-visual-size) - 180px);
   padding: 0;
   overflow: hidden;
   border: 1px solid var(--portfolio-border);
@@ -274,7 +275,8 @@ html.intro-active #app { opacity: 0; pointer-events: none; }
   pointer-events: none;
 }
 .intro-project-space .intro-project-header { padding-left: 41px; }
-.intro-project-gralobe .intro-project-name { visibility: hidden; }
+.intro-project-gralobe .intro-project-name,
+.intro-project-maptheory .intro-project-name { visibility: hidden; }
 .intro-project-name { min-width: 0; font-size: 12px; font-weight: 600; line-height: 12px; }
 .intro-maptheory-accent { color: #2dd4bf; }
 .intro-gralobe-wordmark { color: #44aaff; font-family: system-ui, sans-serif; font-weight: 700; }
@@ -299,11 +301,53 @@ html.intro-active #app { opacity: 0; pointer-events: none; }
 .intro-project-space .intro-project-mark { width: 100px; height: auto; max-height: 42px; }
 .intro-project-cottbus .intro-project-brand { font-size: 18px; }
 .intro-project-brand > .intro-gralobe-wordmark { font-size: 34px; line-height: 1.1; }
+.intro-project-gralobe[data-front="true"] .intro-project-body,
+.intro-project-maptheory[data-front="true"] .intro-project-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  padding: 2px 6px 17px;
+}
+.intro-project-gralobe[data-front="true"] { height: calc(var(--intro-visual-size) - 166px); }
+.intro-project-gralobe[data-front="true"] .intro-project-open { justify-self: start; }
+.intro-project-gralobe[data-front="true"] .intro-gralobe-wordmark { font-size: 24px; }
+.intro-project-maptheory[data-front="true"] .intro-project-brand { justify-self: start; gap: 5px; font-size: 14px; letter-spacing: -.4px; }
+.intro-project-maptheory[data-front="true"] .intro-project-mark { width: 22px; height: 22px; }
+.intro-project-stats {
+  --stat-width: 126px;
+  --stat-height: 29px;
+  --stat-font-size: 13px;
+  --stat-brand-width: 41px;
+  --stat-label-size: 7px;
+  --stat-gap: 3px;
+  --stat-padding: 3px 8px 3px 12px;
+  display: grid;
+  justify-self: end;
+  margin: 0;
+  font-size: 11px;
+}
+.intro-screen .intro-project-stats a:focus-visible { outline-offset: 1px; }
+.intro-project-window:not([data-front="true"]) .intro-project-stats {
+  --stat-width: 99px;
+  --stat-height: 21px;
+  --stat-font-size: 9px;
+  --stat-brand-width: 32px;
+  --stat-label-size: 6px;
+  --stat-gap: 1px;
+  --stat-padding: 2px 6px 2px 10px;
+  position: absolute;
+  top: 2px;
+  right: 4px;
+  font-size: 9px;
+}
 .intro-project-window:not([data-front="true"]) .intro-project-open { position: absolute; top: 0; left: 3px; padding: 4px; }
 .intro-project-window:not([data-front="true"]) .intro-project-mark { width: 20px; height: 20px; }
 .intro-project-window:not([data-front="true"]).intro-project-space .intro-project-mark { width: 28px; }
 .intro-project-window:not([data-front="true"]) .intro-project-logo-copy { display: none; }
+.intro-project-maptheory:not([data-front="true"]) .intro-project-logo-copy { display: block; font-size: 10px; line-height: 14px; letter-spacing: -.3px; }
+.intro-project-maptheory:not([data-front="true"]) .intro-project-brand { gap: 3px; }
 .intro-project-window:not([data-front="true"]) .intro-gralobe-wordmark { font-size: 16px; line-height: 20px; }
+.intro-project-gralobe:not([data-front="true"]) .intro-gralobe-wordmark { font-size: 14px; line-height: 14px; }
 .intro-project-domain,
 .intro-project-domain:visited {
   position: absolute;
@@ -333,19 +377,19 @@ html.intro-active #app { opacity: 0; pointer-events: none; }
   right: auto;
   transform: translateX(-50%);
 }
-@container intro-fan (height < 242px) {
+@container intro-fan (height < 322px) {
   .intro-project-brand { gap: 5px; font-size: 17px; }
   .intro-project-mark { width: 22px; height: 22px; }
   .intro-project-space .intro-project-mark { width: 75px; height: auto; max-height: 30px; }
   .intro-project-cottbus .intro-project-brand { font-size: 15px; }
-  .intro-project-brand > .intro-gralobe-wordmark { font-size: 24px; }
+  .intro-project-brand > .intro-gralobe-wordmark { font-size: 22px; }
 }
 @container intro-fan (width < 220px) {
   .intro-project-window {
-    top: calc(5px + var(--fan-slot) * 46px);
+    top: calc(5px + var(--fan-slot) * 52px);
     left: calc(2px + (3 - var(--fan-slot)) * 1px);
     width: calc(100% - 7px);
-    height: calc(var(--intro-visual-size) - 148px);
+    height: calc(var(--intro-visual-size) - 166px);
     transform: translateX(clamp(-1px, var(--fan-pull-x, 0px), 1px));
   }
   .intro-project-header { gap: 4px; padding-inline: 25px 5px; }
@@ -357,10 +401,43 @@ html.intro-active #app { opacity: 0; pointer-events: none; }
   .intro-project-space .intro-project-mark { width: 28px; height: auto; max-height: 15px; }
   .intro-project-cottbus .intro-project-brand { font-size: 11px; letter-spacing: -.2px; }
   .intro-project-brand > .intro-gralobe-wordmark { font-size: 20px; }
+  .intro-project-gralobe[data-front="true"] .intro-project-body,
+  .intro-project-maptheory[data-front="true"] .intro-project-body { padding: 0 4px 17px; gap: 4px; }
+  .intro-project-gralobe[data-front="true"] { height: calc(var(--intro-visual-size) - 156px); }
+  .intro-project-gralobe[data-front="true"] .intro-gralobe-wordmark { font-size: 12px; }
+  .intro-project-maptheory[data-front="true"] .intro-project-brand { flex-direction: column; gap: 2px; font-size: 9px; letter-spacing: -.3px; }
+  .intro-project-maptheory[data-front="true"] .intro-project-mark { width: 14px; height: 14px; }
+  .intro-project-stats {
+    --stat-width: 74px;
+    --stat-height: 21px;
+    --stat-font-size: 9px;
+    --stat-brand-width: 27px;
+    --stat-label-size: 5.5px;
+    --stat-gap: 2px;
+    --stat-padding: 2px 4px 2px 7px;
+    font-size: 9px;
+  }
   .intro-project-window:not([data-front="true"]) .intro-project-open { left: 1px; }
   .intro-project-window:not([data-front="true"]) .intro-project-mark { width: 16px; height: 16px; }
   .intro-project-window:not([data-front="true"]).intro-project-space .intro-project-mark { width: 23px; }
   .intro-project-window:not([data-front="true"]) .intro-gralobe-wordmark { font-size: 14px; }
+  .intro-project-gralobe:not([data-front="true"]) .intro-gralobe-wordmark { font-size: 12px; line-height: 14px; }
+  .intro-project-maptheory:not([data-front="true"]) .intro-project-logo-copy { font-size: 8px; line-height: 12px; }
+  .intro-project-maptheory:not([data-front="true"]) .intro-project-brand { padding-inline: 3px; }
+  .intro-project-maptheory:not([data-front="true"]) .intro-project-mark { display: none; }
+  .intro-project-window:not([data-front="true"]) .intro-project-stats {
+    --stat-width: 76px;
+    --stat-height: 16px;
+    --stat-font-size: 9px;
+    --stat-brand-width: 28px;
+    --stat-gap: 1px;
+    --stat-padding: 2px 4px 2px 7px;
+    top: 2px;
+    right: 3px;
+  }
+  .intro-project-window:not([data-front="true"]) .stat-pennant-label { display: none; }
+  .intro-project-gralobe:not([data-front="true"]) .intro-project-domain,
+  .intro-project-maptheory:not([data-front="true"]) .intro-project-domain { top: 38px; font-size: 9px; line-height: 10px; }
   .intro-project-domain { left: 5px; right: 5px; max-width: calc(100% - 10px); }
 }
 .intro-achievements-map,
@@ -513,7 +590,7 @@ html.intro-active #app { opacity: 0; pointer-events: none; }
   .intro-bottom-row { gap: 20px; }
   .intro-exploration {
     --intro-map-size: clamp(128px, 35vw, 180px);
-    --intro-visual-size: max(var(--intro-map-size), 208px);
+    --intro-visual-size: calc(max(var(--intro-map-size), 208px) + 32px);
     width: min(100%, 400px);
     gap: 16px;
   }
@@ -540,6 +617,9 @@ html.intro-active #app { opacity: 0; pointer-events: none; }
   .intro-screen .intro-footer-links a { padding-inline: 4px; gap: 4px; font-size: 11px; }
   .intro-cv-arrow { font-size: 13px; }
 }
+@media (max-width: 359px) {
+  .intro-project-fan { width: min(calc(100% + 22px), 300px); }
+}
 @media (max-height: 650px) and (min-width: 761px) {
   .intro-content { padding-top: 0; }
   .intro-primary h1 { font-size: 60px; }
@@ -550,6 +630,14 @@ html.intro-active #app { opacity: 0; pointer-events: none; }
   .intro-primary h1 { font-size: 44px; }
   .intro-tagline { margin-top: 8px; font-size: 13px; }
   .intro-primary::after { margin-top: 10px; }
+}
+@media (min-width: 761px) {
+  .intro-exploration { --intro-visual-size: calc(max(var(--intro-map-size), 232px) + 80px); width: min(100%, 720px); }
+  .intro-project-fan { width: min(100%, 340px); }
+  .intro-project-window { top: calc(14px + var(--fan-slot) * 64px); left: calc(14px + (1.5 - var(--fan-slot)) * 6px); width: calc(100% - 28px); height: calc(var(--intro-visual-size) - 216px); }
+  .intro-project-gralobe[data-front="true"] { height: calc(var(--intro-visual-size) - 202px); }
+  .intro-project-stats { --stat-width: 160px; --stat-height: 40px; --stat-font-size: 17px; --stat-brand-width: 52px; --stat-label-size: 10px; --stat-gap: 4px; font-size: 14px; }
+  .intro-project-window:not([data-front="true"]) .intro-project-stats { --stat-width: 124px; --stat-height: 28px; --stat-font-size: 12px; --stat-brand-width: 40px; --stat-label-size: 9px; --stat-gap: 2px; font-size: 12px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .intro-project-window { transition: none; }

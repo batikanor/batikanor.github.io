@@ -87,7 +87,7 @@ test('all four cards separate native selection buttons from one content-sized lo
 
 test('each project exposes its canonical website as a separate safely opened external URL link', () => {
   const allAnchors = descendants(fan).filter(node => node.tag === 'a');
-  assert.equal(allAnchors.length, LIVE_PROJECTS.length * 2);
+  assert.equal(allAnchors.length, LIVE_PROJECTS.length * 2 + 2);
   for (const project of LIVE_PROJECTS) {
     const window = card(project.id), explore = internal(window), website = external(window);
     assert.ok(website, `${project.name}: its URL is an actual external anchor`);
@@ -108,6 +108,51 @@ test('each project exposes its canonical website as a separate safely opened ext
   const rules = [...css.matchAll(/([^{}]+)\{([^{}]*)\}/g)];
   assert.ok(rules.some(([, selectors, declarations]) => selectors.split(',').some(selector => selector.trim() === '.intro-project-domain') &&
     /text-decoration:\s*underline\b/.test(declarations)), 'website URLs retain an explicit link underline');
+});
+
+test('Gralobe exposes native GitHub stars and npm links independently of its logo and selection', () => {
+  const window = card('gralobe');
+  const stats = descendants(window).find(node => hasClass(node, 'intro-project-stats'));
+  const links = descendants(stats).filter(node => node.tag === 'a');
+  assert.deepEqual(links.map(node => node.attrs.href), [
+    'https://github.com/batikanor/gralobe',
+    'https://www.npmjs.com/package/gralobe',
+  ]);
+  assert.equal(links[0].attrs['aria-label'], '120 GitHub stars');
+  assert.equal(text(descendants(links[0]).find(node => hasClass(node, 'stat-pennant-number'))), '120');
+  assert.ok(links.every(link => hasClass(link, 'stat-pennant')));
+  assert.equal(links[1].attrs['data-npm-package'], 'gralobe');
+  assert.equal(links[1].attrs['data-npm-published-on'], '2025-11-29');
+  for (const link of links) {
+    assert.equal(link.attrs.target, '_blank');
+    assert.equal(link.attrs.rel, 'noopener noreferrer');
+    for (let ancestor = link.parent; ancestor; ancestor = ancestor.parent) {
+      assert.ok(!['a', 'button'].includes(ancestor.tag));
+      assert.notEqual(ancestor.attrs?.['aria-hidden'], 'true');
+    }
+  }
+  assert.doesNotMatch(window.raw, /weekly users/);
+  assert.match(css, /\.intro-project-window:not\(\[data-front="true"\]\) \.intro-project-stats\s*\{[^}]*right:\s*4px/);
+});
+
+test('Maptheory shows owner-supplied unique visitors in a noninteractive pennant', () => {
+  const window = card('maptheory');
+  const stats = descendants(window).find(node => hasClass(node, 'intro-project-stats'));
+  const pennant = descendants(stats).find(node => hasClass(node, 'stat-pennant--visitors'));
+  assert.equal(pennant.tag, 'span');
+  assert.equal(pennant.attrs['aria-label'], undefined);
+  assert.equal(text(descendants(pennant).find(node => hasClass(node, 'stat-pennant-number'))), '~100');
+  assert.equal(text(pennant), '~100 daily unique visitors');
+  const unique = descendants(pennant).find(node => hasClass(node, 'stat-pennant-unique'));
+  assert.equal(text(unique), 'unique');
+  assert.equal(unique.attrs['aria-hidden'], undefined);
+  assert.doesNotMatch(pennant.raw, /p\. day/);
+  for (const node of [stats, ...descendants(stats)]) {
+    assert.ok(!['a', 'button'].includes(node.tag));
+    for (const attribute of ['href', 'role', 'tabindex', 'onclick', 'title']) assert.equal(node.attrs[attribute], undefined);
+  }
+  assert.equal(stats.attrs.hidden, undefined);
+  assert.doesNotMatch(window.raw, /unique users/);
 });
 
 test('the initial Maptheory foreground has one logo while every card retains its original identity for selection', () => {

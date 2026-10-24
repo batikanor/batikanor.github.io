@@ -1,3 +1,5 @@
+import {mountNpmDownloads} from './npmDownloads.js';
+
 const mountedFans = new WeakMap();
 const modified = event => event.ctrlKey || event.metaKey || event.altKey || event.shiftKey;
 
@@ -13,6 +15,7 @@ export function mountIntroProjectFan(fan, {
     surface: node.querySelector('.intro-project-surface'), logo: node.querySelector('.intro-project-open'),
   })).filter(card => card.id && card.surface && card.logo);
   const listeners = [], seenMoves = new WeakSet();
+  let downloads = mountNpmDownloads(fan.querySelector('.intro-project-downloads'));
   let selectedIndex = -1, gesture = null, suppressPointerClick = false, disposed = false;
   const wrap = index => (index % cards.length + cards.length) % cards.length;
   const listen = (target, type, handler, options) => {
@@ -125,12 +128,20 @@ export function mountIntroProjectFan(fan, {
   }
   function preventNativeDrag(event) {if (!disposed) event.preventDefault?.();}
   function pageHidden(event) {
-    if (event.persisted) cancelGesture();
+    if (event.persisted) {
+      cancelGesture();
+      downloads?.dispose();
+      downloads = null;
+    }
     else dispose();
+  }
+  function pageShown(event) {
+    if (event.persisted && !disposed && !downloads) downloads = mountNpmDownloads(fan.querySelector('.intro-project-downloads'));
   }
   function dispose() {
     if (disposed) return;
     disposed = true;finishGesture(true);
+    downloads?.dispose();
     for (const remove of listeners.splice(0)) remove();
     if (mountedFans.get(fan) === api) mountedFans.delete(fan);
   }
@@ -177,6 +188,7 @@ export function mountIntroProjectFan(fan, {
   listen(host, 'resize', cancelGesture);
   listen(host, 'blur', cancelGesture);
   listen(host, 'pagehide', pageHidden);
+  listen(host, 'pageshow', pageShown);
   const initial = cards.findIndex(card => card.node.dataset.front === 'true');
   applySelection(initial < 0 ? 0 : initial);
   return api;

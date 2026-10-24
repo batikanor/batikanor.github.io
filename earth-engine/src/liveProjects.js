@@ -1,5 +1,6 @@
 import { LIVE_PROJECTS, adjacentLiveProject, liveProjectIndex, liveProjectUrl } from './liveProjectsData.js';
 import { decorateBrandLink } from './brandLinks.js';
+import { mountNpmDownloads } from './npmDownloads.js';
 import './liveProjects.css';
 
 const el = (tag, className, text) => {
@@ -120,6 +121,7 @@ export function startLiveProjects({ project } = {}) {
   const cards = [];
   const windowBodies = [];
   const previewButtons = [];
+  const projectStats = [];
   const windowOffsets = LIVE_PROJECTS.map(() => ({ x: 0, y: 0 }));
   let drag = null;
   const tabButtons = LIVE_PROJECTS.map((item, index) => {
@@ -151,9 +153,7 @@ export function startLiveProjects({ project } = {}) {
     const caption = el('span', 'live-projects-tab-caption');
     const text = el('span', 'live-projects-tab-text');
     text.append(el('span', 'live-projects-tab-name', item.name));
-    const check = el('span', 'live-projects-tab-check', '✓');
-    check.setAttribute('aria-hidden', 'true');
-    caption.append(projectBrand(item), text, check);
+    caption.append(projectBrand(item), text);
     button.append(caption);
     const select = el('button', 'live-projects-preview-select');
     select.type = 'button';
@@ -200,6 +200,49 @@ export function startLiveProjects({ project } = {}) {
       moveWindow(index, delta ? windowOffsets[index].x + delta[0] : 0, delta ? windowOffsets[index].y + delta[1] : 0);
     });
     chrome.append(button, address, grip);
+    if (item.githubRepo || item.npmPackage || item.dailyUniqueVisitors) {
+      chrome.classList.add('has-project-stats');
+      const stats = el('div', 'live-projects-window-stats stat-pennants');
+      if (item.dailyUniqueVisitors) {
+        chrome.classList.add('has-visitor-stats');
+        const visitors = el('span', 'live-projects-daily-visitors stat-pennant stat-pennant--visitors');
+        const approximate = `~${item.dailyUniqueVisitors.toLocaleString('en-US')}`;
+        const value = el('span', 'stat-pennant-value');
+        value.append(el('span', 'stat-pennant-number', approximate));
+        const caption = el('span', 'stat-pennant-caption', ' daily ');
+        caption.append(el('span', 'stat-pennant-unique', 'unique '), el('span', null, 'visitors'));
+        visitors.append(value, caption);
+        stats.append(visitors);
+      }
+      const pennant = (className, service, label) => {
+        const link = el('a', `${className} stat-pennant stat-pennant--${service}`);
+        const brand = el('span', 'stat-pennant-brand');
+        brand.setAttribute('aria-hidden', 'true');
+        const value = el('span', 'stat-pennant-value');
+        value.append(el('span', 'stat-pennant-number', '…'));
+        link.append(brand, value, el('span', 'stat-pennant-label', label));
+        return link;
+      };
+      const stars = item.githubRepo ? pennant('live-projects-github-stars', 'github', 'stars') : null;
+      const downloads = item.npmPackage ? pennant('live-projects-npm-downloads', 'npm', 'downloads') : null;
+      if (stars) {
+        stars.href = `https://github.com/${item.githubRepo}`;
+        stars.target = '_blank';
+        stars.rel = 'noopener noreferrer';
+        stats.append(stars);
+      }
+      if (downloads) {
+        downloads.href = `https://www.npmjs.com/package/${item.npmPackage}`;
+        downloads.target = '_blank';
+        downloads.rel = 'noopener noreferrer';
+        downloads.dataset.npmPackage = item.npmPackage;
+        downloads.dataset.npmPublishedOn = item.npmPublishedOn;
+        downloads.querySelector('.stat-pennant-number').setAttribute('data-npm-count', '');
+        stats.append(downloads);
+      }
+      if (stars || downloads) projectStats.push({ item, stars, downloads, npmController: null });
+      chrome.append(stats);
+    }
     button.addEventListener('click', () => selectProject(index));
     button.addEventListener('keydown', event => {
       if (disposed) return;
@@ -241,7 +284,7 @@ export function startLiveProjects({ project } = {}) {
   let disposed = false;
   let activeFrame = null;
   let previewProjectId = null;
-  let starRequest = null;
+  const starRequests = new Map();
   const starCounts = new Map();
   let arranged = false;
   function moveWindow(index, x, y) {
@@ -259,12 +302,15 @@ export function startLiveProjects({ project } = {}) {
     scalePreview();
     arranged = true;
   }
-  function clearStarRequest() {
-    starRequest?.abort();
-    starRequest = null;
+  function suspendMetadata() {
+    for (const request of starRequests.values()) request.abort();
+    starRequests.clear();
+    for (const stats of projectStats) {
+      stats.npmController?.dispose();
+      stats.npmController = null;
+    }
   }
   function showPoints(item) {
-    clearStarRequest();
     points.replaceChildren(...item.points.map(point => {
       if (typeof point === 'string') return el('li', null, point);
       const row = el('li');
@@ -275,31 +321,41 @@ export function startLiveProjects({ project } = {}) {
       row.append(link);
       return row;
     }));
-    if (!item.githubRepo) return;
-    const stars = el('a', 'live-projects-github-stars');
-    stars.href = `https://github.com/${item.githubRepo}`;
-    stars.target = '_blank';
-    stars.rel = 'noopener noreferrer';
-    const showCount = count => { stars.textContent = `${count.toLocaleString('en-US')} GitHub ${count === 1 ? 'star' : 'stars'}`; };
+  }
+  function loadStars(item, stars, refresh = false) {
+    const showCount = count => {
+      const formatted = count.toLocaleString('en-US');
+      stars.querySelector('.stat-pennant-number').textContent = formatted;
+      stars.querySelector('.stat-pennant-label').textContent = count === 1 ? 'star' : 'stars';
+      stars.setAttribute('aria-label', `${formatted} GitHub ${count === 1 ? 'star' : 'stars'} — view repository, opens in a new tab`);
+    };
     showCount(starCounts.get(item.githubRepo) ?? item.githubStars);
     stars.title = starCounts.has(item.githubRepo) ? 'Current star count on GitHub' : `GitHub star count checked ${item.githubStarsCheckedAt}`;
-    const point = el('li');
-    point.append(stars);
-    points.append(point);
-    if (starCounts.has(item.githubRepo)) return;
+    if (!refresh && (starCounts.has(item.githubRepo) || starRequests.has(item.githubRepo))) return;
+    starRequests.get(item.githubRepo)?.abort();
     const request = new AbortController();
-    starRequest = request;
+    starRequests.set(item.githubRepo, request);
     fetch(`https://api.github.com/repos/${item.githubRepo}`, { signal: request.signal, credentials: 'omit' })
       .then(response => response.ok ? response.json() : null)
       .then(data => {
-        if (disposed || request.signal.aborted || starRequest !== request) return;
+        if (disposed || request.signal.aborted || starRequests.get(item.githubRepo) !== request) return;
         const count = data?.stargazers_count;
         if (data?.full_name !== item.githubRepo || !Number.isSafeInteger(count) || count < 0) return;
         starCounts.set(item.githubRepo, count);
         showCount(count);
         stars.title = 'Current star count on GitHub';
       })
-      .catch(() => { /* Keep the last verified count when GitHub is unavailable. */ });
+      .catch(() => { /* Keep the last verified count when GitHub is unavailable. */ })
+      .finally(() => {
+        if (starRequests.get(item.githubRepo) === request) starRequests.delete(item.githubRepo);
+      });
+  }
+  function refreshMetadata(refresh = false) {
+    if (disposed) return;
+    for (const stats of projectStats) {
+      if (stats.stars) loadStars(stats.item, stats.stars, refresh);
+      if (stats.downloads) stats.npmController ||= mountNpmDownloads(stats.downloads);
+    }
   }
   function scalePreview() {
     if (disposed) return;
@@ -403,8 +459,16 @@ export function startLiveProjects({ project } = {}) {
     }
   }
   const onPopState = () => selectProject(new URL(location.href).searchParams.get('project'), { updateUrl: false });
+  const onPageShow = event => {
+    if (!event.persisted || disposed) return;
+    suspendMetadata();
+    refreshMetadata(true);
+  };
   addEventListener('popstate', onPopState);
+  addEventListener('pagehide', suspendMetadata);
+  addEventListener('pageshow', onPageShow);
   selectProject(project || new URL(location.href).searchParams.get('project'), { updateUrl: false });
+  refreshMetadata();
   const controller = {
     root,
     selectProject,
@@ -412,9 +476,11 @@ export function startLiveProjects({ project } = {}) {
       if (disposed) return;
       disposed = true;
       removeEventListener('popstate', onPopState);
+      removeEventListener('pagehide', suspendMetadata);
+      removeEventListener('pageshow', onPageShow);
       if (resizeObserver) resizeObserver.disconnect();
       else removeEventListener('resize', scalePreview);
-      clearStarRequest();
+      suspendMetadata();
       drag = null;
       clearPreview();
       document.body.classList.remove('live-projects-active');
