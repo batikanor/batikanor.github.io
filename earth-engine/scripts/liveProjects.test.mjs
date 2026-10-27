@@ -4,6 +4,9 @@ import { readFile } from 'node:fs/promises';
 import vm from 'node:vm';
 import { LIVE_PROJECTS, liveProjectIndex, adjacentLiveProject, liveProjectUrl } from '../src/liveProjectsData.js';
 import { mountNpmDownloads } from '../src/npmDownloads.js';
+import { mountGithubStars } from '../src/githubStars.js';
+import { GITHUB_STARS_URL } from '../src/githubStarsData.js';
+const seed = {full_name: 'batikanor/gralobe', stargazers_count: 120, verified_at: '2026-10-26T00:00:00Z'};
 
 test('live project destinations include Gralobe’s canonical public demo', () => {
   assert.deepEqual(LIVE_PROJECTS.map(project => project.url), [
@@ -20,8 +23,8 @@ test('live project destinations include Gralobe’s canonical public demo', () =
   assert.equal(LIVE_PROJECTS.slice(1).some(project => project.dailyUniqueVisitors), false);
   assert.equal(LIVE_PROJECTS[3].id, 'gralobe');
   assert.equal(LIVE_PROJECTS[3].githubRepo, 'batikanor/gralobe');
-  assert.equal(LIVE_PROJECTS[3].githubStars, 120);
-  assert.equal(LIVE_PROJECTS[3].githubStarsCheckedAt, '2026-10-23');
+  assert.equal(LIVE_PROJECTS[3].githubStars, undefined, 'stars have no fixed numeric fallback');
+  assert.equal(LIVE_PROJECTS[3].githubStarsCheckedAt, undefined);
   assert.equal(LIVE_PROJECTS[3].npmPackage, 'gralobe');
   assert.equal(LIVE_PROJECTS[3].npmPublishedOn, '2025-11-29');
   assert.equal(LIVE_PROJECTS[3].points.some(point => /weekly users/.test(point)), false);
@@ -112,6 +115,7 @@ function fixture(project = null, { hasResizeObserver = true } = {}) {
     LIVE_PROJECTS, adjacentLiveProject, liveProjectIndex, liveProjectUrl, document, URL, AbortController,
     fetch: fetcher,
     mountNpmDownloads: node => mountNpmDownloads(node, { fetch: fetcher }),
+    mountGithubStars: node => mountGithubStars(node, { fetch: fetcher, document, window: null, snapshot: seed }),
     window: {}, location: { href: `https://staging.batikanor.com/?view=live-projects${project ? `&project=${project}` : ''}` },
     addEventListener: (type, callback) => listeners.set(type, callback),
     removeEventListener: (type, callback) => { if (listeners.get(type) === callback) listeners.delete(type); },
@@ -127,7 +131,7 @@ function fixture(project = null, { hasResizeObserver = true } = {}) {
   const controller = context.startLiveProjects();
   const walk = node => [node, ...node.children.flatMap(walk)];
   const all = className => walk(controller.root).filter(node => node.className.split(' ').includes(className));
-  const respond = (index, body, { ok = true, status = 200 } = {}) => requests[index].resolve({ ok, status, json: async () => body });
+  const respond = (index, body, { ok = true, status = 200 } = {}) => requests[index].resolve({ ok, status, json: async () => body && ({ verified_at: new Date().toISOString(), ...body }) });
   const respondNpm = (index, body, { ok = true } = {}) => npmRequests[index].resolve({ ok, json: async () => body });
   return { context, document, app, controller, pushes, listeners, observers, createdFrames, requests, npmRequests, respond, respondNpm, all, one: className => all(className)[0], nodes: () => walk(controller.root) };
 }
@@ -452,13 +456,14 @@ test('previous and next controls wrap the selected window without recreating its
   f.controller.dispose();
 });
 
-function assertDatedStarsFallback(f) {
+function assertVerifiedStars(f) {
   const stars = f.one('live-projects-github-stars');
-  assert.ok(stars, 'Gralobe retains its GitHub stars link when a fresh count is unavailable');
-  assert.equal(stars.querySelector('.stat-pennant-number').textContent, '120');
+  assert.ok(stars, 'Gralobe retains its verified number and native GitHub link while refreshing');
+  assert.equal(stars.querySelector('.stat-pennant-number').textContent, String(seed.stargazers_count));
   assert.match(stars.getAttribute('aria-label'), /120 GitHub stars/);
-  assert.match([stars.textContent, stars.title, stars.getAttribute('aria-label')].filter(Boolean).join(' '), /2026-10-23/,
-    'a fallback count is identified by the date on which it was checked');
+  assert.doesNotMatch(`${stars.title} ${stars.getAttribute('aria-label')}`, /unavailable|retry|refresh|verified/i);
+  assert.equal(stars.hidden, false);
+  assert.equal(stars.dataset.githubRepo, 'batikanor/gralobe');
   return stars;
 }
 
@@ -507,7 +512,7 @@ test('Maptheory keeps its owner-supplied visitor pennant plain and visible regar
 
 test('Gralobe keeps one native stars link in its window regardless of selection and caches fresh metadata', async () => {
   const f = fixture();
-  const stars = assertDatedStarsFallback(f);
+  const stars = assertVerifiedStars(f);
   assert.equal(f.requests.length, 1, 'the visible Gralobe counter refreshes even while another project is selected');
   assert.ok(stars.parent.classList.contains('live-projects-window-stats'));
   assert.equal(stars.parent.parent.parent, f.all('live-projects-card')[3]);
@@ -531,7 +536,7 @@ test('Gralobe keeps one native stars link in its window regardless of selection 
   assert.ok(stars.parent.parent.classList.contains('has-project-stats'));
   assert.equal(f.all('live-projects-github-stars').length, 1, 'selected details do not duplicate the persistent counter');
   assert.equal(f.requests.length, 1);
-  assert.equal(f.requests[0].url, 'https://api.github.com/repos/batikanor/gralobe');
+  assert.equal(f.requests[0].url, GITHUB_STARS_URL);
   assert.ok(f.requests[0].options.signal instanceof AbortSignal);
   assert.equal(f.requests[0].options.signal.aborted, false);
   f.respond(0, { full_name: 'batikanor/gralobe', stargazers_count: 103 });
@@ -549,7 +554,7 @@ test('Gralobe keeps one native stars link in its window regardless of selection 
 
 test('selection keeps visible metadata requests running without recreating the native counter nodes', async () => {
   const f = fixture('gralobe');
-  const stars = assertDatedStarsFallback(f);
+  const stars = assertVerifiedStars(f);
   const downloads = f.one('live-projects-npm-downloads');
   f.controller.selectProject('space-cottbus');
   assert.equal(f.requests[0].options.signal.aborted, false);
@@ -619,7 +624,7 @@ test('npm metadata failure keeps the native package link without presenting a fi
 
 test('BFCache suspends both counters and refetches current data without restarting the preview', async () => {
   const f = fixture('cottbus');
-  const stars = assertDatedStarsFallback(f), downloads = f.one('live-projects-npm-downloads');
+  const stars = assertVerifiedStars(f), downloads = f.one('live-projects-npm-downloads');
   const frame = f.one('live-projects-site-frame');
   const pageShow = f.listeners.get('pageshow');
   f.listeners.get('pagehide')();
@@ -631,7 +636,7 @@ test('BFCache suspends both counters and refetches current data without restarti
   f.respond(0, { full_name: 'batikanor/gralobe', stargazers_count: 700 });
   f.respondNpm(0, { package: 'gralobe', start: '2026-10-18', end: '2026-10-18', downloads: 1 });
   await settleRequests();
-  assertDatedStarsFallback(f);
+  assertVerifiedStars(f);
   assert.equal(f.npmRequests.length, 2, 'a cancelled npm response cannot start a range request');
   f.respond(1, { full_name: 'batikanor/gralobe', stargazers_count: 121 });
   f.respondNpm(1, { package: 'gralobe', start: '2026-10-22', end: '2026-10-22', downloads: 57 });
@@ -653,19 +658,19 @@ test('BFCache suspends both counters and refetches current data without restarti
 
 test('disposing the controller aborts pending GitHub metadata and prevents detached updates', async () => {
   const f = fixture('gralobe');
-  const stars = assertDatedStarsFallback(f);
+  const stars = assertVerifiedStars(f);
   f.controller.dispose();
   assert.equal(f.requests[0].options.signal.aborted, true);
   assert.equal(f.npmRequests[0].options.signal.aborted, true);
   f.respond(0, { full_name: 'batikanor/gralobe', stargazers_count: 500 });
   await settleRequests();
-  assert.equal(stars.querySelector('.stat-pennant-number').textContent, '120');
+  assert.equal(stars.querySelector('.stat-pennant-number').textContent, String(seed.stargazers_count));
   assert.equal(f.app.children.length, 0);
   f.controller.selectProject('gralobe');
   assert.equal(f.requests.length, 1, 'detached controls cannot start another request');
 });
 
-test('failed GitHub requests preserve the dated count and the native repository link', async t => {
+test('failed feed requests silently retain the verified count and native repository link', async t => {
   for (const [name, fail] of [
     ['network error', f => f.requests[0].reject(new Error('Network unavailable'))],
     ['rate limit', f => f.respond(0, { message: 'Rate limit exceeded' }, { ok: false, status: 429 })],
@@ -675,7 +680,7 @@ test('failed GitHub requests preserve the dated count and the native repository 
       const f = fixture('gralobe');
       fail(f);
       await settleRequests();
-      assert.equal(assertDatedStarsFallback(f).href, 'https://github.com/batikanor/gralobe');
+      assert.equal(assertVerifiedStars(f).href, 'https://github.com/batikanor/gralobe');
       f.controller.selectProject('cottbus');
       assert.equal(f.one('live-projects-site-frame').src, LIVE_PROJECTS[2].url, 'metadata failure does not break project navigation');
       f.controller.dispose();
@@ -698,7 +703,7 @@ test('GitHub counts require the expected repository and a safe nonnegative integ
       const f = fixture('gralobe');
       f.respond(0, body);
       await settleRequests();
-      assertDatedStarsFallback(f);
+      assertVerifiedStars(f);
       f.controller.dispose();
     });
   }

@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {runInNewContext} from 'node:vm';
 import {LIVE_PROJECTS} from '../src/liveProjectsData.js';
+import {GITHUB_STARS_SNAPSHOT} from '../src/githubStarsData.js';
 
 const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const css = readFileSync(new URL('../src/intro.css', import.meta.url), 'utf8');
@@ -118,8 +119,10 @@ test('Gralobe exposes native GitHub stars and npm links independently of its log
     'https://github.com/batikanor/gralobe',
     'https://www.npmjs.com/package/gralobe',
   ]);
-  assert.equal(links[0].attrs['aria-label'], '120 GitHub stars');
-  assert.equal(text(descendants(links[0]).find(node => hasClass(node, 'stat-pennant-number'))), '120');
+  assert.equal(links[0].attrs['aria-label'], `${GITHUB_STARS_SNAPSHOT.stargazers_count.toLocaleString('en-US')} GitHub stars — view repository, opens in a new tab`);
+  assert.equal(links[0].attrs['data-github-repo'], 'batikanor/gralobe');
+  assert.equal(links[0].attrs.title, undefined, 'no historical count is presented as live metadata');
+  assert.equal(text(descendants(links[0]).find(node => hasClass(node, 'stat-pennant-number'))), GITHUB_STARS_SNAPSHOT.stargazers_count.toLocaleString('en-US'));
   assert.ok(links.every(link => hasClass(link, 'stat-pennant')));
   assert.equal(links[1].attrs['data-npm-package'], 'gralobe');
   assert.equal(links[1].attrs['data-npm-published-on'], '2025-11-29');

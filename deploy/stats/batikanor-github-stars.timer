@@ -1,0 +1,11 @@
+[Unit]
+Description=Refresh Batikanor's shared GitHub star feed every two minutes
+
+[Timer]
+OnBootSec=2min
+OnUnitInactiveSec=2min
+AccuracySec=1s
+Unit=batikanor-github-stars.service
+
+[Install]
+WantedBy=timers.target

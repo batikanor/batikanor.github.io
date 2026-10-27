@@ -1,0 +1,7 @@
+    # BEGIN batikanor GitHub stars feed
+    @batikanorGithubStars path /stats/github/batikanor/gralobe.json
+    header @batikanorGithubStars {
+        Access-Control-Allow-Origin "*"
+        Cache-Control "public, max-age=30"
+    }
+    # END batikanor GitHub stars feed

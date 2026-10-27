@@ -1,4 +1,5 @@
 import {mountNpmDownloads} from './npmDownloads.js';
+import {mountGithubStars} from './githubStars.js';
 
 const mountedFans = new WeakMap();
 const modified = event => event.ctrlKey || event.metaKey || event.altKey || event.shiftKey;
@@ -16,6 +17,7 @@ export function mountIntroProjectFan(fan, {
   })).filter(card => card.id && card.surface && card.logo);
   const listeners = [], seenMoves = new WeakSet();
   let downloads = mountNpmDownloads(fan.querySelector('.intro-project-downloads'));
+  let stars = mountGithubStars(fan.querySelector('.intro-project-stars'));
   let selectedIndex = -1, gesture = null, suppressPointerClick = false, disposed = false;
   const wrap = index => (index % cards.length + cards.length) % cards.length;
   const listen = (target, type, handler, options) => {
@@ -132,16 +134,22 @@ export function mountIntroProjectFan(fan, {
       cancelGesture();
       downloads?.dispose();
       downloads = null;
+      stars?.dispose();
+      stars = null;
     }
     else dispose();
   }
   function pageShown(event) {
-    if (event.persisted && !disposed && !downloads) downloads = mountNpmDownloads(fan.querySelector('.intro-project-downloads'));
+    if (!event.persisted || disposed) return;
+    downloads ||= mountNpmDownloads(fan.querySelector('.intro-project-downloads'));
+    stars ||= mountGithubStars(fan.querySelector('.intro-project-stars'));
+    void stars?.refresh();
   }
   function dispose() {
     if (disposed) return;
     disposed = true;finishGesture(true);
     downloads?.dispose();
+    stars?.dispose();
     for (const remove of listeners.splice(0)) remove();
     if (mountedFans.get(fan) === api) mountedFans.delete(fan);
   }

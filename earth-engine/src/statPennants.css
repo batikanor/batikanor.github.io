@@ -121,3 +121,5 @@ a.stat-pennant:hover::before {
 @media (prefers-reduced-motion: no-preference) {
   .stat-pennant::before { transition: filter .15s ease, clip-path .15s ease; }
 }
+/* A badge without any verified value stays absent until its first success. */
+[data-github-repo][hidden] { display: none !important; }

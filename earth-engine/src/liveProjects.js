@@ -1,6 +1,7 @@
 import { LIVE_PROJECTS, adjacentLiveProject, liveProjectIndex, liveProjectUrl } from './liveProjectsData.js';
 import { decorateBrandLink } from './brandLinks.js';
 import { mountNpmDownloads } from './npmDownloads.js';
+import { mountGithubStars } from './githubStars.js';
 import './liveProjects.css';
 
 const el = (tag, className, text) => {
@@ -226,6 +227,7 @@ export function startLiveProjects({ project } = {}) {
       const stars = item.githubRepo ? pennant('live-projects-github-stars', 'github', 'stars') : null;
       const downloads = item.npmPackage ? pennant('live-projects-npm-downloads', 'npm', 'downloads') : null;
       if (stars) {
+        stars.dataset.githubRepo = item.githubRepo;
         stars.href = `https://github.com/${item.githubRepo}`;
         stars.target = '_blank';
         stars.rel = 'noopener noreferrer';
@@ -240,7 +242,7 @@ export function startLiveProjects({ project } = {}) {
         downloads.querySelector('.stat-pennant-number').setAttribute('data-npm-count', '');
         stats.append(downloads);
       }
-      if (stars || downloads) projectStats.push({ item, stars, downloads, npmController: null });
+      if (stars || downloads) projectStats.push({ item, stars, downloads, githubController: null, npmController: null });
       chrome.append(stats);
     }
     button.addEventListener('click', () => selectProject(index));
@@ -284,8 +286,6 @@ export function startLiveProjects({ project } = {}) {
   let disposed = false;
   let activeFrame = null;
   let previewProjectId = null;
-  const starRequests = new Map();
-  const starCounts = new Map();
   let arranged = false;
   function moveWindow(index, x, y) {
     const offset = windowOffsets[index];
@@ -303,9 +303,9 @@ export function startLiveProjects({ project } = {}) {
     arranged = true;
   }
   function suspendMetadata() {
-    for (const request of starRequests.values()) request.abort();
-    starRequests.clear();
     for (const stats of projectStats) {
+      stats.githubController?.dispose();
+      stats.githubController = null;
       stats.npmController?.dispose();
       stats.npmController = null;
     }
@@ -322,38 +322,13 @@ export function startLiveProjects({ project } = {}) {
       return row;
     }));
   }
-  function loadStars(item, stars, refresh = false) {
-    const showCount = count => {
-      const formatted = count.toLocaleString('en-US');
-      stars.querySelector('.stat-pennant-number').textContent = formatted;
-      stars.querySelector('.stat-pennant-label').textContent = count === 1 ? 'star' : 'stars';
-      stars.setAttribute('aria-label', `${formatted} GitHub ${count === 1 ? 'star' : 'stars'} — view repository, opens in a new tab`);
-    };
-    showCount(starCounts.get(item.githubRepo) ?? item.githubStars);
-    stars.title = starCounts.has(item.githubRepo) ? 'Current star count on GitHub' : `GitHub star count checked ${item.githubStarsCheckedAt}`;
-    if (!refresh && (starCounts.has(item.githubRepo) || starRequests.has(item.githubRepo))) return;
-    starRequests.get(item.githubRepo)?.abort();
-    const request = new AbortController();
-    starRequests.set(item.githubRepo, request);
-    fetch(`https://api.github.com/repos/${item.githubRepo}`, { signal: request.signal, credentials: 'omit' })
-      .then(response => response.ok ? response.json() : null)
-      .then(data => {
-        if (disposed || request.signal.aborted || starRequests.get(item.githubRepo) !== request) return;
-        const count = data?.stargazers_count;
-        if (data?.full_name !== item.githubRepo || !Number.isSafeInteger(count) || count < 0) return;
-        starCounts.set(item.githubRepo, count);
-        showCount(count);
-        stars.title = 'Current star count on GitHub';
-      })
-      .catch(() => { /* Keep the last verified count when GitHub is unavailable. */ })
-      .finally(() => {
-        if (starRequests.get(item.githubRepo) === request) starRequests.delete(item.githubRepo);
-      });
-  }
   function refreshMetadata(refresh = false) {
     if (disposed) return;
     for (const stats of projectStats) {
-      if (stats.stars) loadStars(stats.item, stats.stars, refresh);
+      if (stats.stars) {
+        stats.githubController ||= mountGithubStars(stats.stars);
+        if (refresh) void stats.githubController?.refresh();
+      }
       if (stats.downloads) stats.npmController ||= mountNpmDownloads(stats.downloads);
     }
   }

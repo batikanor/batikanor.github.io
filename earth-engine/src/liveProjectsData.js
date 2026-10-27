@@ -55,8 +55,6 @@ export const LIVE_PROJECTS = Object.freeze([
       'Visualise world statistics and your own geographic data.',
     ]),
     githubRepo: 'batikanor/gralobe',
-    githubStars: 120,
-    githubStarsCheckedAt: '2026-10-23',
     npmPackage: 'gralobe',
     npmPublishedOn: '2025-11-29',
     accent: '#a8c9e2',

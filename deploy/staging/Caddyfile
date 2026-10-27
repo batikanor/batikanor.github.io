@@ -19,5 +19,11 @@
     @html path / /index.html *.html */
     header @html Cache-Control "no-cache"
 
+    # One fixed public feed, independent of immutable application releases.
+    handle /site-data/gralobe-stars.json {
+        rewrite * /stats/github/batikanor/gralobe.json
+        reverse_proxy batikanor-release-artifacts:8080
+    }
+
     file_server
 }
